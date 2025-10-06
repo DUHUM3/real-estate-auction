@@ -333,41 +333,36 @@ const Home = () => {
       </div>
 
       {/* قسم الهيرو مع خلفية متحركة */}
-      <section className="hero-section" id="home">
-        <div className={`hero-background slide-${currentSlide}`}></div>
-        <div className="hero-content container">
-          
-          {/* العنوان مع المربع الشفاف */}
-          <div className="hero-title-container">
-            <h1 className="title-with-decoration">
-              استثمر في أفضل <span className="land-word">الأراضي</span>
-              <div className="transparent-box"></div>
-            </h1>
-          </div>
-          
-          <p>منصة متكاملة لشراء وبيع الأراضي والعقارات عبر مزادات إلكترونية آمنة وموثوقة</p>
-          
-          {/* فلتر البحث المختصر */}
-          <div className="search-filter">
-            <form onSubmit={handleSearch} className="filter-form">
-              <div className="filter-group">
-                <input
-                  type="text"
-                  placeholder="ابحث عن منطقة أو عقار..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <FaSearch className="search-icon" />
-              </div>
-              
-              <button type="submit" className="search-submit">
-                بحث
-              </button>
-            </form>
-          </div>
-          
+    <section className="hero-section" id="home">
+  <div className={`hero-background slide-${currentSlide}`}></div>
+
+  <div className="hero-content container">
+    <div className="hero-title-container">
+      <h1 className="title-with-decoration">
+        استثمر في أفضل <span className="land-word">الأراضي</span>
+        <div className="transparent-box"></div>
+      </h1>
+    </div>
+
+    <p>منصة متكاملة لشراء وبيع الأراضي والعقارات عبر مزادات إلكترونية آمنة وموثوقة</p>
+
+    <div className="search-filter">
+      <form onSubmit={handleSearch} className="filter-form">
+        <div className="filter-group">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <span className="typing-placeholder"></span>
         </div>
-      </section>
+        <button type="submit" className="search-submit">بحث</button>
+      </form>
+    </div>
+  </div>
+</section>
+
 
       {/* قسم استكشفوا خدماتنا المحدث */}
       <section className="services-section">
@@ -419,7 +414,7 @@ const Home = () => {
               العقارات المتاحة
               <div className="transparent-box"></div>
             </h2>
-            <p>استكشف أحدث العقارات المتاحة في مختلف المناطق</p>
+            {/* <p>استكشف أحدث العقارات المتاحة في مختلف المناطق</p> */}
           </div>
 
           {/* شريط التبويب */}
@@ -643,7 +638,7 @@ const Home = () => {
               لماذا تختارنا؟
               <div className="transparent-box"></div>
             </h2>
-            <p>أسباب تجعلنا الخيار الأمثل لاستثمارك العقاري</p>
+            {/* <p>أسباب تجعلنا الخيار الأمثل لاستثمارك العقاري</p> */}
           </div>
           
           <div className="why-us-grid">

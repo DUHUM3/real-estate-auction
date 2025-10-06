@@ -47,6 +47,8 @@ body {
   color: var(--background-white);
   overflow: hidden;
   padding: 10px 0;
+  margin-top: 36px; /* 🔹 المسافة تحت الـ Navbar */
+  box-shadow: var(--shadow-sm); /* لمسة جمالية بسيطة */
 }
 
 .ticker-content {
@@ -110,9 +112,15 @@ body {
 /* ===== قسم الهيرو ===== */
 .hero-section {
   position: relative;
-  height: 85vh;
+  height: 95vh; /* أطول قليلاً */
   overflow: hidden;
   color: white;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    height: 115vh; /* أطول في الهاتف */
+  }
 }
 
 .hero-background {
@@ -127,18 +135,23 @@ body {
   z-index: -1;
 }
 
+/* ===== الصور ===== */
 .slide-0 {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+    url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
 }
 
 .slide-1 {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+    url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
 }
 
 .slide-2 {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+    url('https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
 }
 
+/* ===== المحتوى ===== */
 .hero-content {
   height: 100%;
   display: flex;
@@ -146,6 +159,7 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding-top: 60px;
+  animation: fadeInUp 1.3s ease both;
 }
 
 .hero-title-container {
@@ -154,76 +168,204 @@ body {
 }
 
 .title-with-decoration {
-  position: relative;
   font-size: 3.2rem;
   font-weight: 800;
   color: white;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+  animation: fadeIn 2s ease both;
 }
 
 .land-word {
-  position: relative;
   color: var(--secondary-color);
 }
 
 .hero-content p {
-  font-size: 1.3rem;
-  margin-bottom: 30px;
+  font-size: 1.25rem;
+  margin-bottom: 35px;
   max-width: 600px;
-  line-height: 1.7;
+  line-height: 1.8;
+  opacity: 0.9;
+  animation: fadeIn 2.5s ease both;
 }
 
+/* ===== تصميم البحث العصري ===== */
 .search-filter {
   width: 100%;
-  max-width: 700px;
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: var(--border-radius-md);
-  padding: 15px 20px;
-  box-shadow: var(--shadow-md);
+  max-width: 650px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px 20px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.35);
+  animation: fadeInUp 1.8s ease both;
+  transition: all 0.3s ease;
 }
 
 .filter-form {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
-.filter-form .filter-group {
+.filter-group {
   flex: 1;
   position: relative;
 }
-
+/* ===== إدخال البحث الناعم ===== */
 .filter-form input {
   width: 100%;
-  padding: 12px 45px 12px 15px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
+  padding: 12px 15px 12px 42px;
+  border: none;
+  border-radius: 10px;
   font-family: 'Tajawal', sans-serif;
-  font-size: 16px;
+  font-size: 15.5px;
+  background-color: rgba(255, 255, 255, 0.75);
+  outline: none;
+  transition: all 0.35s ease;
 }
 
+.filter-form input:focus {
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+  transform: scale(1.02);
+}
+
+/* ===== أيقونة البحث ===== */
 .search-icon {
   position: absolute;
-  right: 15px;
+  left: 13px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-light);
+  color: var(--primary-color);
+  font-size: 18px;
+  opacity: 0.9;
 }
 
+/* ===== زر البحث ===== */
 .search-submit {
   background-color: var(--primary-color);
   color: white;
   border: none;
-  border-radius: var(--border-radius-sm);
-  padding: 12px 30px;
-  margin-right: 15px;
+  border-radius: 10px;
+  padding: 12px 24px;
   font-family: 'Tajawal', sans-serif;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color var(--transition-speed);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  min-width: 80px;
 }
 
 .search-submit:hover {
   background-color: #0f2d44;
+  transform: scale(1.05);
+}
+
+/* ===== النص المتحرك داخل حقل البحث ===== */
+.typing-placeholder {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 2px solid #888;
+  animation: typing 3.5s steps(25, end) infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes typing {
+  0% { width: 0ch; opacity: 0.5; }
+  50% { width: 15ch; opacity: 1; }
+  100% { width: 0ch; opacity: 0.5; }
+}
+
+.typing-placeholder::before {
+  content: "ابحث عن عقار أو منطقة...";
+}
+
+/* ===== تحسين الموبايل ===== */
+@media (max-width: 768px) {
+  .search-filter {
+    padding: 12px 14px;
+    max-width: 100%;
+    margin: 0 auto;
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .filter-form {
+    flex-direction: row; /* إبقاء التصميم أفقي */
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    flex: 1;
+    min-width: 0; /* يمنع التمدد الزائد */
+  }
+
+  .filter-form input {
+    font-size: 14px;
+    padding: 10px 12px 10px 38px;
+    height: 42px;
+    border-radius: 8px;
+  }
+
+  .search-icon {
+    left: 10px;
+    font-size: 16px;
+  }
+
+  /* حل مشكلة الزر - كود واحد فقط */
+  .search-submit {
+    width: auto; /* لا يأخذ العرض كاملاً */
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    height: 42px;
+    min-width: 70px;
+    margin: 0; /* إزالة أي margin إضافي */
+  }
+}
+
+/* ===== تحسينات إضافية للهواتف الصغيرة جداً ===== */
+@media (max-width: 480px) {
+  .search-filter {
+    padding: 10px 12px;
+  }
+
+  .filter-form input {
+    font-size: 13px;
+    padding: 8px 10px 8px 32px;
+    height: 38px;
+  }
+
+  .search-icon {
+    left: 8px;
+    font-size: 14px;
+  }
+
+  .search-submit {
+    font-size: 13px;
+    padding: 8px 14px;
+    height: 38px;
+    min-width: 60px;
+  }
+}
+
+/* ===== الحركات العامة ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ===== قسم الخدمات ===== */
@@ -975,14 +1117,14 @@ body {
     padding: 20px 15px;
   }
   
-  .filter-form {
+  /* .filter-form {
     flex-direction: column;
-  }
+  } */
   
-  .search-submit {
+  /* .search-submit {
     margin: 15px 0 0;
     width: 100%;
-  }
+  } */
   
   .contact-info {
     grid-template-columns: 1fr;
