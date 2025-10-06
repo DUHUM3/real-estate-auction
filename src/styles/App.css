@@ -109,6 +109,8 @@ body {
   font-size: 1.1rem;
 }
 
+
+
 /* ===== قسم الهيرو ===== */
 .hero-section {
   position: relative;
@@ -467,10 +469,18 @@ body {
   background-color: var(--background-light);
 }
 
+.properties-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
 .properties-tabs {
   display: flex;
-  justify-content: center;
-  margin-bottom: 30px;
+  gap: 10px;
 }
 
 .tab-button {
@@ -491,22 +501,62 @@ body {
   border-bottom-color: var(--secondary-color);
 }
 
+/* زر تبديل الفلتر */
+.filter-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--border-radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.filter-toggle-btn:hover {
+  background-color: #0f2d44;
+  transform: translateY(-2px);
+}
+
+/* الفلتر المتقدم - مخفي بشكل افتراضي */
 .advanced-filter {
   background-color: var(--background-white);
   border-radius: var(--border-radius-md);
-  padding: 20px;
   margin-bottom: 30px;
   box-shadow: var(--shadow-sm);
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.advanced-filter.show {
+  max-height: 500px;
+  padding: 20px;
+}
+
+.filter-content {
+  opacity: 0;
+  transition: opacity 0.3s ease 0.1s;
+}
+
+.advanced-filter.show .filter-content {
+  opacity: 1;
 }
 
 .filter-row {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
+  margin-bottom: 20px;
 }
 
 .filter-group {
   flex: 1 1 180px;
+  min-width: 150px;
 }
 
 .filter-group select,
@@ -518,13 +568,21 @@ body {
   font-family: 'Tajawal', sans-serif;
   font-size: 15px;
   background-color: white;
+  transition: all var(--transition-speed);
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(22, 53, 77, 0.1);
 }
 
 .filter-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
   gap: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
 }
 
 .filter-btn,
@@ -535,7 +593,7 @@ body {
   font-weight: 500;
   border: none;
   cursor: pointer;
-  transition: background-color var(--transition-speed);
+  transition: all var(--transition-speed);
 }
 
 .filter-btn {
@@ -545,6 +603,7 @@ body {
 
 .filter-btn:hover {
   background-color: #0f2d44;
+  transform: translateY(-2px);
 }
 
 .reset-btn {
@@ -554,8 +613,58 @@ body {
 
 .reset-btn:hover {
   background-color: #e2e6ea;
+  transform: translateY(-2px);
 }
 
+/* حاوية العقارات */
+.properties-container {
+  position: relative;
+}
+
+/* عناصر التحكم في العرض للهواتف */
+.properties-header-mobile {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: var(--background-white);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.nav-btn:disabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.nav-btn:not(:disabled):hover {
+  background-color: #0f2d44;
+  transform: scale(1.1);
+}
+
+.properties-count {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 14px;
+}
+
+/* شبكة العقارات */
 .properties-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -607,6 +716,7 @@ body {
 .view-all-btn:hover {
   background-color: var(--primary-color);
   color: white;
+  transform: translateY(-2px);
 }
 
 /* ===== بطاقات الأراضي والمزادات ===== */
@@ -639,6 +749,12 @@ body {
   height: 200px;
   object-fit: cover;
   display: block;
+  transition: transform var(--transition-speed);
+}
+
+.land-card:hover .land-image img,
+.auction-card:hover .auction-image img {
+  transform: scale(1.05);
 }
 
 .land-tag,
@@ -687,7 +803,7 @@ body {
 }
 
 .action-btn {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.9);
   border: none;
   width: 36px;
   height: 36px;
@@ -697,6 +813,11 @@ body {
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition-speed);
+  backdrop-filter: blur(10px);
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
 }
 
 .save-btn:hover {
@@ -719,6 +840,7 @@ body {
   color: var(--primary-color);
   margin-bottom: 8px;
   font-size: 18px;
+  line-height: 1.4;
 }
 
 .location {
@@ -739,6 +861,7 @@ body {
   display: flex;
   gap: 15px;
   margin-bottom: 15px;
+  flex-wrap: wrap;
 }
 
 .land-details span,
@@ -772,14 +895,15 @@ body {
 .bid-btn,
 .details-btn {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: none;
   border-radius: var(--border-radius-sm);
   font-family: 'Tajawal', sans-serif;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color var(--transition-speed);
+  transition: all var(--transition-speed);
   margin-top: 10px;
+  font-size: 15px;
 }
 
 .view-btn {
@@ -789,6 +913,7 @@ body {
 
 .view-btn:hover {
   background-color: #0f2d44;
+  transform: translateY(-2px);
 }
 
 .auction-company {
@@ -846,6 +971,7 @@ body {
 
 .bid-btn:hover {
   background-color: #e67700;
+  transform: translateY(-2px);
 }
 
 .details-btn {
@@ -856,8 +982,168 @@ body {
 
 .details-btn:hover {
   background-color: #e2e6ea;
+  transform: translateY(-2px);
 }
 
+/* معلومات المزاد الإضافية */
+.auction-info {
+  background-color: var(--secondary-light);
+  padding: 10px;
+  border-radius: var(--border-radius-sm);
+  margin: 10px 0;
+}
+
+.auction-title {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ===== تحسينات للهواتف ===== */
+@media (max-width: 768px) {
+  .properties-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .properties-tabs {
+    justify-content: center;
+  }
+  
+  .tab-button {
+    padding: 8px 20px;
+    font-size: 15px;
+  }
+  
+  .filter-toggle-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 13px;
+    padding: 8px 15px;
+  }
+  
+  .advanced-filter.show {
+    padding: 15px;
+  }
+  
+  .filter-row {
+    gap: 10px;
+  }
+  
+  .filter-group {
+    flex: 1 1 100%;
+  }
+  
+  .filter-group select,
+  .filter-group input {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  
+  .filter-actions {
+    flex-direction: column;
+  }
+  
+  .filter-btn,
+  .reset-btn {
+    width: 100%;
+    padding: 12px;
+  }
+  
+  .properties-header-mobile {
+    display: flex;
+  }
+  
+  .properties-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 20px 0;
+    margin: -20px 0;
+    gap: 15px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) var(--background-light);
+  }
+  
+  .properties-grid::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .properties-grid::-webkit-scrollbar-track {
+    background: var(--background-light);
+    border-radius: 10px;
+  }
+  
+  .properties-grid::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+  }
+  
+  .land-card,
+  .auction-card {
+    flex: 0 0 300px;
+    scroll-snap-align: start;
+    margin: 0;
+  }
+  
+  .properties-count {
+    font-size: 12px;
+  }
+  
+  .nav-btn {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .properties-section {
+    padding: 60px 0;
+  }
+  
+  .tab-button {
+    padding: 6px 15px;
+    font-size: 14px;
+  }
+  
+  .land-card,
+  .auction-card {
+    flex: 0 0 280px;
+  }
+  
+  .land-content,
+  .auction-content {
+    padding: 15px;
+  }
+  
+  .land-content h3,
+  .auction-content h3 {
+    font-size: 16px;
+  }
+  
+  .land-price {
+    font-size: 18px;
+  }
+  
+  .view-btn,
+  .bid-btn,
+  .details-btn {
+    padding: 10px;
+    font-size: 14px;
+  }
+}
+
+/* تحسينات للأجهزة اللوحية */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .properties-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .filter-group {
+    flex: 1 1 200px;
+  }
+}
 /* ===== قسم لماذا تختارنا ===== */
 .why-us-section {
   background-color: var(--background-white);

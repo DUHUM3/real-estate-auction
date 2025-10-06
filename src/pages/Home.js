@@ -2,14 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   FaSearch, 
   FaMapMarkerAlt, 
-  FaBed, 
-  FaBath, 
   FaRulerCombined,
-  FaHeart,
-  FaBuilding,
-  FaHome,
-  FaLandmark,
-  FaCity,
   FaMoneyBillWave,
   FaChartLine,
   FaUsers,
@@ -19,17 +12,16 @@ import {
   FaPhone,
   FaEnvelope,
   FaClock,
-  FaFacebookF,
-  FaTwitter,
-  FaInstagram,
-  FaLinkedinIn,
   FaCalendarAlt,
-  FaGavel,
   FaTag,
   FaStar,
   FaShareAlt,
   FaBookmark,
-  FaReact
+  FaReact,
+  FaFilter,
+  FaChevronRight,
+  FaChevronLeft,
+  FaLandmark
 } from 'react-icons/fa';
 
 // مكون بطاقة الأرض
@@ -146,6 +138,9 @@ const Home = () => {
   const [lands, setLands] = useState([]);
   const [auctions, setAuctions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage] = useState(6);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeService, setActiveService] = useState('large-lands');
   const [filterType, setFilterType] = useState('lands');
@@ -162,6 +157,27 @@ const Home = () => {
     endDate: '',
     maxDaysLeft: ''
   });
+
+  // حساب العناصر المعروضة
+  const displayedItems = filterType === 'lands' ? lands : auctions;
+
+  // دوال التنقل بين الصفحات
+  const nextPage = () => {
+    if (currentPage < Math.ceil(displayedItems.length / itemsPerPage) - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // العناصر الحالية للعرض
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = displayedItems.slice(startIndex, endIndex);
 
   // محاكاة جلب البيانات
   useEffect(() => {
@@ -397,238 +413,252 @@ const Home = () => {
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
-              <a href="#" className="learn-more">
-                <span className="arrow">←</span>
-                {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
-              </a>
+          <button className="learn-more">
+  <span className="arrow">←</span>
+  {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
+</button>
             </div>
           </div>
         </div>
       </section>
 
       {/* قسم العقارات المحدث مع الفلاتر */}
-      <section className="properties-section" id="properties">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">
-              العقارات المتاحة
-              <div className="transparent-box"></div>
-            </h2>
-            {/* <p>استكشف أحدث العقارات المتاحة في مختلف المناطق</p> */}
-          </div>
+ <section className="properties-section" id="properties">
+  <div className="container">
+    <div className="section-header">
+      <h2 className="section-title">
+        العقارات المتاحة
+        <div className="transparent-box"></div>
+      </h2>
+    </div>
 
-          {/* شريط التبويب */}
-          <div className="properties-tabs">
-            <button 
-              className={`tab-button ${filterType === 'lands' ? 'active' : ''}`}
-              onClick={() => setFilterType('lands')}
-            >
-              الأراضي
-            </button>
-            <button 
-              className={`tab-button ${filterType === 'auctions' ? 'active' : ''}`}
-              onClick={() => setFilterType('auctions')}
-            >
-              المزادات
-            </button>
-          </div>
+    {/* شريط التبويب مع زر الفلتر */}
+    <div className="properties-header">
+      <div className="properties-tabs">
+        <button 
+          className={`tab-button ${filterType === 'lands' ? 'active' : ''}`}
+          onClick={() => {
+            setFilterType('lands');
+            setCurrentPage(0);
+            setShowFilter(false);
+          }}
+        >
+          الأراضي
+        </button>
+        <button 
+          className={`tab-button ${filterType === 'auctions' ? 'active' : ''}`}
+          onClick={() => {
+            setFilterType('auctions');
+            setCurrentPage(0);
+            setShowFilter(false);
+          }}
+        >
+          المزادات
+        </button>
+      </div>
+      
+      <button 
+        className="filter-toggle-btn"
+        onClick={() => setShowFilter(!showFilter)}
+      >
+        <FaFilter />
+        {showFilter ? 'إخفاء الفلتر' : 'عرض الفلتر'}
+      </button>
+    </div>
 
-          {/* الفلتر المتقدم للأراضي */}
-          {filterType === 'lands' && (
-            <div className="advanced-filter">
-              <div className="filter-row">
-                <div className="filter-group">
-                  <select 
-                    value={landFilter.propertyType}
-                    onChange={(e) => handleLandFilterChange('propertyType', e.target.value)}
-                  >
-                    <option value="">نوع العقار</option>
-                    <option value="سكني">سكني</option>
-                    <option value="تجاري">تجاري</option>
-                    <option value="زراعي">زراعي</option>
-                    <option value="صناعي">صناعي</option>
-                    <option value="مختلط">مختلط</option>
-                  </select>
-                </div>
-                
-                <div className="filter-group">
-                  <select 
-                    value={landFilter.city}
-                    onChange={(e) => handleLandFilterChange('city', e.target.value)}
-                  >
-                    <option value="">المدينة</option>
-                    <option value="الرياض">الرياض</option>
-                    <option value="جدة">جدة</option>
-                    <option value="الدمام">الدمام</option>
-                    <option value="مكة">مكة المكرمة</option>
-                  </select>
-                </div>
-                
-                <div className="filter-group">
-                  <select 
-                    value={landFilter.purpose}
-                    onChange={(e) => handleLandFilterChange('purpose', e.target.value)}
-                  >
-                    <option value="">الغرض من العقار</option>
-                    <option value="بيع">بيع</option>
-                    <option value="استثمار">استثمار</option>
-                  </select>
-                </div>
-                
-                <div className="filter-group">
-                  <select 
-                    value={landFilter.priceRange}
-                    onChange={(e) => handleLandFilterChange('priceRange', e.target.value)}
-                  >
-                    <option value="">نطاق السعر</option>
-                    <option value="0-1000000">حتى 1,000,000 ريال</option>
-                    <option value="1000000-3000000">1,000,000 - 3,000,000 ريال</option>
-                    <option value="3000000-5000000">3,000,000 - 5,000,000 ريال</option>
-                    <option value="5000000+">أكثر من 5,000,000 ريال</option>
-                  </select>
-                </div>
-
-                <div className="filter-group">
-                  <select 
-                    value={landFilter.area}
-                    onChange={(e) => handleLandFilterChange('area', e.target.value)}
-                  >
-                    <option value="">المساحة</option>
-                    <option value="0-500">حتى 500 م²</option>
-                    <option value="500-1000">500 - 1,000 م²</option>
-                    <option value="1000-5000">1,000 - 5,000 م²</option>
-                    <option value="5000+">أكثر من 5,000 م²</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="filter-actions">
-                <button className="filter-btn">تطبيق الفلتر</button>
-                <button 
-                  className="reset-btn"
-                  onClick={() => setLandFilter({
-                    propertyType: '',
-                    city: '',
-                    purpose: '',
-                    priceRange: '',
-                    area: ''
-                  })}
+    {/* الفلتر المتقدم - مخفي بشكل افتراضي */}
+    <div className={`advanced-filter ${showFilter ? 'show' : ''}`}>
+      <div className="filter-content">
+        {/* الفلتر المتقدم للأراضي */}
+        {filterType === 'lands' && (
+          <div className="filter-section">
+            <div className="filter-row">
+              <div className="filter-group">
+                <select 
+                  value={landFilter.propertyType}
+                  onChange={(e) => handleLandFilterChange('propertyType', e.target.value)}
                 >
-                  إعادة تعيين
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* الفلتر المتقدم للمزادات */}
-          {filterType === 'auctions' && (
-            <div className="advanced-filter">
-              <div className="filter-row">
-                <div className="filter-group">
-                  <select 
-                    value={auctionFilter.city}
-                    onChange={(e) => handleAuctionFilterChange('city', e.target.value)}
-                  >
-                    <option value="">المدينة</option>
-                    <option value="الرياض">الرياض</option>
-                    <option value="جدة">جدة</option>
-                    <option value="الدمام">الدمام</option>
-                    <option value="مكة">مكة المكرمة</option>
-                  </select>
-                </div>
-                
-                <div className="filter-group">
-                  <input
-                    type="date"
-                    value={auctionFilter.startDate}
-                    onChange={(e) => handleAuctionFilterChange('startDate', e.target.value)}
-                    placeholder="من تاريخ"
-                  />
-                </div>
-                
-                <div className="filter-group">
-                  <input
-                    type="date"
-                    value={auctionFilter.endDate}
-                    onChange={(e) => handleAuctionFilterChange('endDate', e.target.value)}
-                    placeholder="إلى تاريخ"
-                  />
-                </div>
-                
-                <div className="filter-group">
-                  <select 
-                    value={auctionFilter.maxDaysLeft}
-                    onChange={(e) => handleAuctionFilterChange('maxDaysLeft', e.target.value)}
-                  >
-                    <option value="">الأيام المتبقية</option>
-                    <option value="7">أقل من أسبوع</option>
-                    <option value="15">أقل من أسبوعين</option>
-                    <option value="30">أقل من شهر</option>
-                    <option value="60">أقل من شهرين</option>
-                  </select>
-                </div>
+                  <option value="">نوع العقار</option>
+                  <option value="سكني">سكني</option>
+                  <option value="تجاري">تجاري</option>
+                  <option value="زراعي">زراعي</option>
+                  <option value="صناعي">صناعي</option>
+                  <option value="مختلط">مختلط</option>
+                </select>
               </div>
               
-              <div className="filter-actions">
-                <button className="filter-btn">تطبيق الفلتر</button>
-                <button 
-                  className="reset-btn"
-                  onClick={() => setAuctionFilter({
-                    city: '',
-                    startDate: '',
-                    endDate: '',
-                    maxDaysLeft: ''
-                  })}
+              <div className="filter-group">
+                <select 
+                  value={landFilter.city}
+                  onChange={(e) => handleLandFilterChange('city', e.target.value)}
                 >
-                  إعادة تعيين
-                </button>
+                  <option value="">المدينة</option>
+                  <option value="الرياض">الرياض</option>
+                  <option value="جدة">جدة</option>
+                  <option value="الدمام">الدمام</option>
+                  <option value="مكة">مكة المكرمة</option>
+                </select>
+              </div>
+              
+              <div className="filter-group">
+                <select 
+                  value={landFilter.purpose}
+                  onChange={(e) => handleLandFilterChange('purpose', e.target.value)}
+                >
+                  <option value="">الغرض من العقار</option>
+                  <option value="بيع">بيع</option>
+                  <option value="استثمار">استثمار</option>
+                </select>
+              </div>
+              
+              <div className="filter-group">
+                <select 
+                  value={landFilter.priceRange}
+                  onChange={(e) => handleLandFilterChange('priceRange', e.target.value)}
+                >
+                  <option value="">نطاق السعر</option>
+                  <option value="0-1000000">حتى 1,000,000 ريال</option>
+                  <option value="1000000-3000000">1,000,000 - 3,000,000 ريال</option>
+                  <option value="3000000-5000000">3,000,000 - 5,000,000 ريال</option>
+                  <option value="5000000+">أكثر من 5,000,000 ريال</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <select 
+                  value={landFilter.area}
+                  onChange={(e) => handleLandFilterChange('area', e.target.value)}
+                >
+                  <option value="">المساحة</option>
+                  <option value="0-500">حتى 500 م²</option>
+                  <option value="500-1000">500 - 1,000 م²</option>
+                  <option value="1000-5000">1,000 - 5,000 م²</option>
+                  <option value="5000+">أكثر من 5,000 م²</option>
+                </select>
               </div>
             </div>
-          )}
-          
-          {isLoading ? (
-            <div className="loading">
-              <div className="loading-spinner"></div>
-              جاري تحميل العقارات...
-            </div>
-          ) : (
-            <div className="properties-grid">
-              {filterType === 'lands' && lands.map(land => (
-                <LandCard
-                  key={land.id}
-                  img={land.img}
-                  title={land.title}
-                  location={land.location}
-                  price={land.price}
-                  area={land.area}
-                  landType={land.landType}
-                  purpose={land.purpose}
-                />
-              ))}
-              
-              {filterType === 'auctions' && auctions.map(auction => (
-                <AuctionCard
-                  key={auction.id}
-                  img={auction.img}
-                  title={auction.title}
-                  location={auction.location}
-                  startPrice={auction.startPrice}
-                  currentBid={auction.currentBid}
-                  area={auction.area}
-                  endDate={auction.endDate}
-                  auctionCompany={auction.auctionCompany}
-                  bidders={auction.bidders}
-                  daysLeft={auction.daysLeft}
-                />
-              ))}
-            </div>
-          )}
-          
-          <div className="view-all">
-            <button className="view-all-btn">عرض المزيد</button>
           </div>
+        )}
+
+        {/* الفلتر المتقدم للمزادات */}
+        {filterType === 'auctions' && (
+          <div className="filter-section">
+            <div className="filter-row">
+              <div className="filter-group">
+                <select 
+                  value={auctionFilter.city}
+                  onChange={(e) => handleAuctionFilterChange('city', e.target.value)}
+                >
+                  <option value="">المدينة</option>
+                  <option value="الرياض">الرياض</option>
+                  <option value="جدة">جدة</option>
+                  <option value="الدمام">الدمام</option>
+                  <option value="مكة">مكة المكرمة</option>
+                </select>
+              </div>
+              
+              <div className="filter-group">
+                <input
+                  type="date"
+                  value={auctionFilter.startDate}
+                  onChange={(e) => handleAuctionFilterChange('startDate', e.target.value)}
+                  placeholder="من تاريخ"
+                />
+              </div>
+              
+              <div className="filter-group">
+                <input
+                  type="date"
+                  value={auctionFilter.endDate}
+                  onChange={(e) => handleAuctionFilterChange('endDate', e.target.value)}
+                  placeholder="إلى تاريخ"
+                />
+              </div>
+              
+              <div className="filter-group">
+                <select 
+                  value={auctionFilter.maxDaysLeft}
+                  onChange={(e) => handleAuctionFilterChange('maxDaysLeft', e.target.value)}
+                >
+                  <option value="">الأيام المتبقية</option>
+                  <option value="7">أقل من أسبوع</option>
+                  <option value="15">أقل من أسبوعين</option>
+                  <option value="30">أقل من شهر</option>
+                  <option value="60">أقل من شهرين</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div className="filter-actions">
+          <button className="filter-btn">تطبيق الفلتر</button>
+          <button 
+            className="reset-btn"
+            onClick={() => {
+              if (filterType === 'lands') {
+                setLandFilter({
+                  propertyType: '',
+                  city: '',
+                  purpose: '',
+                  priceRange: '',
+                  area: ''
+                });
+              } else {
+                setAuctionFilter({
+                  city: '',
+                  startDate: '',
+                  endDate: '',
+                  maxDaysLeft: ''
+                });
+              }
+            }}
+          >
+            إعادة تعيين
+          </button>
         </div>
-      </section>
+      </div>
+    </div>
+    
+    {/* عرض البطاقات مع عناصر التحكم */}
+    <div className="properties-container">
+      <div className="properties-header-mobile">
+        <button className="nav-btn prev-btn" onClick={prevPage} disabled={currentPage === 0}>
+          <FaChevronRight />
+        </button>
+        
+        <span className="properties-count">
+          عرض {startIndex + 1}-{Math.min(endIndex, displayedItems.length)} من {displayedItems.length}
+        </span>
+        
+        <button className="nav-btn next-btn" onClick={nextPage} disabled={currentPage >= Math.ceil(displayedItems.length / itemsPerPage) - 1}>
+          <FaChevronLeft />
+        </button>
+      </div>
+
+      {isLoading ? (
+        <div className="loading">
+          <div className="loading-spinner"></div>
+          جاري تحميل العقارات...
+        </div>
+      ) : (
+        <div className="properties-grid">
+          {currentItems.map(item => (
+            filterType === 'lands' ? (
+              <LandCard key={item.id} {...item} />
+            ) : (
+              <AuctionCard key={item.id} {...item} />
+            )
+          ))}
+        </div>
+      )}
+      
+      <div className="view-all">
+        <button className="view-all-btn">عرض الكل</button>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* قسم لماذا تختارنا - تصميم أجمل */}
       <section className="why-us-section">
