@@ -1,0 +1,1018 @@
+/* ===== الخطوط ===== */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
+
+/* ===== الأساسيات ===== */
+:root {
+  --primary-color: #16354d;
+  --secondary-color: #ffb703;
+  --secondary-light: rgba(255, 183, 3, 0.15);
+  --accent-color: #fb8500;
+  --text-color: #333;
+  --text-light: #767676;
+  --background-light: #f8f9fa;
+  --background-white: #ffffff;
+  --border-color: #eaeaea;
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  --transition-speed: 0.3s;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  direction: rtl;
+}
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  color: var(--text-color);
+  background-color: var(--background-light);
+  line-height: 1.6;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ===== شريط العملاء المتحرك ===== */
+.client-ticker {
+  background-color: var(--primary-color);
+  color: var(--background-white);
+  overflow: hidden;
+  padding: 10px 0;
+}
+
+.ticker-content {
+  display: flex;
+  white-space: nowrap;
+  animation: ticker 30s linear infinite;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 30px;
+}
+
+.react-icon {
+  color: var(--secondary-color);
+  margin-left: 10px;
+  font-size: 18px;
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ===== العناوين مع المربع الشفاف ===== */
+.section-title {
+  position: relative;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--primary-color);
+  display: inline-block;
+}
+
+.transparent-box {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 60px;
+  height: 4px;
+  background-color: var(--secondary-color);
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.section-header {
+  text-align: right;
+  margin-bottom: 30px;
+}
+
+.section-header p {
+  color: var(--text-light);
+  font-size: 1.1rem;
+}
+
+/* ===== قسم الهيرو ===== */
+.hero-section {
+  position: relative;
+  height: 85vh;
+  overflow: hidden;
+  color: white;
+}
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 1s ease;
+  z-index: -1;
+}
+
+.slide-0 {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
+}
+
+.slide-1 {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
+}
+
+.slide-2 {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
+}
+
+.hero-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 60px;
+}
+
+.hero-title-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.title-with-decoration {
+  position: relative;
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.land-word {
+  position: relative;
+  color: var(--secondary-color);
+}
+
+.hero-content p {
+  font-size: 1.3rem;
+  margin-bottom: 30px;
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+.search-filter {
+  width: 100%;
+  max-width: 700px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-md);
+  padding: 15px 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.filter-form {
+  display: flex;
+  align-items: center;
+}
+
+.filter-form .filter-group {
+  flex: 1;
+  position: relative;
+}
+
+.filter-form input {
+  width: 100%;
+  padding: 12px 45px 12px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 16px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+}
+
+.search-submit {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  padding: 12px 30px;
+  margin-right: 15px;
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.search-submit:hover {
+  background-color: #0f2d44;
+}
+
+/* ===== قسم الخدمات ===== */
+.services-section {
+  background-color: var(--background-white);
+  padding: 80px 0;
+}
+
+.services-content {
+  display: flex;
+  gap: 40px;
+  margin-top: 30px;
+}
+
+.services-list {
+  flex: 0 0 300px;
+}
+
+.services-list ul {
+  list-style: none;
+}
+
+.services-list li {
+  background-color: var(--background-light);
+  padding: 15px 20px;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+
+.services-list li.active {
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.service-details {
+  flex: 1;
+  background-color: var(--secondary-light);
+  padding: 30px;
+  border-radius: var(--border-radius-md);
+  position: relative;
+}
+
+.service-details h3 {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+
+.service-details p {
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+
+.sub-services {
+  list-style: none;
+  margin: 20px 0;
+}
+
+.sub-services li {
+  position: relative;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.sub-services li:before {
+  content: '✓';
+  position: absolute;
+  right: 0;
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+.learn-more {
+  display: inline-block;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 15px;
+}
+
+.arrow {
+  margin-left: 5px;
+  transition: margin-left var(--transition-speed);
+}
+
+.learn-more:hover .arrow {
+  margin-left: 10px;
+}
+
+/* ===== قسم العقارات ===== */
+.properties-section {
+  padding: 80px 0;
+  background-color: var(--background-light);
+}
+
+.properties-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 25px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  color: var(--text-light);
+}
+
+.tab-button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--secondary-color);
+}
+
+.advanced-filter {
+  background-color: var(--background-white);
+  border-radius: var(--border-radius-md);
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.filter-group {
+  flex: 1 1 180px;
+}
+
+.filter-group select,
+.filter-group input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 15px;
+  background-color: white;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  gap: 15px;
+}
+
+.filter-btn,
+.reset-btn {
+  padding: 10px 25px;
+  border-radius: var(--border-radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.filter-btn {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.filter-btn:hover {
+  background-color: #0f2d44;
+}
+
+.reset-btn {
+  background-color: var(--background-light);
+  color: var(--text-color);
+}
+
+.reset-btn:hover {
+  background-color: #e2e6ea;
+}
+
+.properties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 0;
+  color: var(--text-light);
+  font-size: 16px;
+}
+
+.loading-spinner {
+  border: 5px solid var(--background-light);
+  border-top: 5px solid var(--secondary-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.view-all {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.view-all-btn {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  padding: 10px 30px;
+  border-radius: var(--border-radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.view-all-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* ===== بطاقات الأراضي والمزادات ===== */
+.land-card,
+.auction-card {
+  background-color: var(--background-white);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+  position: relative;
+}
+
+.land-card:hover,
+.auction-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.land-image,
+.auction-image,
+.auction-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.land-image img,
+.auction-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.land-tag,
+.auction-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  padding: 5px 12px;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 2;
+}
+
+.auction-badge {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.auction-timer {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 12px;
+  border-radius: var(--border-radius-sm);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+}
+
+.timer-icon {
+  margin-left: 5px;
+}
+
+.card-actions {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+
+.action-btn {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.save-btn:hover {
+  background-color: #fcefd1;
+  color: var(--accent-color);
+}
+
+.share-btn:hover {
+  background-color: #e1f5fe;
+  color: #0288d1;
+}
+
+.land-content,
+.auction-content {
+  padding: 20px;
+}
+
+.land-content h3,
+.auction-content h3 {
+  color: var(--primary-color);
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.location {
+  color: var(--text-light);
+  margin-bottom: 15px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.location-icon {
+  margin-left: 5px;
+  color: var(--secondary-color);
+}
+
+.land-details,
+.auction-details {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.land-details span,
+.auction-details span {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.details-icon {
+  margin-left: 5px;
+  color: var(--text-light);
+}
+
+.land-price {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 20px;
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+}
+
+.price-icon {
+  margin-left: 5px;
+  color: var(--secondary-color);
+}
+
+.view-btn,
+.bid-btn,
+.details-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+  margin-top: 10px;
+}
+
+.view-btn {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.view-btn:hover {
+  background-color: #0f2d44;
+}
+
+.auction-company {
+  display: inline-block;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 6px 15px;
+  font-size: 14px;
+  border-radius: 0 0 var(--border-radius-sm) 0;
+}
+
+.price-info {
+  background-color: var(--background-light);
+  border-radius: var(--border-radius-sm);
+  padding: 12px;
+  margin: 15px 0;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.price-row:last-child {
+  margin-bottom: 0;
+}
+
+.price-label {
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+.current-price {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.start-price {
+  color: var(--text-light);
+  text-decoration: line-through;
+  font-size: 14px;
+}
+
+.auction-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.bid-btn {
+  flex: 1;
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.bid-btn:hover {
+  background-color: #e67700;
+}
+
+.details-btn {
+  flex: 1;
+  background-color: var(--background-light);
+  color: var(--primary-color);
+}
+
+.details-btn:hover {
+  background-color: #e2e6ea;
+}
+
+/* ===== قسم لماذا تختارنا ===== */
+.why-us-section {
+  background-color: var(--background-white);
+  padding: 80px 0;
+}
+
+.why-us-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 40px;
+}
+
+.why-us-card {
+  background-color: var(--background-light);
+  padding: 30px 25px;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-speed);
+  text-align: center;
+}
+
+.why-us-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-icon {
+  font-size: 30px;
+  height: 70px;
+  width: 70px;
+  line-height: 70px;
+  background-color: var(--secondary-light);
+  color: var(--secondary-color);
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.why-us-card h3 {
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+.why-us-card p {
+  color: var(--text-light);
+  font-size: 15px;
+}
+
+/* ===== قسم اتصل بنا ===== */
+.contact-section {
+  padding: 80px 0;
+  background-color: var(--background-light);
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.contact-form {
+  background-color: var(--background-white);
+  padding: 30px;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 15px;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.submit-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: var(--border-radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+  width: 100%;
+}
+
+.submit-btn:hover {
+  background-color: #0f2d44;
+}
+
+.contact-info {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  background-color: var(--background-white);
+  padding: 20px;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.info-icon {
+  margin-left: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: var(--secondary-light);
+  color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 20px;
+}
+
+.info-text h4 {
+  color: var(--primary-color);
+  margin-bottom: 8px;
+}
+
+.info-text p {
+  color: var(--text-light);
+  margin-bottom: 5px;
+  font-size: 15px;
+}
+
+/* ===== قسم النشرة البريدية ===== */
+.newsletter-section {
+  background-color: var(--primary-color);
+  padding: 60px 0;
+  color: white;
+}
+
+.newsletter-content {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.newsletter-content h2 {
+  color: white;
+  margin-bottom: 20px;
+}
+
+.newsletter-content .transparent-box {
+  background-color: var(--accent-color);
+}
+
+.newsletter-content p {
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+.newsletter-form {
+  display: flex;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.newsletter-form input {
+  flex: 1;
+  padding: 12px 15px;
+  border: none;
+  border-radius: var(--border-radius-sm) 0 0 var(--border-radius-sm);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 15px;
+}
+
+.newsletter-form button {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: none;
+  padding: 0 25px;
+  border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.newsletter-form button:hover {
+  background-color: #f3aa00;
+}
+
+/* ===== تصميم متجاوب ===== */
+@media (max-width: 992px) {
+  .services-content {
+    flex-direction: column;
+  }
+  
+  .services-list {
+    flex: 0 0 auto;
+  }
+  
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .title-with-decoration {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .properties-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 20px 0;
+    margin: -20px 0;
+  }
+  
+  .land-card,
+  .auction-card {
+    flex: 0 0 300px;
+    margin-right: 15px;
+    scroll-snap-align: start;
+  }
+  
+  .title-with-decoration {
+    font-size: 2.4rem;
+  }
+  
+  .hero-content p {
+    font-size: 1.1rem;
+  }
+  
+  .why-us-card {
+    padding: 20px 15px;
+  }
+  
+  .filter-form {
+    flex-direction: column;
+  }
+  
+  .search-submit {
+    margin: 15px 0 0;
+    width: 100%;
+  }
+  
+  .contact-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .title-with-decoration {
+    font-size: 2rem;
+  }
+  
+  .section-title {
+    font-size: 1.6rem;
+  }
+  
+  .hero-section {
+    height: 70vh;
+  }
+  
+  .newsletter-form {
+    flex-direction: column;
+  }
+  
+  .newsletter-form input {
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 10px;
+  }
+  
+  .newsletter-form button {
+    border-radius: var(--border-radius-sm);
+    padding: 10px;
+  }
+}
