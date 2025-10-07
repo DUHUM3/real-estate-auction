@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FaSearch, 
-  FaMapMarkerAlt, 
+import {
+  FaSearch,
+  FaMapMarkerAlt,
   FaRulerCombined,
   FaMoneyBillWave,
   FaChartLine,
@@ -25,15 +25,15 @@ import {
 } from 'react-icons/fa';
 
 // مكون بطاقة الأرض
-const LandCard = ({ 
-  img, 
-  title, 
-  location, 
-  price, 
-  area, 
-  landType, 
+const LandCard = ({
+  img,
+  title,
+  location,
+  price,
+  area,
+  landType,
   purpose,
-  auctionTitle 
+  auctionTitle
 }) => (
   <div className="land-card">
     <div className="land-image">
@@ -75,17 +75,17 @@ const LandCard = ({
 );
 
 // بطاقة المزاد
-const AuctionCard = ({ 
-  img, 
-  title, 
-  location, 
-  startPrice, 
-  currentBid, 
-  area, 
+const AuctionCard = ({
+  img,
+  title,
+  location,
+  startPrice,
+  currentBid,
+  area,
   endDate,
   auctionCompany,
   bidders,
-  daysLeft 
+  daysLeft
 }) => (
   <div className="auction-card">
     <div className="auction-header">
@@ -349,36 +349,58 @@ const Home = () => {
       </div>
 
       {/* قسم الهيرو مع خلفية متحركة */}
-    <section className="hero-section" id="home">
-  <div className={`hero-background slide-${currentSlide}`}></div>
+      <section className="hero-section" id="home">
+        <div className={`hero-background slide-${currentSlide}`}></div>
 
-  <div className="hero-content container">
-    <div className="hero-title-container">
-      <h1 className="title-with-decoration">
-        استثمر في أفضل <span className="land-word">الأراضي</span>
-        <div className="transparent-box"></div>
-      </h1>
-    </div>
+        <div className="hero-content container">
+          <div className="hero-title-container">
+            <h1 className="title-with-decoration">
+              استثمر في أفضل <span className="land-word">الأراضي</span>
+              <div className="transparent-box"></div>
+            </h1>
+          </div>
 
-    <p>منصة متكاملة لشراء وبيع الأراضي والعقارات عبر مزادات إلكترونية آمنة وموثوقة</p>
+          <p>منصة متكاملة لشراء وبيع الأراضي والعقارات عبر مزادات إلكترونية آمنة وموثوقة</p>
 
-    <div className="search-filter">
-      <form onSubmit={handleSearch} className="filter-form">
-        <div className="filter-group">
-          <FaSearch className="search-icon" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <span className="typing-placeholder"></span>
+          <div className="search-filter">
+            <form onSubmit={handleSearch} className="filter-form">
+              <div className="filter-group">
+                <FaSearch className="search-icon" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <span className="typing-placeholder"></span>
+              </div>
+              <button type="submit" className="search-submit">بحث</button>
+            </form>
+          </div>
         </div>
-        <button type="submit" className="search-submit">بحث</button>
-      </form>
+      </section>
+
+      {/* قسم العملاء - المربع الفاصل */}
+<section class="clients-section">
+  <div class="container">
+    <div class="clients-box">
+      <h3 class="clients-title">عملاؤنا المميزون</h3>
+
+      <div class="clients-logos">
+        <div class="clients-logos-track">
+          <div class="client-logo"><img src="/images/human.jpg" alt="شعار عميل" /></div>
+          <div class="client-logo"><img src="/images/client3.jpeg" alt="شعار عميل" /></div>
+          <div class="client-logo"><img src="/images/client3.jpeg" alt="شعار عميل" /></div>
+          <div class="client-logo"><img src="/images/client3.jpeg" alt="شعار عميل" /></div>
+          <div class="client-logo"><img src="/images/client3.jpeg" alt="شعار عميل" /></div>
+        </div>
+      </div>
+
+      <p class="clients-subtitle">
+        نفتخر بشراكتنا مع أكبر الشركات العقارية في المملكة
+      </p>
     </div>
   </div>
 </section>
-
 
       {/* قسم استكشفوا خدماتنا المحدث */}
       <section className="services-section">
@@ -390,13 +412,13 @@ const Home = () => {
           <div className="services-content">
             <div className="services-list">
               <ul>
-                <li 
+                <li
                   className={activeService === 'large-lands' ? 'active' : ''}
                   onClick={() => setActiveService('large-lands')}
                 >
                   الأراضي الكبيرة
                 </li>
-                <li 
+                <li
                   className={activeService === 'auction-partnership' ? 'active' : ''}
                   onClick={() => setActiveService('auction-partnership')}
                 >
@@ -413,252 +435,252 @@ const Home = () => {
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
-          <button className="learn-more">
-  <span className="arrow">←</span>
-  {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
-</button>
+              <button className="learn-more">
+                <span className="arrow">←</span>
+                {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       {/* قسم العقارات المحدث مع الفلاتر */}
- <section className="properties-section" id="properties">
-  <div className="container">
-    <div className="section-header">
-      <h2 className="section-title">
-        العقارات المتاحة
-        <div className="transparent-box"></div>
-      </h2>
-    </div>
+      <section className="properties-section" id="properties">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">
+              العقارات المتاحة
+              <div className="transparent-box"></div>
+            </h2>
+          </div>
 
-    {/* شريط التبويب مع زر الفلتر */}
-    <div className="properties-header">
-      <div className="properties-tabs">
-        <button 
-          className={`tab-button ${filterType === 'lands' ? 'active' : ''}`}
-          onClick={() => {
-            setFilterType('lands');
-            setCurrentPage(0);
-            setShowFilter(false);
-          }}
-        >
-          الأراضي
-        </button>
-        <button 
-          className={`tab-button ${filterType === 'auctions' ? 'active' : ''}`}
-          onClick={() => {
-            setFilterType('auctions');
-            setCurrentPage(0);
-            setShowFilter(false);
-          }}
-        >
-          المزادات
-        </button>
-      </div>
-      
-      <button 
-        className="filter-toggle-btn"
-        onClick={() => setShowFilter(!showFilter)}
-      >
-        <FaFilter />
-        {showFilter ? 'إخفاء الفلتر' : 'عرض الفلتر'}
-      </button>
-    </div>
+          {/* شريط التبويب مع زر الفلتر */}
+          <div className="properties-header">
+            <div className="properties-tabs">
+              <button
+                className={`tab-button ${filterType === 'lands' ? 'active' : ''}`}
+                onClick={() => {
+                  setFilterType('lands');
+                  setCurrentPage(0);
+                  setShowFilter(false);
+                }}
+              >
+                الأراضي
+              </button>
+              <button
+                className={`tab-button ${filterType === 'auctions' ? 'active' : ''}`}
+                onClick={() => {
+                  setFilterType('auctions');
+                  setCurrentPage(0);
+                  setShowFilter(false);
+                }}
+              >
+                المزادات
+              </button>
+            </div>
 
-    {/* الفلتر المتقدم - مخفي بشكل افتراضي */}
-    <div className={`advanced-filter ${showFilter ? 'show' : ''}`}>
-      <div className="filter-content">
-        {/* الفلتر المتقدم للأراضي */}
-        {filterType === 'lands' && (
-          <div className="filter-section">
-            <div className="filter-row">
-              <div className="filter-group">
-                <select 
-                  value={landFilter.propertyType}
-                  onChange={(e) => handleLandFilterChange('propertyType', e.target.value)}
-                >
-                  <option value="">نوع العقار</option>
-                  <option value="سكني">سكني</option>
-                  <option value="تجاري">تجاري</option>
-                  <option value="زراعي">زراعي</option>
-                  <option value="صناعي">صناعي</option>
-                  <option value="مختلط">مختلط</option>
-                </select>
-              </div>
-              
-              <div className="filter-group">
-                <select 
-                  value={landFilter.city}
-                  onChange={(e) => handleLandFilterChange('city', e.target.value)}
-                >
-                  <option value="">المدينة</option>
-                  <option value="الرياض">الرياض</option>
-                  <option value="جدة">جدة</option>
-                  <option value="الدمام">الدمام</option>
-                  <option value="مكة">مكة المكرمة</option>
-                </select>
-              </div>
-              
-              <div className="filter-group">
-                <select 
-                  value={landFilter.purpose}
-                  onChange={(e) => handleLandFilterChange('purpose', e.target.value)}
-                >
-                  <option value="">الغرض من العقار</option>
-                  <option value="بيع">بيع</option>
-                  <option value="استثمار">استثمار</option>
-                </select>
-              </div>
-              
-              <div className="filter-group">
-                <select 
-                  value={landFilter.priceRange}
-                  onChange={(e) => handleLandFilterChange('priceRange', e.target.value)}
-                >
-                  <option value="">نطاق السعر</option>
-                  <option value="0-1000000">حتى 1,000,000 ريال</option>
-                  <option value="1000000-3000000">1,000,000 - 3,000,000 ريال</option>
-                  <option value="3000000-5000000">3,000,000 - 5,000,000 ريال</option>
-                  <option value="5000000+">أكثر من 5,000,000 ريال</option>
-                </select>
-              </div>
+            <button
+              className="filter-toggle-btn"
+              onClick={() => setShowFilter(!showFilter)}
+            >
+              <FaFilter />
+              {showFilter ? 'إخفاء الفلتر' : 'عرض الفلتر'}
+            </button>
+          </div>
 
-              <div className="filter-group">
-                <select 
-                  value={landFilter.area}
-                  onChange={(e) => handleLandFilterChange('area', e.target.value)}
+          {/* الفلتر المتقدم - مخفي بشكل افتراضي */}
+          <div className={`advanced-filter ${showFilter ? 'show' : ''}`}>
+            <div className="filter-content">
+              {/* الفلتر المتقدم للأراضي */}
+              {filterType === 'lands' && (
+                <div className="filter-section">
+                  <div className="filter-row">
+                    <div className="filter-group">
+                      <select
+                        value={landFilter.propertyType}
+                        onChange={(e) => handleLandFilterChange('propertyType', e.target.value)}
+                      >
+                        <option value="">نوع العقار</option>
+                        <option value="سكني">سكني</option>
+                        <option value="تجاري">تجاري</option>
+                        <option value="زراعي">زراعي</option>
+                        <option value="صناعي">صناعي</option>
+                        <option value="مختلط">مختلط</option>
+                      </select>
+                    </div>
+
+                    <div className="filter-group">
+                      <select
+                        value={landFilter.city}
+                        onChange={(e) => handleLandFilterChange('city', e.target.value)}
+                      >
+                        <option value="">المدينة</option>
+                        <option value="الرياض">الرياض</option>
+                        <option value="جدة">جدة</option>
+                        <option value="الدمام">الدمام</option>
+                        <option value="مكة">مكة المكرمة</option>
+                      </select>
+                    </div>
+
+                    <div className="filter-group">
+                      <select
+                        value={landFilter.purpose}
+                        onChange={(e) => handleLandFilterChange('purpose', e.target.value)}
+                      >
+                        <option value="">الغرض من العقار</option>
+                        <option value="بيع">بيع</option>
+                        <option value="استثمار">استثمار</option>
+                      </select>
+                    </div>
+
+                    <div className="filter-group">
+                      <select
+                        value={landFilter.priceRange}
+                        onChange={(e) => handleLandFilterChange('priceRange', e.target.value)}
+                      >
+                        <option value="">نطاق السعر</option>
+                        <option value="0-1000000">حتى 1,000,000 ريال</option>
+                        <option value="1000000-3000000">1,000,000 - 3,000,000 ريال</option>
+                        <option value="3000000-5000000">3,000,000 - 5,000,000 ريال</option>
+                        <option value="5000000+">أكثر من 5,000,000 ريال</option>
+                      </select>
+                    </div>
+
+                    <div className="filter-group">
+                      <select
+                        value={landFilter.area}
+                        onChange={(e) => handleLandFilterChange('area', e.target.value)}
+                      >
+                        <option value="">المساحة</option>
+                        <option value="0-500">حتى 500 م²</option>
+                        <option value="500-1000">500 - 1,000 م²</option>
+                        <option value="1000-5000">1,000 - 5,000 م²</option>
+                        <option value="5000+">أكثر من 5,000 م²</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* الفلتر المتقدم للمزادات */}
+              {filterType === 'auctions' && (
+                <div className="filter-section">
+                  <div className="filter-row">
+                    <div className="filter-group">
+                      <select
+                        value={auctionFilter.city}
+                        onChange={(e) => handleAuctionFilterChange('city', e.target.value)}
+                      >
+                        <option value="">المدينة</option>
+                        <option value="الرياض">الرياض</option>
+                        <option value="جدة">جدة</option>
+                        <option value="الدمام">الدمام</option>
+                        <option value="مكة">مكة المكرمة</option>
+                      </select>
+                    </div>
+
+                    <div className="filter-group">
+                      <input
+                        type="date"
+                        value={auctionFilter.startDate}
+                        onChange={(e) => handleAuctionFilterChange('startDate', e.target.value)}
+                        placeholder="من تاريخ"
+                      />
+                    </div>
+
+                    <div className="filter-group">
+                      <input
+                        type="date"
+                        value={auctionFilter.endDate}
+                        onChange={(e) => handleAuctionFilterChange('endDate', e.target.value)}
+                        placeholder="إلى تاريخ"
+                      />
+                    </div>
+
+                    <div className="filter-group">
+                      <select
+                        value={auctionFilter.maxDaysLeft}
+                        onChange={(e) => handleAuctionFilterChange('maxDaysLeft', e.target.value)}
+                      >
+                        <option value="">الأيام المتبقية</option>
+                        <option value="7">أقل من أسبوع</option>
+                        <option value="15">أقل من أسبوعين</option>
+                        <option value="30">أقل من شهر</option>
+                        <option value="60">أقل من شهرين</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="filter-actions">
+                <button className="filter-btn">تطبيق الفلتر</button>
+                <button
+                  className="reset-btn"
+                  onClick={() => {
+                    if (filterType === 'lands') {
+                      setLandFilter({
+                        propertyType: '',
+                        city: '',
+                        purpose: '',
+                        priceRange: '',
+                        area: ''
+                      });
+                    } else {
+                      setAuctionFilter({
+                        city: '',
+                        startDate: '',
+                        endDate: '',
+                        maxDaysLeft: ''
+                      });
+                    }
+                  }}
                 >
-                  <option value="">المساحة</option>
-                  <option value="0-500">حتى 500 م²</option>
-                  <option value="500-1000">500 - 1,000 م²</option>
-                  <option value="1000-5000">1,000 - 5,000 م²</option>
-                  <option value="5000+">أكثر من 5,000 م²</option>
-                </select>
+                  إعادة تعيين
+                </button>
               </div>
             </div>
           </div>
-        )}
 
-        {/* الفلتر المتقدم للمزادات */}
-        {filterType === 'auctions' && (
-          <div className="filter-section">
-            <div className="filter-row">
-              <div className="filter-group">
-                <select 
-                  value={auctionFilter.city}
-                  onChange={(e) => handleAuctionFilterChange('city', e.target.value)}
-                >
-                  <option value="">المدينة</option>
-                  <option value="الرياض">الرياض</option>
-                  <option value="جدة">جدة</option>
-                  <option value="الدمام">الدمام</option>
-                  <option value="مكة">مكة المكرمة</option>
-                </select>
-              </div>
-              
-              <div className="filter-group">
-                <input
-                  type="date"
-                  value={auctionFilter.startDate}
-                  onChange={(e) => handleAuctionFilterChange('startDate', e.target.value)}
-                  placeholder="من تاريخ"
-                />
-              </div>
-              
-              <div className="filter-group">
-                <input
-                  type="date"
-                  value={auctionFilter.endDate}
-                  onChange={(e) => handleAuctionFilterChange('endDate', e.target.value)}
-                  placeholder="إلى تاريخ"
-                />
-              </div>
-              
-              <div className="filter-group">
-                <select 
-                  value={auctionFilter.maxDaysLeft}
-                  onChange={(e) => handleAuctionFilterChange('maxDaysLeft', e.target.value)}
-                >
-                  <option value="">الأيام المتبقية</option>
-                  <option value="7">أقل من أسبوع</option>
-                  <option value="15">أقل من أسبوعين</option>
-                  <option value="30">أقل من شهر</option>
-                  <option value="60">أقل من شهرين</option>
-                </select>
-              </div>
+          {/* عرض البطاقات مع عناصر التحكم */}
+          <div className="properties-container">
+            <div className="properties-header-mobile">
+              <button className="nav-btn prev-btn" onClick={prevPage} disabled={currentPage === 0}>
+                <FaChevronRight />
+              </button>
+
+              <span className="properties-count">
+                عرض {startIndex + 1}-{Math.min(endIndex, displayedItems.length)} من {displayedItems.length}
+              </span>
+
+              <button className="nav-btn next-btn" onClick={nextPage} disabled={currentPage >= Math.ceil(displayedItems.length / itemsPerPage) - 1}>
+                <FaChevronLeft />
+              </button>
             </div>
-          </div>
-        )}
-        
-        <div className="filter-actions">
-          <button className="filter-btn">تطبيق الفلتر</button>
-          <button 
-            className="reset-btn"
-            onClick={() => {
-              if (filterType === 'lands') {
-                setLandFilter({
-                  propertyType: '',
-                  city: '',
-                  purpose: '',
-                  priceRange: '',
-                  area: ''
-                });
-              } else {
-                setAuctionFilter({
-                  city: '',
-                  startDate: '',
-                  endDate: '',
-                  maxDaysLeft: ''
-                });
-              }
-            }}
-          >
-            إعادة تعيين
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    {/* عرض البطاقات مع عناصر التحكم */}
-    <div className="properties-container">
-      <div className="properties-header-mobile">
-        <button className="nav-btn prev-btn" onClick={prevPage} disabled={currentPage === 0}>
-          <FaChevronRight />
-        </button>
-        
-        <span className="properties-count">
-          عرض {startIndex + 1}-{Math.min(endIndex, displayedItems.length)} من {displayedItems.length}
-        </span>
-        
-        <button className="nav-btn next-btn" onClick={nextPage} disabled={currentPage >= Math.ceil(displayedItems.length / itemsPerPage) - 1}>
-          <FaChevronLeft />
-        </button>
-      </div>
 
-      {isLoading ? (
-        <div className="loading">
-          <div className="loading-spinner"></div>
-          جاري تحميل العقارات...
-        </div>
-      ) : (
-        <div className="properties-grid">
-          {currentItems.map(item => (
-            filterType === 'lands' ? (
-              <LandCard key={item.id} {...item} />
+            {isLoading ? (
+              <div className="loading">
+                <div className="loading-spinner"></div>
+                جاري تحميل العقارات...
+              </div>
             ) : (
-              <AuctionCard key={item.id} {...item} />
-            )
-          ))}
+              <div className="properties-grid">
+                {currentItems.map(item => (
+                  filterType === 'lands' ? (
+                    <LandCard key={item.id} {...item} />
+                  ) : (
+                    <AuctionCard key={item.id} {...item} />
+                  )
+                ))}
+              </div>
+            )}
+
+            <div className="view-all">
+              <button className="view-all-btn">عرض الكل</button>
+            </div>
+          </div>
         </div>
-      )}
-      
-      <div className="view-all">
-        <button className="view-all-btn">عرض الكل</button>
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* قسم لماذا تختارنا - تصميم أجمل */}
       <section className="why-us-section">
@@ -670,7 +692,7 @@ const Home = () => {
             </h2>
             {/* <p>أسباب تجعلنا الخيار الأمثل لاستثمارك العقاري</p> */}
           </div>
-          
+
           <div className="why-us-grid">
             <div className="why-us-card">
               <div className="card-icon">
@@ -679,7 +701,7 @@ const Home = () => {
               <h3>الريادة في السوق</h3>
               <p>نحن رواد في مجال التسويق العقاري مع أكثر من 15 عاماً من الخبرة والتميز</p>
             </div>
-            
+
             <div className="why-us-card">
               <div className="card-icon">
                 <FaStar />
@@ -687,7 +709,7 @@ const Home = () => {
               <h3>جودة لا تضاهى</h3>
               <p>نقدم خدمات عالية الجودة تلبي توقعات عملائنا وتتجاوزها</p>
             </div>
-            
+
             <div className="why-us-card">
               <div className="card-icon">
                 <FaChartLine />
@@ -695,7 +717,7 @@ const Home = () => {
               <h3>سرعة في الأداء</h3>
               <p>نتعامل بسرعة وكفاءة لتحقيق أفضل النتائج في أقصر وقت ممكن</p>
             </div>
-            
+
             <div className="why-us-card">
               <div className="card-icon">
                 <FaHandshake />
@@ -703,7 +725,7 @@ const Home = () => {
               <h3>ثقة العملاء</h3>
               <p>ثقة آلاف العملاء شهادة على نجاحنا وتميزنا في تقديم الخدمات</p>
             </div>
-            
+
             <div className="why-us-card">
               <div className="card-icon">
                 <FaLandmark />
@@ -711,7 +733,7 @@ const Home = () => {
               <h3>حلول مبتكرة</h3>
               <p>نطور حلولاً مبتكرة تلبي احتياجات السوق المتغيرة</p>
             </div>
-            
+
             <div className="why-us-card">
               <div className="card-icon">
                 <FaShieldAlt />
@@ -733,7 +755,7 @@ const Home = () => {
             </h2>
             <p>نحن هنا للإجابة على استفساراتك ومساعدتك في العثور على ما تبحث عنه</p>
           </div>
-          
+
           <div className="contact-grid">
             <div className="contact-form">
               <form>
@@ -767,7 +789,7 @@ const Home = () => {
                 <button type="submit" className="submit-btn">إرسال الرسالة</button>
               </form>
             </div>
-            
+
             <div className="contact-info">
               <div className="info-item">
                 <div className="info-icon">
@@ -778,7 +800,7 @@ const Home = () => {
                   <p>الرياض، طريق الملك فهد، برج المملكة، الدور 20</p>
                 </div>
               </div>
-              
+
               <div className="info-item">
                 <div className="info-icon">
                   <FaPhone />
@@ -789,7 +811,7 @@ const Home = () => {
                   <p>966598765432+</p>
                 </div>
               </div>
-              
+
               <div className="info-item">
                 <div className="info-icon">
                   <FaEnvelope />
@@ -800,7 +822,7 @@ const Home = () => {
                   <p>sales@realestate.com</p>
                 </div>
               </div>
-              
+
               <div className="info-item">
                 <div className="info-icon">
                   <FaClock />

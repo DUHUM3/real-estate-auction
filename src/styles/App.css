@@ -30,8 +30,7 @@
 body {
   font-family: 'Tajawal', sans-serif;
   color: var(--text-color);
-  background-color: var(--background-light);
-  line-height: 1.6;
+    line-height: 1.6;
 }
 
 .container {
@@ -369,6 +368,139 @@ body {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+
+/* ===== قسم العملاء ===== */
+.clients-section {
+  position: relative;
+  margin-top: -70px;
+  margin-bottom: 30px;
+  z-index: 10;
+}
+
+.clients-box {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  text-align: center;
+  max-width: 90%;
+  margin: 0 auto;
+  border-top: 4px solid var(--primary-color);
+}
+
+.clients-title {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+}
+
+.clients-title::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 3px;
+  background-color: var(--secondary-color);
+  bottom: -8px;
+  right: 50%;
+  transform: translateX(50%);
+}
+
+/* السلايدر */
+.clients-logos {
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.clients-logos-track {
+  display: flex;
+  gap: 40px;
+  animation: scroll 25s linear infinite;
+}
+
+.client-logo {
+  flex: 0 0 auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.client-logo img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.client-logo:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.clients-subtitle {
+  color: #777;
+  font-size: 0.9rem;
+  margin-top: 15px;
+}
+
+/* موبايل */
+@media (max-width: 768px) {
+  .clients-section {
+    margin-top: -40px;
+  }
+  
+  .clients-box {
+    padding: 20px 15px;
+    max-width: 95%;
+  }
+  
+  .clients-logos-track {
+    gap: 20px;
+    animation-duration: 20s;
+  }
+  
+  .client-logo {
+    height: 45px;
+  }
+}
+
+@media (max-width: 480px) {
+  .clients-section {
+    margin-top: -25px;
+  }
+  
+  .clients-box {
+    padding: 15px 10px;
+  }
+  
+  .clients-title {
+    font-size: 1.2rem;
+  }
+  
+  .clients-logos-track {
+    gap: 15px;
+    animation-duration: 15s;
+  }
+  
+  .client-logo {
+    height: 35px;
+  }
+}
+
 
 /* ===== قسم الخدمات ===== */
 .services-section {
