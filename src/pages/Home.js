@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FaSearch,
   FaMapMarkerAlt,
@@ -37,7 +37,7 @@ const LandCard = ({
 }) => (
   <div className="land-card">
     <div className="land-image">
-      <img src={img || "https://via.placeholder.com/300x200?text=أرض+للبيع"} alt={title} />
+      <img src={img || ""} alt={title} />
       <div className="land-tag">{landType}</div>
       {auctionTitle && <div className="auction-badge">مزاد</div>}
       <div className="card-actions">
@@ -92,7 +92,7 @@ const AuctionCard = ({
       <span className="auction-company">{auctionCompany}</span>
     </div>
     <div className="auction-image">
-      <img src={img || "https://via.placeholder.com/300x200?text=مزاد+عقاري"} alt={title} />
+      <img src={img || ""} alt={title} />
       <div className="auction-timer">
         <FaCalendarAlt className="timer-icon" /> {daysLeft} يوم متبقي
       </div>
@@ -133,6 +133,86 @@ const AuctionCard = ({
   </div>
 );
 
+// مكون شريط العملاء المتحرك المعدل
+const ClientsSlider = () => {
+  const clientLogos = [
+    { id: 1, src: "/images/human.jpg", alt: "شعار عميل" },
+    { id: 2, src: "/images/client1.jpg", alt: "شعار عميل" },
+    { id: 3, src: "/images/client2.jpg", alt: "شعار عميل" },
+    { id: 4, src: "/images/client3.jpeg", alt: "شعار عميل" },
+    // { id: 5, src: "/images/client3.jpeg", alt: "شعار عميل" }
+  ];
+
+  const [activeIndex, setActiveIndex] = useState(1);
+  const maxVisibleLogos = 3; // عدد العملاء المعروضين
+
+  const nextClient = () => {
+    setActiveIndex((prevIndex) => (prevIndex + 1) % clientLogos.length);
+  };
+
+  const prevClient = () => {
+    setActiveIndex((prevIndex) => (prevIndex - 1 + clientLogos.length) % clientLogos.length);
+  };
+
+  // التهيئة الأولية والتحديث التلقائي
+  useEffect(() => {
+    const interval = setInterval(nextClient, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // إنشاء مصفوفة معدلة للعرض مع تطبيق النمط الدائري
+  const getVisibleLogos = () => {
+    let visibleLogos = [];
+    
+    for (let i = 0; i < maxVisibleLogos; i++) {
+      const index = (activeIndex + i) % clientLogos.length;
+      visibleLogos.push({
+        ...clientLogos[index],
+        isActive: i === 1 // العنصر الأوسط هو النشط
+      });
+    }
+    
+    return visibleLogos;
+  };
+
+  return (
+    <section className="clients-section">
+      <div className="container">
+        <div className="clients-box">
+          <h3 className="clients-title">عملاؤنا المميزون</h3>
+
+          <div className="clients-slider-container">
+            <button className="client-nav-btn prev-btn" onClick={prevClient}>
+              <FaChevronRight />
+            </button>
+            
+            <div className="clients-slider">
+              <div className="clients-track">
+                {getVisibleLogos().map((logo) => (
+                  <div 
+                    key={logo.id} 
+                    className={`client-logo ${logo.isActive ? 'active' : 'inactive'}`}
+                  >
+                    <img src={logo.src} alt={logo.alt} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <button className="client-nav-btn next-btn" onClick={nextClient}>
+              <FaChevronLeft />
+            </button>
+          </div>
+
+          <p className="clients-subtitle">
+            نفتخر بشراكتنا مع أكبر الشركات العقارية في المملكة
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [lands, setLands] = useState([]);
@@ -165,12 +245,18 @@ const Home = () => {
   const nextPage = () => {
     if (currentPage < Math.ceil(displayedItems.length / itemsPerPage) - 1) {
       setCurrentPage(currentPage + 1);
+    } else {
+      // عند الوصول للنهاية، العودة للصفحة الأولى (دوران)
+      setCurrentPage(0);
     }
   };
 
   const prevPage = () => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
+    } else {
+      // عند الوصول للبداية، الانتقال للصفحة الأخيرة (دوران)
+      setCurrentPage(Math.ceil(displayedItems.length / itemsPerPage) - 1);
     }
   };
 
@@ -380,27 +466,7 @@ const Home = () => {
       </section>
 
       {/* قسم العملاء - المربع الفاصل */}
-<section class="clients-section">
-  <div class="container">
-    <div class="clients-box">
-      <h3 class="clients-title">عملاؤنا المميزون</h3>
-
-      <div class="clients-logos">
-        <div class="clients-logos-track">
-          <div class="client-logo"><img src="/images/human.jpg" alt="شعار عميل" /></div>
-          <div class="client-logo"><img src="/images/client3.jpeg" alt="شعار عميل" /></div>
-          <div class="client-logo"><img src="/images/client3.jpeg" alt="شعار عميل" /></div>
-          <div class="client-logo"><img src="/images/client3.jpeg" alt="شعار عميل" /></div>
-          <div class="client-logo"><img src="/images/client3.jpeg" alt="شعار عميل" /></div>
-        </div>
-      </div>
-
-      <p class="clients-subtitle">
-        نفتخر بشراكتنا مع أكبر الشركات العقارية في المملكة
-      </p>
-    </div>
-  </div>
-</section>
+      <ClientsSlider />
 
       {/* قسم استكشفوا خدماتنا المحدث */}
       <section className="services-section">
@@ -435,10 +501,20 @@ const Home = () => {
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
-              <button className="learn-more">
-                <span className="arrow">←</span>
-                {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
-              </button>
+              <div className="service-actions">
+                <button className="learn-more">
+                  <span className="arrow">←</span>
+                  {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
+                </button>
+                <div className="service-navigation">
+                  <button 
+                    className="service-nav-btn" 
+                    onClick={() => setActiveService(activeService === 'large-lands' ? 'auction-partnership' : 'large-lands')}
+                  >
+                    {activeService === 'large-lands' ? <FaChevronLeft /> : <FaChevronRight />}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -644,16 +720,18 @@ const Home = () => {
 
           {/* عرض البطاقات مع عناصر التحكم */}
           <div className="properties-container">
-            <div className="properties-header-mobile">
-              <button className="nav-btn prev-btn" onClick={prevPage} disabled={currentPage === 0}>
+            <div className="properties-nav-container">
+              <button className="property-nav-btn prev-btn" onClick={prevPage}>
                 <FaChevronRight />
               </button>
 
-              <span className="properties-count">
-                عرض {startIndex + 1}-{Math.min(endIndex, displayedItems.length)} من {displayedItems.length}
-              </span>
+              <div className="properties-header-mobile">
+                <span className="properties-count">
+                  عرض {startIndex + 1}-{Math.min(endIndex, displayedItems.length)} من {displayedItems.length}
+                </span>
+              </div>
 
-              <button className="nav-btn next-btn" onClick={nextPage} disabled={currentPage >= Math.ceil(displayedItems.length / itemsPerPage) - 1}>
+              <button className="property-nav-btn next-btn" onClick={nextPage}>
                 <FaChevronLeft />
               </button>
             </div>

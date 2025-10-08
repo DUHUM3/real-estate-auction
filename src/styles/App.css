@@ -120,7 +120,7 @@ body {
 
 @media (max-width: 768px) {
   .hero-section {
-    height: 115vh; /* أطول في الهاتف */
+    height: 90vh !important; /* اختبار فقط */
   }
 }
 
@@ -369,8 +369,14 @@ body {
   to { opacity: 1; }
 }
 
+/* عند الوقوف للكتابة أو التركيز على الحقل */
+.filter-form input:focus ~ .typing-placeholder {
+  display: none;
+}
+
 
 /* ===== قسم العملاء ===== */
+/* ===== قسم العملاء المميزون المعدل ===== */
 .clients-section {
   position: relative;
   margin-top: -70px;
@@ -409,103 +415,108 @@ body {
   transform: translateX(50%);
 }
 
-/* السلايدر */
-.clients-logos {
-  overflow: hidden;
-  margin: 20px 0;
-}
-
-.clients-logos-track {
-  display: flex;
-  gap: 40px;
-  animation: scroll 25s linear infinite;
-}
-
-.client-logo {
-  flex: 0 0 auto;
-  height: 60px;
+/* سلايدر العملاء المعدل */
+.clients-slider-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.8;
-  transition: all 0.3s ease;
+  margin: 30px 0;
+  gap: 15px;
+}
+
+.clients-slider {
+  overflow: hidden;
+  position: relative;
+  width: 70%;
+  max-width: 600px;
+}
+
+.clients-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  transition: transform 0.5s ease-in-out;
+}
+
+.client-logo {
+  flex: 0 0 150px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.client-logo.inactive {
+  opacity: 0.3; /* العملاء الغير نشطين باهتين */
+}
+
+.client-logo.active {
+  transform: scale(1.2);
+  opacity: 1; /* العميل النشط واضح */
 }
 
 .client-logo img {
   max-height: 100%;
   max-width: 100%;
   object-fit: contain;
+  pointer-events: none;
 }
 
-.client-logo:hover {
-  opacity: 1;
-  transform: scale(1.05);
+/* أزرار التنقل بين العملاء */
+.client-nav-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-speed);
 }
 
-@keyframes scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.clients-subtitle {
-  color: #777;
-  font-size: 0.9rem;
-  margin-top: 15px;
+.client-nav-btn:hover {
+  background-color: #0f2d44;
+  transform: scale(1.1);
 }
 
 /* موبايل */
 @media (max-width: 768px) {
-  .clients-section {
-    margin-top: -40px;
+  .clients-slider {
+    width: 100%;
   }
   
-  .clients-box {
-    padding: 20px 15px;
-    max-width: 95%;
+  .clients-track {
+    gap: 10px;
   }
-  
-  .clients-logos-track {
-    gap: 20px;
-    animation-duration: 20s;
-  }
-  
+
   .client-logo {
-    height: 45px;
+    flex: 0 0 auto;
+    width: 30%;
+    height: 60px;
+  }
+
+  .client-logo.active {
+    transform: scale(1.1);
+  }
+  
+  .client-nav-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 12px;
   }
 }
 
-@media (max-width: 480px) {
-  .clients-section {
-    margin-top: -25px;
-  }
-  
-  .clients-box {
-    padding: 15px 10px;
-  }
-  
-  .clients-title {
-    font-size: 1.2rem;
-  }
-  
-  .clients-logos-track {
-    gap: 15px;
-    animation-duration: 15s;
-  }
-  
-  .client-logo {
-    height: 35px;
-  }
-}
 
 
 /* ===== قسم الخدمات ===== */
 .services-section {
   background-color: var(--background-white);
-  padding: 80px 0;
+  padding: 50px 0;
 }
 
 .services-content {
@@ -595,6 +606,40 @@ body {
   margin-left: 10px;
 }
 
+.learn-more {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #16354d, #16354d); /* تدرج أحمر جذّاب */
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 26px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
+}
+
+.learn-more:hover {
+  background: linear-gradient(135deg, #16354d, #16354d);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(211, 47, 47, 0.4);
+}
+
+.learn-more .arrow {
+  display: inline-block;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.learn-more:hover .arrow {
+  transform: translateX(-5px); /* تحريك السهم لليسار عند المرور */
+}
+
 /* ===== قسم العقارات ===== */
 .properties-section {
   padding: 80px 0;
@@ -608,6 +653,117 @@ body {
   margin-bottom: 30px;
   flex-wrap: wrap;
   gap: 15px;
+}
+
+/* أزرار التنقل في قسم العقارات */
+.properties-nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  background-color: var(--background-white);
+  border-radius: var(--border-radius-md);
+  padding: 10px 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.property-nav-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.property-nav-btn:hover {
+  background-color: #0f2d44;
+  transform: scale(1.1);
+}
+
+.properties-header-mobile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.properties-count {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 14px;
+}
+
+/* للهاتف المحمول - قسم العقارات */
+@media (max-width: 768px) {
+  .properties-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: hidden;
+    scroll-snap-type: x mandatory;
+    padding: 10px 0;
+    gap: 15px;
+    margin: 0 -15px;
+  }
+  
+  .land-card,
+  .auction-card {
+    flex: 0 0 85%;
+    scroll-snap-align: center;
+    margin: 0 auto;
+  }
+}
+
+/* تعديلات قسم الخدمات - إضافة أزرار التنقل */
+.service-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.service-navigation {
+  display: flex;
+  gap: 10px;
+}
+
+.service-nav-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.service-nav-btn:hover {
+  background-color: #0f2d44;
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .service-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .learn-more {
+    width: 100%;
+  }
+  
+  .service-nav-btn {
+    width: 35px;
+    height: 35px;
+  }
 }
 
 .properties-tabs {
