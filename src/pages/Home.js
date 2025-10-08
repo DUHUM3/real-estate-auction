@@ -4,7 +4,10 @@ import {
   FaMapMarkerAlt,
   FaRulerCombined,
   FaMoneyBillWave,
+  FaArrowLeft,
   FaChartLine,
+  FaGavel,
+  FaCheck,
   FaUsers,
   FaShieldAlt,
   FaAward,
@@ -440,10 +443,10 @@ const Home = () => {
 
         <div className="hero-content container">
           <div className="hero-title-container">
-            <h1 className="title-with-decoration">
+            <div className="title-with-decoration7">
               استثمر في أفضل <span className="land-word">الأراضي</span>
               <div className="transparent-box"></div>
-            </h1>
+            </div>
           </div>
 
           <p>منصة متكاملة لشراء وبيع الأراضي والعقارات عبر مزادات إلكترونية آمنة وموثوقة</p>
@@ -462,63 +465,101 @@ const Home = () => {
               <button type="submit" className="search-submit">بحث</button>
             </form>
           </div>
+
         </div>
       </section>
 
       {/* قسم العملاء - المربع الفاصل */}
       <ClientsSlider />
 
-      {/* قسم استكشفوا خدماتنا المحدث */}
-      <section className="services-section">
-        <div className="container">
-          <h2 className="section-title">
-            استكشفوا خدماتنا
-            <div className="transparent-box"></div>
-          </h2>
-          <div className="services-content">
-            <div className="services-list">
-              <ul>
-                <li
-                  className={activeService === 'large-lands' ? 'active' : ''}
-                  onClick={() => setActiveService('large-lands')}
-                >
-                  الأراضي الكبيرة
-                </li>
-                <li
-                  className={activeService === 'auction-partnership' ? 'active' : ''}
-                  onClick={() => setActiveService('auction-partnership')}
-                >
-                  شراكة مميزة مع شركات المزادات
-                </li>
-              </ul>
-            </div>
+  <section className="services-section">
+  <div className="container">
+    <h2 className="section-title">
+      استكشفوا خدماتنا
+      <div className="transparent-box"></div>
+    </h2>
+    
+    {/* مؤشر الخدمات للهاتف */}
+    <div className="mobile-service-indicator">
+      <div className="indicator-dots">
+        <span className={activeService === 'large-lands' ? 'active' : ''}></span>
+        <span className={activeService === 'auction-partnership' ? 'active' : ''}></span>
+      </div>
+    </div>
 
-            <div className="service-details">
-              <h3>{servicesData[activeService].title}</h3>
-              <p>{servicesData[activeService].description}</p>
-              <ul className="sub-services">
-                {servicesData[activeService].features.map((feature, index) => (
-                  <li key={index}>{feature}</li>
-                ))}
-              </ul>
-              <div className="service-actions">
-                <button className="learn-more">
-                  <span className="arrow">←</span>
-                  {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
-                </button>
-                <div className="service-navigation">
-                  <button 
-                    className="service-nav-btn" 
-                    onClick={() => setActiveService(activeService === 'large-lands' ? 'auction-partnership' : 'large-lands')}
-                  >
-                    {activeService === 'large-lands' ? <FaChevronLeft /> : <FaChevronRight />}
-                  </button>
-                </div>
-              </div>
-            </div>
+    <div className="services-content">
+      {/* القائمة الجانبية (تظهر في الكمبيوتر فقط) */}
+      <div className="services-list">
+        <ul>
+          <li
+            className={activeService === 'large-lands' ? 'active' : ''}
+            onClick={() => setActiveService('large-lands')}
+          >
+            <FaLandmark className="service-icon" />
+            الأراضي الكبيرة
+          </li>
+          <li
+            className={activeService === 'auction-partnership' ? 'active' : ''}
+            onClick={() => setActiveService('auction-partnership')}
+          >
+            <FaGavel className="service-icon" />
+            شراكة مميزة مع شركات المزادات
+          </li>
+        </ul>
+      </div>
+
+      {/* البطاقة الرئيسية */}
+      <div className="service-details">
+        {/* رأس البطاقة مع الأيقونة */}
+        <div className="service-header">
+          <div className="service-icon-container">
+            {activeService === 'large-lands' ? 
+              <FaLandmark className="main-service-icon" /> : 
+              <FaGavel className="main-service-icon" />
+            }
+          </div>
+          <h3>{servicesData[activeService].title}</h3>
+        </div>
+
+        <p>{servicesData[activeService].description}</p>
+        
+        <ul className="sub-services">
+          {servicesData[activeService].features.map((feature, index) => (
+            <li key={index}>
+              <FaCheck className="check-icon" />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+        
+        <div className="service-actions">
+          <button className={`learn-more ${activeService === 'auction-partnership' ? 'auction-btn' : ''}`}>
+            <span className="arrow">←</span>
+            {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
+          </button>
+          
+          {/* أزرار التنقل للهاتف */}
+          <div className="mobile-nav">
+            <button 
+              className="mobile-nav-btn prev" 
+              onClick={() => setActiveService('large-lands')}
+              disabled={activeService === 'large-lands'}
+            >
+              <FaChevronRight />
+            </button>
+            <button 
+              className="mobile-nav-btn next" 
+              onClick={() => setActiveService('auction-partnership')}
+              disabled={activeService === 'auction-partnership'}
+            >
+              <FaChevronLeft />
+            </button>
           </div>
         </div>
-      </section>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* قسم العقارات المحدث مع الفلاتر */}
       <section className="properties-section" id="properties">
@@ -720,21 +761,21 @@ const Home = () => {
 
           {/* عرض البطاقات مع عناصر التحكم */}
           <div className="properties-container">
-            <div className="properties-nav-container">
+            {/* <div className="properties-nav-container">
               <button className="property-nav-btn prev-btn" onClick={prevPage}>
                 <FaChevronRight />
-              </button>
+              </button> */}
 
-              <div className="properties-header-mobile">
+              {/* <div className="properties-header-mobile">
                 <span className="properties-count">
                   عرض {startIndex + 1}-{Math.min(endIndex, displayedItems.length)} من {displayedItems.length}
                 </span>
-              </div>
+              </div> */}
 
-              <button className="property-nav-btn next-btn" onClick={nextPage}>
+              {/* <button className="property-nav-btn next-btn" onClick={nextPage}>
                 <FaChevronLeft />
-              </button>
-            </div>
+              </button> */}
+            {/* </div> */}
 
             {isLoading ? (
               <div className="loading">
