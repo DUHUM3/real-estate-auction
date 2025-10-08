@@ -43,7 +43,11 @@ const LandCard = ({
 }) => (
   <div className="land-card">
     <div className="land-image">
-      <img src={img || ""} alt={title} />
+<img 
+  src={img || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"} 
+  alt={title || "أرض عقارية"} 
+/>
+
       <div className="land-tag">{landType}</div>
       {auctionTitle && <div className="auction-badge">مزاد</div>}
       <div className="card-actions">
@@ -98,7 +102,11 @@ const AuctionCard = ({
       <span className="auction-company">{auctionCompany}</span>
     </div>
     <div className="auction-image">
-      <img src={img || ""} alt={title} />
+<img 
+  src={img || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"} 
+  alt={title || "أرض عقارية"} 
+/>
+
       <div className="auction-timer">
         <FaCalendarAlt className="timer-icon" /> {daysLeft} يوم متبقي
       </div>
