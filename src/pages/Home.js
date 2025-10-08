@@ -24,6 +24,9 @@ import {
   FaFilter,
   FaChevronRight,
   FaChevronLeft,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
   FaLandmark
 } from 'react-icons/fa';
 
@@ -222,8 +225,12 @@ const Home = () => {
   const [auctions, setAuctions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+const [touchEnd, setTouchEnd] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage] = useState(6);
+   const [activeTab, setActiveTab] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeService, setActiveService] = useState('large-lands');
   const [filterType, setFilterType] = useState('lands');
@@ -244,23 +251,106 @@ const Home = () => {
   // حساب العناصر المعروضة
   const displayedItems = filterType === 'lands' ? lands : auctions;
 
-  // دوال التنقل بين الصفحات
-  const nextPage = () => {
-    if (currentPage < Math.ceil(displayedItems.length / itemsPerPage) - 1) {
-      setCurrentPage(currentPage + 1);
-    } else {
-      // عند الوصول للنهاية، العودة للصفحة الأولى (دوران)
-      setCurrentPage(0);
+  const minSwipeDistance = 50;
+
+const handleTouchStart = (e) => {
+  setTouchEnd(null);
+  setTouchStart(e.targetTouches[0].clientX);
+};
+
+const handleTouchMove = (e) => {
+  setTouchEnd(e.targetTouches[0].clientX);
+};
+
+const handleTouchEnd = () => {
+  if (!touchStart || !touchEnd) return;
+  
+  const distance = touchStart - touchEnd;
+  const isLeftSwipe = distance > minSwipeDistance;
+  const isRightSwipe = distance < -minSwipeDistance;
+
+  if (isLeftSwipe) {
+    nextCard();
+  } else if (isRightSwipe) {
+    prevCard();
+  }
+};
+    const cardsData = [
+    {
+      id: 1,
+      title: "الريادة في السوق",
+      description: "نحن رواد في مجال التسويق العقاري مع أكثر من 15 عاماً من الخبرة والتميز",
+      icon: <FaAward />,
+      details: [
+        "أكثر من 15 عاماً من الخبرة في السوق العقاري",
+        "شبكة واسعة من الشركاء والعملاء",
+        "معدل نجاح يتجاوز 95% في صفقاتنا"
+      ]
+    },
+    {
+      id: 2,
+      title: "جودة لا تضاهى",
+      description: "نقدم خدمات عالية الجودة تلبي توقعات عملائنا وتتجاوزها",
+      icon: <FaStar />,
+      details: [
+        "فريق محترف من الخبراء والمستشارين",
+        "مراجعة جودة مستمرة لجميع خدماتنا",
+        "تقييمات إيجابية من أكثر من 5000 عميل"
+      ]
+    },
+    {
+      id: 3,
+      title: "سرعة في الأداء",
+      description: "نتعامل بسرعة وكفاءة لتحقيق أفضل النتائج في أقصر وقت ممكن",
+      icon: <FaChartLine />,
+      details: [
+        "استجابة فورية لاستفسارات العملاء",
+        "إتمام الصفقات في وقت قياسي",
+        "نظام متابعة وتحديث مستمر"
+      ]
+    },
+    {
+      id: 4,
+      title: "ثقة العملاء",
+      description: "ثقة آلاف العملاء شهادة على نجاحنا وتميزنا في تقديم الخدمات",
+      icon: <FaHandshake />,
+      details: [
+        "أكثر من 10,000 عميل راضٍ عن خدماتنا",
+        "نسبة تجديد عقود تصل إلى 80%",
+        "توصيات مباشرة من عملائنا السابقين"
+      ]
+    },
+    {
+      id: 5,
+      title: "حلول مبتكرة",
+      description: "نطور حلولاً مبتكرة تلبي احتياجات السوق المتغيرة",
+      icon: <FaLandmark />,
+      details: [
+        "منصات رقمية متطورة لتسهيل التعامل",
+        "حلول تمويلية مبتكرة تناسب الجميع",
+        "استراتيجيات تسويقية حديثة وفعالة"
+      ]
+    },
+    {
+      id: 6,
+      title: "أمان وموثوقية",
+      description: "جميع تعاملاتنا تتم ضمن أعلى معايير الأمان والموثوقية",
+      icon: <FaShieldAlt />,
+      details: [
+        "أنظمة حماية متطورة للبيانات",
+        "شهادات أمان معترف بها عالمياً",
+        "ضمانات قانونية كاملة لجميع الصفقات"
+      ]
     }
+  ];
+
+  // دوال التنقل بين الصفحات
+   const nextCard = () => {
+    setActiveTab((prev) => (prev === cardsData.length - 1 ? 0 : prev + 1));
   };
 
-  const prevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    } else {
-      // عند الوصول للبداية، الانتقال للصفحة الأخيرة (دوران)
-      setCurrentPage(Math.ceil(displayedItems.length / itemsPerPage) - 1);
-    }
+  const prevCard = () => {
+    setActiveTab((prev) => (prev === 0 ? cardsData.length - 1 : prev - 1));
   };
 
   // العناصر الحالية للعرض
@@ -801,164 +891,222 @@ const Home = () => {
         </div>
       </section>
 
-      {/* قسم لماذا تختارنا - تصميم أجمل */}
-      <section className="why-us-section">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">
-              لماذا تختارنا؟
-              <div className="transparent-box"></div>
-            </h2>
-            {/* <p>أسباب تجعلنا الخيار الأمثل لاستثمارك العقاري</p> */}
+    {/* قسم لماذا تختارنا - تصميم معدل مع إصلاح المشاكل */}
+<section className="why-us-section">
+  <div className="container">
+    <div className="section-header">
+      <h2 className="section-title">
+        لماذا تختارنا؟
+        <div className="transparent-box"></div>
+      </h2>
+    </div>
+
+    {/* تصميم الكمبيوتر - بطاقة ملء الشاشة */}
+    <div className="desktop-why-us">
+      <div className="full-screen-card">
+        <div className="card-content">
+          <div className="card-icon">
+            {cardsData[activeTab].icon}
           </div>
-
-          <div className="why-us-grid">
-            <div className="why-us-card">
-              <div className="card-icon">
-                <FaAward />
-              </div>
-              <h3>الريادة في السوق</h3>
-              <p>نحن رواد في مجال التسويق العقاري مع أكثر من 15 عاماً من الخبرة والتميز</p>
-            </div>
-
-            <div className="why-us-card">
-              <div className="card-icon">
-                <FaStar />
-              </div>
-              <h3>جودة لا تضاهى</h3>
-              <p>نقدم خدمات عالية الجودة تلبي توقعات عملائنا وتتجاوزها</p>
-            </div>
-
-            <div className="why-us-card">
-              <div className="card-icon">
-                <FaChartLine />
-              </div>
-              <h3>سرعة في الأداء</h3>
-              <p>نتعامل بسرعة وكفاءة لتحقيق أفضل النتائج في أقصر وقت ممكن</p>
-            </div>
-
-            <div className="why-us-card">
-              <div className="card-icon">
-                <FaHandshake />
-              </div>
-              <h3>ثقة العملاء</h3>
-              <p>ثقة آلاف العملاء شهادة على نجاحنا وتميزنا في تقديم الخدمات</p>
-            </div>
-
-            <div className="why-us-card">
-              <div className="card-icon">
-                <FaLandmark />
-              </div>
-              <h3>حلول مبتكرة</h3>
-              <p>نطور حلولاً مبتكرة تلبي احتياجات السوق المتغيرة</p>
-            </div>
-
-            <div className="why-us-card">
-              <div className="card-icon">
-                <FaShieldAlt />
-              </div>
-              <h3>أمان وموثوقية</h3>
-              <p>جميع تعاملاتنا تتم ضمن أعلى معايير الأمان والموثوقية</p>
+          <div className="card-main-content">
+            <h3>{cardsData[activeTab].title}</h3>
+            <p className="card-description">{cardsData[activeTab].description}</p>
+            <div className="card-details">
+              <h4>تفاصيل إضافية:</h4>
+              <ul>
+                {cardsData[activeTab].details.map((detail, index) => (
+                  <li key={index}>
+                    <FaCheck className="check-icon" />
+                    {detail}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
-      </section>
+        
+        {/* شريط التنقل في الأسفل */}
+        <div className="card-navigation">
+          <div className="nav-arrows">
+            <button className="nav-arrow prev" onClick={prevCard}>
+              <FaChevronRight />
+            </button>
+            <button className="nav-arrow next" onClick={nextCard}>
+              <FaChevronLeft />
+            </button>
+          </div>
+          
+          <div className="nav-indicators">
+            {cardsData.map((card, index) => (
+              <button
+                key={card.id}
+                className={`nav-indicator ${activeTab === index ? 'active' : ''}`}
+                onClick={() => setActiveTab(index)}
+              >
+                {card.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
 
+    {/* تصميم الهاتف - عرض بطاقة واحدة مع إمكانية التمرير والسحب */}
+    <div className="mobile-why-us">
+      <div className="mobile-cards-container">
+        <div 
+          className="mobile-cards-track" 
+          style={{ transform: `translateX(-${activeTab * 100}%)` }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {cardsData.map((card, index) => (
+            <div 
+              key={card.id} 
+              className="mobile-why-card"
+            >
+              <div className="card-icon">
+                {card.icon}
+              </div>
+              <h3>{card.title}</h3>
+              <p>{card.description}</p>
+              <div className="card-details">
+                <h4>تفاصيل إضافية:</h4>
+                <ul>
+                  {card.details.map((detail, idx) => (
+                    <li key={idx}>
+                      <FaCheck className="check-icon" />
+                      {detail}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* مؤشرات التمرير */}
+        <div className="mobile-indicators">
+          {cardsData.map((_, index) => (
+            <button
+              key={index}
+              className={`mobile-indicator ${activeTab === index ? 'active' : ''}`}
+              onClick={() => setActiveTab(index)}
+            ></button>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
       {/* قسم اتصل بنا */}
-      <section className="contact-section" id="contact">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">
-              اتصل بنا
-              <div className="transparent-box"></div>
-            </h2>
-            <p>نحن هنا للإجابة على استفساراتك ومساعدتك في العثور على ما تبحث عنه</p>
-          </div>
+     {/* قسم الاستشارة */}
+<section className="consultation-section" id="consultation">
+  <div className="container">
+    <div className="section-header">
+      <h2 className="section-title">
+        هل تحتاج إلى استشارة؟
+        <div className="transparent-box"></div>
+      </h2>
+      <p>نحن هنا لمساعدتك في تحقيق أهدافك الاستثمارية</p>
+    </div>
 
-          <div className="contact-grid">
-            <div className="contact-form">
-              <form>
-                <div className="form-group">
-                  <label htmlFor="name">الاسم</label>
-                  <input type="text" id="name" placeholder="أدخل اسمك الكامل" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email">البريد الإلكتروني</label>
-                  <input type="email" id="email" placeholder="أدخل بريدك الإلكتروني" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="phone">رقم الجوال</label>
-                  <input type="tel" id="phone" placeholder="أدخل رقم جوالك" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="subject">الموضوع</label>
-                  <select id="subject">
-                    <option value="" disabled selected>اختر الموضوع</option>
-                    <option value="buy">شراء عقار</option>
-                    <option value="sell">بيع عقار</option>
-                    <option value="invest">استثمار عقاري</option>
-                    <option value="consult">استشارة عقارية</option>
-                    <option value="other">أخرى</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="message">الرسالة</label>
-                  <textarea id="message" placeholder="اكتب رسالتك هنا..." rows="5"></textarea>
-                </div>
-                <button type="submit" className="submit-btn">إرسال الرسالة</button>
-              </form>
-            </div>
+    <div className="consultation-form-container">
+      <form className="consultation-form">
+        {/* حقل كيف يمكننا مساعدتك */}
+        <div className="form-group">
+          <label htmlFor="help">كيف يمكننا مساعدتك؟ *</label>
+          <textarea 
+            id="help" 
+            placeholder="اشرح لنا احتياجاتك ونوع الاستشارة التي تبحث عنها..." 
+            rows="5"
+            required
+          ></textarea>
+        </div>
 
-            <div className="contact-info">
-              <div className="info-item">
-                <div className="info-icon">
-                  <FaMapMarkerAlt />
-                </div>
-                <div className="info-text">
-                  <h4>العنوان</h4>
-                  <p>الرياض، طريق الملك فهد، برج المملكة، الدور 20</p>
-                </div>
+        {/* حقل رفع الملفات */}
+        <div className="form-group">
+          <label>ارفق ملف أو صورة (اختياري)</label>
+          <div className="file-upload-container">
+            <input 
+              type="file" 
+              id="file-upload" 
+              className="file-input" 
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              multiple
+            />
+            <label htmlFor="file-upload" className="file-upload-label">
+              <div className="upload-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2"/>
+                  <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2"/>
+                  <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2"/>
+                  <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2"/>
+                  <polyline points="10,9 9,9 8,9" stroke="currentColor" strokeWidth="2"/>
+                </svg>
               </div>
-
-              <div className="info-item">
-                <div className="info-icon">
-                  <FaPhone />
-                </div>
-                <div className="info-text">
-                  <h4>اتصل بنا</h4>
-                  <p>966512345678+</p>
-                  <p>966598765432+</p>
-                </div>
+              <div className="upload-text">
+                <span className="upload-title">انقر لرفع الملفات</span>
+                <span className="upload-subtitle">PDF, Word, JPG, PNG (الحد الأقصى 10MB)</span>
               </div>
-
-              <div className="info-item">
-                <div className="info-icon">
-                  <FaEnvelope />
-                </div>
-                <div className="info-text">
-                  <h4>البريد الإلكتروني</h4>
-                  <p>info@realestate.com</p>
-                  <p>sales@realestate.com</p>
-                </div>
-              </div>
-
-              <div className="info-item">
-                <div className="info-icon">
-                  <FaClock />
-                </div>
-                <div className="info-text">
-                  <h4>ساعات العمل</h4>
-                  <p>الأحد - الخميس: 8:00 صباحاً - 5:00 مساءً</p>
-                  <p>السبت: 10:00 صباحاً - 2:00 مساءً</p>
-                </div>
-              </div>
-            </div>
+            </label>
+            <div className="file-preview" id="file-preview"></div>
           </div>
         </div>
-      </section>
+
+        {/* معلومات الاتصال */}
+        <div className="contact-fields">
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="name">الاسم الكامل *</label>
+              <input 
+                type="text" 
+                id="name" 
+                placeholder="أدخل اسمك الكامل" 
+                required 
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="email">البريد الإلكتروني *</label>
+              <input 
+                type="email" 
+                id="email" 
+                placeholder="example@email.com" 
+                required 
+              />
+            </div>
+          </div>
+
+          <div className="form-group phone-group">
+            <label htmlFor="phone">رقم الجوال (سعودي) *</label>
+            <div className="phone-input-container">
+              <div className="country-code">+966</div>
+              <input 
+                type="tel" 
+                id="phone" 
+                placeholder="5X XXX XXXX" 
+                pattern="[0-9]{9}"
+                maxLength="9"
+                required
+                className="phone-input"
+              />
+            </div>
+            <small className="phone-hint">يجب أن يبدأ الرقم بـ 5</small>
+          </div>
+        </div>
+
+        <button type="submit" className="submit-consultation-btn">
+          إرسال طلب الاستشارة
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
 
       {/* قسم الاشتراك في النشرة البريدية */}
-      <section className="newsletter-section">
+      {/* <section className="newsletter-section">
         <div className="container">
           <div className="newsletter-content">
             <h2 className="section-title">
@@ -972,7 +1120,7 @@ const Home = () => {
             </form>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };
