@@ -1,0 +1,1089 @@
+:root {
+  --primary-color: #16354d;
+  --secondary-color: #ffb703;
+  --secondary-light: rgba(255, 183, 3, 0.15);
+  --accent-color: #fb8500;
+  --text-color: #333;
+  --text-light: #767676;
+  --background-light: #f8f9fa;
+  --background-white: #ffffff;
+  --border-color: #eaeaea;
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  --transition-speed: 0.3s;
+}
+
+/* تهيئة المستند */
+.property-list-container {
+  min-height: 100vh;
+  background: var(--background-light);
+  padding-top: 80px;
+}
+
+/* شريط البحث */
+.search-bar {
+  background: var(--background-white);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
+  position: sticky;
+  top: 70px;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.search-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 500px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 3rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+  transition: all var(--transition-speed) ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(22, 53, 77, 0.1);
+}
+
+.search-button {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.filter-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  background: var(--primary-color);
+  color: var(--background-white);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+.filter-toggle-btn:hover {
+  background: var(--accent-color);
+}
+
+/* التخطيط الرئيسي */
+.main-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr 400px;
+  gap: 0;
+  min-height: calc(100vh - 140px);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* العمود الأيمن - الفلتر */
+.filter-sidebar {
+  background: var(--background-white);
+  border-right: 1px solid var(--border-color);
+  height: calc(100vh - 140px);
+  overflow-y: auto;
+  position: sticky;
+  top: 140px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-light);
+}
+
+.filter-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.filter-sidebar::-webkit-scrollbar-track {
+  background: var(--background-light);
+}
+
+.filter-sidebar::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 20px;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--background-white);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.filter-header h3 {
+  margin: 0;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.filter-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: color var(--transition-speed) ease;
+  padding: 0.5rem;
+  border-radius: 50%;
+}
+
+.filter-close-btn:hover {
+  color: var(--accent-color);
+  background: var(--secondary-light);
+}
+
+.filter-content {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+/* تبويب الفلتر */
+.filter-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+}
+
+.filter-tab {
+  flex: 1;
+  padding: 1rem 0.5rem;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  font-weight: 500;
+  transition: all var(--transition-speed) ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.filter-tab:hover {
+  color: var(--primary-color);
+}
+
+.filter-tab.active {
+  color: var(--secondary-color);
+}
+
+.filter-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 25%;
+  width: 50%;
+  height: 3px;
+  background-color: var(--secondary-color);
+  border-radius: 2px;
+}
+
+.filter-section {
+  margin-bottom: 1.5rem;
+}
+
+.filter-section h4 {
+  margin: 0 0 1rem 0;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  transition: color var(--transition-speed) ease;
+  user-select: none;
+}
+
+.filter-option:hover {
+  color: var(--secondary-color);
+}
+
+.filter-option input {
+  margin: 0;
+  accent-color: var(--secondary-color);
+  width: 16px;
+  height: 16px;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-speed) ease;
+  color: var(--text-color);
+  background-color: var(--background-white);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px var(--secondary-light);
+}
+
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.range-inputs input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: 0.9rem;
+  color: var(--text-color);
+  background-color: var(--background-white);
+  transition: all var(--transition-speed) ease;
+}
+
+.range-inputs input:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px var(--secondary-light);
+}
+
+.range-inputs span {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.range-inputs.single-input input {
+  width: 100%;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-container input {
+  accent-color: var(--secondary-color);
+  width: 16px;
+  height: 16px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
+}
+
+.filter-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.apply-filters {
+  padding: 0.8rem;
+  background: var(--secondary-color);
+  color: var(--primary-color);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+.apply-filters:hover {
+  background: var(--accent-color);
+  color: var(--background-white);
+}
+
+.reset-filters {
+  padding: 0.8rem;
+  background: var(--background-light);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+.reset-filters:hover {
+  background: var(--border-color);
+}
+
+/* العمود الأوسط - قائمة العقارات */
+.property-list-main {
+  background: var(--background-light);
+  padding: 2rem;
+  height: calc(100vh - 140px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-light);
+}
+
+.property-list-main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.property-list-main::-webkit-scrollbar-track {
+  background: var(--background-light);
+}
+
+.property-list-main::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 20px;
+}
+
+.property-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.property-list-header h2 {
+  margin: 0;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.property-results-count {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  background: var(--background-white);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.property-card {
+  background: var(--background-white);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-speed) ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.property-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.property-card-active {
+  border: 2px solid var(--secondary-color);
+  box-shadow: 0 4px 15px rgba(255, 183, 3, 0.2);
+}
+
+.property-card-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.property-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-speed) ease;
+}
+
+.property-card:hover .property-card-image img {
+  transform: scale(1.05);
+}
+
+.property-card-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--primary-color);
+  color: var(--background-white);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  z-index: 10;
+}
+
+.property-card-badge.auction-badge {
+  background: var(--accent-color);
+}
+
+.property-favorite-btn {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: var(--background-white);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  box-shadow: var(--shadow-sm);
+  color: var(--text-light);
+  z-index: 10;
+}
+
+.property-favorite-btn:hover {
+  background: #ff4444;
+  color: var(--background-white);
+}
+
+.property-auction-timer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  color: var(--background-white);
+  padding: 1.5rem 1rem 0.7rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.property-card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.property-card-title {
+  margin: 0 0 0.8rem 0;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.property-card-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.property-card-features {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.property-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.property-card-price {
+  margin-bottom: 1.5rem;
+}
+
+.property-card-price.auction-price {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-label {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-bottom: 0.2rem;
+}
+
+.price-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.bidders-count {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.property-card-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: auto;
+}
+
+.property-btn {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  text-align: center;
+  border-radius: var(--border-radius-md);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all var(--transition-speed) ease;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.property-btn-primary {
+  background: var(--primary-color);
+  color: var(--background-white);
+}
+
+.property-btn-primary:hover {
+  background: var(--accent-color);
+}
+
+.property-btn-secondary {
+  background: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+
+.property-btn-secondary:hover {
+  background: var(--secondary-light);
+}
+
+.property-btn-full {
+  width: 100%;
+}
+
+/* لا توجد نتائج */
+.property-no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-light);
+  background: var(--background-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.property-no-results svg {
+  font-size: 4rem;
+  color: var(--border-color);
+  margin-bottom: 1rem;
+}
+
+.property-no-results h3 {
+  margin: 0 0 1rem 0;
+  color: var(--primary-color);
+}
+
+/* نظام الصفحات */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  background: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--primary-color);
+  color: var(--background-white);
+  border-color: var(--primary-color);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-numbers {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.pagination-number {
+  padding: 0.7rem 1rem;
+  background: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  min-width: 44px;
+  text-align: center;
+}
+
+.pagination-number:hover {
+  background: var(--secondary-light);
+}
+
+.pagination-active {
+  background: var(--secondary-color) !important;
+  color: var(--primary-color) !important;
+  border-color: var(--secondary-color) !important;
+  font-weight: 600;
+}
+
+.pagination-ellipsis {
+  color: var(--text-light);
+}
+
+/* العمود الأيسر - تفاصيل العقار */
+.property-details-sidebar {
+  background: var(--background-white);
+  border-left: 1px solid var(--border-color);
+  height: calc(100vh - 140px);
+  overflow-y: auto;
+  position: sticky;
+  top: 140px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-light);
+}
+
+.property-details-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.property-details-sidebar::-webkit-scrollbar-track {
+  background: var(--background-light);
+}
+
+.property-details-sidebar::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 20px;
+}
+
+.property-details-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--background-white);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.property-details-header h3 {
+  margin: 0;
+  color: var(--primary-color);
+}
+
+.property-details-content {
+  padding: 1.5rem;
+}
+
+.property-details-image {
+  position: relative;
+  height: 250px;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.property-details-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.property-auction-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--accent-color);
+  color: white;
+  padding: 0.5rem;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.property-details-info h2 {
+  margin: 0 0 0.8rem 0;
+  color: var(--primary-color);
+  font-size: 1.3rem;
+}
+
+.property-details-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+}
+
+.property-details-price {
+  margin-bottom: 1.5rem;
+}
+
+.property-details-price-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.auction-details-price {
+  background: var(--background-light);
+  padding: 1.2rem;
+  border-radius: var(--border-radius-lg);
+  margin-bottom: 1.5rem;
+}
+
+.auction-current-bid-label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 0.5rem;
+}
+
+.auction-details-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.auction-min-increment, .auction-bidders {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
+}
+
+.property-details-features {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.property-detail-feature {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.property-detail-feature svg {
+  color: var(--secondary-color);
+  font-size: 1.2rem;
+}
+
+.property-detail-feature div {
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-label {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.feature-value {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.property-details-description {
+  margin-bottom: 1.5rem;
+}
+
+.property-details-description h4 {
+  margin: 0 0 0.8rem 0;
+  color: var(--primary-color);
+}
+
+.property-details-description p {
+  color: var(--text-light);
+  line-height: 1.6;
+  margin: 0;
+  text-align: justify;
+}
+
+.property-details-features-list {
+  margin-bottom: 1.5rem;
+}
+
+.property-details-features-list h4 {
+  margin: 0 0 1rem 0;
+  color: var(--primary-color);
+}
+
+.property-features-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.property-feature-tag {
+  background: var(--background-light);
+  color: var(--text-color);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: inline-block;
+}
+
+.property-details-auction {
+  margin-bottom: 1.5rem;
+  background: var(--secondary-light);
+  padding: 1.2rem;
+  border-radius: var(--border-radius-lg);
+}
+
+.property-details-auction h4 {
+  margin: 0 0 1rem 0;
+  color: var(--primary-color);
+}
+
+.property-auction-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.auction-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.property-details-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.property-no-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-light);
+}
+
+.property-no-selection svg {
+  font-size: 4rem;
+  color: var(--border-color);
+  margin-bottom: 1rem;
+}
+
+.property-no-selection h3 {
+  margin: 0 0 1rem 0;
+  color: var(--primary-color);
+}
+
+.mobile-only {
+  display: none;
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 1200px) {
+  .main-layout {
+    grid-template-columns: 280px 1fr;
+  }
+  
+  .property-details-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-sidebar {
+    position: fixed;
+    top: 140px;
+    right: -100%;
+    width: 100%;
+    max-width: 320px;
+    height: calc(100vh - 140px);
+    z-index: 1000;
+    transition: right var(--transition-speed) ease;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .filter-sidebar.active {
+    right: 0;
+  }
+  
+  .mobile-only {
+    display: block;
+  }
+  
+  .filter-text {
+    display: none;
+  }
+  
+  .search-content {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .search-box {
+    max-width: calc(100% - 50px);
+  }
+  
+  .filter-toggle-btn {
+    padding: 0.7rem;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .property-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .property-list-main {
+    padding: 1.5rem 1rem;
+  }
+  
+  .property-card-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .property-list-container {
+    padding-top: 70px;
+  }
+  
+  .search-bar {
+    top: 60px;
+    padding: 0.8rem 0;
+  }
+  
+  .search-content {
+    padding: 0 1rem;
+  }
+  
+  .property-list-main {
+    padding: 1rem 0.8rem;
+    height: auto;
+  }
+  
+  .property-card-content {
+    padding: 1.2rem;
+  }
+  
+  .property-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .range-inputs {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .range-inputs span {
+    display: none;
+  }
+  
+  .pagination {
+    gap: 0.5rem;
+  }
+  
+  .pagination-btn {
+    padding: 0.7rem;
+  }
+  
+  .pagination-number {
+    padding: 0.7rem;
+    min-width: 36px;
+  }
+}

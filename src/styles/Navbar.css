@@ -1,0 +1,639 @@
+@import url('./fonts.css');
+
+/* 🌟 إعدادات عامة */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  color: #333333;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  transition: all 0.4s ease-in-out;
+  padding: 0.7rem 1.5rem;
+}
+
+.navbar.scrolled {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 🌟 الحاوية */
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 🌟 الأقسام الجديدة */
+.nav-right-section {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-left: auto;
+}
+
+.nav-left-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+/* 🌟 الشعار */
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-weight: 700;
+  color: #1976d2;
+  transition: all 0.3s ease;
+  font-size: 1.3rem;
+  margin-left: 0;
+}
+
+.nav-logo:hover {
+  transform: translateY(-2px);
+  color: #1565c0;
+}
+
+/* 🌟 القائمة الرئيسية */
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: all 0.3s ease-in-out;
+}
+
+/* 🌟 مجموعة المستخدم */
+.nav-user-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 0;
+}
+
+/* 🌟 الروابط */
+.nav-link {
+  position: relative;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333333;
+  text-decoration: none;
+  padding: 0.5rem 0.8rem;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  background: none;
+}
+
+.link-icon {
+  margin-left: 8px;
+  font-size: 1rem;
+}
+
+.nav-link:hover {
+  color: #1976d2;
+  background: rgba(25, 118, 210, 0.05);
+  transform: translateY(-1px);
+}
+
+.nav-link.active {
+  color: #1976d2;
+  background: rgba(25, 118, 210, 0.1);
+  font-weight: 600;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 2px;
+  background: #1976d2;
+  border-radius: 2px;
+}
+
+/* 🌟 أزرار المصادقة */
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #1976d2, #1565c0);
+  color: #fff !important;
+  padding: 0.5rem 0.9rem;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.register-btn {
+  background: transparent;
+  color: #1976d2 !important;
+  padding: 0.5rem 0.9rem;
+  border-radius: 20px;
+  border: 2px solid #1976d2;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.register-btn:hover {
+  background: #1976d2;
+  color: #fff !important;
+  transform: translateY(-2px);
+}
+
+.login-icon, .register-icon {
+  font-size: 0.9rem;
+}
+
+.login-btn:hover {
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+}
+
+/* 🌟 زر القائمة (الهاتف) */
+.mobile-menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.mobile-menu-btn span {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: #1976d2;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-btn:hover span {
+  background: #1565c0;
+}
+
+/* 🌟 القائمة المنسدلة */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-width: 250px;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  width: 100%;
+  border: none;
+  background: none;
+  text-align: right;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s;
+  color: #333;
+  text-decoration: none;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #1976d2;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-icon {
+  margin-left: 12px;
+  font-size: 1rem;
+  color: #1976d2;
+}
+
+/* 🌟 الإشعارات */
+.notifications-container {
+  position: relative;
+}
+
+.notification-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.notification-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.notification-icon {
+  font-size: 1.2rem;
+  color: #1976d2;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  background: #ff4444;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  width: 320px;
+  max-height: 400px;
+  overflow: hidden;
+  z-index: 1001;
+}
+
+.notifications-header {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #f8f9fa;
+}
+
+.notifications-header h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+}
+
+.notifications-count {
+  font-size: 12px;
+  color: #666;
+}
+
+.notifications-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* إخفاء شريط التمرير للإشعارات */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.notification-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.notification-item:hover {
+  background-color: #f8f9fa;
+}
+
+.notification-item.unread {
+  background-color: #f0f7ff;
+}
+
+.notification-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.notification-content p {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.notification-time {
+  font-size: 11px;
+  color: #999;
+}
+
+.view-all-notifications {
+  display: block;
+  text-align: center;
+  padding: 12px;
+  background: #f8f9fa;
+  color: #1976d2;
+  text-decoration: none;
+  border-top: 1px solid #f0f0f0;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.view-all-notifications:hover {
+  background: #e8f4fd;
+}
+
+/* 🌟 قائمة المستخدم */
+.user-menu-container {
+  position: relative;
+}
+
+.user-profile-btn {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+
+.user-profile-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  background: #1976d2;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.avatar-icon {
+  font-size: 1rem;
+}
+
+.user-name {
+  font-size: 14px;
+  color: #333;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  min-width: 220px;
+  z-index: 1001;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.dropdown-divider {
+  margin: 4px 16px;
+  border: none;
+  border-top: 1px solid #f0f0f0;
+}
+
+.logout-item {
+  color: #dc3545 !important;
+}
+
+.logout-item:hover {
+  background-color: #fff5f5;
+}
+
+.logout-item .dropdown-icon {
+  color: #dc3545;
+}
+
+/* تحسينات للشاشات المتوسطة */
+@media (max-width: 1100px) {
+  .nav-buttons-group {
+    gap: 1rem;
+  }
+  
+  .nav-right-section {
+    gap: 1.5rem;
+  }
+}
+
+/* 🌟 التصميم المتجاوب */
+@media (max-width: 900px) {
+  .nav-right-section {
+    order: -1;
+    margin-right: auto;
+    margin-left: 0;
+  }
+  
+  .nav-buttons-group {
+    display: none;
+  }
+  
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    height: 100vh;
+    width: 85%;
+    background: #ffffff;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0;
+    transition: right 0.4s ease-in-out;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+    padding: 2rem 1.5rem;
+  }
+
+  .nav-menu.active {
+    right: 0;
+  }
+
+  .nav-user-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+    margin: 0;
+  }
+
+  /* إظهار الأزرار في القائمة المنسدلة للهاتف */
+  .nav-menu .nav-buttons-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 1.5rem;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  /* زر الإغلاق (X) */
+  .close-btn {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #1976d2;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+
+  .close-btn:hover {
+    color: #ff4444;
+  }
+
+  .navbar {
+    padding: 0.8rem 1rem;
+  }
+  
+  /* في وضع الهاتف */
+  .dropdown-menu,
+  .notifications-dropdown,
+  .user-dropdown {
+    position: static;
+    box-shadow: none;
+    border: none;
+    width: 100%;
+    max-height: none;
+    display: none;
+  }
+  
+  .nav-dropdown:hover .dropdown-menu {
+    display: none;
+  }
+  
+  .nav-dropdown.active .dropdown-menu {
+    display: block;
+  }
+  
+  /* أزرار المصادقة في الهاتف */
+  .auth-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.8rem;
+  }
+  
+  .login-btn, .register-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* إخفاء اسم المستخدم في الهاتف */
+  .user-name {
+    display: none;
+  }
+}
+
+/* 🌟 تحسينات للشاشات الصغيرة جداً */
+@media (max-width: 480px) {
+  .nav-menu {
+    width: 90%;
+  }
+  
+  .nav-logo {
+    font-size: 1.2rem;
+  }
+  
+  .login-btn, .register-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .login-text, .register-text {
+    display: none;
+  }
+  
+  .login-icon, .register-icon {
+    margin: 0;
+  }
+}

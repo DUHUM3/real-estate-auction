@@ -28,10 +28,20 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('user');
   };
 
+  const updateUser = (userData) => {
+    const updatedUser = {
+      ...currentUser,
+      ...userData
+    };
+    setCurrentUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
   const value = {
     currentUser,
     login,
     logout,
+    updateUser,
     loading
   };
 

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import '../styles/AuthModal.css';
 
-function Login() {
+function Login({ onClose, onSwitchToRegister }) {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -26,14 +27,25 @@ function Login() {
       email: formData.email
     };
     login(userData);
-    navigate('/dashboard');
+    navigate('/');
+    if (onClose) onClose();
+  }; 
+
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget && onClose) {
+      onClose();
+    }
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <h2>تسجيل الدخول</h2>
-        <form onSubmit={handleSubmit}>
+    <div className="auth-modal-overlay" onClick={handleOverlayClick}>
+      <div className="auth-modal">
+        <div className="auth-modal-header">
+          <h2>تسجيل الدخول</h2>
+          <button className="close-btn" onClick={onClose}>×</button>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <input
               type="email"
@@ -42,6 +54,7 @@ function Login() {
               value={formData.email}
               onChange={handleChange}
               required
+              className="form-input"
             />
           </div>
           <div className="form-group">
@@ -52,13 +65,18 @@ function Login() {
               value={formData.password}
               onChange={handleChange}
               required
+              className="form-input"
             />
           </div>
-          <button type="submit" className="btn btn-primary">تسجيل الدخول</button>
+          <button type="submit" className="btn btn-primary btn-full">تسجيل الدخول</button>
         </form>
-        <p>
-          ليس لديك حساب؟ <Link to="/register">انشاء حساب</Link>
-        </p>
+        
+        <div className="auth-modal-footer">
+          <p>
+            ليس لديك حساب؟ 
+            <span className="auth-link" onClick={onSwitchToRegister}> انشاء حساب</span>
+          </p>
+        </div>
       </div>
     </div>
   );

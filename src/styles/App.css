@@ -46,7 +46,7 @@ body {
   color: var(--background-white);
   overflow: hidden;
   padding: 10px 0;
-  margin-top: 36px; /* 🔹 المسافة تحت الـ Navbar */
+  margin-top: 63px; /* 🔹 المسافة تحت الـ Navbar */
   box-shadow: var(--shadow-sm); /* لمسة جمالية بسيطة */
 }
 
