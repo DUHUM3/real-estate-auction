@@ -304,7 +304,7 @@ body {
 /* ===== تحسين الموبايل ===== */
 @media (max-width: 768px) {
    .hero-content {
-    margin-top: -120px !important; /* رفع فعلي للأعلى */
+    margin-top: -10px !important; /* رفع فعلي للأعلى */
     padding-top: 0 !important;
     transform: none !important; /* إلغاء أي تأثير قد يمنعه */
   }

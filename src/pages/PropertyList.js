@@ -22,7 +22,10 @@ import {
   FaCity,
   FaCalendarAlt,
   FaRegSun,
-  FaLayerGroup
+  FaLayerGroup,
+  FaChevronDown,
+  FaAngleLeft,
+  FaAngleRight,
 } from 'react-icons/fa';
 import '../styles/PropertyList.css';
 
@@ -30,7 +33,7 @@ function PropertyList() {
   const [properties, setProperties] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [showSidebarFilter, setShowSidebarFilter] = useState(window.innerWidth > 768);
+  const [showSidebarFilter, setShowSidebarFilter] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [propertiesPerPage] = useState(9);
   const [filterType, setFilterType] = useState('lands'); // 'lands' or 'auctions'
@@ -56,7 +59,9 @@ function PropertyList() {
       purpose: 'all' // investment, purchase, all
     }
   });
-
+  const [expandedFilterSection, setExpandedFilterSection] = useState(null);
+  const [mobileDetailView, setMobileDetailView] = useState(false);
+  
   useEffect(() => {
     // بيانات تجريبية
     const sampleProperties = [
@@ -69,7 +74,7 @@ function PropertyList() {
         region: 'الرياض',
         city: 'الرياض',
         area: 450,
-        image: '/images/land1.jpg',
+        image: 'https://images.unsplash.com/photo-1618845072389-17ed0a939399',
         isAuction: false,
         facing: 'شمالي',
         developed: true,
@@ -89,7 +94,7 @@ function PropertyList() {
         region: 'مكة المكرمة',
         city: 'جدة',
         area: 1200,
-        image: '/images/land2.jpg',
+        image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6',
         isAuction: true,
         auctionEnd: '2025-12-25',
         currentBid: 4500000,
@@ -114,7 +119,7 @@ function PropertyList() {
         region: 'الرياض',
         city: 'وادي الدواسر',
         area: 10000,
-        image: '/images/land3.jpg',
+        image: 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef',
         isAuction: true,
         auctionEnd: '2025-11-20',
         currentBid: 1200000,
@@ -139,7 +144,7 @@ function PropertyList() {
         region: 'الرياض',
         city: 'الرياض',
         area: 400,
-        image: '/images/land4.jpg',
+        image: 'https://images.unsplash.com/photo-1631193816258-28b828b5a786',
         isAuction: false,
         facing: 'غربي',
         developed: true,
@@ -159,7 +164,7 @@ function PropertyList() {
         region: 'المنطقة الشرقية',
         city: 'الدمام',
         area: 600,
-        image: '/images/land5.jpg',
+        image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
         isAuction: true,
         auctionEnd: '2025-12-05',
         currentBid: 3500000,
@@ -185,7 +190,7 @@ function PropertyList() {
         region: 'الرياض',
         city: 'الرياض',
         area: 750,
-        image: '/images/land6.jpg',
+        image: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716',
         currentBid: 1800000,
         minBidIncrement: 25000,
         bidders: 18,
@@ -208,7 +213,7 @@ function PropertyList() {
         region: 'المنطقة الشرقية',
         city: 'الدمام',
         area: 3000,
-        image: '/images/land7.jpg',
+        image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab',
         isAuction: false,
         facing: 'شرقي',
         developed: true,
@@ -228,7 +233,7 @@ function PropertyList() {
         region: 'مكة المكرمة',
         city: 'جدة',
         area: 2200,
-        image: '/images/land8.jpg',
+        image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa',
         isAuction: false,
         facing: 'جنوبي',
         developed: true,
@@ -248,7 +253,7 @@ function PropertyList() {
         region: 'الرياض',
         city: 'الرياض',
         area: 1500,
-        image: '/images/land9.jpg',
+        image: 'https://images.unsplash.com/photo-1617850687395-620757abd1ac',
         isAuction: false,
         facing: 'شمالي',
         developed: true,
@@ -269,7 +274,7 @@ function PropertyList() {
         region: 'المنطقة الشرقية',
         city: 'الخبر',
         area: 1000,
-        image: '/images/land10.jpg',
+        image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
         currentBid: 3200000,
         minBidIncrement: 50000,
         bidders: 14,
@@ -292,7 +297,7 @@ function PropertyList() {
         region: 'القصيم',
         city: 'بريدة',
         area: 15000,
-        image: '/images/land11.jpg',
+        image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef',
         isAuction: false,
         facing: 'شرقي',
         developed: false,
@@ -313,7 +318,7 @@ function PropertyList() {
         region: 'الرياض',
         city: 'الرياض',
         area: 500,
-        image: '/images/land12.jpg',
+        image: 'https://images.unsplash.com/photo-1448630360428-65456885c650',
         currentBid: 920000,
         minBidIncrement: 20000,
         bidders: 22,
@@ -326,17 +331,182 @@ function PropertyList() {
         createdAt: '2025-10-09',
         status: 'active',
         contact: '+966500000016'
-      }
+      },
+        {
+        id: 13,
+        title: 'أرض سكنية في حي الياسمين',
+        type: 'أرض',
+        purpose: 'سكني',
+        price: 850000,
+        region: 'الرياض',
+        city: 'الرياض',
+        area: 450,
+        image: 'https://images.unsplash.com/photo-1618845072389-17ed0a939399',
+        isAuction: false,
+        facing: 'شمالي',
+        developed: true,
+        description: 'أرض سكنية مطورة في حي الياسمين، موقع مميز مع خدمات متكاملة وقريبة من المرافق الحيوية. مساحتها 450 متر مربع وتتميز بواجهة شمالية. مناسبة لبناء فلل سكنية فاخرة.',
+        features: ['واجهة شمالية', 'شوارع مسفلتة', 'أرصفة', 'إنارة', 'قريبة من الخدمات', 'مخطط معتمد'],
+        owner: 'شركة العقارية المتميزة',
+        createdAt: '2025-10-01',
+        status: 'active',
+        contact: '+966500000001'
+      },
+        {
+        id: 14,
+        title: 'أرض سكنية في حي الياسمين',
+        type: 'أرض',
+        purpose: 'سكني',
+        price: 850000,
+        region: 'الرياض',
+        city: 'الرياض',
+        area: 450,
+        image: 'https://images.unsplash.com/photo-1618845072389-17ed0a939399',
+        isAuction: false,
+        facing: 'شمالي',
+        developed: true,
+        description: 'أرض سكنية مطورة في حي الياسمين، موقع مميز مع خدمات متكاملة وقريبة من المرافق الحيوية. مساحتها 450 متر مربع وتتميز بواجهة شمالية. مناسبة لبناء فلل سكنية فاخرة.',
+        features: ['واجهة شمالية', 'شوارع مسفلتة', 'أرصفة', 'إنارة', 'قريبة من الخدمات', 'مخطط معتمد'],
+        owner: 'شركة العقارية المتميزة',
+        createdAt: '2025-10-01',
+        status: 'active',
+        contact: '+966500000001'
+      },
+        {
+        id: 15,
+        title: 'أرض سكنية في حي الياسمين',
+        type: 'أرض',
+        purpose: 'سكني',
+        price: 850000,
+        region: 'الرياض',
+        city: 'الرياض',
+        area: 450,
+        image: 'https://images.unsplash.com/photo-1618845072389-17ed0a939399',
+        isAuction: false,
+        facing: 'شمالي',
+        developed: true,
+        description: 'أرض سكنية مطورة في حي الياسمين، موقع مميز مع خدمات متكاملة وقريبة من المرافق الحيوية. مساحتها 450 متر مربع وتتميز بواجهة شمالية. مناسبة لبناء فلل سكنية فاخرة.',
+        features: ['واجهة شمالية', 'شوارع مسفلتة', 'أرصفة', 'إنارة', 'قريبة من الخدمات', 'مخطط معتمد'],
+        owner: 'شركة العقارية المتميزة',
+        createdAt: '2025-10-01',
+        status: 'active',
+        contact: '+966500000001'
+      },
+        {
+        id: 16,
+        title: 'أرض سكنية في حي الياسمين',
+        type: 'أرض',
+        purpose: 'سكني',
+        price: 850000,
+        region: 'الرياض',
+        city: 'الرياض',
+        area: 450,
+        image: 'https://images.unsplash.com/photo-1618845072389-17ed0a939399',
+        isAuction: false,
+        facing: 'شمالي',
+        developed: true,
+        description: 'أرض سكنية مطورة في حي الياسمين، موقع مميز مع خدمات متكاملة وقريبة من المرافق الحيوية. مساحتها 450 متر مربع وتتميز بواجهة شمالية. مناسبة لبناء فلل سكنية فاخرة.',
+        features: ['واجهة شمالية', 'شوارع مسفلتة', 'أرصفة', 'إنارة', 'قريبة من الخدمات', 'مخطط معتمد'],
+        owner: 'شركة العقارية المتميزة',
+        createdAt: '2025-10-01',
+        status: 'active',
+        contact: '+966500000001'
+      },
+        {
+        id: 17,
+        title: 'أرض سكنية في حي الياسمين',
+        type: 'أرض',
+        purpose: 'سكني',
+        price: 850000,
+        region: 'الرياض',
+        city: 'الرياض',
+        area: 450,
+        image: 'https://images.unsplash.com/photo-1618845072389-17ed0a939399',
+        isAuction: false,
+        facing: 'شمالي',
+        developed: true,
+        description: 'أرض سكنية مطورة في حي الياسمين، موقع مميز مع خدمات متكاملة وقريبة من المرافق الحيوية. مساحتها 450 متر مربع وتتميز بواجهة شمالية. مناسبة لبناء فلل سكنية فاخرة.',
+        features: ['واجهة شمالية', 'شوارع مسفلتة', 'أرصفة', 'إنارة', 'قريبة من الخدمات', 'مخطط معتمد'],
+        owner: 'شركة العقارية المتميزة',
+        createdAt: '2025-10-01',
+        status: 'active',
+        contact: '+966500000001'
+      },
+        {
+        id: 18,
+        title: 'أرض سكنية في حي الياسمين',
+        type: 'أرض',
+        purpose: 'سكني',
+        price: 850000,
+        region: 'الرياض',
+        city: 'الرياض',
+        area: 450,
+        image: 'https://images.unsplash.com/photo-1618845072389-17ed0a939399',
+        isAuction: false,
+        facing: 'شمالي',
+        developed: true,
+        description: 'أرض سكنية مطورة في حي الياسمين، موقع مميز مع خدمات متكاملة وقريبة من المرافق الحيوية. مساحتها 450 متر مربع وتتميز بواجهة شمالية. مناسبة لبناء فلل سكنية فاخرة.',
+        features: ['واجهة شمالية', 'شوارع مسفلتة', 'أرصفة', 'إنارة', 'قريبة من الخدمات', 'مخطط معتمد'],
+        owner: 'شركة العقارية المتميزة',
+        createdAt: '2025-10-01',
+        status: 'active',
+        contact: '+966500000001'
+      },
+        {
+        id: 19,
+        title: 'أرض سكنية في حي الياسمين',
+        type: 'أرض',
+        purpose: 'سكني',
+        price: 850000,
+        region: 'الرياض',
+        city: 'الرياض',
+        area: 450,
+        image: 'https://images.unsplash.com/photo-1618845072389-17ed0a939399',
+        isAuction: false,
+        facing: 'شمالي',
+        developed: true,
+        description: 'أرض سكنية مطورة في حي الياسمين، موقع مميز مع خدمات متكاملة وقريبة من المرافق الحيوية. مساحتها 450 متر مربع وتتميز بواجهة شمالية. مناسبة لبناء فلل سكنية فاخرة.',
+        features: ['واجهة شمالية', 'شوارع مسفلتة', 'أرصفة', 'إنارة', 'قريبة من الخدمات', 'مخطط معتمد'],
+        owner: 'شركة العقارية المتميزة',
+        createdAt: '2025-10-01',
+        status: 'active',
+        contact: '+966500000001'
+      },
+        {
+        id: 20,
+        title: 'أرض سكنية في حي الياسمين',
+        type: 'أرض',
+        purpose: 'سكني',
+        price: 850000,
+        region: 'الرياض',
+        city: 'الرياض',
+        area: 450,
+        image: 'https://images.unsplash.com/photo-1618845072389-17ed0a939399',
+        isAuction: false,
+        facing: 'شمالي',
+        developed: true,
+        description: 'أرض سكنية مطورة في حي الياسمين، موقع مميز مع خدمات متكاملة وقريبة من المرافق الحيوية. مساحتها 450 متر مربع وتتميز بواجهة شمالية. مناسبة لبناء فلل سكنية فاخرة.',
+        features: ['واجهة شمالية', 'شوارع مسفلتة', 'أرصفة', 'إنارة', 'قريبة من الخدمات', 'مخطط معتمد'],
+        owner: 'شركة العقارية المتميزة',
+        createdAt: '2025-10-01',
+        status: 'active',
+        contact: '+966500000001'
+      },
     ];
     setProperties(sampleProperties);
     // تحديد أول عقار كافتراضي
     setSelectedProperty(sampleProperties[0]);
 
-    // إضافة مستمع حجم النافذة للتصميم المتجاوب
+    // تعديل حالة الفلتر الجانبي بناءً على حجم الشاشة
     const handleResize = () => {
-      setShowSidebarFilter(window.innerWidth > 768);
+      if (window.innerWidth > 992) {
+        setShowSidebarFilter(false);
+        setMobileDetailView(false);
+      }
     };
     window.addEventListener('resize', handleResize);
+    handleResize();
+    
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -344,9 +514,9 @@ function PropertyList() {
   const filteredProperties = properties.filter(property => {
     // تنقية بناء على مصطلح البحث
     if (searchTerm && !property.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !property.city.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !property.region.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !property.description.toLowerCase().includes(searchTerm.toLowerCase())) {
+        !property.city.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !property.region.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !property.description.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
 
@@ -434,14 +604,14 @@ function PropertyList() {
       // تصفية حسب تاريخ المزاد (من - إلى)
       if (auctionFilters.dateRange.from || auctionFilters.dateRange.to) {
         const auctionDate = new Date(property.auctionEnd);
-        
+
         if (auctionFilters.dateRange.from) {
           const fromDate = new Date(auctionFilters.dateRange.from);
           if (auctionDate < fromDate) {
             return false;
           }
         }
-        
+
         if (auctionFilters.dateRange.to) {
           const toDate = new Date(auctionFilters.dateRange.to);
           if (auctionDate > toDate) {
@@ -478,7 +648,7 @@ function PropertyList() {
       if (auctionFilters.minBidIncrement > 0 && property.minBidIncrement < auctionFilters.minBidIncrement) {
         return false;
       }
-      
+
       // تصفية حسب الغرض
       if (auctionFilters.purpose !== 'all' && property.purpose !== auctionFilters.purpose) {
         return false;
@@ -494,7 +664,10 @@ function PropertyList() {
   const currentProperties = filteredProperties.slice(indexOfFirstProperty, indexOfLastProperty);
   const totalPages = Math.ceil(filteredProperties.length / propertiesPerPage);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+  };
 
   const resetFilters = () => {
     setFilters({
@@ -561,769 +734,820 @@ function PropertyList() {
   const nextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
+      window.scrollTo(0, 0);
     }
   };
 
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const toggleFilterSection = (section) => {
+    if (expandedFilterSection === section) {
+      setExpandedFilterSection(null);
+    } else {
+      setExpandedFilterSection(section);
     }
   };
 
   // الحصول على قائمة المناطق الفريدة
   const uniqueRegions = [...new Set(properties.map(property => property.region))];
-  
+
   // الحصول على قائمة المدن الفريدة حسب المنطقة المختارة
   const getUniqueCities = (region) => {
     if (!region) return [...new Set(properties.map(property => property.city))];
     return [...new Set(properties.filter(property => property.region === region).map(property => property.city))];
   };
 
+  // التبديل بين وضع التفاصيل للجوال
+  const toggleMobileDetailView = (property = null) => {
+    setSelectedProperty(property);
+    setMobileDetailView(!!property);
+  };
+
   return (
-    <div className="property-list-container">
+    <div className="real-estate-app">
       {/* شريط البحث */}
       <div className="search-bar">
-        <div className="search-content">
-          <div className="search-box">
+        <div className="search-container">
+          <div className="search-field">
             <input
               type="text"
               placeholder="ابحث عن أرض، موقع، مزاد..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
             />
-            <button className="search-button">
-              <FaSearch />
-            </button>
+            <FaSearch className="search-icon" />
           </div>
-
-          <button
-            className="filter-toggle-btn"
-            onClick={() => setShowSidebarFilter(!showSidebarFilter)}
-          >
+          <button className="filter-toggle" onClick={() => setShowSidebarFilter(!showSidebarFilter)}>
             <FaFilter />
-            <span className="filter-text">{showSidebarFilter ? 'إخفاء الفلتر' : 'إظهار الفلتر'}</span>
+            <span>الفلتر</span>
           </button>
         </div>
       </div>
 
-      {/* المحتوى الرئيسي */}
-      <div className="main-layout">
-        {/* العمود الأيمن - الفلتر */}
-        <div className={`filter-sidebar ${showSidebarFilter ? 'active' : ''}`}>
+      <div className="content-container">
+        {/* لوحة الفلتر */}
+        <div className={`filter-panel ${showSidebarFilter ? 'active' : ''}`}>
           <div className="filter-header">
-            <h3>
+            <div className="filter-title">
               <FaSlidersH />
-              تصفية النتائج
-            </h3>
-            <button className="filter-close-btn mobile-only" onClick={() => setShowSidebarFilter(false)}>
+              <h3>تصفية البحث</h3>
+            </div>
+            <button className="close-filter" onClick={() => setShowSidebarFilter(false)}>
               <FaTimes />
             </button>
           </div>
-
+          
           <div className="filter-tabs">
-            <button
-              className={`filter-tab ${filterType === 'lands' ? 'active' : ''}`}
+            <button 
+              className={`filter-tab ${filterType === 'lands' ? 'active' : ''}`} 
               onClick={() => switchFilterType('lands')}
             >
               <FaLandmark />
-              الأراضي
+              <span>الأراضي</span>
             </button>
-            <button
-              className={`filter-tab ${filterType === 'auctions' ? 'active' : ''}`}
+            <button 
+              className={`filter-tab ${filterType === 'auctions' ? 'active' : ''}`} 
               onClick={() => switchFilterType('auctions')}
             >
               <FaGavel />
-              المزادات
+              <span>المزادات</span>
             </button>
           </div>
-
-          <div className="filter-content2">
+          
+          <div className="filter-body">
             {filterType === 'lands' ? (
-              // فلتر الأراضي
-              <>
-                {/* المنطقة */}
+              /* فلترات الأراضي */
+              <div className="filter-sections">
                 <div className="filter-section">
-                  <h4>
-                    <FaMapMarkerAlt />
-                    المنطقة
-                  </h4>
-                  <select
-                    value={filters.lands.region}
-                    onChange={(e) => handleFilterChange('lands', 'region', e.target.value)}
-                    className="filter-select"
+                  <div 
+                    className="filter-section-header" 
+                    onClick={() => toggleFilterSection('region')}
                   >
-                    <option value="">جميع المناطق</option>
-                    {uniqueRegions.map((region, index) => (
-                      <option key={index} value={region}>{region}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* المدينة */}
-                <div className="filter-section">
-                  <h4>
-                    <FaCity />
-                    المدينة
-                  </h4>
-                  <select
-                    value={filters.lands.city}
-                    onChange={(e) => handleFilterChange('lands', 'city', e.target.value)}
-                    className="filter-select"
-                  >
-                    <option value="">جميع المدن</option>
-                    {getUniqueCities(filters.lands.region).map((city, index) => (
-                      <option key={index} value={city}>{city}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* نطاق السعر */}
-                <div className="filter-section">
-                  <h4>
-                    <FaMoneyBillWave />
-                    نطاق السعر
-                  </h4>
-                  <div className="price-range">
-                    <div className="range-inputs">
-                      <input
-                        type="number"
-                        placeholder="الحد الأدنى"
-                        value={filters.lands.priceRange.min}
-                        onChange={(e) => handleRangeChange('lands', 'priceRange', parseInt(e.target.value) || 0, filters.lands.priceRange.max)}
-                      />
-                      <span>إلى</span>
-                      <input
-                        type="number"
-                        placeholder="الحد الأقصى"
-                        value={filters.lands.priceRange.max}
-                        onChange={(e) => handleRangeChange('lands', 'priceRange', filters.lands.priceRange.min, parseInt(e.target.value) || 10000000)}
-                      />
+                    <div className="filter-section-title">
+                      <FaMapMarkerAlt />
+                      <span>المنطقة والمدينة</span>
                     </div>
+                    <FaChevronDown className={expandedFilterSection === 'region' ? 'rotate' : ''} />
                   </div>
-                </div>
-
-                {/* المساحة */}
-                <div className="filter-section">
-                  <h4>
-                    <FaRulerCombined />
-                    المساحة (م²)
-                  </h4>
-                  <div className="range-inputs">
-                    <input
-                      type="number"
-                      placeholder="الحد الأدنى"
-                      value={filters.lands.area.min}
-                      onChange={(e) => handleRangeChange('lands', 'area', parseInt(e.target.value) || 0, filters.lands.area.max)}
-                    />
-                    <span>إلى</span>
-                    <input
-                      type="number"
-                      placeholder="الحد الأقصى"
-                      value={filters.lands.area.max}
-                      onChange={(e) => handleRangeChange('lands', 'area', filters.lands.area.min, parseInt(e.target.value) || 5000)}
-                    />
-                  </div>
-                </div>
-
-                {/* الغرض */}
-                <div className="filter-section">
-                  <h4>
-                    <FaCity />
-                    الغرض
-                  </h4>
-                  <div className="filter-options">
-                    {[
-                      { value: 'all', label: 'جميع الأغراض' },
-                      { value: 'سكني', label: 'سكني' },
-                      { value: 'تجاري', label: 'تجاري' },
-                      { value: 'زراعي', label: 'زراعي' },
-                      { value: 'صناعي', label: 'صناعي' },
-                      { value: 'مختلط', label: 'مختلط' }
-                    ].map(option => (
-                      <label key={option.value} className="filter-option">
-                        <input
-                          type="radio"
-                          name="landPurpose"
-                          value={option.value}
-                          checked={filters.lands.purpose === option.value}
-                          onChange={(e) => handleFilterChange('lands', 'purpose', e.target.value)}
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* حالة التطوير */}
-                <div className="filter-section">
-                  <h4>
-                    <FaLayerGroup />
-                    حالة التطوير
-                  </h4>
-                  <div className="filter-options">
-                    {[
-                      { value: 'all', label: 'الكل' },
-                      { value: 'yes', label: 'مطورة' },
-                      { value: 'no', label: 'غير مطورة' }
-                    ].map(option => (
-                      <label key={option.value} className="filter-option">
-                        <input
-                          type="radio"
-                          name="developed"
-                          value={option.value}
-                          checked={filters.lands.developed === option.value}
-                          onChange={(e) => handleFilterChange('lands', 'developed', e.target.value)}
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* اتجاه الأرض */}
-                <div className="filter-section">
-                  <h4>
-                    <FaRegSun />
-                    اتجاه الأرض
-                  </h4>
-                  <div className="filter-options">
-                    {[
-                      { value: 'all', label: 'جميع الاتجاهات' },
-                      { value: 'شمالي', label: 'شمالي' },
-                      { value: 'جنوبي', label: 'جنوبي' },
-                      { value: 'شرقي', label: 'شرقي' },
-                      { value: 'غربي', label: 'غربي' }
-                    ].map(option => (
-                      <label key={option.value} className="filter-option">
-                        <input
-                          type="radio"
-                          name="propertyFacing"
-                          value={option.value}
-                          checked={filters.lands.propertyFacing === option.value}
-                          onChange={(e) => handleFilterChange('lands', 'propertyFacing', e.target.value)}
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* تاريخ النشر */}
-                <div className="filter-section">
-                  <h4>
-                    <FaCalendarAlt />
-                    تاريخ النشر
-                  </h4>
-                  <div className="filter-options">
-                    {[
-                      { value: 'all', label: 'جميع التواريخ' },
-                      { value: 'today', label: 'اليوم' },
-                      { value: 'thisWeek', label: 'هذا الأسبوع' },
-                      { value: 'thisMonth', label: 'هذا الشهر' }
-                    ].map(option => (
-                      <label key={option.value} className="filter-option">
-                        <input
-                          type="radio"
-                          name="publishDate"
-                          value={option.value}
-                          checked={filters.lands.publishDate === option.value}
-                          onChange={(e) => handleFilterChange('lands', 'publishDate', e.target.value)}
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : (
-              // فلتر المزادات
-              <>
-                {/* المنطقة */}
-                <div className="filter-section">
-                  <h4>
-                    <FaMapMarkerAlt />
-                    المنطقة
-                  </h4>
-                  <select
-                    value={filters.auctions.region}
-                    onChange={(e) => handleFilterChange('auctions', 'region', e.target.value)}
-                    className="filter-select"
-                  >
-                    <option value="">جميع المناطق</option>
-                    {uniqueRegions.map((region, index) => (
-                      <option key={index} value={region}>{region}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* المدينة */}
-                <div className="filter-section">
-                  <h4>
-                    <FaCity />
-                    المدينة
-                  </h4>
-                  <select
-                    value={filters.auctions.city}
-                    onChange={(e) => handleFilterChange('auctions', 'city', e.target.value)}
-                    className="filter-select"
-                  >
-                    <option value="">جميع المدن</option>
-                    {getUniqueCities(filters.auctions.region).map((city, index) => (
-                      <option key={index} value={city}>{city}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* تاريخ المزاد (من) */}
-                <div className="filter-section">
-                  <h4>
-                    <FaCalendarAlt />
-                    تاريخ المزاد من
-                  </h4>
-                  <div className="range-inputs single-input">
-                    <input
-                      type="date"
-                      value={filters.auctions.dateRange.from}
-                      onChange={(e) => handleDateRangeChange('auctions', 'dateRange', e.target.value, filters.auctions.dateRange.to)}
-                    />
-                  </div>
-                </div>
-
-                {/* تاريخ المزاد (إلى) */}
-                <div className="filter-section">
-                  <h4>
-                    <FaCalendarAlt />
-                    تاريخ المزاد إلى
-                  </h4>
-                  <div className="range-inputs single-input">
-                    <input
-                      type="date"
-                      value={filters.auctions.dateRange.to}
-                      onChange={(e) => handleDateRangeChange('auctions', 'dateRange', filters.auctions.dateRange.from, e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* الأيام المتبقية */}
-                <div className="filter-section">
-                  <h4>
-                    <FaClock />
-                    الأيام المتبقية (كحد أقصى)
-                  </h4>
-                  <div className="range-inputs single-input">
-                    <input
-                      type="number"
-                      placeholder="الأيام المتبقية"
-                      value={filters.auctions.daysRemaining}
-                      onChange={(e) => handleFilterChange('auctions', 'daysRemaining', parseInt(e.target.value) || 30)}
-                    />
-                  </div>
-                </div>
-
-                {/* حالة المزاد */}
-                <div className="filter-section">
-                  <h4>
-                    <FaCalendarAlt />
-                    حالة المزاد
-                  </h4>
-                  <div className="filter-options">
-                    {[
-                      { value: 'all', label: 'الكل' },
-                      { value: 'active', label: 'نشط' },
-                      { value: 'upcoming', label: 'قادم' },
-                      { value: 'completed', label: 'منتهي' }
-                    ].map(option => (
-                      <label key={option.value} className="filter-option">
-                        <input
-                          type="radio"
-                          name="auctionStatus"
-                          value={option.value}
-                          checked={filters.auctions.status === option.value}
-                          onChange={(e) => handleFilterChange('auctions', 'status', e.target.value)}
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* نوع العقار */}
-                <div className="filter-section">
-                  <h4>
-                    <FaBuilding />
-                    نوع العقار
-                  </h4>
-                  <div className="filter-options">
-                    {[
-                      { value: 'all', label: 'جميع الأنواع' },
-                      { value: 'lands', label: 'أراضي' },
-                      { value: 'buildings', label: 'مباني' }
-                    ].map(option => (
-                      <label key={option.value} className="filter-option">
-                        <input
-                          type="radio"
-                          name="auctionType"
-                          value={option.value}
-                          checked={filters.auctions.type === option.value}
-                          onChange={(e) => handleFilterChange('auctions', 'type', e.target.value)}
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* الحد الأدنى للمزايدة */}
-                <div className="filter-section">
-                  <h4>
-                    <FaMoneyBillWave />
-                    الحد الأدنى للمزايدة
-                  </h4>
-                  <div className="range-inputs single-input">
-                    <input
-                      type="number"
-                      placeholder="الحد الأدنى للمزايدة"
-                      value={filters.auctions.minBidIncrement}
-                      onChange={(e) => handleFilterChange('auctions', 'minBidIncrement', parseInt(e.target.value) || 0)}
-                    />
-                  </div>
+                  {(expandedFilterSection === 'region' || expandedFilterSection === null) && (
+                    <div className="filter-section-content">
+                      <div className="filter-input">
+                        <label>المنطقة</label>
+                        <select
+                          value={filters.lands.region}
+                          onChange={(e) => handleFilterChange('lands', 'region', e.target.value)}
+                        >
+                          <option value="">جميع المناطق</option>
+                          {uniqueRegions.map((region, index) => (
+                            <option key={index} value={region}>{region}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="filter-input">
+                        <label>المدينة</label>
+                        <select
+                          value={filters.lands.city}
+                          onChange={(e) => handleFilterChange('lands', 'city', e.target.value)}
+                        >
+                          <option value="">جميع المدن</option>
+                          {getUniqueCities(filters.lands.region).map((city, index) => (
+                            <option key={index} value={city}>{city}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
-                {/* الغرض من العقار */}
                 <div className="filter-section">
-                  <h4>
-                    <FaCity />
-                    الغرض من العقار
-                  </h4>
-                  <div className="filter-options">
-                    {[
-                      { value: 'all', label: 'جميع الأغراض' },
-                      { value: 'استثمار', label: 'استثمار' },
-                      { value: 'شراء', label: 'شراء' }
-                    ].map(option => (
-                      <label key={option.value} className="filter-option">
-                        <input
-                          type="radio"
-                          name="auctionPurpose"
-                          value={option.value}
-                          checked={filters.auctions.purpose === option.value}
-                          onChange={(e) => handleFilterChange('auctions', 'purpose', e.target.value)}
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    ))}
+                  <div 
+                    className="filter-section-header" 
+                    onClick={() => toggleFilterSection('priceArea')}
+                  >
+                    <div className="filter-section-title">
+                      <FaMoneyBillWave />
+                      <span>السعر والمساحة</span>
+                    </div>
+                    <FaChevronDown className={expandedFilterSection === 'priceArea' ? 'rotate' : ''} />
                   </div>
+                  {(expandedFilterSection === 'priceArea' || expandedFilterSection === null) && (
+                    <div className="filter-section-content">
+                      <div className="filter-input">
+                        <label>نطاق السعر (ريال)</label>
+                        <div className="range-inputs">
+                          <input
+                            type="number"
+                            placeholder="الحد الأدنى"
+                            value={filters.lands.priceRange.min}
+                            onChange={(e) => handleRangeChange('lands', 'priceRange', parseInt(e.target.value) || 0, filters.lands.priceRange.max)}
+                          />
+                          <span className="range-separator">إلى</span>
+                          <input
+                            type="number"
+                            placeholder="الحد الأقصى"
+                            value={filters.lands.priceRange.max}
+                            onChange={(e) => handleRangeChange('lands', 'priceRange', filters.lands.priceRange.min, parseInt(e.target.value) || 10000000)}
+                          />
+                        </div>
+                      </div>
+                      <div className="filter-input">
+                        <label>المساحة (م²)</label>
+                        <div className="range-inputs">
+                          <input
+                            type="number"
+                            placeholder="الحد الأدنى"
+                            value={filters.lands.area.min}
+                            onChange={(e) => handleRangeChange('lands', 'area', parseInt(e.target.value) || 0, filters.lands.area.max)}
+                          />
+                          <span className="range-separator">إلى</span>
+                          <input
+                            type="number"
+                            placeholder="الحد الأقصى"
+                            value={filters.lands.area.max}
+                            onChange={(e) => handleRangeChange('lands', 'area', filters.lands.area.min, parseInt(e.target.value) || 5000)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </>
+                
+                <div className="filter-section">
+                  <div 
+                    className="filter-section-header" 
+                    onClick={() => toggleFilterSection('purpose')}
+                  >
+                    <div className="filter-section-title">
+                      <FaCity />
+                      <span>الغرض</span>
+                    </div>
+                    <FaChevronDown className={expandedFilterSection === 'purpose' ? 'rotate' : ''} />
+                  </div>
+                  {(expandedFilterSection === 'purpose' || expandedFilterSection === null) && (
+                    <div className="filter-section-content">
+                      <div className="radio-options">
+                        {[
+                          { value: 'all', label: 'جميع الأغراض' },
+                          { value: 'سكني', label: 'سكني' },
+                          { value: 'تجاري', label: 'تجاري' },
+                          { value: 'زراعي', label: 'زراعي' },
+                          { value: 'صناعي', label: 'صناعي' },
+                          { value: 'مختلط', label: 'مختلط' }
+                        ].map(option => (
+                          <label key={option.value} className="radio-option">
+                            <input
+                              type="radio"
+                              name="landPurpose"
+                              value={option.value}
+                              checked={filters.lands.purpose === option.value}
+                              onChange={(e) => handleFilterChange('lands', 'purpose', e.target.value)}
+                            />
+                            <span>{option.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="filter-section">
+                  <div 
+                    className="filter-section-header" 
+                    onClick={() => toggleFilterSection('developed')}
+                  >
+                    <div className="filter-section-title">
+                      <FaLayerGroup />
+                      <span>حالة التطوير واتجاه الأرض</span>
+                    </div>
+                    <FaChevronDown className={expandedFilterSection === 'developed' ? 'rotate' : ''} />
+                  </div>
+                  {(expandedFilterSection === 'developed' || expandedFilterSection === null) && (
+                    <div className="filter-section-content">
+                      <div className="filter-input">
+                        <label>حالة التطوير</label>
+                        <div className="radio-options">
+                          {[
+                            { value: 'all', label: 'الكل' },
+                            { value: 'yes', label: 'مطورة' },
+                            { value: 'no', label: 'غير مطورة' }
+                          ].map(option => (
+                            <label key={option.value} className="radio-option">
+                              <input
+                                type="radio"
+                                name="developed"
+                                value={option.value}
+                                checked={filters.lands.developed === option.value}
+                                onChange={(e) => handleFilterChange('lands', 'developed', e.target.value)}
+                              />
+                              <span>{option.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="filter-input">
+                        <label>اتجاه الأرض</label>
+                        <div className="radio-options">
+                          {[
+                            { value: 'all', label: 'جميع الاتجاهات' },
+                            { value: 'شمالي', label: 'شمالي' },
+                            { value: 'جنوبي', label: 'جنوبي' },
+                            { value: 'شرقي', label: 'شرقي' },
+                            { value: 'غربي', label: 'غربي' }
+                          ].map(option => (
+                            <label key={option.value} className="radio-option">
+                              <input
+                                type="radio"
+                                name="propertyFacing"
+                                value={option.value}
+                                checked={filters.lands.propertyFacing === option.value}
+                                onChange={(e) => handleFilterChange('lands', 'propertyFacing', e.target.value)}
+                              />
+                              <span>{option.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="filter-section">
+                  <div 
+                    className="filter-section-header" 
+                    onClick={() => toggleFilterSection('date')}
+                  >
+                    <div className="filter-section-title">
+                      <FaCalendarAlt />
+                      <span>تاريخ النشر</span>
+                    </div>
+                    <FaChevronDown className={expandedFilterSection === 'date' ? 'rotate' : ''} />
+                  </div>
+                  {(expandedFilterSection === 'date' || expandedFilterSection === null) && (
+                    <div className="filter-section-content">
+                      <div className="radio-options">
+                        {[
+                          { value: 'all', label: 'جميع التواريخ' },
+                          { value: 'today', label: 'اليوم' },
+                          { value: 'thisWeek', label: 'هذا الأسبوع' },
+                          { value: 'thisMonth', label: 'هذا الشهر' }
+                        ].map(option => (
+                          <label key={option.value} className="radio-option">
+                            <input
+                              type="radio"
+                              name="publishDate"
+                              value={option.value}
+                              checked={filters.lands.publishDate === option.value}
+                              onChange={(e) => handleFilterChange('lands', 'publishDate', e.target.value)}
+                            />
+                            <span>{option.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* فلترات المزادات */
+              <div className="filter-sections">
+                <div className="filter-section">
+                  <div 
+                    className="filter-section-header" 
+                    onClick={() => toggleFilterSection('auctionRegion')}
+                  >
+                    <div className="filter-section-title">
+                      <FaMapMarkerAlt />
+                      <span>المنطقة والمدينة</span>
+                    </div>
+                    <FaChevronDown className={expandedFilterSection === 'auctionRegion' ? 'rotate' : ''} />
+                  </div>
+                  {(expandedFilterSection === 'auctionRegion' || expandedFilterSection === null) && (
+                    <div className="filter-section-content">
+                      <div className="filter-input">
+                        <label>المنطقة</label>
+                        <select
+                          value={filters.auctions.region}
+                          onChange={(e) => handleFilterChange('auctions', 'region', e.target.value)}
+                        >
+                          <option value="">جميع المناطق</option>
+                          {uniqueRegions.map((region, index) => (
+                            <option key={index} value={region}>{region}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="filter-input">
+                        <label>المدينة</label>
+                        <select
+                          value={filters.auctions.city}
+                          onChange={(e) => handleFilterChange('auctions', 'city', e.target.value)}
+                        >
+                          <option value="">جميع المدن</option>
+                          {getUniqueCities(filters.auctions.region).map((city, index) => (
+                            <option key={index} value={city}>{city}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="filter-section">
+                  <div 
+                    className="filter-section-header" 
+                    onClick={() => toggleFilterSection('auctionDate')}
+                  >
+                    <div className="filter-section-title">
+                      <FaCalendarAlt />
+                      <span>تاريخ المزاد</span>
+                    </div>
+                    <FaChevronDown className={expandedFilterSection === 'auctionDate' ? 'rotate' : ''} />
+                  </div>
+                  {(expandedFilterSection === 'auctionDate' || expandedFilterSection === null) && (
+                    <div className="filter-section-content">
+                      <div className="filter-input">
+                        <label>من تاريخ</label>
+                        <input
+                          type="date"
+                          value={filters.auctions.dateRange.from}
+                          onChange={(e) => handleDateRangeChange('auctions', 'dateRange', e.target.value, filters.auctions.dateRange.to)}
+                        />
+                      </div>
+                      <div className="filter-input">
+                        <label>إلى تاريخ</label>
+                        <input
+                          type="date"
+                          value={filters.auctions.dateRange.to}
+                          onChange={(e) => handleDateRangeChange('auctions', 'dateRange', filters.auctions.dateRange.from, e.target.value)}
+                        />
+                      </div>
+                      <div className="filter-input">
+                        <label>الأيام المتبقية (كحد أقصى)</label>
+                        <input
+                          type="number"
+                          placeholder="عدد الأيام"
+                          value={filters.auctions.daysRemaining}
+                          onChange={(e) => handleFilterChange('auctions', 'daysRemaining', parseInt(e.target.value) || 30)}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="filter-section">
+                  <div 
+                    className="filter-section-header" 
+                    onClick={() => toggleFilterSection('auctionStatus')}
+                  >
+                    <div className="filter-section-title">
+                      <FaGavel />
+                      <span>حالة ونوع المزاد</span>
+                    </div>
+                    <FaChevronDown className={expandedFilterSection === 'auctionStatus' ? 'rotate' : ''} />
+                  </div>
+                  {(expandedFilterSection === 'auctionStatus' || expandedFilterSection === null) && (
+                    <div className="filter-section-content">
+                      <div className="filter-input">
+                        <label>حالة المزاد</label>
+                        <div className="radio-options">
+                          {[
+                            { value: 'all', label: 'الكل' },
+                            { value: 'active', label: 'نشط' },
+                            { value: 'upcoming', label: 'قادم' },
+                            { value: 'completed', label: 'منتهي' }
+                          ].map(option => (
+                            <label key={option.value} className="radio-option">
+                              <input
+                                type="radio"
+                                name="auctionStatus"
+                                value={option.value}
+                                checked={filters.auctions.status === option.value}
+                                onChange={(e) => handleFilterChange('auctions', 'status', e.target.value)}
+                              />
+                              <span>{option.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="filter-input">
+                        <label>نوع العقار</label>
+                        <div className="radio-options">
+                          {[
+                            { value: 'all', label: 'جميع الأنواع' },
+                            { value: 'lands', label: 'أراضي' },
+                            { value: 'buildings', label: 'مباني' }
+                          ].map(option => (
+                            <label key={option.value} className="radio-option">
+                              <input
+                                type="radio"
+                                name="auctionType"
+                                value={option.value}
+                                checked={filters.auctions.type === option.value}
+                                onChange={(e) => handleFilterChange('auctions', 'type', e.target.value)}
+                              />
+                              <span>{option.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="filter-section">
+                  <div 
+                    className="filter-section-header" 
+                    onClick={() => toggleFilterSection('auctionBid')}
+                  >
+                    <div className="filter-section-title">
+                      <FaMoneyBillWave />
+                      <span>المزايدة والغرض</span>
+                    </div>
+                    <FaChevronDown className={expandedFilterSection === 'auctionBid' ? 'rotate' : ''} />
+                  </div>
+                  {(expandedFilterSection === 'auctionBid' || expandedFilterSection === null) && (
+                    <div className="filter-section-content">
+                      <div className="filter-input">
+                        <label>الحد الأدنى للمزايدة</label>
+                        <input
+                          type="number"
+                          placeholder="الحد الأدنى للمزايدة"
+                          value={filters.auctions.minBidIncrement}
+                          onChange={(e) => handleFilterChange('auctions', 'minBidIncrement', parseInt(e.target.value) || 0)}
+                        />
+                      </div>
+                      
+                      <div className="filter-input">
+                        <label>الغرض من العقار</label>
+                        <div className="radio-options">
+                          {[
+                            { value: 'all', label: 'جميع الأغراض' },
+                            { value: 'استثمار', label: 'استثمار' },
+                            { value: 'شراء', label: 'شراء' }
+                          ].map(option => (
+                            <label key={option.value} className="radio-option">
+                              <input
+                                type="radio"
+                                name="auctionPurpose"
+                                value={option.value}
+                                checked={filters.auctions.purpose === option.value}
+                                onChange={(e) => handleFilterChange('auctions', 'purpose', e.target.value)}
+                              />
+                              <span>{option.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
-
-            {/* أزرار الفلتر */}
+            
             <div className="filter-actions">
-              <button className="apply-filters" onClick={() => setCurrentPage(1)}>
+              <button className="btn-apply" onClick={() => {
+                setCurrentPage(1);
+                setShowSidebarFilter(false);
+              }}>
                 تطبيق الفلتر
               </button>
-              <button className="reset-filters" onClick={resetFilters}>
-                إعادة التعيين
+              <button className="btn-reset" onClick={() => {
+                resetFilters();
+                setShowSidebarFilter(false);
+              }}>
+                إعادة تعيين
               </button>
             </div>
           </div>
         </div>
-
-        {/* العمود الأوسط - قائمة العقارات */}
-        <div className="property-list-main">
-          <div className="property-list-header">
-            <h2>
-              {filterType === 'lands' ? 'الأراضي المتاحة' : 'المزادات النشطة'}
-            </h2>
-            <div className="property-results-count">
-              <span>{filteredProperties.length} {filterType === 'lands' ? 'أرض' : 'مزاد'} متاح</span>
-            </div>
+        
+        {/* القائمة الرئيسية */}
+        <div className={`main-content ${mobileDetailView ? 'hide-on-mobile' : ''}`}>
+          <div className="result-header">
+            <h2>{filterType === 'lands' ? 'الأراضي المتاحة' : 'المزادات العقارية'}</h2>
+            <span className="result-count">{filteredProperties.length} عنصر</span>
           </div>
-
-          {/* شبكة العقارات */}
-          <div className="property-grid">
-            {currentProperties.length > 0 ? (
-              currentProperties.map(property => (
-                <div
-                  key={property.id}
-                  className={`property-card ${selectedProperty?.id === property.id ? 'property-card-active' : ''}`}
-                  onClick={() => setSelectedProperty(property)}
+          
+          {currentProperties.length > 0 ? (
+            <div className="property-grid">
+              {currentProperties.map(property => (
+                <div 
+                  key={property.id} 
+                  className={`property-card ${selectedProperty?.id === property.id ? 'active' : ''}`}
+                  onClick={() => {
+                    setSelectedProperty(property);
+                    if (window.innerWidth <= 768) {
+                      toggleMobileDetailView(property);
+                    }
+                  }}
                 >
-                  <div className="property-card-image">
-                    <img src={property.image} alt={property.title} />
-                    <div className={`property-card-badge ${property.isAuction ? 'auction-badge' : ''}`}>
-                      {property.isAuction ? 'مزاد' : property.type}
-                    </div>
-                    <button className="property-favorite-btn">
+                  <div className="property-image">
+                    <img src={property.image} alt={property.title} onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23cccccc' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Ccircle cx='9' cy='9' r='2'%3E%3C/circle%3E%3Cpath d='M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21'%3E%3C/path%3E%3C/svg%3E";
+                    }} />
+                    {property.isAuction ? (
+                      <div className="property-badge auction">
+                        <FaGavel />
+                        <span>مزاد</span>
+                      </div>
+                    ) : (
+                      <div className="property-badge">
+                        <span>{property.type}</span>
+                      </div>
+                    )}
+                    <button className="favorite-btn" onClick={(e) => {
+                      e.stopPropagation();
+                    }}>
                       <FaHeart />
                     </button>
                     {property.isAuction && (
-                      <div className="property-auction-timer">
+                      <div className="auction-timer">
                         <FaClock />
                         <span>{property.auctionEnd}</span>
                       </div>
                     )}
                   </div>
-
-                  <div className="property-card-content">
-                    <h3 className="property-card-title">{property.title}</h3>
-
-                    <div className="property-card-location">
+                  
+                  <div className="property-info">
+                    <h3 className="property-title">{property.title}</h3>
+                    <div className="property-location">
                       <FaMapMarkerAlt />
                       <span>{property.city}، {property.region}</span>
                     </div>
-
-                    <div className="property-card-features">
-                      <div className="property-feature">
+                    <div className="property-specs">
+                      <div className="spec">
                         <FaRulerCombined />
                         <span>{property.area} م²</span>
                       </div>
-                      {property.purpose && (
-                        <div className="property-feature">
-                          <FaLayerGroup />
-                          <span>{property.purpose}</span>
-                        </div>
-                      )}
+                      <div className="spec">
+                        <FaLayerGroup />
+                        <span>{property.purpose}</span>
+                      </div>
                     </div>
-
                     {property.isAuction ? (
-                      <div className="property-card-price auction-price">
-                        <span className="price-label">المزايدة الحالية</span>
-                        <span className="price-value">{property.currentBid.toLocaleString()} ريال</span>
-                        <span className="bidders-count">
+                      <div className="property-price auction">
+                        <small>المزايدة الحالية</small>
+                        <strong>{property.currentBid.toLocaleString()} ريال</strong>
+                        <div className="bidders">
                           <FaGavel />
-                          {property.bidders} مزايد
-                        </span>
+                          <span>{property.bidders} مزايد</span>
+                        </div>
                       </div>
                     ) : (
-                      <div className="property-card-price">
-                        <span className="price-value">{property.price.toLocaleString()} ريال</span>
+                      <div className="property-price">
+                        <strong>{property.price.toLocaleString()} ريال</strong>
                       </div>
                     )}
-
-                    <div className="property-card-actions">
-                      <Link to={`/property/${property.id}`} className="property-btn property-btn-primary">
-                        عرض التفاصيل
+                    <div className="property-actions">
+                      <Link to={`/property/${property.id}`} className="btn-details">
+                        التفاصيل
                       </Link>
                       {property.isAuction ? (
-                        <Link to={`/auction/${property.id}`} className="property-btn property-btn-secondary">
-                          المزايدة الآن
+                        <Link to={`/auction/${property.id}`} className="btn-contact">
+                          المزايدة
                         </Link>
                       ) : (
-                        <Link to={`/contact/${property.id}`} className="property-btn property-btn-secondary">
-                          تواصل مع المالك
+                        <Link to={`/contact/${property.id}`} className="btn-contact">
+                          اتصال
                         </Link>
                       )}
                     </div>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="property-no-results">
-                <FaHome />
-                <h3>لا توجد عقارات مطابقة للبحث</h3>
-                <p>جرب تعديل فلتر البحث للحصول على نتائج أكثر</p>
-              </div>
-            )}
-          </div>
-
-          {/* التصفح بين الصفحات */}
+              ))}
+            </div>
+          ) : (
+            <div className="no-results">
+              <FaHome className="icon" />
+              <h3>لا توجد نتائج مطابقة</h3>
+              <p>يرجى تعديل معايير البحث للحصول على المزيد من النتائج</p>
+              <button className="btn-reset" onClick={resetFilters}>
+                إعادة تعيين الفلتر
+              </button>
+            </div>
+          )}
+          
+          {/* ترقيم الصفحات */}
           {totalPages > 1 && (
             <div className="pagination">
-              <button
-                className="pagination-btn pagination-prev"
+              <button 
+                className="pagination-arrow" 
                 onClick={prevPage}
                 disabled={currentPage === 1}
               >
-                <FaChevronRight />
-                السابق
+                <FaAngleRight />
               </button>
-
+              
               <div className="pagination-numbers">
-                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                  let pageNumber;
-                  if (totalPages <= 5) {
-                    pageNumber = i + 1;
-                  } else if (currentPage <= 3) {
-                    pageNumber = i + 1;
-                  } else if (currentPage >= totalPages - 2) {
-                    pageNumber = totalPages - 4 + i;
-                  } else {
-                    pageNumber = currentPage - 2 + i;
-                  }
-                  return (
-                    <button
-                      key={i}
-                      className={`pagination-number ${currentPage === pageNumber ? 'pagination-active' : ''}`}
-                      onClick={() => paginate(pageNumber)}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                })}
-                {totalPages > 5 && currentPage < totalPages - 2 && (
-                  <>
-                    <span className="pagination-ellipsis">...</span>
-                    <button
-                      className="pagination-number"
-                      onClick={() => paginate(totalPages)}
-                    >
-                      {totalPages}
-                    </button>
-                  </>
-                )}
+                {getPaginationGroup(currentPage, totalPages).map((num) => (
+                  <button
+                    key={num}
+                    className={`pagination-number ${currentPage === num ? 'active' : ''}`}
+                    onClick={() => paginate(num)}
+                  >
+                    {num}
+                  </button>
+                ))}
               </div>
-
-              <button
-                className="pagination-btn pagination-next"
+              
+              <button 
+                className="pagination-arrow" 
                 onClick={nextPage}
                 disabled={currentPage === totalPages}
               >
-                التالي
-                <FaChevronLeft />
+                <FaAngleLeft />
               </button>
             </div>
           )}
         </div>
-
-        {/* العمود الأيسر - تفاصيل العقار */}
-        <div className="property-details-sidebar">
+        
+        {/* تفاصيل العقار */}
+        <div className={`property-details ${mobileDetailView ? 'show-on-mobile' : ''}`}>
           {selectedProperty ? (
             <>
-              <div className="property-details-header">
-                <h3>{selectedProperty.isAuction ? 'تفاصيل المزاد' : 'تفاصيل الأرض'}</h3>
+              <div className="details-header mobile-only">
+                <button className="back-btn" onClick={() => toggleMobileDetailView(null)}>
+                  <FaChevronRight />
+                  <span>العودة للقائمة</span>
+                </button>
               </div>
-
-              <div className="property-details-content">
-                <div className="property-details-image">
-                  <img src={selectedProperty.image} alt={selectedProperty.title} />
+              <div className="details-content">
+                <div className="details-image">
+                  <img src={selectedProperty.image} alt={selectedProperty.title} onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23cccccc' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Ccircle cx='9' cy='9' r='2'%3E%3C/circle%3E%3Cpath d='M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21'%3E%3C/path%3E%3C/svg%3E";
+                  }} />
                   {selectedProperty.isAuction && (
-                    <div className="property-auction-badge">
+                    <div className="details-badge">
                       <FaGavel />
-                      مزاد
+                      <span>مزاد عقاري</span>
                     </div>
                   )}
                 </div>
-
-                <div className="property-details-info">
-                  <h2 className="property-details-title">{selectedProperty.title}</h2>
-
-                  <div className="property-details-location">
+                
+                <div className="details-header">
+                  <h2>{selectedProperty.title}</h2>
+                  <div className="details-location">
                     <FaMapMarkerAlt />
                     <span>{selectedProperty.city}، {selectedProperty.region}</span>
                   </div>
-
-                  <div className={`property-details-price ${selectedProperty.isAuction ? 'auction-details-price' : ''}`}>
-                    {selectedProperty.isAuction ? (
-                      <>
-                        <span className="auction-current-bid-label">المزايدة الحالية</span>
-                        <span className="property-details-price-value">{selectedProperty.currentBid.toLocaleString()} ريال</span>
-                        <div className="auction-details-meta">
-                          <span className="auction-min-increment">
-                            <FaMoneyBillWave />
-                            الحد الأدنى للمزايدة: {selectedProperty.minBidIncrement.toLocaleString()} ريال
-                          </span>
-                          <span className="auction-bidders">
-                            <FaGavel />
-                            {selectedProperty.bidders} مزايد
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <span className="property-details-price-value">{selectedProperty.price.toLocaleString()} ريال</span>
-                    )}
-                  </div>
-
-                  <div className="property-details-features">
-                    <div className="property-detail-feature">
-                      <FaRulerCombined />
-                      <div>
-                        <span className="feature-label">المساحة</span>
-                        <span className="feature-value">{selectedProperty.area} م²</span>
-                      </div>
+                </div>
+                
+                {selectedProperty.isAuction ? (
+                  <div className="details-auction-price">
+                    <div className="auction-price-info">
+                      <span className="label">المزايدة الحالية</span>
+                      <span className="value">{selectedProperty.currentBid.toLocaleString()} ريال</span>
                     </div>
-
-                    <div className="property-detail-feature">
-                      <FaCity />
-                      <div>
-                        <span className="feature-label">الغرض</span>
-                        <span className="feature-value">{selectedProperty.purpose}</span>
+                    <div className="auction-meta">
+                      <div className="auction-increment">
+                        <FaMoneyBillWave />
+                        <span>الحد الأدنى للمزايدة: {selectedProperty.minBidIncrement.toLocaleString()} ريال</span>
                       </div>
-                    </div>
-
-                    <div className="property-detail-feature">
-                      <FaRegSun />
-                      <div>
-                        <span className="feature-label">الاتجاه</span>
-                        <span className="feature-value">{selectedProperty.facing}</span>
+                      <div className="auction-bidders">
+                        <FaGavel />
+                        <span>{selectedProperty.bidders} مزايد</span>
+                      </div>
+                      <div className="auction-end">
+                        <FaClock />
+                        <span>ينتهي في: {selectedProperty.auctionEnd}</span>
                       </div>
                     </div>
                   </div>
-
-                  <div className="property-details-description">
-                    <h4>الوصف</h4>
-                    <p>{selectedProperty.description}</p>
+                ) : (
+                  <div className="details-price">
+                    <span>{selectedProperty.price.toLocaleString()} ريال</span>
                   </div>
-
-                  <div className="property-details-features-list">
-                    <h4>المميزات</h4>
-                    <div className="property-features-grid">
-                      {selectedProperty.features?.map((feature, index) => (
-                        <span key={index} className="property-feature-tag">
-                          {feature}
-                        </span>
-                      ))}
+                )}
+                
+                <div className="details-specs">
+                  <div className="spec-item">
+                    <FaRulerCombined className="spec-icon" />
+                    <div>
+                      <small>المساحة</small>
+                      <strong>{selectedProperty.area} م²</strong>
                     </div>
                   </div>
-
-                  {selectedProperty.isAuction && (
-                    <div className="property-details-auction">
-                      <h4>معلومات المزاد</h4>
-                      <div className="property-auction-details">
-                        <div className="auction-info-item">
-                          <FaClock />
-                          <span>ينتهي المزاد: {selectedProperty.auctionEnd}</span>
-                        </div>
-                        <div className="auction-info-item">
-                          <FaBuilding />
-                          <span>المالك: {selectedProperty.owner}</span>
-                        </div>
-                        <div className="auction-info-item">
-                          <span>الاتصال: {selectedProperty.contact}</span>
-                        </div>
-                      </div>
+                  <div className="spec-item">
+                    <FaCity className="spec-icon" />
+                    <div>
+                      <small>الغرض</small>
+                      <strong>{selectedProperty.purpose}</strong>
                     </div>
-                  )}
-
-                  <div className="property-details-actions">
-                    <Link to={`/property/${selectedProperty.id}`} className="property-btn property-btn-primary property-btn-full">
-                      عرض التفاصيل الكاملة
+                  </div>
+                  <div className="spec-item">
+                    <FaRegSun className="spec-icon" />
+                    <div>
+                      <small>الاتجاه</small>
+                      <strong>{selectedProperty.facing}</strong>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="details-section">
+                  <h3>الوصف</h3>
+                  <p>{selectedProperty.description}</p>
+                </div>
+                
+                <div className="details-section">
+                  <h3>المميزات</h3>
+                  <div className="features-list">
+                    {selectedProperty.features.map((feature, index) => (
+                      <span key={index} className="feature-tag">{feature}</span>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="details-actions">
+                  <Link to={`/property/${selectedProperty.id}`} className="btn-full btn-primary">
+                    عرض التفاصيل الكاملة
+                  </Link>
+                  {selectedProperty.isAuction ? (
+                    <Link to={`/auction/${selectedProperty.id}`} className="btn-full btn-secondary">
+                      الدخول للمزايدة
                     </Link>
-                    {selectedProperty.isAuction ? (
-                      <Link to={`/auction/${selectedProperty.id}`} className="property-btn property-btn-secondary property-btn-full">
-                        الدخول للمزايدة
-                      </Link>
-                    ) : (
-                      <Link to={`/contact/${selectedProperty.id}`} className="property-btn property-btn-secondary property-btn-full">
-                        تواصل مع المالك
-                      </Link>
-                    )}
-                  </div>
+                  ) : (
+                    <Link to={`/contact/${selectedProperty.id}`} className="btn-full btn-secondary">
+                      تواصل مع المالك
+                    </Link>
+                  )}
                 </div>
               </div>
             </>
           ) : (
-            <div className="property-no-selection">
-              <FaHome />
+            <div className="details-placeholder">
+              <FaHome className="icon" />
               <h3>اختر عقاراً لعرض التفاصيل</h3>
-              <p>انقر على أي عقار في القائمة لعرض التفاصيل الكاملة هنا</p>
+              <p>انقر على أحد العقارات من القائمة لعرض المزيد من المعلومات</p>
             </div>
           )}
         </div>
       </div>
+      
+      {/* Overlay */}
+      {showSidebarFilter && <div className="overlay" onClick={() => setShowSidebarFilter(false)}></div>}
+      {mobileDetailView && <div className="overlay mobile-only" onClick={() => toggleMobileDetailView(null)}></div>}
     </div>
   );
+}
+
+// وظيفة مساعدة لإنشاء مجموعة أرقام الصفحات
+function getPaginationGroup(currentPage, totalPages) {
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, startPage + 4);
+  
+  if (endPage - startPage < 4 && totalPages > 4) {
+    startPage = Math.max(1, endPage - 4);
+  }
+  
+  return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 }
 
 export default PropertyList;
