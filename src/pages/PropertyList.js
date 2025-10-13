@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  FaSearch, 
-  FaFilter, 
-  FaSlidersH, 
-  FaTimes, 
-  FaMapMarkerAlt, 
-  FaBed, 
-  FaBath, 
-  FaArrowsAlt, 
-  FaClock, 
+import {
+  FaSearch,
+  FaFilter,
+  FaSlidersH,
+  FaTimes,
+  FaMapMarkerAlt,
+  FaBed,
+  FaBath,
+  FaArrowsAlt,
+  FaClock,
   FaHeart,
   FaChevronRight,
   FaChevronLeft,
@@ -32,23 +32,28 @@ function PropertyList() {
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [showSidebarFilter, setShowSidebarFilter] = useState(window.innerWidth > 768);
   const [currentPage, setCurrentPage] = useState(1);
-  const [propertiesPerPage] = useState(6);
+  const [propertiesPerPage] = useState(9);
   const [filterType, setFilterType] = useState('lands'); // 'lands' or 'auctions'
   const [filters, setFilters] = useState({
     lands: {
-      location: '',
+      region: '',
+      city: '',
       priceRange: { min: 0, max: 10000000 },
       area: { min: 0, max: 5000 },
-      purpose: 'all', // residential, commercial, agricultural
+      purpose: 'all', // residential, commercial, agricultural, industrial, mixed
       developed: 'all', // yes, no, all
-      propertyFacing: 'all' // north, south, east, west, all
+      propertyFacing: 'all', // north, south, east, west, all
+      publishDate: 'all' // today, thisWeek, thisMonth, all
     },
     auctions: {
-      location: '',
+      region: '',
+      city: '',
+      dateRange: { from: '', to: '' },
+      daysRemaining: 30,
       status: 'all', // active, upcoming, completed
       type: 'all', // lands, buildings
       minBidIncrement: 0,
-      endingSoon: false
+      purpose: 'all' // investment, purchase, all
     }
   });
 
@@ -61,7 +66,8 @@ function PropertyList() {
         type: 'أرض',
         purpose: 'سكني',
         price: 850000,
-        location: 'الرياض',
+        region: 'الرياض',
+        city: 'الرياض',
         area: 450,
         image: '/images/land1.jpg',
         isAuction: false,
@@ -70,7 +76,7 @@ function PropertyList() {
         description: 'أرض سكنية مطورة في حي الياسمين، موقع مميز مع خدمات متكاملة وقريبة من المرافق الحيوية. مساحتها 450 متر مربع وتتميز بواجهة شمالية. مناسبة لبناء فلل سكنية فاخرة.',
         features: ['واجهة شمالية', 'شوارع مسفلتة', 'أرصفة', 'إنارة', 'قريبة من الخدمات', 'مخطط معتمد'],
         owner: 'شركة العقارية المتميزة',
-        createdAt: '2024-01-15',
+        createdAt: '2025-10-01',
         status: 'active',
         contact: '+966500000001'
       },
@@ -80,11 +86,12 @@ function PropertyList() {
         type: 'أرض',
         purpose: 'تجاري',
         price: 4500000,
-        location: 'جدة',
+        region: 'مكة المكرمة',
+        city: 'جدة',
         area: 1200,
         image: '/images/land2.jpg',
         isAuction: true,
-        auctionEnd: '2024-12-25',
+        auctionEnd: '2025-12-25',
         currentBid: 4500000,
         minBidIncrement: 50000,
         bidders: 8,
@@ -94,7 +101,7 @@ function PropertyList() {
         description: 'أرض تجارية على طريق الملك فهد مباشرة، موقع استراتيجي للمشاريع التجارية. مساحة 1200 متر مربع، مناسبة لإنشاء مركز تجاري أو مبنى مكتبي.',
         features: ['موقع استراتيجي', 'واجهة تجارية', 'قريبة من المراكز التجارية', 'تصريح تجاري'],
         owner: 'مجموعة الأعمال التجارية',
-        createdAt: '2024-01-12',
+        createdAt: '2025-10-08',
         status: 'active',
         contact: '+966500000006'
       },
@@ -104,11 +111,12 @@ function PropertyList() {
         type: 'أرض',
         purpose: 'زراعي',
         price: 1200000,
-        location: 'وادي الدواسر',
+        region: 'الرياض',
+        city: 'وادي الدواسر',
         area: 10000,
         image: '/images/land3.jpg',
         isAuction: true,
-        auctionEnd: '2024-11-20',
+        auctionEnd: '2025-11-20',
         currentBid: 1200000,
         minBidIncrement: 20000,
         bidders: 5,
@@ -118,7 +126,7 @@ function PropertyList() {
         description: 'أرض زراعية خصبة في منطقة وادي الدواسر، مساحة 10000 متر مربع، تربة خصبة صالحة للزراعة مع توفر مصادر المياه. مناسبة للمشاريع الزراعية.',
         features: ['تربة خصبة', 'مصادر مياه', 'مناخ مناسب للزراعة', 'شوارع مؤدية'],
         owner: 'مؤسسة الأراضي الزراعية',
-        createdAt: '2024-02-05',
+        createdAt: '2025-09-25',
         status: 'active',
         contact: '+966500000007'
       },
@@ -128,7 +136,8 @@ function PropertyList() {
         type: 'أرض',
         purpose: 'سكني',
         price: 760000,
-        location: 'الرياض',
+        region: 'الرياض',
+        city: 'الرياض',
         area: 400,
         image: '/images/land4.jpg',
         isAuction: false,
@@ -137,7 +146,7 @@ function PropertyList() {
         description: 'أرض سكنية في حي النرجس، قريبة من المدارس والمرافق العامة. مساحتها 400 متر مربع بواجهة غربية. مخطط معتمد وجاهز للبناء الفوري.',
         features: ['مخطط معتمد', 'خدمات متكاملة', 'واجهة غربية', 'قريبة من المدارس'],
         owner: 'مكتب الأراضي الذهبية',
-        createdAt: '2024-03-10',
+        createdAt: '2025-10-05',
         status: 'active',
         contact: '+966500000008'
       },
@@ -147,11 +156,12 @@ function PropertyList() {
         type: 'أرض',
         purpose: 'سكني',
         price: 3500000,
-        location: 'الدمام',
+        region: 'المنطقة الشرقية',
+        city: 'الدمام',
         area: 600,
         image: '/images/land5.jpg',
         isAuction: true,
-        auctionEnd: '2024-12-05',
+        auctionEnd: '2025-12-05',
         currentBid: 3500000,
         minBidIncrement: 100000,
         bidders: 12,
@@ -161,7 +171,7 @@ function PropertyList() {
         description: 'أرض سكنية مميزة مطلة على بحيرة اصطناعية في مشروع سكني راقي. تبلغ مساحتها 600 متر مربع مع إطلالة خلابة. موقع فريد يجمع بين الخصوصية والرفاهية.',
         features: ['إطلالة على بحيرة', 'مجتمع سكني راقي', 'خدمات متكاملة', 'أمن على مدار الساعة'],
         owner: 'شركة التطوير العقاري المتحدة',
-        createdAt: '2024-02-20',
+        createdAt: '2025-09-15',
         status: 'active',
         contact: '+966500000009'
       },
@@ -171,8 +181,9 @@ function PropertyList() {
         type: 'أرض',
         purpose: 'سكني',
         isAuction: true,
-        auctionEnd: '2024-10-30',
-        location: 'الرياض',
+        auctionEnd: '2025-10-30',
+        region: 'الرياض',
+        city: 'الرياض',
         area: 750,
         image: '/images/land6.jpg',
         currentBid: 1800000,
@@ -184,9 +195,137 @@ function PropertyList() {
         description: 'مزاد علني على مجموعة أراضٍ مميزة في مخطط الفروسية. تبدأ المزايدة من 1,800,000 ريال. أراضي مطورة بالكامل ومخططة بشكل متميز في موقع حيوي.',
         features: ['مخطط معتمد', 'بنية تحتية متكاملة', 'مزاد تنافسي', 'موقع استراتيجي'],
         owner: 'الهيئة العامة للعقار',
-        createdAt: '2024-03-15',
+        createdAt: '2025-10-10',
         status: 'active',
         contact: '+966500000010'
+      },
+      {
+        id: 7,
+        title: 'أرض صناعية في المدينة الصناعية',
+        type: 'أرض',
+        purpose: 'صناعي',
+        price: 5800000,
+        region: 'المنطقة الشرقية',
+        city: 'الدمام',
+        area: 3000,
+        image: '/images/land7.jpg',
+        isAuction: false,
+        facing: 'شرقي',
+        developed: true,
+        description: 'أرض صناعية مطورة بالكامل في المدينة الصناعية بالدمام. مساحة 3000 متر مربع، مناسبة لإقامة مشاريع صناعية متوسطة. تتميز بموقع استراتيجي وقربها من الطرق الرئيسية.',
+        features: ['تصريح صناعي', 'شبكات مرافق', 'قريبة من الطرق السريعة', 'منطقة صناعية معتمدة'],
+        owner: 'شركة المدن الصناعية',
+        createdAt: '2025-10-07',
+        status: 'active',
+        contact: '+966500000011'
+      },
+      {
+        id: 8,
+        title: 'أرض استثمارية متعددة الاستخدامات',
+        type: 'أرض',
+        purpose: 'مختلط',
+        price: 8200000,
+        region: 'مكة المكرمة',
+        city: 'جدة',
+        area: 2200,
+        image: '/images/land8.jpg',
+        isAuction: false,
+        facing: 'جنوبي',
+        developed: true,
+        description: 'أرض استثمارية بتصريح متعدد الاستخدامات في منطقة حيوية بجدة. مساحة 2200 متر مربع، مناسبة للمشاريع التجارية والسكنية المشتركة. موقع متميز بالقرب من المناطق الحيوية.',
+        features: ['تصريح متعدد الاستخدامات', 'موقع حيوي', 'كثافة سكانية عالية', 'قربها من مراكز التسوق'],
+        owner: 'مؤسسة التطوير العقاري',
+        createdAt: '2025-09-20',
+        status: 'active',
+        contact: '+966500000012'
+      },
+      {
+        id: 9,
+        title: 'أرض تجارية على الدائري الشرقي',
+        type: 'أرض',
+        purpose: 'تجاري',
+        price: 6300000,
+        region: 'الرياض',
+        city: 'الرياض',
+        area: 1500,
+        image: '/images/land9.jpg',
+        isAuction: false,
+        facing: 'شمالي',
+        developed: true,
+        description: 'أرض تجارية على طريق الدائري الشرقي في الرياض. مساحة 1500 متر مربع، واجهة شمالية، مناسبة لإقامة مجمع تجاري أو مبنى إداري. فرصة استثمارية مميزة.',
+        features: ['موقع استراتيجي', 'واجهة تجارية', 'كثافة مرورية عالية', 'قريبة من المراكز التجارية'],
+        owner: 'شركة الاستثمار العقاري',
+        createdAt: '2025-10-02',
+        status: 'active',
+        contact: '+966500000013'
+      },
+      {
+        id: 10,
+        title: 'مزاد على أراضي سكنية وتجارية',
+        type: 'أرض',
+        purpose: 'مختلط',
+        isAuction: true,
+        auctionEnd: '2025-11-15',
+        region: 'المنطقة الشرقية',
+        city: 'الخبر',
+        area: 1000,
+        image: '/images/land10.jpg',
+        currentBid: 3200000,
+        minBidIncrement: 50000,
+        bidders: 14,
+        auctionStatus: 'active',
+        facing: 'غربي',
+        developed: true,
+        description: 'مزاد على مجموعة أراضي سكنية وتجارية في مخطط جديد بالخبر. المزاد يشمل أراضي بمساحات متنوعة ومواقع مميزة. فرصة استثمارية للمستثمرين والأفراد.',
+        features: ['مخطط جديد', 'تنوع الاستخدامات', 'مواقع استراتيجية', 'فرصة استثمارية'],
+        owner: 'هيئة تطوير المدن',
+        createdAt: '2025-09-28',
+        status: 'active',
+        contact: '+966500000014'
+      },
+      {
+        id: 11,
+        title: 'أرض زراعية في القصيم',
+        type: 'أرض',
+        purpose: 'زراعي',
+        price: 950000,
+        region: 'القصيم',
+        city: 'بريدة',
+        area: 15000,
+        image: '/images/land11.jpg',
+        isAuction: false,
+        facing: 'شرقي',
+        developed: false,
+        description: 'أرض زراعية خصبة في منطقة القصيم. مساحة 15000 متر مربع، تربة ممتازة للزراعة، مع توفر مصادر مياه. مناسبة لمشاريع الزراعة المتنوعة.',
+        features: ['تربة خصبة', 'مصادر مياه متوفرة', 'منطقة زراعية معروفة', 'قريبة من الأسواق المركزية'],
+        owner: 'مؤسسة الأراضي الزراعية',
+        createdAt: '2025-09-18',
+        status: 'active',
+        contact: '+966500000015'
+      },
+      {
+        id: 12,
+        title: 'مزاد على أراضي في ضاحية الملك فهد',
+        type: 'أرض',
+        purpose: 'سكني',
+        isAuction: true,
+        auctionEnd: '2025-12-15',
+        region: 'الرياض',
+        city: 'الرياض',
+        area: 500,
+        image: '/images/land12.jpg',
+        currentBid: 920000,
+        minBidIncrement: 20000,
+        bidders: 22,
+        auctionStatus: 'active',
+        facing: 'شمالي',
+        developed: true,
+        description: 'مزاد على مجموعة أراضي سكنية في ضاحية الملك فهد. أراضي مخططة بمساحات متنوعة ومواقع مميزة. البنية التحتية مكتملة والخدمات متوفرة.',
+        features: ['ضاحية راقية', 'بنية تحتية متكاملة', 'قريبة من المرافق العامة', 'مخطط معتمد'],
+        owner: 'وزارة الإسكان',
+        createdAt: '2025-10-09',
+        status: 'active',
+        contact: '+966500000016'
       }
     ];
     setProperties(sampleProperties);
@@ -205,8 +344,9 @@ function PropertyList() {
   const filteredProperties = properties.filter(property => {
     // تنقية بناء على مصطلح البحث
     if (searchTerm && !property.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !property.location.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !property.description.toLowerCase().includes(searchTerm.toLowerCase())) {
+      !property.city.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !property.region.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !property.description.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
 
@@ -223,22 +363,32 @@ function PropertyList() {
     if (filterType === 'lands') {
       const landFilters = filters.lands;
 
-      if (landFilters.location && !property.location.includes(landFilters.location)) {
+      // تصفية حسب المنطقة
+      if (landFilters.region && property.region !== landFilters.region) {
         return false;
       }
 
+      // تصفية حسب المدينة
+      if (landFilters.city && property.city !== landFilters.city) {
+        return false;
+      }
+
+      // تصفية حسب السعر
       if (!property.isAuction && (property.price < landFilters.priceRange.min || property.price > landFilters.priceRange.max)) {
         return false;
       }
 
+      // تصفية حسب المساحة
       if (property.area < landFilters.area.min || property.area > landFilters.area.max) {
         return false;
       }
 
+      // تصفية حسب الغرض
       if (landFilters.purpose !== 'all' && property.purpose !== landFilters.purpose) {
         return false;
       }
 
+      // تصفية حسب حالة التطوير
       if (landFilters.developed !== 'all') {
         const isDeveloped = landFilters.developed === 'yes';
         if (property.developed !== isDeveloped) {
@@ -246,8 +396,24 @@ function PropertyList() {
         }
       }
 
+      // تصفية حسب اتجاه الأرض
       if (landFilters.propertyFacing !== 'all' && property.facing !== landFilters.propertyFacing) {
         return false;
+      }
+
+      // تصفية حسب تاريخ النشر
+      if (landFilters.publishDate !== 'all') {
+        const today = new Date();
+        const publishDate = new Date(property.createdAt);
+        const daysDifference = Math.ceil((today - publishDate) / (1000 * 60 * 60 * 24));
+
+        if (landFilters.publishDate === 'today' && daysDifference > 1) {
+          return false;
+        } else if (landFilters.publishDate === 'thisWeek' && daysDifference > 7) {
+          return false;
+        } else if (landFilters.publishDate === 'thisMonth' && daysDifference > 30) {
+          return false;
+        }
       }
     }
 
@@ -255,14 +421,51 @@ function PropertyList() {
     if (filterType === 'auctions') {
       const auctionFilters = filters.auctions;
 
-      if (auctionFilters.location && !property.location.includes(auctionFilters.location)) {
+      // تصفية حسب المنطقة
+      if (auctionFilters.region && property.region !== auctionFilters.region) {
         return false;
       }
 
+      // تصفية حسب المدينة
+      if (auctionFilters.city && property.city !== auctionFilters.city) {
+        return false;
+      }
+
+      // تصفية حسب تاريخ المزاد (من - إلى)
+      if (auctionFilters.dateRange.from || auctionFilters.dateRange.to) {
+        const auctionDate = new Date(property.auctionEnd);
+        
+        if (auctionFilters.dateRange.from) {
+          const fromDate = new Date(auctionFilters.dateRange.from);
+          if (auctionDate < fromDate) {
+            return false;
+          }
+        }
+        
+        if (auctionFilters.dateRange.to) {
+          const toDate = new Date(auctionFilters.dateRange.to);
+          if (auctionDate > toDate) {
+            return false;
+          }
+        }
+      }
+
+      // تصفية حسب الأيام المتبقية
+      if (auctionFilters.daysRemaining > 0) {
+        const today = new Date();
+        const auctionEndDate = new Date(property.auctionEnd);
+        const daysDifference = Math.ceil((auctionEndDate - today) / (1000 * 60 * 60 * 24));
+        if (daysDifference > auctionFilters.daysRemaining) {
+          return false;
+        }
+      }
+
+      // تصفية حسب حالة المزاد
       if (auctionFilters.status !== 'all' && property.auctionStatus !== auctionFilters.status) {
         return false;
       }
 
+      // تصفية حسب نوع العقار
       if (auctionFilters.type !== 'all') {
         if (auctionFilters.type === 'lands' && property.type !== 'أرض') {
           return false;
@@ -271,17 +474,14 @@ function PropertyList() {
         }
       }
 
+      // تصفية حسب الحد الأدنى للمزايدة
       if (auctionFilters.minBidIncrement > 0 && property.minBidIncrement < auctionFilters.minBidIncrement) {
         return false;
       }
-
-      if (auctionFilters.endingSoon) {
-        const today = new Date();
-        const auctionEndDate = new Date(property.auctionEnd);
-        const daysDifference = Math.ceil((auctionEndDate - today) / (1000 * 60 * 60 * 24));
-        if (daysDifference > 7) {
-          return false;
-        }
+      
+      // تصفية حسب الغرض
+      if (auctionFilters.purpose !== 'all' && property.purpose !== auctionFilters.purpose) {
+        return false;
       }
     }
 
@@ -299,19 +499,24 @@ function PropertyList() {
   const resetFilters = () => {
     setFilters({
       lands: {
-        location: '',
+        region: '',
+        city: '',
         priceRange: { min: 0, max: 10000000 },
         area: { min: 0, max: 5000 },
         purpose: 'all',
         developed: 'all',
-        propertyFacing: 'all'
+        propertyFacing: 'all',
+        publishDate: 'all'
       },
       auctions: {
-        location: '',
+        region: '',
+        city: '',
+        dateRange: { from: '', to: '' },
+        daysRemaining: 30,
         status: 'all',
         type: 'all',
         minBidIncrement: 0,
-        endingSoon: false
+        purpose: 'all'
       }
     });
     setSearchTerm('');
@@ -338,6 +543,16 @@ function PropertyList() {
     }));
   };
 
+  const handleDateRangeChange = (filterGroup, rangeKey, from, to) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterGroup]: {
+        ...prev[filterGroup],
+        [rangeKey]: { from, to }
+      }
+    }));
+  };
+
   const switchFilterType = (type) => {
     setFilterType(type);
     setCurrentPage(1);
@@ -353,6 +568,15 @@ function PropertyList() {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
+  };
+
+  // الحصول على قائمة المناطق الفريدة
+  const uniqueRegions = [...new Set(properties.map(property => property.region))];
+  
+  // الحصول على قائمة المدن الفريدة حسب المنطقة المختارة
+  const getUniqueCities = (region) => {
+    if (!region) return [...new Set(properties.map(property => property.city))];
+    return [...new Set(properties.filter(property => property.region === region).map(property => property.city))];
   };
 
   return (
@@ -373,7 +597,7 @@ function PropertyList() {
             </button>
           </div>
 
-          <button 
+          <button
             className="filter-toggle-btn"
             onClick={() => setShowSidebarFilter(!showSidebarFilter)}
           >
@@ -398,14 +622,14 @@ function PropertyList() {
           </div>
 
           <div className="filter-tabs">
-            <button 
+            <button
               className={`filter-tab ${filterType === 'lands' ? 'active' : ''}`}
               onClick={() => switchFilterType('lands')}
             >
               <FaLandmark />
               الأراضي
             </button>
-            <button 
+            <button
               className={`filter-tab ${filterType === 'auctions' ? 'active' : ''}`}
               onClick={() => switchFilterType('auctions')}
             >
@@ -414,28 +638,43 @@ function PropertyList() {
             </button>
           </div>
 
-          <div className="filter-content">
+          <div className="filter-content2">
             {filterType === 'lands' ? (
               // فلتر الأراضي
               <>
-                {/* الموقع */}
+                {/* المنطقة */}
                 <div className="filter-section">
                   <h4>
                     <FaMapMarkerAlt />
-                    الموقع
+                    المنطقة
                   </h4>
-                  <select 
-                    value={filters.lands.location} 
-                    onChange={(e) => handleFilterChange('lands', 'location', e.target.value)}
+                  <select
+                    value={filters.lands.region}
+                    onChange={(e) => handleFilterChange('lands', 'region', e.target.value)}
                     className="filter-select"
                   >
-                    <option value="">جميع المواقع</option>
-                    <option value="الرياض">الرياض</option>
-                    <option value="جدة">جدة</option>
-                    <option value="الدمام">الدمام</option>
-                    <option value="مكة">مكة</option>
-                    <option value="المدينة">المدينة</option>
-                    <option value="وادي الدواسر">وادي الدواسر</option>
+                    <option value="">جميع المناطق</option>
+                    {uniqueRegions.map((region, index) => (
+                      <option key={index} value={region}>{region}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* المدينة */}
+                <div className="filter-section">
+                  <h4>
+                    <FaCity />
+                    المدينة
+                  </h4>
+                  <select
+                    value={filters.lands.city}
+                    onChange={(e) => handleFilterChange('lands', 'city', e.target.value)}
+                    className="filter-select"
+                  >
+                    <option value="">جميع المدن</option>
+                    {getUniqueCities(filters.lands.region).map((city, index) => (
+                      <option key={index} value={city}>{city}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -498,7 +737,9 @@ function PropertyList() {
                       { value: 'all', label: 'جميع الأغراض' },
                       { value: 'سكني', label: 'سكني' },
                       { value: 'تجاري', label: 'تجاري' },
-                      { value: 'زراعي', label: 'زراعي' }
+                      { value: 'زراعي', label: 'زراعي' },
+                      { value: 'صناعي', label: 'صناعي' },
+                      { value: 'مختلط', label: 'مختلط' }
                     ].map(option => (
                       <label key={option.value} className="filter-option">
                         <input
@@ -567,29 +808,117 @@ function PropertyList() {
                     ))}
                   </div>
                 </div>
+
+                {/* تاريخ النشر */}
+                <div className="filter-section">
+                  <h4>
+                    <FaCalendarAlt />
+                    تاريخ النشر
+                  </h4>
+                  <div className="filter-options">
+                    {[
+                      { value: 'all', label: 'جميع التواريخ' },
+                      { value: 'today', label: 'اليوم' },
+                      { value: 'thisWeek', label: 'هذا الأسبوع' },
+                      { value: 'thisMonth', label: 'هذا الشهر' }
+                    ].map(option => (
+                      <label key={option.value} className="filter-option">
+                        <input
+                          type="radio"
+                          name="publishDate"
+                          value={option.value}
+                          checked={filters.lands.publishDate === option.value}
+                          onChange={(e) => handleFilterChange('lands', 'publishDate', e.target.value)}
+                        />
+                        <span>{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
               </>
             ) : (
               // فلتر المزادات
               <>
-                {/* الموقع */}
+                {/* المنطقة */}
                 <div className="filter-section">
                   <h4>
                     <FaMapMarkerAlt />
-                    الموقع
+                    المنطقة
                   </h4>
-                  <select 
-                    value={filters.auctions.location} 
-                    onChange={(e) => handleFilterChange('auctions', 'location', e.target.value)}
+                  <select
+                    value={filters.auctions.region}
+                    onChange={(e) => handleFilterChange('auctions', 'region', e.target.value)}
                     className="filter-select"
                   >
-                    <option value="">جميع المواقع</option>
-                    <option value="الرياض">الرياض</option>
-                    <option value="جدة">جدة</option>
-                    <option value="الدمام">الدمام</option>
-                    <option value="مكة">مكة</option>
-                    <option value="المدينة">المدينة</option>
-                    <option value="وادي الدواسر">وادي الدواسر</option>
+                    <option value="">جميع المناطق</option>
+                    {uniqueRegions.map((region, index) => (
+                      <option key={index} value={region}>{region}</option>
+                    ))}
                   </select>
+                </div>
+
+                {/* المدينة */}
+                <div className="filter-section">
+                  <h4>
+                    <FaCity />
+                    المدينة
+                  </h4>
+                  <select
+                    value={filters.auctions.city}
+                    onChange={(e) => handleFilterChange('auctions', 'city', e.target.value)}
+                    className="filter-select"
+                  >
+                    <option value="">جميع المدن</option>
+                    {getUniqueCities(filters.auctions.region).map((city, index) => (
+                      <option key={index} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* تاريخ المزاد (من) */}
+                <div className="filter-section">
+                  <h4>
+                    <FaCalendarAlt />
+                    تاريخ المزاد من
+                  </h4>
+                  <div className="range-inputs single-input">
+                    <input
+                      type="date"
+                      value={filters.auctions.dateRange.from}
+                      onChange={(e) => handleDateRangeChange('auctions', 'dateRange', e.target.value, filters.auctions.dateRange.to)}
+                    />
+                  </div>
+                </div>
+
+                {/* تاريخ المزاد (إلى) */}
+                <div className="filter-section">
+                  <h4>
+                    <FaCalendarAlt />
+                    تاريخ المزاد إلى
+                  </h4>
+                  <div className="range-inputs single-input">
+                    <input
+                      type="date"
+                      value={filters.auctions.dateRange.to}
+                      onChange={(e) => handleDateRangeChange('auctions', 'dateRange', filters.auctions.dateRange.from, e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* الأيام المتبقية */}
+                <div className="filter-section">
+                  <h4>
+                    <FaClock />
+                    الأيام المتبقية (كحد أقصى)
+                  </h4>
+                  <div className="range-inputs single-input">
+                    <input
+                      type="number"
+                      placeholder="الأيام المتبقية"
+                      value={filters.auctions.daysRemaining}
+                      onChange={(e) => handleFilterChange('auctions', 'daysRemaining', parseInt(e.target.value) || 30)}
+                    />
+                  </div>
                 </div>
 
                 {/* حالة المزاد */}
@@ -660,20 +989,31 @@ function PropertyList() {
                     />
                   </div>
                 </div>
-
-                {/* تنتهي قريباً */}
+                
+                {/* الغرض من العقار */}
                 <div className="filter-section">
-                  <label className="checkbox-container">
-                    <input
-                      type="checkbox"
-                      checked={filters.auctions.endingSoon}
-                      onChange={(e) => handleFilterChange('auctions', 'endingSoon', e.target.checked)}
-                    />
-                    <span className="checkbox-label">
-                      <FaClock />
-                      تنتهي خلال 7 أيام
-                    </span>
-                  </label>
+                  <h4>
+                    <FaCity />
+                    الغرض من العقار
+                  </h4>
+                  <div className="filter-options">
+                    {[
+                      { value: 'all', label: 'جميع الأغراض' },
+                      { value: 'استثمار', label: 'استثمار' },
+                      { value: 'شراء', label: 'شراء' }
+                    ].map(option => (
+                      <label key={option.value} className="filter-option">
+                        <input
+                          type="radio"
+                          name="auctionPurpose"
+                          value={option.value}
+                          checked={filters.auctions.purpose === option.value}
+                          onChange={(e) => handleFilterChange('auctions', 'purpose', e.target.value)}
+                        />
+                        <span>{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </>
             )}
@@ -705,8 +1045,8 @@ function PropertyList() {
           <div className="property-grid">
             {currentProperties.length > 0 ? (
               currentProperties.map(property => (
-                <div 
-                  key={property.id} 
+                <div
+                  key={property.id}
                   className={`property-card ${selectedProperty?.id === property.id ? 'property-card-active' : ''}`}
                   onClick={() => setSelectedProperty(property)}
                 >
@@ -725,13 +1065,13 @@ function PropertyList() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="property-card-content">
                     <h3 className="property-card-title">{property.title}</h3>
-                    
+
                     <div className="property-card-location">
                       <FaMapMarkerAlt />
-                      <span>{property.location}</span>
+                      <span>{property.city}، {property.region}</span>
                     </div>
 
                     <div className="property-card-features">
@@ -791,7 +1131,7 @@ function PropertyList() {
           {/* التصفح بين الصفحات */}
           {totalPages > 1 && (
             <div className="pagination">
-              <button 
+              <button
                 className="pagination-btn pagination-prev"
                 onClick={prevPage}
                 disabled={currentPage === 1}
@@ -799,7 +1139,7 @@ function PropertyList() {
                 <FaChevronRight />
                 السابق
               </button>
-              
+
               <div className="pagination-numbers">
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                   let pageNumber;
@@ -825,7 +1165,7 @@ function PropertyList() {
                 {totalPages > 5 && currentPage < totalPages - 2 && (
                   <>
                     <span className="pagination-ellipsis">...</span>
-                    <button 
+                    <button
                       className="pagination-number"
                       onClick={() => paginate(totalPages)}
                     >
@@ -834,8 +1174,8 @@ function PropertyList() {
                   </>
                 )}
               </div>
-              
-              <button 
+
+              <button
                 className="pagination-btn pagination-next"
                 onClick={nextPage}
                 disabled={currentPage === totalPages}
@@ -868,10 +1208,10 @@ function PropertyList() {
 
                 <div className="property-details-info">
                   <h2 className="property-details-title">{selectedProperty.title}</h2>
-                  
+
                   <div className="property-details-location">
                     <FaMapMarkerAlt />
-                    <span>{selectedProperty.location}</span>
+                    <span>{selectedProperty.city}، {selectedProperty.region}</span>
                   </div>
 
                   <div className={`property-details-price ${selectedProperty.isAuction ? 'auction-details-price' : ''}`}>

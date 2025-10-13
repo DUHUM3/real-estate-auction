@@ -637,3 +637,350 @@
     margin: 0;
   }
 }
+
+/* 🌟 عناصر التحكم في الشريط العلوي للمستخدم المسجل */
+.top-bar-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.top-auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+/* 🌟 تحسينات للشريط العلوي في الهاتف */
+@media (max-width: 900px) {
+  .top-bar-controls {
+    display: none; /* إخفاء في الهاتف */
+  }
+  
+  .top-auth-buttons {
+    display: none; /* إخفاء في الهاتف */
+  }
+  
+  .nav-buttons-group {
+    display: none;
+  }
+  
+  .mobile-menu-btn {
+    display: flex;
+  }
+}
+
+/* 🌟 إظهار عناصر الشريط العلوي في الكمبيوتر */
+@media (min-width: 901px) {
+  .top-bar-controls,
+  .top-auth-buttons {
+    display: flex;
+  }
+  
+  .mobile-sidebar,
+  .mobile-overlay {
+    display: none;
+  }
+}
+
+/* 🌟 تحسينات لأيقونات المستخدم والإشعارات في الشريط */
+.user-profile-btn {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 20px;
+  transition: all 0.2s;
+  gap: 8px;
+}
+
+.user-profile-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  background: #1976d2;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.avatar-icon {
+  font-size: 1rem;
+}
+
+.user-name {
+  font-size: 14px;
+  color: #333;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 🌟 القوائم المنسدلة في الشريط العلوي */
+.notifications-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  width: 320px;
+  max-height: 400px;
+  overflow: hidden;
+  z-index: 1001;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  min-width: 220px;
+  z-index: 1001;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* 🌟 القائمة الجانبية للهاتف */
+.mobile-sidebar {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 320px;
+  height: 100vh;
+  background: #ffffff;
+  z-index: 1002;
+  transition: right 0.3s ease-in-out;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-sidebar.active {
+  right: 0;
+}
+
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+}
+
+.mobile-sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.mobile-sidebar-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+  margin-right: auto;
+}
+
+.mobile-sidebar-header .close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #1976d2;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.mobile-sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 0;
+}
+
+/* 🌟 أقسام القائمة الجانبية */
+.mobile-nav-section,
+.mobile-user-section {
+  padding: 0 1rem;
+  margin-bottom: 2rem;
+}
+
+.mobile-auth-section {
+  padding: 0 1rem;
+}
+
+/* 🌟 روابط القائمة الجانبية */
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+  text-decoration: none;
+  color: #333;
+  border: none;
+  background: none;
+  text-align: right;
+  cursor: pointer;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.mobile-nav-link:hover {
+  background: #f8f9fa;
+  color: #1976d2;
+}
+
+.mobile-nav-link.active {
+  background: rgba(25, 118, 210, 0.1);
+  color: #1976d2;
+  font-weight: 600;
+}
+
+.mobile-nav-link .link-icon {
+  margin-left: 12px;
+  font-size: 1.2rem;
+}
+
+/* 🌟 القوائم المنسدلة في الجانبية */
+.mobile-nav-dropdown {
+  width: 100%;
+}
+
+.mobile-dropdown-menu {
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: none;
+  background: none;
+  text-align: right;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.mobile-dropdown-item:hover {
+  background: #e9ecef;
+  color: #1976d2;
+}
+
+.mobile-dropdown-item .dropdown-icon {
+  margin-left: 10px;
+  font-size: 1rem;
+}
+
+/* 🌟 معلومات المستخدم في الجانبية */
+.mobile-user-info {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.mobile-user-avatar {
+  width: 40px;
+  height: 40px;
+  background: #1976d2;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 12px;
+}
+
+.mobile-user-name {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 🌟 زر تسجيل الخروج في الجانبية */
+.mobile-nav-link.logout-btn {
+  color: #dc3545;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+}
+
+.mobile-nav-link.logout-btn:hover {
+  background: #fff5f5;
+  color: #dc3545;
+}
+
+/* 🌟 شارة الإشعارات في الجانبية */
+.mobile-notification-badge {
+  background: #ff4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: auto;
+}
+
+/* 🌟 تحسينات للشاشات الصغيرة جداً */
+@media (max-width: 480px) {
+  .mobile-sidebar {
+    width: 280px;
+  }
+  
+  .mobile-nav-link {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .mobile-user-info {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .mobile-user-avatar {
+    margin-left: 0;
+    margin-bottom: 0.5rem;
+  }
+}

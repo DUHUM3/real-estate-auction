@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Properties from './pages/PropertyList';
 import PropertyDetail from './pages/PropertyDetail';
+import Favorites from './pages/Favorites';
 import CreateProperty from './pages/CreateProperty';
 import Profile from './pages/Profile';
 import MyAds from './pages/MyAds';
@@ -50,6 +51,7 @@ function App() {
               <Route path="/property/:id" element={<PropertyDetail />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/my-ads" element={<MyAds />} />
+              <Route path="/my-lands" element={<Favorites />} />              
               <Route path="/create-property" element={<CreateProperty />} />
               <Route path="/auction/:id" element={<AuctionRoom />} />
               <Route path="/dashboard" element={<Dashboard />} />
