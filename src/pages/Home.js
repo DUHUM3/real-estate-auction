@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   FaSearch,
+  FaBullhorn, FaSearchDollar,
   FaMapMarkerAlt,
   FaRulerCombined,
   FaMoneyBillWave,
@@ -227,7 +230,9 @@ const ClientsSlider = () => {
   );
 };
 
-const Home = () => {
+function Home({ onLoginClick }) { // إضافة onLoginClick كـ prop
+  const { currentUser } = useAuth(); // الحصول على currentUser من context
+  const navigate = useNavigate(); // استخدام useNavigate للتنقل
   const [searchTerm, setSearchTerm] = useState('');
   const [lands, setLands] = useState([]);
   const [auctions, setAuctions] = useState([]);
@@ -514,7 +519,7 @@ const handleTouchEnd = () => {
   return (
     <div className="home-page">
       {/* شريط العملاء المتحرك */}
-      <div className="client-ticker">
+      {/* <div className="client-ticker">
         <div className="ticker-content">
           <div className="ticker-item">
             <FaReact className="react-icon" />
@@ -533,10 +538,33 @@ const handleTouchEnd = () => {
             <span>نفخر بتقديم خدمات عقارية متكاملة بمعايير عالمية</span>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      {/* قسم الهيرو مع خلفية متحركة */}
+            {/* قسم الهيرو مع خلفية متحركة */}
       <section className="hero-section" id="home">
+        {/* 🔹 الشريط المتحرك أصبح داخل قسم الهيرو */}
+        <div className="client-ticker">
+          <div className="ticker-content">
+            <div className="ticker-item">
+              <FaReact className="react-icon" />
+              <span>عملاؤنا مستمرون في الثقة بخدماتنا منذ أكثر من 15 عاماً</span>
+            </div>
+            <div className="ticker-item">
+              <FaReact className="react-icon" />
+              <span>أكثر من 5000 عميل راضٍ عن خدماتنا العقارية المتميزة</span>
+            </div>
+            <div className="ticker-item">
+              <FaReact className="react-icon" />
+              <span>شركاء النجاح مع أكبر شركات التطوير العقاري في المملكة</span>
+            </div>
+            <div className="ticker-item">
+              <FaReact className="react-icon" />
+              <span>نفخر بتقديم خدمات عقارية متكاملة بمعايير عالمية</span>
+            </div>
+          </div>
+        </div>
+
+
         <div className={`hero-background slide-${currentSlide}`}></div>
 
         <div className="hero-content container">
@@ -549,21 +577,44 @@ const handleTouchEnd = () => {
 
           <p>منصة متكاملة لشراء وبيع الأراضي والعقارات عبر مزادات إلكترونية آمنة وموثوقة</p>
 
-          <div className="search-filter">
-            <form onSubmit={handleSearch} className="filter-form">
-              <div className="filter-group">
-                <FaSearch className="search-icon" />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <span className="typing-placeholder"></span>
-              </div>
-              <button type="submit" className="search-submit">بحث</button>
-            </form>
+            <div className="search-filter">
+                  <form onSubmit={handleSearch} className="filter-form">
+                    <div className="filter-group">
+                      <FaSearch className="search-icon" />
+                      <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                      <span className="typing-placeholder"></span>
+                    </div>
+                    <button type="submit" className="search-submit">بحث</button>
+                  </form>
+                </div>
+          
+          {/* الأزرار خارج إطار البحث */}
+          <div className="hero-buttons">
+            <button 
+              className="hero-btn primary-btn"
+              onClick={() => {
+                if (currentUser) {
+                  navigate('/create-listing');
+                } else {
+                  onLoginClick();
+                }
+              }}
+            >
+              <FaBullhorn className="btn-icon" />
+              <span className="btn-text">اعرض أرضك للبيع</span>
+            </button>
+            <button 
+              className="hero-btn secondary-btn"
+              onClick={() => navigate('/investments')}
+            >
+              <FaSearchDollar className="btn-icon" />
+              <span className="btn-text">ابحث عن استثمار</span>
+            </button>
           </div>
-
         </div>
       </section>
 

@@ -6,8 +6,8 @@
   top: 0;
   left: 0;
   width: 100%;
-  background: #ffffff;
-  color: #333333;
+  background: #16354d; /* اللون الجديد عندما يكون في الأعلى */
+  color: #ffffff; /* النصوص بيضاء عندما يكون في الأعلى */
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
   z-index: 1000;
   transition: all 0.4s ease-in-out;
@@ -15,9 +15,10 @@
 }
 
 .navbar.scrolled {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.98); /* أبيض عند التمرير */
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  color: #16354d; /* النصوص تصبح باللون 16354d عند التمرير */
 }
 
 /* 🌟 الحاوية */
@@ -56,15 +57,23 @@
   gap: 0.5rem;
   text-decoration: none;
   font-weight: 700;
-  color: #1976d2;
+  color: #ffffff; /* أبيض عندما يكون في الأعلى */
   transition: all 0.3s ease;
   font-size: 1.3rem;
   margin-left: 0;
 }
 
+.navbar.scrolled .nav-logo {
+  color: #16354d; /* يتغير إلى 16354d عند التمرير */
+}
+
 .nav-logo:hover {
   transform: translateY(-2px);
-  color: #1565c0;
+  color: #e0e0e0; /* لون فاتح عند hover عندما يكون في الأعلى */
+}
+
+.navbar.scrolled .nav-logo:hover {
+  color: #0f2d44; /* لون أغمق عند hover عند التمرير */
 }
 
 /* 🌟 القائمة الرئيسية */
@@ -88,7 +97,7 @@
   position: relative;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #333333;
+  color: #ffffff; /* أبيض عندما يكون في الأعلى */
   text-decoration: none;
   padding: 0.5rem 0.8rem;
   transition: all 0.3s ease;
@@ -100,21 +109,36 @@
   background: none;
 }
 
+.navbar.scrolled .nav-link {
+  color: #16354d; /* يتغير إلى 16354d عند التمرير */
+}
+
 .link-icon {
   margin-left: 8px;
   font-size: 1rem;
+  color: inherit; /* يرث لون النص */
 }
 
 .nav-link:hover {
-  color: #1976d2;
-  background: rgba(25, 118, 210, 0.05);
+  color: #e0e0e0; /* لون فاتح عند hover عندما يكون في الأعلى */
+  background: rgba(255, 255, 255, 0.1); /* خلفية شفافة فاتحة */
   transform: translateY(-1px);
 }
 
+.navbar.scrolled .nav-link:hover {
+  color: #0f2d44; /* لون أغمق عند hover عند التمرير */
+  background: rgba(22, 53, 77, 0.05); /* خلفية شفافة من اللون الأساسي */
+}
+
 .nav-link.active {
-  color: #1976d2;
-  background: rgba(25, 118, 210, 0.1);
+  color: #ffffff; /* أبيض عندما يكون في الأعلى */
+  background: rgba(255, 255, 255, 0.15); /* خلفية شفافة فاتحة */
   font-weight: 600;
+}
+
+.navbar.scrolled .nav-link.active {
+  color: #16354d; /* يتغير إلى 16354d عند التمرير */
+  background: rgba(22, 53, 77, 0.1); /* خلفية شفافة من اللون الأساسي */
 }
 
 .nav-link.active::after {
@@ -125,8 +149,12 @@
   transform: translateX(-50%);
   width: 30px;
   height: 2px;
-  background: #1976d2;
+  background: #ffffff; /* أبيض عندما يكون في الأعلى */
   border-radius: 2px;
+}
+
+.navbar.scrolled .nav-link.active::after {
+  background: #16354d; /* يتغير إلى 16354d عند التمرير */
 }
 
 /* 🌟 أزرار المصادقة */
@@ -137,27 +165,34 @@
 }
 
 .login-btn {
-  background: linear-gradient(135deg, #1976d2, #1565c0);
-  color: #fff !important;
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  color: #16354d !important; /* نص باللون 16354d */
   padding: 0.5rem 0.9rem;
   border-radius: 20px;
-  border: none;
+  border: 2px solid #ffffff;
   cursor: pointer;
   font-weight: 500;
   font-size: 0.9rem;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.navbar.scrolled .login-btn {
+  background: linear-gradient(135deg, #16354d, #0f2d44);
+  color: #ffffff !important; /* أبيض عند التمرير */
+  border: 2px solid #16354d;
+  box-shadow: 0 2px 8px rgba(22, 53, 77, 0.3);
 }
 
 .register-btn {
   background: transparent;
-  color: #1976d2 !important;
+  color: #ffffff !important; /* أبيض عندما يكون في الأعلى */
   padding: 0.5rem 0.9rem;
   border-radius: 20px;
-  border: 2px solid #1976d2;
+  border: 2px solid #ffffff;
   cursor: pointer;
   font-weight: 500;
   font-size: 0.9rem;
@@ -167,10 +202,20 @@
   gap: 6px;
 }
 
+.navbar.scrolled .register-btn {
+  color: #16354d !important; /* يتغير إلى 16354d عند التمرير */
+  border: 2px solid #16354d;
+}
+
 .register-btn:hover {
-  background: #1976d2;
-  color: #fff !important;
+  background: #ffffff;
+  color: #16354d !important; /* عند hover يصبح النص 16354d */
   transform: translateY(-2px);
+}
+
+.navbar.scrolled .register-btn:hover {
+  background: #16354d;
+  color: #ffffff !important; /* عند hover يصبح النص أبيض */
 }
 
 .login-icon, .register-icon {
@@ -178,9 +223,14 @@
 }
 
 .login-btn:hover {
-  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
+}
+
+.navbar.scrolled .login-btn:hover {
+  background: linear-gradient(135deg, #0f2d44, #0a2438);
+  box-shadow: 0 4px 12px rgba(22, 53, 77, 0.4);
 }
 
 /* 🌟 زر القائمة (الهاتف) */
@@ -200,13 +250,21 @@
   display: block;
   width: 100%;
   height: 3px;
-  background: #1976d2;
+  background: #ffffff; /* أبيض عندما يكون في الأعلى */
   border-radius: 3px;
   transition: all 0.3s ease;
 }
 
+.navbar.scrolled .mobile-menu-btn span {
+  background: #16354d; /* يتغير إلى 16354d عند التمرير */
+}
+
 .mobile-menu-btn:hover span {
-  background: #1565c0;
+  background: #e0e0e0; /* لون فاتح عند hover عندما يكون في الأعلى */
+}
+
+.navbar.scrolled .mobile-menu-btn:hover span {
+  background: #0f2d44; /* لون أغمق عند hover عند التمرير */
 }
 
 /* 🌟 القائمة المنسدلة */
@@ -265,7 +323,7 @@
 
 .dropdown-item:hover {
   background-color: #f8f9fa;
-  color: #1976d2;
+  color: #16354d; /* اللون الجديد */
 }
 
 .dropdown-item:last-child {
@@ -275,7 +333,7 @@
 .dropdown-icon {
   margin-left: 12px;
   font-size: 1rem;
-  color: #1976d2;
+  color: #16354d; /* اللون الجديد */
 }
 
 /* 🌟 الإشعارات */
@@ -294,12 +352,20 @@
 }
 
 .notification-btn:hover {
-  background-color: #f0f0f0;
+  background-color: rgba(255, 255, 255, 0.1); /* شفافية فاتحة عندما يكون في الأعلى */
+}
+
+.navbar.scrolled .notification-btn:hover {
+  background-color: rgba(22, 53, 77, 0.1); /* شفافية من اللون الأساسي عند التمرير */
 }
 
 .notification-icon {
   font-size: 1.2rem;
-  color: #1976d2;
+  color: #ffffff; /* أبيض عندما يكون في الأعلى */
+}
+
+.navbar.scrolled .notification-icon {
+  color: #16354d; /* يتغير إلى 16354d عند التمرير */
 }
 
 .notification-badge {
@@ -341,6 +407,7 @@
 .notifications-header h3 {
   margin: 0 0 4px 0;
   font-size: 16px;
+  color: #16354d; /* اللون الجديد */
 }
 
 .notifications-count {
@@ -400,7 +467,7 @@
   text-align: center;
   padding: 12px;
   background: #f8f9fa;
-  color: #1976d2;
+  color: #16354d; /* اللون الجديد */
   text-decoration: none;
   border-top: 1px solid #f0f0f0;
   font-size: 14px;
@@ -428,21 +495,31 @@
 }
 
 .user-profile-btn:hover {
-  background-color: #f0f0f0;
+  background-color: rgba(255, 255, 255, 0.1); /* شفافية فاتحة عندما يكون في الأعلى */
+}
+
+.navbar.scrolled .user-profile-btn:hover {
+  background-color: rgba(22, 53, 77, 0.1); /* شفافية من اللون الأساسي عند التمرير */
 }
 
 .user-avatar {
   width: 36px;
   height: 36px;
-  background: #1976d2;
-  color: white;
+  background: #ffffff; /* أبيض عندما يكون في الأعلى */
+  color: #16354d; /* نص باللون 16354d */
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-left: 8px;
   font-weight: bold;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+}
+
+.navbar.scrolled .user-avatar {
+  background: #16354d; /* يتغير إلى 16354d عند التمرير */
+  color: #ffffff; /* نص أبيض عند التمرير */
+  box-shadow: 0 2px 8px rgba(22, 53, 77, 0.3);
 }
 
 .avatar-icon {
@@ -451,11 +528,15 @@
 
 .user-name {
   font-size: 14px;
-  color: #333;
+  color: #16354d; /* أبيض عندما يكون في الأعلى */
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.navbar.scrolled .user-name {
+  color: #16354d; /* يتغير إلى 16354d عند التمرير */
 }
 
 .user-dropdown {
@@ -563,7 +644,7 @@
     background: none;
     border: none;
     font-size: 2rem;
-    color: #1976d2;
+    color: #16354d; /* اللون الجديد */
     cursor: pointer;
     transition: color 0.3s ease;
   }
@@ -697,13 +778,13 @@
 }
 
 .user-profile-btn:hover {
-  background-color: #f0f0f0;
+  background-color: #16354d;
 }
 
 .user-avatar {
   width: 36px;
   height: 36px;
-  background: #1976d2;
+  background: #767676;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -795,6 +876,7 @@
   margin: 0;
   font-size: 1.2rem;
   color: #333;
+margin-left: 100px;
   margin-right: auto;
 }
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/AuthModal.css';
 
@@ -20,7 +20,6 @@ function Login({ onClose, onSwitchToRegister }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // هنا سيتم إضافة منطق تسجيل الدخول مع الخادم
     const userData = {
       id: 1,
       name: 'مستخدم تجريبي',
@@ -39,43 +38,70 @@ function Login({ onClose, onSwitchToRegister }) {
 
   return (
     <div className="auth-modal-overlay" onClick={handleOverlayClick}>
-      <div className="auth-modal">
+      <div className="auth-modal login-modal">
         <div className="auth-modal-header">
-          <h2>تسجيل الدخول</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
         
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <input
-              type="email"
-              name="email"
-              placeholder="البريد الإلكتروني"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
+        <div className="auth-content">
+          {/* العنوان الرئيسي */}
+          <div className="auth-hero-section">
+            <h1 className="auth-main-title">منصة العقارات السعودية</h1>
+            <p className="auth-subtitle">إبدأ رحلتك العقارية معنا</p>
+            <div className="auth-divider"></div>
           </div>
-          <div className="form-group">
-            <input
-              type="password"
-              name="password"
-              placeholder="كلمة المرور"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
+
+          {/* رسالة الترحيب */}
+          {/* <div className="auth-welcome-section">
+            <h2 className="auth-welcome-title">مرحباً بك</h2>
+            <p className="auth-welcome-text">سجل دخولك أو أنشئ حساب جديد</p>
+          </div> */}
+
+          {/* خيارات التسجيل */}
+          <div className="auth-options">
+            <button className="auth-option-btn active">
+              تسجيل الدخول
+            </button>
+            <button 
+              className="auth-option-btn" 
+              onClick={onSwitchToRegister}
+            >
+              حساب جديد
+            </button>
           </div>
-          <button type="submit" className="btn btn-primary btn-full">تسجيل الدخول</button>
-        </form>
-        
-        <div className="auth-modal-footer">
-          <p>
-            ليس لديك حساب؟ 
-            <span className="auth-link" onClick={onSwitchToRegister}> انشاء حساب</span>
-          </p>
+
+          {/* نموذج تسجيل الدخول */}
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+              <label className="form-label">البريد الإلكتروني</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="example@email.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="form-input"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">كلمة المرور</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="........."
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="form-input"
+              />
+            </div>
+
+            <button type="submit" className="btn-login-submit">
+              تسجيل الدخول
+            </button>
+          </form>
         </div>
       </div>
     </div>

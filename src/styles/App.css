@@ -42,24 +42,31 @@ body {
 
 /* ===== شريط العملاء المتحرك ===== */
 .client-ticker {
-  background-color: var(--primary-color);
-  color: var(--background-white);
+  position: absolute;
+  top: 80px; /* 🔹 عدّل حسب ارتفاع الـ Navbar عندك */
+  left: 0;
+  width: 100%;
+  z-index: 5; /* فوق خلفية الهيرو */
+  background: transparent; /* ✅ خلفية شفافة تمامًا */
+  color: white;
   overflow: hidden;
-  padding: 10px 0;
-  margin-top: 63px; /* 🔹 المسافة تحت الـ Navbar */
-  box-shadow: var(--shadow-sm); /* لمسة جمالية بسيطة */
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+/* ===== محتوى الشريط ===== */
 .ticker-content {
   display: flex;
   white-space: nowrap;
-  animation: ticker 30s linear infinite;
+  animation: ticker-right-to-left 30s linear infinite;
 }
 
 .ticker-item {
   display: inline-flex;
   align-items: center;
-  margin: 0 30px;
+  margin: 0 40px;
+  font-family: var(--font-lt);
+  font-size: 0.95rem;
 }
 
 .react-icon {
@@ -68,59 +75,61 @@ body {
   font-size: 18px;
 }
 
-@keyframes ticker {
+/* ===== حركة من اليمين إلى اليسار ===== */
+@keyframes ticker-right-to-left {
   0% {
-    transform: translateX(-100%);
-  }
-  100% {
     transform: translateX(100%);
   }
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
-/* ===== العناوين مع المربع الشفاف ===== */
-.section-title {
-  position: relative;
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: var(--primary-color);
-  display: inline-block;
+/* ===== تحسينات للهاتف ===== */
+@media (max-width: 768px) {
+  .client-ticker {
+    top: 65px; /* 🔹 أقل لأن الـ Navbar أصغر غالبًا */
+    padding: 10px 0;
+    background: transparent; /* ✅ تبقى الخلفية شفافة */
+  }
+
+  .ticker-item {
+    margin: 0 20px;
+    font-size: 0.7rem; /* ✅ خط أصغر في الهاتف */
+  }
+
+  .react-icon {
+    font-size: 15px;
+  }
 }
 
-.transparent-box {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 60px;
-  height: 4px;
-  background-color: var(--secondary-color);
-  border-radius: 2px;
-  z-index: 1;
+/* ===== شاشات صغيرة جداً ===== */
+@media (max-width: 480px) {
+  .ticker-item {
+    font-size: 0.65rem; /* ✅ أصغر أكثر */
+    margin: 0 15px;
+  }
+
+  .react-icon {
+    font-size: 14px;
+  }
 }
 
-.section-header {
-  text-align: right;
-  margin-bottom: 30px;
-}
 
-.section-header p {
-  color: var(--text-light);
-  font-size: 1.1rem;
-}
 
 
 
 /* ===== قسم الهيرو ===== */
 .hero-section {
   position: relative;
-  height: 95vh; /* أطول قليلاً */
+  height: 110vh; /* أطول قليلاً */
   overflow: hidden;
   color: white;
 }
 
 @media (max-width: 768px) {
   .hero-section {
-    height: 85vh !important; /* اختبار فقط */
+    height: 100vh !important; /* اختبار فقط */
   }
 }
 
@@ -137,17 +146,17 @@ body {
 }
 
 /* ===== الصور ===== */
-.slide-0 {
+.slide-2 {
   background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
     url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
 }
 
-.slide-1 {
+.slide-0 {
   background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
     url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
 }
 
-.slide-2 {
+.slide-1 {
   background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
     url('https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
 }
@@ -568,6 +577,126 @@ body {
   }
 }
 
+/* ===== أزرار الهيرو خارج البحث ===== */
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 35px; /* 🔹 زيادة المسافة بين الأزرار والعنصر الذي فوقها */
+  animation: fadeInUp 2s ease both;
+  justify-content: flex-start; /* تبدأ من البداية */
+  width: 100%;
+  max-width: 650px;
+}
+
+/* الزر العام */
+.hero-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 26px;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font-lt);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  min-width: 160px;
+  justify-content: center;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap; /* ✅ يجعل النص في سطر واحد */
+}
+
+/* تأثير اللمعان */
+.hero-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+.hero-btn:hover::before { left: 100%; }
+
+.hero-btn .btn-icon {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+.hero-btn:hover .btn-icon { transform: scale(1.1); }
+
+/* الزر الأساسي */
+.primary-btn {
+  background: linear-gradient(135deg, var(--primary-color), #1a3a5a);
+  color: white;
+  border: 2px solid var(--primary-color);
+}
+.primary-btn:hover {
+  background: linear-gradient(135deg, #1a3a5a, var(--primary-color));
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
+}
+
+/* الزر الثانوي */
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+/* ===== تحسينات للهاتف ===== */
+@media (max-width: 768px) {
+  .hero-buttons {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.8rem; /* 🔹 زيادة المسافة بين الأزرار */
+    margin-top: 45px; /* 🔹 زيادة المسافة مع العنصر الذي فوق */
+    max-width: 100%;
+  }
+
+  .hero-btn {
+    min-width: auto;
+    padding: 10px 22px; /* 🔹 جعل الأزرار أطول */
+    font-size: 0.8rem;
+    border-radius: 8px;
+    flex: none;
+    max-width: 160px;
+    white-space: nowrap; /* ✅ منع النص من الانقسام */
+  }
+
+  .hero-btn .btn-icon { font-size: 0.85rem; }
+  .btn-text { font-size: 0.75rem; }
+}
+
+/* ===== شاشات صغيرة جداً ===== */
+@media (max-width: 480px) {
+  .hero-buttons {
+    justify-content: flex-start;
+    gap: 0.6rem;
+    margin-top: 40px; /* 🔹 مسافة إضافية للأناقة */
+  }
+
+  .hero-btn {
+    padding: 9px 18px;
+    font-size: 0.75rem;
+    max-width: 140px;
+    white-space: nowrap; /* ✅ يضمن بقاء النص في سطر واحد */
+  }
+
+  .hero-btn .btn-icon { font-size: 0.8rem; }
+  .btn-text { font-size: 0.7rem; }
+}
 
 /* ===== قسم الخدمات ===== */
 .services-section {

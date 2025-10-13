@@ -168,13 +168,13 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                     <FaBullhorn className="dropdown-icon" />
                     طلب تسويق عقار
                   </button>
-                  <button 
+                  {/* <button 
                     className="dropdown-item"
                     onClick={() => handleCreateRequest('market-land')}
                   >
                     <FaBullhorn className="dropdown-icon" />
                     طلب تسويق أرض
-                  </button>
+                  </button> */}
                 </div>
               )}
             </div>
@@ -238,9 +238,9 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                   <span className="user-avatar">
                     <FaUser className="avatar-icon" />
                   </span>
-                  <span className="user-name">
+                  {/* <span className="user-name">
                     {currentUser.email?.split('@')[0]}
-                  </span>
+                  </span> */}
                 </button>
                 
                 {showUserMenu && (
@@ -340,7 +340,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
             >
               ✕
             </button>
-            <h3>القائمة الرئيسية</h3>
+              <h3>القائمة الرئيسية</h3>
           </div>
 
           <div className="mobile-sidebar-content">
@@ -390,13 +390,13 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                       <FaBullhorn className="dropdown-icon" />
                       طلب تسويق عقار
                     </button>
-                    <button 
+                    {/* <button 
                       className="mobile-dropdown-item"
                       onClick={() => handleCreateRequest('market-land')}
                     >
                       <FaBullhorn className="dropdown-icon" />
                       طلب تسويق أرض
-                    </button>
+                    </button> */}
                   </div>
                 )}
               </div>
