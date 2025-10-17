@@ -7,7 +7,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Properties from './pages/PropertyList';
-import PropertyDetail from './pages/PropertyDetail';
+import PropertyDetail from './pages/PropertyDetailsModal';
 import Favorites from './pages/Favorites';
 import CreateProperty from './pages/CreateProperty';
 import Profile from './pages/Profile';

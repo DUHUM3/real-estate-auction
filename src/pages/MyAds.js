@@ -1,180 +1,257 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { FaPlus, FaEdit, FaTrash, FaFilter, FaSearch } from 'react-icons/fa';
 import '../styles/MyAds.css';
 
 function MyAds() {
   const { currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('ads');
   const [showAdForm, setShowAdForm] = useState(false);
-  const [showAuctionForm, setShowAuctionForm] = useState(false);
   const [ads, setAds] = useState([]);
-  const [auctions, setAuctions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [formLoading, setFormLoading] = useState(false);
+  const [activeStatus, setActiveStatus] = useState('الكل');
+  const [searchTerm, setSearchTerm] = useState('');
+  
   const [adFormData, setAdFormData] = useState({
+    announcement_number: '',
+    region: '',
+    city: '',
     title: '',
+    land_type: 'سكني',
+    purpose: 'بيع',
+    geo_location_text: '',
+    total_area: '',
+    length_north: '',
+    length_south: '',
+    length_east: '',
+    length_west: '',
     description: '',
-    price: '',
-    area: '',
-    location: '',
-    landType: 'residential',
+    deed_number: '',
+    price_per_sqm: '',
+    investment_duration: '',
+    estimated_investment_value: '',
+    agency_number: '',
+    legal_declaration: false,
+    cover_image: null,
     images: []
   });
-  const [auctionFormData, setAuctionFormData] = useState({
-    title: '',
-    description: '',
-    startPrice: '',
-    minBid: '',
-    endDate: '',
-    area: '',
-    location: '',
-    landType: 'residential',
-    documents: []
-  });
+
+  // جلب الإعلانات من API
+  const fetchAds = async (status = 'الكل') => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      
+      let url = 'https://shahin-tqay.onrender.com/api/user/properties/my';
+      
+      // إذا كان هناك تصفية بالحالة، استخدم API الحالة
+      if (status !== 'الكل') {
+        url = `https://shahin-tqay.onrender.com/api/user/properties/status/${status}`;
+      }
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const result = await response.json();
+      
+      if (result.status) {
+        setAds(result.data);
+      } else {
+        setError('فشل في جلب الإعلانات');
+      }
+    } catch (error) {
+      setError('حدث خطأ في الاتصال بالخادم');
+      console.error('Error fetching ads:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // تغيير تصفية الحالة
+  const handleStatusChange = (status) => {
+    setActiveStatus(status);
+    fetchAds(status);
+  };
+
+  // حذف إعلان
+  const deleteAd = async (adId) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الإعلان؟')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`https://shahin-tqay.onrender.com/api/user/properties/${adId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const result = await response.json();
+      
+      if (result.status) {
+        setAds(ads.filter(ad => ad.id !== adId));
+        alert('تم حذف الإعلان بنجاح');
+      } else {
+        alert('فشل في حذف الإعلان');
+      }
+    } catch (error) {
+      alert('حدث خطأ أثناء حذف الإعلان');
+      console.error('Error deleting ad:', error);
+    }
+  };
+
+  // إضافة إعلان جديد
+  const handleAddAd = async (e) => {
+    e.preventDefault();
+    setFormLoading(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+
+      // إضافة الحقول الأساسية
+      const fields = [
+        'announcement_number', 'region', 'city', 'title', 'land_type', 'purpose',
+        'geo_location_text', 'total_area', 'length_north', 'length_south', 
+        'length_east', 'length_west', 'description', 'deed_number', 'legal_declaration'
+      ];
+
+      fields.forEach(field => {
+        formData.append(field, adFormData[field]);
+      });
+
+      // إضافة الحقول المشروطة حسب purpose
+      if (adFormData.purpose === 'بيع') {
+        formData.append('price_per_sqm', adFormData.price_per_sqm);
+      } else if (adFormData.purpose === 'استثمار') {
+        formData.append('investment_duration', adFormData.investment_duration);
+        formData.append('estimated_investment_value', adFormData.estimated_investment_value);
+      }
+
+      // إضافة agency_number إذا كان المستخدم وكيل شرعي
+      if (currentUser?.user_type === 'وكيل شرعي') {
+        formData.append('agency_number', adFormData.agency_number);
+      }
+
+      // إضافة الصور
+      if (adFormData.cover_image) {
+        formData.append('cover_image', adFormData.cover_image);
+      }
+
+      if (adFormData.images && adFormData.images.length > 0) {
+        adFormData.images.forEach((image, index) => {
+          formData.append(`images[${index}]`, image);
+        });
+      }
+
+      const response = await fetch('https://shahin-tqay.onrender.com/api/user/properties', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData
+      });
+
+      const result = await response.json();
+      
+      if (result.status) {
+        alert('تم إضافة الإعلان بنجاح');
+        setShowAdForm(false);
+        resetForm();
+        fetchAds(activeStatus); // إعادة تحميل الإعلانات
+      } else {
+        alert(result.message || 'فشل في إضافة الإعلان');
+      }
+    } catch (error) {
+      alert('حدث خطأ أثناء إضافة الإعلان');
+      console.error('Error adding ad:', error);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setAdFormData({
+      announcement_number: '',
+      region: '',
+      city: '',
+      title: '',
+      land_type: 'سكني',
+      purpose: 'بيع',
+      geo_location_text: '',
+      total_area: '',
+      length_north: '',
+      length_south: '',
+      length_east: '',
+      length_west: '',
+      description: '',
+      deed_number: '',
+      price_per_sqm: '',
+      investment_duration: '',
+      estimated_investment_value: '',
+      agency_number: '',
+      legal_declaration: false,
+      cover_image: null,
+      images: []
+    });
+  };
+
+  const handleAdChange = (e) => {
+    const { name, value, type, checked, files } = e.target;
+    
+    if (type === 'file') {
+      if (name === 'cover_image') {
+        setAdFormData({
+          ...adFormData,
+          cover_image: files[0]
+        });
+      } else if (name === 'images') {
+        setAdFormData({
+          ...adFormData,
+          images: Array.from(files)
+        });
+      }
+    } else if (type === 'checkbox') {
+      setAdFormData({
+        ...adFormData,
+        [name]: checked
+      });
+    } else {
+      setAdFormData({
+        ...adFormData,
+        [name]: value
+      });
+    }
+  };
 
   // تحميل البيانات الأولية
   useEffect(() => {
-    // محاكاة بيانات الإعلانات
-    const sampleAds = [
-      {
-        id: 1,
-        title: 'أرض سكنية في حي الربيع',
-        description: 'أرض سكنية ممتازة بمساحة 600 متر',
-        price: '500,000',
-        area: '600',
-        location: 'حي الربيع، الرياض',
-        status: 'active',
-        date: '2024-01-15',
-        views: 150
-      },
-      {
-        id: 2,
-        title: 'مزرعة للبيع في الخرج',
-        description: 'مزرعة بها بئر وأشجار مثمرة',
-        price: '1,200,000',
-        area: '5000',
-        location: 'الخرج',
-        status: 'pending',
-        date: '2024-01-10',
-        views: 80
-      }
-    ];
-
-    const sampleAuctions = [
-      {
-        id: 1,
-        title: 'مزاد أرض تجارية',
-        description: 'أرض تجارية بموقع مميز',
-        startPrice: '300,000',
-        currentBid: '450,000',
-        minBid: '10,000',
-        endDate: '2024-02-01',
-        status: 'active',
-        bidders: 12,
-        date: '2024-01-12'
-      }
-    ];
-
-    setAds(sampleAds);
-    setAuctions(sampleAuctions);
+    fetchAds();
   }, []);
 
-  const handleAdChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'images') {
-      setAdFormData({
-        ...adFormData,
-        images: Array.from(files)
-      });
-    } else {
-      setAdFormData({
-        ...adFormData,
-        [name]: value
-      });
-    }
-  };
+  // بحث في الإعلانات
+  const filteredAds = ads.filter(ad => 
+    ad.title.includes(searchTerm) || 
+    ad.description.includes(searchTerm) || 
+    ad.city.includes(searchTerm)
+  );
 
-  const handleAuctionChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'documents') {
-      setAuctionFormData({
-        ...auctionFormData,
-        documents: Array.from(files)
-      });
-    } else {
-      setAuctionFormData({
-        ...auctionFormData,
-        [name]: value
-      });
-    }
-  };
-
-  const handleAdSubmit = (e) => {
-    e.preventDefault();
-    const newAd = {
-      id: ads.length + 1,
-      ...adFormData,
-      status: 'pending',
-      date: new Date().toISOString().split('T')[0],
-      views: 0
-    };
-    setAds([newAd, ...ads]);
-    setShowAdForm(false);
-    setAdFormData({
-      title: '',
-      description: '',
-      price: '',
-      area: '',
-      location: '',
-      landType: 'residential',
-      images: []
-    });
-    alert('تم إنشاء الإعلان بنجاح وسيتم مراجعته من قبل الإدارة');
-  };
-
-  const handleAuctionSubmit = (e) => {
-    e.preventDefault();
-    const newAuction = {
-      id: auctions.length + 1,
-      ...auctionFormData,
-      status: 'pending',
-      currentBid: auctionFormData.startPrice,
-      bidders: 0,
-      date: new Date().toISOString().split('T')[0]
-    };
-    setAuctions([newAuction, ...auctions]);
-    setShowAuctionForm(false);
-    setAuctionFormData({
-      title: '',
-      description: '',
-      startPrice: '',
-      minBid: '',
-      endDate: '',
-      area: '',
-      location: '',
-      landType: 'residential',
-      documents: []
-    });
-    alert('تم تقديم طلب المزاد بنجاح وسيتم مراجعته من قبل الإدارة');
-  };
-
-  const deleteAd = (adId) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا الإعلان؟')) {
-      setAds(ads.filter(ad => ad.id !== adId));
-    }
-  };
-
-  const deleteAuction = (auctionId) => {
-    if (window.confirm('هل أنت متأكد من حذف طلب المزاد هذا؟')) {
-      setAuctions(auctions.filter(auction => auction.id !== auctionId));
-    }
-  };
-
+  // تنسيق الحالة
   const getStatusBadge = (status) => {
     const statusConfig = {
-      active: { text: 'نشط', class: 'status-active' },
-      pending: { text: 'قيد المراجعة', class: 'status-pending' },
-      rejected: { text: 'مرفوض', class: 'status-rejected' },
-      sold: { text: 'تم البيع', class: 'status-sold' },
-      expired: { text: 'منتهي', class: 'status-expired' }
+      'مقبول': { text: 'مقبول', class: 'status-approved' },
+      'قيد المراجعة': { text: 'قيد المراجعة', class: 'status-pending' },
+      'مرفوض': { text: 'مرفوض', class: 'status-rejected' },
+      'تم البيع': { text: 'تم البيع', class: 'status-sold' },
+      'مفتوح': { text: 'مفتوح', class: 'status-open' }
     };
     const config = statusConfig[status] || { text: status, class: 'status-pending' };
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
@@ -184,437 +261,467 @@ function MyAds() {
     <div className="form-overlay">
       <div className="form-modal">
         <div className="form-header">
-          <h3>إنشاء إعلان جديد</h3>
-          <button className="close-btn" onClick={() => setShowAdForm(false)}>×</button>
+          <h3>إضافة أرض جديدة</h3>
+          <button className="close-btn" onClick={() => setShowAdForm(false)}>&times;</button>
         </div>
-        <form onSubmit={handleAdSubmit} className="ad-form">
+        <form onSubmit={handleAddAd} className="ad-form">
           <div className="form-grid">
+            {/* المعلومات الأساسية */}
             <div className="form-group">
-              <label>عنوان الإعلان *</label>
+              <label>رقم الإعلان</label>
+              <input
+                type="text"
+                name="announcement_number"
+                value={adFormData.announcement_number}
+                onChange={handleAdChange}
+                required
+                className="form-control"
+                placeholder="أدخل رقم الإعلان"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>المنطقة</label>
+              <input
+                type="text"
+                name="region"
+                value={adFormData.region}
+                onChange={handleAdChange}
+                required
+                className="form-control"
+                placeholder="أدخل المنطقة"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>المدينة</label>
+              <input
+                type="text"
+                name="city"
+                value={adFormData.city}
+                onChange={handleAdChange}
+                required
+                className="form-control"
+                placeholder="أدخل المدينة"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>عنوان الإعلان</label>
               <input
                 type="text"
                 name="title"
                 value={adFormData.title}
                 onChange={handleAdChange}
                 required
-                className="form-input"
+                className="form-control"
                 placeholder="أدخل عنوان الإعلان"
               />
             </div>
 
             <div className="form-group">
-              <label>وصف الإعلان *</label>
+              <label>نوع الأرض</label>
+              <select
+                name="land_type"
+                value={adFormData.land_type}
+                onChange={handleAdChange}
+                required
+                className="form-control"
+              >
+                <option value="سكني">سكني</option>
+                <option value="تجاري">تجاري</option>
+                <option value="زراعي">زراعي</option>
+                <option value="صناعي">صناعي</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>الغرض</label>
+              <select
+                name="purpose"
+                value={adFormData.purpose}
+                onChange={handleAdChange}
+                required
+                className="form-control"
+              >
+                <option value="بيع">بيع</option>
+                <option value="استثمار">استثمار</option>
+              </select>
+            </div>
+
+            {/* الحقول المشروطة حسب purpose */}
+            {adFormData.purpose === 'بيع' && (
+              <div className="form-group">
+                <label>سعر المتر المربع (ريال)</label>
+                <input
+                  type="number"
+                  name="price_per_sqm"
+                  value={adFormData.price_per_sqm}
+                  onChange={handleAdChange}
+                  required
+                  className="form-control"
+                  placeholder="أدخل سعر المتر المربع"
+                />
+              </div>
+            )}
+
+            {adFormData.purpose === 'استثمار' && (
+              <>
+                <div className="form-group">
+                  <label>مدة الاستثمار (شهر)</label>
+                  <input
+                    type="number"
+                    name="investment_duration"
+                    value={adFormData.investment_duration}
+                    onChange={handleAdChange}
+                    required
+                    className="form-control"
+                    placeholder="أدخل مدة الاستثمار بالأشهر"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>القيمة الاستثمارية المتوقعة (ريال)</label>
+                  <input
+                    type="number"
+                    name="estimated_investment_value"
+                    value={adFormData.estimated_investment_value}
+                    onChange={handleAdChange}
+                    required
+                    className="form-control"
+                    placeholder="أدخل القيمة الاستثمارية المتوقعة"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* حقل agency_number للمستخدمين الوكلاء الشرعيين */}
+            {currentUser?.user_type === 'وكيل شرعي' && (
+              <div className="form-group">
+                <label>رقم الوكالة</label>
+                <input
+                  type="text"
+                  name="agency_number"
+                  value={adFormData.agency_number}
+                  onChange={handleAdChange}
+                  required
+                  className="form-control"
+                  placeholder="أدخل رقم الوكالة"
+                />
+              </div>
+            )}
+
+            {/* المعلومات الهندسية */}
+            <div className="form-group">
+              <label>المساحة الإجمالية (م²)</label>
+              <input
+                type="number"
+                name="total_area"
+                value={adFormData.total_area}
+                onChange={handleAdChange}
+                required
+                className="form-control"
+                placeholder="أدخل المساحة الإجمالية"
+                step="0.01"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>الطول شمال (م)</label>
+              <input
+                type="number"
+                name="length_north"
+                value={adFormData.length_north}
+                onChange={handleAdChange}
+                className="form-control"
+                placeholder="الطول شمال"
+                step="0.01"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>الطول جنوب (م)</label>
+              <input
+                type="number"
+                name="length_south"
+                value={adFormData.length_south}
+                onChange={handleAdChange}
+                className="form-control"
+                placeholder="الطول جنوب"
+                step="0.01"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>الطول شرق (م)</label>
+              <input
+                type="number"
+                name="length_east"
+                value={adFormData.length_east}
+                onChange={handleAdChange}
+                className="form-control"
+                placeholder="الطول شرق"
+                step="0.01"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>الطول غرب (م)</label>
+              <input
+                type="number"
+                name="length_west"
+                value={adFormData.length_west}
+                onChange={handleAdChange}
+                className="form-control"
+                placeholder="الطول غرب"
+                step="0.01"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>رقم الصك</label>
+              <input
+                type="text"
+                name="deed_number"
+                value={adFormData.deed_number}
+                onChange={handleAdChange}
+                required
+                className="form-control"
+                placeholder="أدخل رقم الصك"
+              />
+            </div>
+
+            <div className="form-group full-width">
+              <label>الموقع الجغرافي (وصف)</label>
+              <input
+                type="text"
+                name="geo_location_text"
+                value={adFormData.geo_location_text}
+                onChange={handleAdChange}
+                required
+                className="form-control"
+                placeholder="أدخل وصف الموقع الجغرافي"
+              />
+            </div>
+
+            <div className="form-group full-width">
+              <label>الوصف</label>
               <textarea
                 name="description"
                 value={adFormData.description}
                 onChange={handleAdChange}
                 required
-                className="form-input"
+                className="form-control"
                 rows="4"
                 placeholder="أدخل وصفاً مفصلاً عن الأرض"
               />
             </div>
 
+            {/* رفع الملفات */}
             <div className="form-group">
-              <label>السعر (ريال سعودي) *</label>
-              <input
-                type="number"
-                name="price"
-                value={adFormData.price}
-                onChange={handleAdChange}
-                required
-                className="form-input"
-                placeholder="أدخل السعر"
-              />
+              <label>الصورة الرئيسية</label>
+              <div className="file-input-wrapper">
+                <input
+                  type="file"
+                  name="cover_image"
+                  onChange={handleAdChange}
+                  required
+                  accept="image/*"
+                  className="form-control"
+                />
+              </div>
             </div>
 
             <div className="form-group">
-              <label>المساحة (م²) *</label>
-              <input
-                type="number"
-                name="area"
-                value={adFormData.area}
-                onChange={handleAdChange}
-                required
-                className="form-input"
-                placeholder="أدخل المساحة بالمتر المربع"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>الموقع *</label>
-              <input
-                type="text"
-                name="location"
-                value={adFormData.location}
-                onChange={handleAdChange}
-                required
-                className="form-input"
-                placeholder="أدخل الموقع"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>نوع الأرض *</label>
-              <select
-                name="landType"
-                value={adFormData.landType}
-                onChange={handleAdChange}
-                required
-                className="form-input"
-              >
-                <option value="residential">سكنية</option>
-                <option value="commercial">تجارية</option>
-                <option value="agricultural">زراعية</option>
-                <option value="industrial">صناعية</option>
-              </select>
+              <label>الصور الإضافية</label>
+              <div className="file-input-wrapper">
+                <input
+                  type="file"
+                  name="images"
+                  onChange={handleAdChange}
+                  multiple
+                  accept="image/*"
+                  className="form-control"
+                />
+                <small>يمكنك رفع أكثر من صورة</small>
+              </div>
             </div>
 
             <div className="form-group full-width">
-              <label>صور الأرض</label>
-              <input
-                type="file"
-                name="images"
-                onChange={handleAdChange}
-                multiple
-                accept="image/*"
-                className="form-input"
-              />
-              <small>يمكنك رفع أكثر من صورة</small>
+              <label className="checkbox-container">
+                <input
+                  type="checkbox"
+                  name="legal_declaration"
+                  checked={adFormData.legal_declaration}
+                  onChange={handleAdChange}
+                  required
+                />
+                <span className="checkmark"></span>
+                <span>أقر بأن جميع المعلومات المقدمة صحيحة وأتحمل المسؤولية القانونية</span>
+              </label>
             </div>
           </div>
 
           <div className="form-actions">
-            <button type="button" className="btn btn-secondary" onClick={() => setShowAdForm(false)}>
+            <button 
+              type="button" 
+              className="btn btn-outline"
+              onClick={() => {
+                setShowAdForm(false);
+                resetForm();
+              }}
+              disabled={formLoading}
+            >
               إلغاء
             </button>
-            <button type="submit" className="btn btn-primary">
-              نشر الإعلان
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={formLoading}
+            >
+              {formLoading ? 'جاري الإضافة...' : 'إضافة الأرض'}
             </button>
           </div>
         </form>
       </div>
-    </div>
-  );
-
-  const renderAuctionForm = () => (
-    <div className="form-overlay">
-      <div className="form-modal">
-        <div className="form-header">
-          <h3>طلب مزاد جديد</h3>
-          <button className="close-btn" onClick={() => setShowAuctionForm(false)}>×</button>
-        </div>
-        <form onSubmit={handleAuctionSubmit} className="auction-form">
-          <div className="form-grid">
-            <div className="form-group">
-              <label>عنوان المزاد *</label>
-              <input
-                type="text"
-                name="title"
-                value={auctionFormData.title}
-                onChange={handleAuctionChange}
-                required
-                className="form-input"
-                placeholder="أدخل عنوان المزاد"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>وصف المزاد *</label>
-              <textarea
-                name="description"
-                value={auctionFormData.description}
-                onChange={handleAuctionChange}
-                required
-                className="form-input"
-                rows="4"
-                placeholder="أدخل وصفاً مفصلاً عن الأرض المعروضة للمزاد"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>سعر البدء (ريال سعودي) *</label>
-              <input
-                type="number"
-                name="startPrice"
-                value={auctionFormData.startPrice}
-                onChange={handleAuctionChange}
-                required
-                className="form-input"
-                placeholder="أدخل سعر البدء"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>أقل مزايدة (ريال سعودي) *</label>
-              <input
-                type="number"
-                name="minBid"
-                value={auctionFormData.minBid}
-                onChange={handleAuctionChange}
-                required
-                className="form-input"
-                placeholder="أدخل أقل مبلغ للمزايدة"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>تاريخ انتهاء المزاد *</label>
-              <input
-                type="date"
-                name="endDate"
-                value={auctionFormData.endDate}
-                onChange={handleAuctionChange}
-                required
-                className="form-input"
-                min={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>المساحة (م²) *</label>
-              <input
-                type="number"
-                name="area"
-                value={auctionFormData.area}
-                onChange={handleAuctionChange}
-                required
-                className="form-input"
-                placeholder="أدخل المساحة بالمتر المربع"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>الموقع *</label>
-              <input
-                type="text"
-                name="location"
-                value={auctionFormData.location}
-                onChange={handleAuctionChange}
-                required
-                className="form-input"
-                placeholder="أدخل الموقع"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>نوع الأرض *</label>
-              <select
-                name="landType"
-                value={auctionFormData.landType}
-                onChange={handleAuctionChange}
-                required
-                className="form-input"
-              >
-                <option value="residential">سكنية</option>
-                <option value="commercial">تجارية</option>
-                <option value="agricultural">زراعية</option>
-                <option value="industrial">صناعية</option>
-              </select>
-            </div>
-
-            <div className="form-group full-width">
-              <label>الوثائق المطلوبة</label>
-              <input
-                type="file"
-                name="documents"
-                onChange={handleAuctionChange}
-                multiple
-                accept=".pdf,.jpg,.jpeg,.png"
-                className="form-input"
-              />
-              <small>صك الملكية، الهوية، وغيرها من الوثائق</small>
-            </div>
-          </div>
-
-          <div className="form-actions">
-            <button type="button" className="btn btn-secondary" onClick={() => setShowAuctionForm(false)}>
-              إلغاء
-            </button>
-            <button type="submit" className="btn btn-primary">
-              تقديم طلب المزاد
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-
-  const renderAdsList = () => (
-    <div className="ads-section">
-      <div className="section-header">
-        <h2>إعلاناتي</h2>
-        <button 
-          className="btn btn-primary"
-          onClick={() => setShowAdForm(true)}
-        >
-          + إنشاء إعلان جديد
-        </button>
-      </div>
-
-      {ads.length === 0 ? (
-        <div className="empty-state">
-          <p>لا توجد إعلانات</p>
-          <button 
-            className="btn btn-primary"
-            onClick={() => setShowAdForm(true)}
-          >
-            إنشاء أول إعلان
-          </button>
-        </div>
-      ) : (
-        <div className="ads-grid">
-          {ads.map(ad => (
-            <div key={ad.id} className="ad-card">
-              <div className="ad-header">
-                <h3>{ad.title}</h3>
-                {getStatusBadge(ad.status)}
-              </div>
-              <div className="ad-body">
-                <p className="ad-description">{ad.description}</p>
-                <div className="ad-details">
-                  <div className="detail-item">
-                    <span className="label">السعر:</span>
-                    <span className="value">{ad.price} ريال</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">المساحة:</span>
-                    <span className="value">{ad.area} م²</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">الموقع:</span>
-                    <span className="value">{ad.location}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">المشاهدات:</span>
-                    <span className="value">{ad.views}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="ad-footer">
-                <span className="ad-date">{ad.date}</span>
-                <div className="ad-actions">
-                  <button className="btn btn-outline">تعديل</button>
-                  <button 
-                    className="btn btn-danger"
-                    onClick={() => deleteAd(ad.id)}
-                  >
-                    حذف
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-
-  const renderAuctionsList = () => (
-    <div className="auctions-section">
-      <div className="section-header">
-        <h2>مزاداتي</h2>
-        <button 
-          className="btn btn-primary"
-          onClick={() => setShowAuctionForm(true)}
-        >
-          + طلب مزاد جديد
-        </button>
-      </div>
-
-      {auctions.length === 0 ? (
-        <div className="empty-state">
-          <p>لا توجد طلبات مزاد</p>
-          <button 
-            className="btn btn-primary"
-            onClick={() => setShowAuctionForm(true)}
-          >
-            تقديم أول طلب مزاد
-          </button>
-        </div>
-      ) : (
-        <div className="auctions-grid">
-          {auctions.map(auction => (
-            <div key={auction.id} className="auction-card">
-              <div className="auction-header">
-                <h3>{auction.title}</h3>
-                {getStatusBadge(auction.status)}
-              </div>
-              <div className="auction-body">
-                <p className="auction-description">{auction.description}</p>
-                <div className="auction-details">
-                  <div className="detail-item">
-                    <span className="label">سعر البدء:</span>
-                    <span className="value">{auction.startPrice} ريال</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">السعر الحالي:</span>
-                    <span className="value highlight">{auction.currentBid} ريال</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">أقل مزايدة:</span>
-                    <span className="value">{auction.minBid} ريال</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">ينتهي في:</span>
-                    <span className="value">{auction.endDate}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">عدد المزايدين:</span>
-                    <span className="value">{auction.bidders}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="auction-footer">
-                <span className="auction-date">{auction.date}</span>
-                <div className="auction-actions">
-                  <button className="btn btn-outline">تفاصيل</button>
-                  <button 
-                    className="btn btn-danger"
-                    onClick={() => deleteAuction(auction.id)}
-                  >
-                    حذف
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 
   return (
-    <div className="my-ads-container">
-      <div className="page-header">
-        <h1>إعلاناتي وطلبات المزاد</h1>
-        <p>إدارة إعلانات الأراضي وطلبات المزادات</p>
-      </div>
-
-      <div className="tabs-container">
-        <div className="tabs">
-          <button 
-            className={`tab ${activeTab === 'ads' ? 'active' : ''}`}
-            onClick={() => setActiveTab('ads')}
-          >
-            الإعلانات ({ads.length})
-          </button>
-          <button 
-            className={`tab ${activeTab === 'auctions' ? 'active' : ''}`}
-            onClick={() => setActiveTab('auctions')}
-          >
-            طلبات المزاد ({auctions.length})
+    <div className="my-ads-page">
+      <div className="page-container">
+        <div className="header-row">
+          <h1 className="page-title">إعلاناتي</h1>
+          <button className="add-btn" onClick={() => setShowAdForm(true)}>
+            <FaPlus /> إضافة إعلان
           </button>
         </div>
 
-        <div className="tab-content">
-          {activeTab === 'ads' && renderAdsList()}
-          {activeTab === 'auctions' && renderAuctionsList()}
+        <div className="search-bar">
+          <div className="search-input">
+            <FaSearch className="search-icon" />
+            <input 
+              type="text" 
+              placeholder="ابحث في إعلاناتك..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
-      </div>
 
+        <div className="status-filter">
+          <button 
+            className={`status-btn ${activeStatus === 'الكل' ? 'active' : ''}`}
+            onClick={() => handleStatusChange('الكل')}
+          >
+            الكل
+          </button>
+          <button 
+            className={`status-btn ${activeStatus === 'مقبول' ? 'active' : ''}`}
+            onClick={() => handleStatusChange('مقبول')}
+          >
+            مقبول
+          </button>
+          <button 
+            className={`status-btn ${activeStatus === 'قيد المراجعة' ? 'active' : ''}`}
+            onClick={() => handleStatusChange('قيد المراجعة')}
+          >
+            قيد المراجعة
+          </button>
+          <button 
+            className={`status-btn ${activeStatus === 'مرفوض' ? 'active' : ''}`}
+            onClick={() => handleStatusChange('مرفوض')}
+          >
+            مرفوض
+          </button>
+          <button 
+            className={`status-btn ${activeStatus === 'تم البيع' ? 'active' : ''}`}
+            onClick={() => handleStatusChange('تم البيع')}
+          >
+            تم البيع
+          </button>
+          <button 
+            className={`status-btn ${activeStatus === 'مفتوح' ? 'active' : ''}`}
+            onClick={() => handleStatusChange('مفتوح')}
+          >
+            مفتوح
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="loading-state">
+            <div className="loader"></div>
+            <p>جاري تحميل الإعلانات...</p>
+          </div>
+        ) : error ? (
+          <div className="error-state">
+            <div className="error-icon">!</div>
+            <p>{error}</p>
+            <button className="btn btn-primary" onClick={() => fetchAds(activeStatus)}>
+              إعادة المحاولة
+            </button>
+          </div>
+        ) : filteredAds.length > 0 ? (
+          <div className="ads-grid">
+            {filteredAds.map(ad => (
+              <div key={ad.id} className="ad-card">
+                <div className="ad-img">
+                  <img src={ad.cover_image_url || 'https://via.placeholder.com/300x150?text=لا+توجد+صورة'} alt={ad.title} />
+                  {getStatusBadge(ad.status)}
+                </div>
+                <div className="ad-content">
+                  <h3 className="ad-title">{ad.title}</h3>
+                  <div className="ad-info">
+                    <div className="info-item">
+                      <span className="info-label">المدينة:</span>
+                      <span className="info-value">{ad.city}</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">المساحة:</span>
+                      <span className="info-value">{ad.total_area} م²</span>
+                    </div>
+                    {ad.purpose === 'بيع' ? (
+                      <div className="info-item">
+                        <span className="info-label">السعر:</span>
+                        <span className="info-value">{ad.price_per_sqm * ad.total_area} ريال</span>
+                      </div>
+                    ) : (
+                      <div className="info-item">
+                        <span className="info-label">قيمة الاستثمار:</span>
+                        <span className="info-value">{ad.estimated_investment_value} ريال</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="ad-desc">{ad.description.substring(0, 100)}...</p>
+                  <div className="ad-footer">
+                    <span className="ad-date">{new Date(ad.created_at).toLocaleDateString('ar-SA')}</span>
+                    <div className="ad-actions">
+                      <button className="action-btn edit-btn">
+                        <FaEdit />
+                      </button>
+                      <button 
+                        className="action-btn delete-btn"
+                        onClick={() => deleteAd(ad.id)}
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <div className="empty-icon">📝</div>
+            <h3>لا توجد إعلانات</h3>
+            <p>لم تقم بإضافة أي إعلانات بعد أو لا توجد إعلانات تطابق البحث</p>
+            <button className="btn btn-primary" onClick={() => setShowAdForm(true)}>
+              إضافة إعلان جديد
+            </button>
+          </div>
+        )}
+      </div>
       {showAdForm && renderAdForm()}
-      {showAuctionForm && renderAuctionForm()}
     </div>
   );
 }

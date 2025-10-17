@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { FaUser, FaBell, FaSignOutAlt, FaHeart, FaCog, FaPlus, FaChartBar, FaMapMarked, FaBriefcase, FaShoppingCart, FaBullhorn } from 'react-icons/fa';
+import { FaUser, FaBell, FaSignOutAlt, FaHeart, FaCog, FaPlus, FaChartBar, FaMapMarked, FaBriefcase, FaShoppingCart, FaBullhorn, FaListAlt, FaHandshake } from 'react-icons/fa';
 import { BsHouseFill } from 'react-icons/bs';
 import '../../styles/Navbar.css';
 
@@ -26,6 +26,19 @@ function Navbar({ onLoginClick, onRegisterClick }) {
   };
 
   const isActive = (path) => location.pathname === path;
+
+  // التحقق من نوع المستخدم
+  const isGeneralUser = () => {
+    return currentUser?.user_type === 'مستخدم عام';
+  };
+
+  const isLandOwner = () => {
+    return currentUser?.user_type === 'مالك أرض';
+  };
+
+  const isInvestor = () => {
+    return currentUser?.user_type === 'مستثمر';
+  };
 
   // إغلاق القوائم عند النقر خارجها
   useEffect(() => {
@@ -168,13 +181,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                     <FaBullhorn className="dropdown-icon" />
                     طلب تسويق عقار
                   </button>
-                  {/* <button 
-                    className="dropdown-item"
-                    onClick={() => handleCreateRequest('market-land')}
-                  >
-                    <FaBullhorn className="dropdown-icon" />
-                    طلب تسويق أرض
-                  </button> */}
                 </div>
               )}
             </div>
@@ -238,9 +244,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                   <span className="user-avatar">
                     <FaUser className="avatar-icon" />
                   </span>
-                  {/* <span className="user-name">
-                    {currentUser.email?.split('@')[0]}
-                  </span> */}
                 </button>
                 
                 {showUserMenu && (
@@ -253,14 +256,40 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                       <FaUser className="dropdown-icon" />
                       الملف الشخصي
                     </Link>
-                    <Link 
-                      to="/my-ads" 
-                      className="dropdown-item"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      <FaBriefcase className="dropdown-icon" />
-                      أعلاناتي
-                    </Link>
+                    
+                    {/* إذا كان المستخدم عام يعرض "طلباتي"، وإلا يعرض "إعلاناتي" */}
+                    {isGeneralUser() ? (
+                      <Link 
+                        to="/my-requests" 
+                        className="dropdown-item"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <FaListAlt className="dropdown-icon" />
+                        طلباتي
+                      </Link>
+                    ) : (
+                      <Link 
+                        to="/my-ads" 
+                        className="dropdown-item"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <FaBriefcase className="dropdown-icon" />
+                        إعلاناتي
+                      </Link>
+                    )}
+                    
+                    {/* إذا كان مالك أرض أو مستثمر يعرض "عروضي" */}
+                    {(isLandOwner() || isInvestor()) && (
+                      <Link 
+                        to="/my-offers" 
+                        className="dropdown-item"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <FaHandshake className="dropdown-icon" />
+                        عروضي
+                      </Link>
+                    )}
+                    
                     <Link 
                       to="/my-lands" 
                       className="dropdown-item"
@@ -269,6 +298,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                       <FaHeart className="dropdown-icon" />
                       المفضلة
                     </Link>
+                    
                     <Link 
                       to="/settings" 
                       className="dropdown-item"
@@ -277,7 +307,9 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                       <FaCog className="dropdown-icon" />
                       الإعدادات
                     </Link>
+                    
                     <hr className="dropdown-divider" />
+                    
                     <button 
                       onClick={handleLogout} 
                       className="dropdown-item logout-item"
@@ -340,7 +372,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
             >
               ✕
             </button>
-              <h3>القائمة الرئيسية</h3>
+            <h3>القائمة الرئيسية</h3>
           </div>
 
           <div className="mobile-sidebar-content">
@@ -390,13 +422,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                       <FaBullhorn className="dropdown-icon" />
                       طلب تسويق عقار
                     </button>
-                    {/* <button 
-                      className="mobile-dropdown-item"
-                      onClick={() => handleCreateRequest('market-land')}
-                    >
-                      <FaBullhorn className="dropdown-icon" />
-                      طلب تسويق أرض
-                    </button> */}
                   </div>
                 )}
               </div>
@@ -409,7 +434,10 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                   <div className="mobile-user-avatar">
                     <FaUser className="avatar-icon" />
                   </div>
-                  <span className="mobile-user-name">مرحباً، {currentUser.email?.split('@')[0]}</span>
+                  <span className="mobile-user-name">
+                    مرحباً، {currentUser.full_name || currentUser.email?.split('@')[0]}
+                  </span>
+                  <span className="mobile-user-type">({currentUser.user_type})</span>
                 </div>
 
                 <Link 
@@ -421,14 +449,38 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                   الملف الشخصي
                 </Link>
 
-                <Link 
-                  to="/my-ads" 
-                  className="mobile-nav-link"
-                  onClick={handleCloseMenu}
-                >
-                  <FaBriefcase className="link-icon" />
-                  أعلاناتي
-                </Link>
+                {/* إذا كان المستخدم عام يعرض "طلباتي"، وإلا يعرض "إعلاناتي" */}
+                {isGeneralUser() ? (
+                  <Link 
+                    to="/my-requests" 
+                    className="mobile-nav-link"
+                    onClick={handleCloseMenu}
+                  >
+                    <FaListAlt className="link-icon" />
+                    طلباتي
+                  </Link>
+                ) : (
+                  <Link 
+                    to="/my-ads" 
+                    className="mobile-nav-link"
+                    onClick={handleCloseMenu}
+                  >
+                    <FaBriefcase className="link-icon" />
+                    إعلاناتي
+                  </Link>
+                )}
+
+                {/* إذا كان مالك أرض أو مستثمر يعرض "عروضي" */}
+                {(isLandOwner() || isInvestor()) && (
+                  <Link 
+                    to="/my-offers" 
+                    className="mobile-nav-link"
+                    onClick={handleCloseMenu}
+                  >
+                    <FaHandshake className="link-icon" />
+                    عروضي
+                  </Link>
+                )}
 
                 <Link 
                   to="/my-lands" 

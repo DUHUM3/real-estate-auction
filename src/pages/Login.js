@@ -8,6 +8,9 @@ function Login({ onClose, onSwitchToRegister }) {
     email: '',
     password: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -16,19 +19,57 @@ function Login({ onClose, onSwitchToRegister }) {
       ...formData,
       [e.target.name]: e.target.value
     });
+    setError(''); // مسح الخطأ عند تغيير المدخلات
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const userData = {
-      id: 1,
-      name: 'مستخدم تجريبي',
-      email: formData.email
-    };
-    login(userData);
-    navigate('/');
-    if (onClose) onClose();
-  }; 
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('https://shahin-tqay.onrender.com/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // تخزين البيانات المستلمة من API
+        const userData = {
+          id: data.user.id,
+          full_name: data.user.full_name,
+          email: data.user.email,
+          phone: data.user.phone,
+          user_type: data.user.user_type,
+          status: data.user.status,
+          access_token: data.access_token,
+          token_type: data.token_type,
+          expires_at: data.expires_at
+        };
+        
+        // استدعاء دالة login من AuthContext لتخزين البيانات
+        login(userData);
+        navigate('/');
+        if (onClose) onClose();
+      } else {
+        setError(data.message || 'حدث خطأ أثناء تسجيل الدخول');
+      }
+    } catch (error) {
+      setError('حدث خطأ في الاتصال بالخادم');
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget && onClose) {
@@ -51,12 +92,6 @@ function Login({ onClose, onSwitchToRegister }) {
             <div className="auth-divider"></div>
           </div>
 
-          {/* رسالة الترحيب */}
-          {/* <div className="auth-welcome-section">
-            <h2 className="auth-welcome-title">مرحباً بك</h2>
-            <p className="auth-welcome-text">سجل دخولك أو أنشئ حساب جديد</p>
-          </div> */}
-
           {/* خيارات التسجيل */}
           <div className="auth-options">
             <button className="auth-option-btn active">
@@ -70,6 +105,13 @@ function Login({ onClose, onSwitchToRegister }) {
             </button>
           </div>
 
+          {/* عرض رسالة الخطأ */}
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
+
           {/* نموذج تسجيل الدخول */}
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
@@ -82,6 +124,7 @@ function Login({ onClose, onSwitchToRegister }) {
                 onChange={handleChange}
                 required
                 className="form-input"
+                disabled={loading}
               />
             </div>
 
@@ -95,11 +138,16 @@ function Login({ onClose, onSwitchToRegister }) {
                 onChange={handleChange}
                 required
                 className="form-input"
+                disabled={loading}
               />
             </div>
 
-            <button type="submit" className="btn-login-submit">
-              تسجيل الدخول
+            <button 
+              type="submit" 
+              className="btn-login-submit"
+              disabled={loading}
+            >
+              {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
             </button>
           </form>
         </div>

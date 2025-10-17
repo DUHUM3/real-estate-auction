@@ -385,3 +385,18 @@
 .auth-modal {
   margin: 0 auto !important;
 }
+.error-message {
+  background-color: #fee;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.btn-login-submit:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
