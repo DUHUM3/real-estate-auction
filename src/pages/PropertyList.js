@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FaSearch, 
-  FaShare, 
-  FaFilter, 
-  FaHeart, 
-  FaMapMarkerAlt, 
-  FaRulerCombined, 
-  FaMoneyBillWave, 
-  FaArrowRight, 
+import {
+  FaSearch,
+  FaShare,
+  FaFilter,
+  FaHeart,
+  FaMapMarkerAlt,
+  FaRulerCombined,
+  FaMoneyBillWave,
+  FaArrowRight,
   FaArrowLeft,
   FaTimes
 } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 import PropertyDetailsModal from './PropertyDetailsModal';
 import '../styles/PropertyList.css';
-// CSS الجديد (يمكن وضعه في ملف PropertyList.css)
-
 
 const PropertiesPage = () => {
   // State variables
@@ -30,7 +28,7 @@ const PropertiesPage = () => {
   const [favorites, setFavorites] = useState([]);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [showPropertyModal, setShowPropertyModal] = useState(false);
-  
+
   // Filter states
   const [filters, setFilters] = useState({
     search: '',
@@ -56,27 +54,27 @@ const PropertiesPage = () => {
     const fetchProperties = async () => {
       try {
         setLoading(true);
-        
+
         const queryParams = new URLSearchParams();
         Object.entries(filters).forEach(([key, value]) => {
           if (value) queryParams.append(key, value);
         });
-        
+
         const url = `https://shahin-tqay.onrender.com/api/properties?${queryParams}`;
         const response = await fetch(url);
-        
+
         if (!response.ok) {
           throw new Error('فشل في جلب البيانات');
         }
-        
+
         const data = await response.json();
-        
+
         if (data.status && data.data) {
           setProperties(data.data);
         } else {
           setProperties([]);
         }
-        
+
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -205,13 +203,13 @@ const PropertiesPage = () => {
   const currentItems = properties.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  
+
   const nextPage = () => {
     if (currentPage < Math.ceil(properties.length / itemsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
-  
+
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -227,19 +225,18 @@ const PropertiesPage = () => {
   // Get status badge class
   const getStatusBadgeClass = (status) => {
     switch(status) {
-      case 'مفتوح': return 'status-open';
-      case 'تم البيع': return 'status-sold';
-      case 'محجوز': return 'status-reserved';
-      default: return 'status-unknown';
+      case 'مفتوح': return 'elegantStatus_open';
+      case 'تم البيع': return 'elegantStatus_sold';
+      case 'محجوز': return 'elegantStatus_reserved';
+      default: return 'elegantStatus_unknown';
     }
   };
 
   // Filter component
   const FiltersContent = () => (
-    <div className="filters-content">
-      {/* <h3>🔍 فلاتر البحث</h3> */}
-      <div className="filters-grid">
-        <div className="filter-group">
+    <div className="elegantFilters_content">
+      <div className="elegantFilters_grid">
+        <div className="elegantFilter_group">
           <label>المنطقة</label>
           <select name="region" value={filters.region} onChange={handleFilterChange}>
             <option value="">كل المناطق</option>
@@ -248,8 +245,8 @@ const PropertiesPage = () => {
             ))}
           </select>
         </div>
-        
-        <div className="filter-group">
+
+        <div className="elegantFilter_group">
           <label>المدينة</label>
           <input 
             type="text" 
@@ -259,8 +256,8 @@ const PropertiesPage = () => {
             onChange={handleFilterChange} 
           />
         </div>
-        
-        <div className="filter-group">
+
+        <div className="elegantFilter_group">
           <label>نوع الأرض</label>
           <select name="land_type" value={filters.land_type} onChange={handleFilterChange}>
             <option value="">كل الأنواع</option>
@@ -269,8 +266,8 @@ const PropertiesPage = () => {
             ))}
           </select>
         </div>
-        
-        <div className="filter-group">
+
+        <div className="elegantFilter_group">
           <label>الغرض</label>
           <select name="purpose" value={filters.purpose} onChange={handleFilterChange}>
             <option value="">جميع الأغراض</option>
@@ -279,8 +276,8 @@ const PropertiesPage = () => {
             ))}
           </select>
         </div>
-        
-        <div className="filter-group">
+
+        <div className="elegantFilter_group">
           <label>المساحة من (م²)</label>
           <input 
             type="number" 
@@ -290,8 +287,8 @@ const PropertiesPage = () => {
             onChange={handleFilterChange} 
           />
         </div>
-        
-        <div className="filter-group">
+
+        <div className="elegantFilter_group">
           <label>المساحة إلى (م²)</label>
           <input 
             type="number" 
@@ -301,10 +298,10 @@ const PropertiesPage = () => {
             onChange={handleFilterChange} 
           />
         </div>
-        
+
         {filters.purpose !== 'استثمار' && (
           <>
-            <div className="filter-group">
+            <div className="elegantFilter_group">
               <label>السعر من (ريال/م²)</label>
               <input 
                 type="number" 
@@ -315,7 +312,7 @@ const PropertiesPage = () => {
               />
             </div>
             
-            <div className="filter-group">
+            <div className="elegantFilter_group">
               <label>السعر إلى (ريال/م²)</label>
               <input 
                 type="number" 
@@ -328,27 +325,21 @@ const PropertiesPage = () => {
           </>
         )}
       </div>
-      
-      <div className="filter-actions">
-        <button className="reset-btn" onClick={resetFilters}>إعادة تعيين</button>
-        <button className="apply-btn" onClick={applyFilters}>تطبيق الفلتر</button>
+
+      <div className="elegantFilter_actions">
+        <button className="elegantReset_btn" onClick={resetFilters}>إعادة تعيين</button>
+        <button className="elegantApply_btn" onClick={applyFilters}>تطبيق الفلتر</button>
       </div>
     </div>
   );
 
   return (
     <>
-      <div className="properties-container">
-        {/* Header - سيتم تغيير هيكله وإزالة العنوان كما طلبت */}
-        <div className="header">
-          {/* عنوان تم إزالته كما طلبت في المتطلبات */}
-        </div>
-
-        {/* Search and Filter Bar */}
-        <div className="search-and-filter">
-          <div className="search-bar">
-            <div className="search-input">
-              <FaSearch className="search-icon" />
+      <div className="elegantProperties_container">
+        <div className="elegantSearch_filter">
+          <div className="elegantSearch_bar">
+            <div className="elegantSearch_input">
+              <FaSearch className="elegantSearch_icon" />
               <input
                 type="text"
                 placeholder="البحث عن أراضي..."
@@ -358,24 +349,23 @@ const PropertiesPage = () => {
               />
             </div>
             <button 
-              className="filter-toggle" 
+              className="elegantFilter_toggle" 
               onClick={() => window.innerWidth < 768 ? setShowMobileFilters(true) : setShowFilters(!showFilters)}
             >
               {showFilters ? <MdClose /> : <FaFilter />}
-              <span>{showFilters ? 'إغلاق الفلتر' : 'فلترة'}</span>
+              <span>{showFilters ? 'إغلاق' : 'فلترة'}</span>
             </button>
           </div>
           
-          {/* Tabs - تم نقلها تحت البحث والفلتر كما طلبت */}
-          <div className="tabs">
+          <div className="elegantTabs">
             <button 
-              className={activeTab === 'lands' ? 'active' : ''}
+              className={activeTab === 'lands' ? 'elegantActive' : ''}
               onClick={() => setActiveTab('lands')}
             >
               الأراضي
             </button>
             <button 
-              className={activeTab === 'auctions' ? 'active' : ''}
+              className={activeTab === 'auctions' ? 'elegantActive' : ''}
               onClick={() => setActiveTab('auctions')}
             >
               المزادات
@@ -385,17 +375,17 @@ const PropertiesPage = () => {
 
         {/* Desktop Filters */}
         {showFilters && window.innerWidth >= 768 && (
-          <div className="filters-container desktop">
+          <div className="elegantFilters_container elegantDesktop">
             <FiltersContent />
           </div>
         )}
 
         {/* Mobile Filter Sidebar */}
-        <div className={`overlay ${showMobileFilters ? 'active' : ''}`} onClick={() => setShowMobileFilters(false)}></div>
-        <div className={`mobile-filter-sidebar ${showMobileFilters ? 'active' : ''}`}>
-          <div className="sidebar-header">
+        <div className={`elegantOverlay ${showMobileFilters ? 'elegantActive' : ''}`} onClick={() => setShowMobileFilters(false)}></div>
+        <div className={`elegantMobileFilter_sidebar ${showMobileFilters ? 'elegantActive' : ''}`}>
+          <div className="elegantSidebar_header">
             <h3>🔍 فلاتر البحث</h3>
-            <button className="close-sidebar" onClick={() => setShowMobileFilters(false)}>
+            <button className="elegantClose_sidebar" onClick={() => setShowMobileFilters(false)}>
               <FaTimes />
             </button>
           </div>
@@ -403,68 +393,68 @@ const PropertiesPage = () => {
         </div>
 
         {/* Main Content */}
-        <div className="content-area">
+        <div className="elegantContent_area">
           {activeTab === 'lands' ? (
             <>
               {loading ? (
-                <div className="loading-container">
-                  <div className="loader"></div>
+                <div className="elegantLoading_container">
+                  <div className="elegantLoader"></div>
                   <p>جاري تحميل الأراضي...</p>
                 </div>
               ) : error ? (
-                <div className="error-container">
+                <div className="elegantError_container">
                   <p>حدث خطأ: {error}</p>
                   <button onClick={() => window.location.reload()}>إعادة المحاولة</button>
                 </div>
               ) : properties.length === 0 ? (
-                <div className="empty-state">
+                <div className="elegantEmpty_state">
                   <p>لم يتم العثور على أي أراضٍ تطابق معايير البحث</p>
                   <button onClick={resetFilters}>إعادة تعيين الفلتر</button>
                 </div>
               ) : (
-                <div className="properties-grid">
+                <div className="elegantProperties_grid">
                   {currentItems.map((property) => (
                     <div 
                       key={property.id} 
-                      className="property-card"
+                      className="elegantProperty_card"
                       onClick={() => openPropertyDetails(property)}
                     >
-                      <div className="property-image">
+                      <div className="elegantProperty_image">
                         {getImageUrl(property) ? (
                           <img src={getImageUrl(property)} alt={property.title} />
                         ) : (
-                          <div className="placeholder-image">
+                          <div className="elegantPlaceholder_image">
                             <FaMapMarkerAlt />
                           </div>
                         )}
-                        <div className={`status-badge ${getStatusBadgeClass(property.status)}`}>
+                        <div className={`elegantStatus_badge ${getStatusBadgeClass(property.status)}`}>
                           {property.status}
                         </div>
                         <button 
-                          className={`favorite-btn ${favorites.includes(property.id) ? 'active' : ''}`}
+                          className={`elegantFavorite_btn ${favorites.includes(property.id) ? 'elegantActive' : ''}`}
                           onClick={(e) => toggleFavorite(property.id, e)}
                         >
                           <FaHeart />
                         </button>
                       </div>
                       
-                      <div className="property-details">
+                      <div className="elegantProperty_details">
                         <h3>{property.title}</h3>
                         
-                        <div className="property-location">
+                        <div className="elegantProperty_location">
                           <FaMapMarkerAlt />
                           <span>{property.region} - {property.city}</span>
                           {property.geo_location_text && (
-                            <span className="location-detail">({property.geo_location_text})</span>
+                            <span className="elegantLocation_detail">({property.geo_location_text})</span>
                           )}
                         </div>
                         
-                        <div className="property-specs">
-                          <div className="spec">
+                        <div className="elegantProperty_specs">
+                          <div className="elegantSpec">
                             <FaRulerCombined />
                             <span>{formatPrice(property.total_area)} م²</span>
                           </div>
-                          <div className="spec">
+                          <div className="elegantSpec">
                             <FaMoneyBillWave />
                             <span>
                               {property.purpose === 'بيع' 
@@ -475,24 +465,24 @@ const PropertiesPage = () => {
                         </div>
 
                         {property.purpose === 'بيع' && property.price_per_sqm && property.total_area && (
-                          <div className="total-price">
+                          <div className="elegantTotal_price">
                             <strong>السعر الإجمالي: {formatPrice(calculateTotalPrice(property))} ر.س</strong>
                           </div>
                         )}
                         
-                        <div className="property-type">
-                          <span className={`tag ${property.land_type?.toLowerCase()}`}>
+                        <div className="elegantProperty_type">
+                          <span className={`elegantTag ${property.land_type?.toLowerCase()}`}>
                             {property.land_type}
                           </span>
-                          <span className={`tag purpose ${property.purpose?.toLowerCase()}`}>
+                          <span className={`elegantTag elegantPurpose ${property.purpose?.toLowerCase()}`}>
                             {property.purpose}
                           </span>
                         </div>
 
-                        <div className="property-actions">
-                          <button className="action-btn details-btn">تفاصيل</button>
+                        <div className="elegantProperty_actions">
+                          <button className="elegantAction_btn elegantDetails_btn">تفاصيل</button>
                           <button 
-                            className="action-btn share-btn" 
+                            className="elegantAction_btn elegantShare_btn" 
                             onClick={(e) => shareProperty(property, e)}
                           >
                             <FaShare /> مشاركة
@@ -505,8 +495,8 @@ const PropertiesPage = () => {
               )}
               
               {properties.length > itemsPerPage && (
-                <div className="pagination">
-                  <button onClick={prevPage} disabled={currentPage === 1} className="page-arrow">
+                <div className="elegantPagination">
+                  <button onClick={prevPage} disabled={currentPage === 1} className="elegantPage_arrow">
                     <FaArrowRight />
                   </button>
                   
@@ -514,7 +504,7 @@ const PropertiesPage = () => {
                     <button 
                       key={i + 1}
                       onClick={() => paginate(i + 1)}
-                      className={currentPage === i + 1 ? 'active' : ''}
+                      className={currentPage === i + 1 ? 'elegantActive' : ''}
                     >
                       {i + 1}
                     </button>
@@ -523,7 +513,7 @@ const PropertiesPage = () => {
                   <button 
                     onClick={nextPage} 
                     disabled={currentPage === Math.ceil(properties.length / itemsPerPage)}
-                    className="page-arrow"
+                    className="elegantPage_arrow"
                   >
                     <FaArrowLeft />
                   </button>
@@ -531,9 +521,9 @@ const PropertiesPage = () => {
               )}
             </>
           ) : (
-            <div className="auctions-coming-soon">
-              <h2>المزادات قادمة قريباً</h2>
-              <p>نعمل حالياً على توفير خدمة المزادات، ترقبوا الإطلاق قريباً!</p>
+            <div className="elegantAuctions_comingSoon">
+              <h2></h2>
+              <p></p>
             </div>
           )}
         </div>

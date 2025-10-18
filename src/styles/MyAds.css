@@ -1,32 +1,39 @@
-
-
-
-
 .my-ads-page {
   min-height: 100vh;
 }
 
-.page-container {
+.myads-page-container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 1rem;
 }
 
-/* Header */
-.header-row {
+/* Header - تصميم جديد لجعل الزر والشريط في نفس السطر */
+.myads-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.page-title {
+.myads-page-title {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary-color);
+  width: 100%; /* يجعل العنوان يأخذ السطر كاملاً */
 }
 
-.add-btn {
+.myads-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  flex-direction: row; /* الاتجاه الافقي */
+}
+
+.myads-add-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -39,23 +46,29 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  order: 2; /* يجعل الزر على اليمين */
 }
 
-.add-btn:hover {
+.myads-add-btn:hover {
   background-color: var(--primary-dark);
 }
 
-/* Search Bar */
-.search-bar {
-  margin-bottom: 1.5rem;
+/* Search Bar - تعديل ليأخذ المساحة المتبقية */
+.myads-search-bar {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 200px;
+  order: 1; /* يجعل شريط البحث على اليسار */
 }
 
-.search-input {
+.myads-search-input {
   position: relative;
   width: 100%;
 }
 
-.search-icon {
+.myads-search-icon {
   position: absolute;
   left: 1rem;
   top: 50%;
@@ -63,7 +76,7 @@
   color: var(--text-secondary);
 }
 
-.search-input input {
+.myads-search-input input {
   width: 100%;
   padding: 0.8rem 1rem 0.8rem 2.5rem;
   border: 1px solid var(--border-color);
@@ -72,14 +85,14 @@
   transition: all 0.2s ease;
 }
 
-.search-input input:focus {
+.myads-search-input input:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px var(--primary-light);
 }
 
 /* Status Filter */
-.status-filter {
+.myads-status-filter {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
@@ -89,11 +102,11 @@
   scrollbar-width: none;
 }
 
-.status-filter::-webkit-scrollbar {
+.myads-status-filter::-webkit-scrollbar {
   display: none;
 }
 
-.status-btn {
+.myads-status-btn {
   background-color: white;
   color: var(--text-color);
   border: 1px solid var(--border-color);
@@ -105,37 +118,37 @@
   transition: all 0.2s ease;
 }
 
-.status-btn.active {
+.myads-status-btn.active {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
   color: white;
 }
 
 /* Ads Grid */
-.ads-grid {
+.myads-grid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   gap: 1rem;
 }
 
 @media (min-width: 640px) {
-  .ads-grid {
+  .myads-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
-  .ads-grid {
+  .myads-grid {
     grid-template-columns: repeat(3, 1fr);
   }
   
-  .page-title {
+  .myads-page-title {
     font-size: 1.8rem;
   }
 }
 
 /* Ad Card */
-.ad-card {
+.myads-card {
   background-color: var(--card-color);
   border-radius: var(--border-radius);
   overflow: hidden;
@@ -144,30 +157,30 @@
   position: relative;
 }
 
-.ad-card:hover {
+.myads-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
-.ad-img {
+.myads-img {
   height: 180px;
   width: 100%;
   position: relative;
   overflow: hidden;
 }
 
-.ad-img img {
+.myads-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.ad-card:hover .ad-img img {
+.myads-card:hover .myads-img img {
   transform: scale(1.05);
 }
 
-.status-badge {
+.myads-status-badge {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -179,32 +192,32 @@
   color: white;
 }
 
-.status-approved {
+.myads-status-approved {
   background-color: var(--success-color);
 }
 
-.status-pending {
+.myads-status-pending {
   background-color: var(--pending-color);
 }
 
-.status-rejected {
+.myads-status-rejected {
   background-color: var(--danger-color);
 }
 
-.status-sold {
+.myads-status-sold {
   background-color: var(--secondary-color);
 }
 
-.status-open {
+.myads-status-open {
   background-color: var(--primary-color);
 }
 
 /* Ad Content */
-.ad-content {
+.myads-content {
   padding: 1rem;
 }
 
-.ad-title {
+.myads-title {
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
@@ -213,29 +226,29 @@
   text-overflow: ellipsis;
 }
 
-.ad-info {
+.myads-info {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
-.info-item {
+.myads-info-item {
   display: flex;
   flex-direction: column;
   font-size: 0.85rem;
 }
 
-.info-label {
+.myads-info-label {
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-.info-value {
+.myads-info-value {
   font-weight: 600;
 }
 
-.ad-desc {
+.myads-desc {
   color: var(--text-secondary);
   font-size: 0.9rem;
   margin-bottom: 1rem;
@@ -246,7 +259,7 @@
   overflow: hidden;
 }
 
-.ad-footer {
+.myads-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -254,17 +267,17 @@
   border-top: 1px solid var(--border-color);
 }
 
-.ad-date {
+.myads-date {
   font-size: 0.85rem;
   color: var(--text-secondary);
 }
 
-.ad-actions {
+.myads-actions {
   display: flex;
   gap: 0.5rem;
 }
 
-.action-btn {
+.myads-action-btn {
   width: 32px;
   height: 32px;
   display: flex;
@@ -277,20 +290,20 @@
   transition: all 0.2s ease;
 }
 
-.edit-btn:hover {
+.myads-edit-btn:hover {
   background-color: var(--primary-light);
   color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.delete-btn:hover {
+.myads-delete-btn:hover {
   background-color: #ffebee;
   color: var(--danger-color);
   border-color: var(--danger-color);
 }
 
 /* Loading State */
-.loading-state {
+.myads-loading-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -299,7 +312,7 @@
   gap: 1rem;
 }
 
-.loader {
+.myads-loader {
   width: 40px;
   height: 40px;
   border: 3px solid var(--primary-light);
@@ -313,7 +326,7 @@
 }
 
 /* Error State */
-.error-state {
+.myads-error-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -324,7 +337,7 @@
   text-align: center;
 }
 
-.error-icon {
+.myads-error-icon {
   width: 50px;
   height: 50px;
   background-color: #ffebee;
@@ -338,7 +351,7 @@
 }
 
 /* Empty State */
-.empty-state {
+.myads-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -349,13 +362,13 @@
   text-align: center;
 }
 
-.empty-icon {
+.myads-empty-icon {
   font-size: 50px;
   margin-bottom: 1rem;
 }
 
 /* Form Overlay */
-.form-overlay {
+.myads-form-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -369,7 +382,7 @@
   padding: 1rem;
 }
 
-.form-modal {
+.myads-form-modal {
   background-color: white;
   border-radius: var(--border-radius);
   width: 100%;
@@ -379,7 +392,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-.form-header {
+.myads-form-header {
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-color);
   display: flex;
@@ -391,7 +404,7 @@
   z-index: 1;
 }
 
-.close-btn {
+.myads-close-btn {
   background: none;
   border: none;
   font-size: 1.5rem;
@@ -404,42 +417,42 @@
   border-radius: 50%;
 }
 
-.close-btn:hover {
+.myads-close-btn:hover {
   background-color: #f5f5f5;
 }
 
 /* Ad Form */
-.ad-form {
+.myads-form {
   padding: 1.5rem;
 }
 
-.form-grid {
+.myads-form-grid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   gap: 1rem;
 }
 
 @media (min-width: 640px) {
-  .form-grid {
+  .myads-form-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-.form-group {
+.myads-form-group {
   margin-bottom: 1rem;
 }
 
-.form-group.full-width {
+.myads-form-group.full-width {
   grid-column: 1 / -1;
 }
 
-.form-group label {
+.myads-form-group label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
 }
 
-.form-control {
+.myads-form-control {
   width: 100%;
   padding: 0.7rem 1rem;
   border: 1px solid var(--border-color);
@@ -448,22 +461,22 @@
   transition: all 0.2s ease;
 }
 
-.form-control:focus {
+.myads-form-control:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px var(--primary-light);
 }
 
-.file-input-wrapper {
+.myads-file-input-wrapper {
   position: relative;
 }
 
-.file-input-wrapper input[type="file"] {
+.myads-file-input-wrapper input[type="file"] {
   padding: 0.5rem;
 }
 
 /* Checkbox */
-.checkbox-container {
+.myads-checkbox-container {
   display: flex;
   align-items: center;
   position: relative;
@@ -472,14 +485,14 @@
   user-select: none;
 }
 
-.checkbox-container input {
+.myads-checkbox-container input {
   position: absolute;
   opacity: 0;
   height: 0;
   width: 0;
 }
 
-.checkmark {
+.myads-checkmark {
   position: absolute;
   right: 0;
   top: 0;
@@ -490,26 +503,26 @@
   border-radius: 4px;
 }
 
-.checkbox-container:hover input ~ .checkmark {
+.myads-checkbox-container:hover input ~ .myads-checkmark {
   background-color: #f5f5f5;
 }
 
-.checkbox-container input:checked ~ .checkmark {
+.myads-checkbox-container input:checked ~ .myads-checkmark {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.checkmark:after {
+.myads-checkmark:after {
   content: "";
   position: absolute;
   display: none;
 }
 
-.checkbox-container input:checked ~ .checkmark:after {
+.myads-checkbox-container input:checked ~ .myads-checkmark:after {
   display: block;
 }
 
-.checkbox-container .checkmark:after {
+.myads-checkbox-container .myads-checkmark:after {
   right: 7px;
   top: 3px;
   width: 5px;
@@ -520,14 +533,14 @@
 }
 
 /* Form Actions */
-.form-actions {
+.myads-form-actions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
   margin-top: 2rem;
 }
 
-.btn {
+.myads-btn {
   padding: 0.7rem 1.5rem;
   border-radius: 8px;
   font-weight: 600;
@@ -537,26 +550,84 @@
   font-size: 0.95rem;
 }
 
-.btn-primary {
+.myads-btn-primary {
   background-color: var(--primary-color);
   color: white;
 }
 
-.btn-primary:hover {
+.myads-btn-primary:hover {
   background-color: var(--primary-dark);
 }
 
-.btn-outline {
+.myads-btn-outline {
   background-color: transparent;
   color: var(--text-color);
   border: 1px solid var(--border-color);
 }
 
-.btn-outline:hover {
+.myads-btn-outline:hover {
   background-color: #f5f5f5;
 }
 
-.btn:disabled {
+.myads-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* تحسينات للاستجابة على الشاشات الصغيرة - التعديل الجديد */
+@media (max-width: 767px) {
+  .myads-header-controls {
+    flex-direction: row; /* يبقى أفقي في الهاتف */
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  
+  .myads-search-bar {
+    order: 1; /* البحث على اليسار */
+    flex: 1;
+    margin-left: 0;
+    margin-right: auto;
+  }
+  
+  .myads-add-btn {
+    order: 2; /* الزر على اليمين */
+    flex-shrink: 0;
+    margin-right: 0;
+  }
+  
+  /* تحسين المسافات في الهاتف */
+  .myads-header-row {
+    gap: 0.75rem;
+  }
+  
+  .myads-add-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .myads-search-input input {
+    padding: 0.7rem 0.9rem 0.7rem 2.3rem;
+  }
+}
+
+/* تحسين إضافي للشاشات الصغيرة جداً */
+@media (max-width: 360px) {
+  .myads-header-controls {
+    gap: 0.5rem;
+  }
+  
+  .myads-add-btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .myads-add-btn span {
+    display: none; /* إخفاء النص في الشاشات الصغيرة جداً */
+  }
+  
+  .myads-add-btn::before {
+    content: "+"; /* إظهار علامة الزائد فقط */
+    font-size: 1rem;
+    font-weight: bold;
+  }
 }

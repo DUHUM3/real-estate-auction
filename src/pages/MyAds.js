@@ -247,27 +247,27 @@ function MyAds() {
   // تنسيق الحالة
   const getStatusBadge = (status) => {
     const statusConfig = {
-      'مقبول': { text: 'مقبول', class: 'status-approved' },
-      'قيد المراجعة': { text: 'قيد المراجعة', class: 'status-pending' },
-      'مرفوض': { text: 'مرفوض', class: 'status-rejected' },
-      'تم البيع': { text: 'تم البيع', class: 'status-sold' },
-      'مفتوح': { text: 'مفتوح', class: 'status-open' }
+      // 'مقبول': { text: 'مقبول', class: 'myads-status-approved' },
+      'قيد المراجعة': { text: 'قيد المراجعة', class: 'myads-status-pending' },
+      'مرفوض': { text: 'مرفوض', class: 'myads-status-rejected' },
+      'تم البيع': { text: 'تم البيع', class: 'myads-status-sold' },
+      'مفتوح': { text: 'مفتوح', class: 'myads-status-open' }
     };
-    const config = statusConfig[status] || { text: status, class: 'status-pending' };
-    return <span className={`status-badge ${config.class}`}>{config.text}</span>;
+    const config = statusConfig[status] || { text: status, class: 'myads-status-pending' };
+    return <span className={`myads-status-badge ${config.class}`}>{config.text}</span>;
   };
 
   const renderAdForm = () => (
-    <div className="form-overlay">
-      <div className="form-modal">
-        <div className="form-header">
+    <div className="myads-form-overlay">
+      <div className="myads-form-modal">
+        <div className="myads-form-header">
           <h3>إضافة أرض جديدة</h3>
-          <button className="close-btn" onClick={() => setShowAdForm(false)}>&times;</button>
+          <button className="myads-close-btn" onClick={() => setShowAdForm(false)}>&times;</button>
         </div>
-        <form onSubmit={handleAddAd} className="ad-form">
-          <div className="form-grid">
+        <form onSubmit={handleAddAd} className="myads-form">
+          <div className="myads-form-grid">
             {/* المعلومات الأساسية */}
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>رقم الإعلان</label>
               <input
                 type="text"
@@ -275,12 +275,12 @@ function MyAds() {
                 value={adFormData.announcement_number}
                 onChange={handleAdChange}
                 required
-                className="form-control"
+                className="myads-form-control"
                 placeholder="أدخل رقم الإعلان"
               />
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>المنطقة</label>
               <input
                 type="text"
@@ -288,12 +288,12 @@ function MyAds() {
                 value={adFormData.region}
                 onChange={handleAdChange}
                 required
-                className="form-control"
+                className="myads-form-control"
                 placeholder="أدخل المنطقة"
               />
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>المدينة</label>
               <input
                 type="text"
@@ -301,12 +301,12 @@ function MyAds() {
                 value={adFormData.city}
                 onChange={handleAdChange}
                 required
-                className="form-control"
+                className="myads-form-control"
                 placeholder="أدخل المدينة"
               />
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>عنوان الإعلان</label>
               <input
                 type="text"
@@ -314,19 +314,19 @@ function MyAds() {
                 value={adFormData.title}
                 onChange={handleAdChange}
                 required
-                className="form-control"
+                className="myads-form-control"
                 placeholder="أدخل عنوان الإعلان"
               />
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>نوع الأرض</label>
               <select
                 name="land_type"
                 value={adFormData.land_type}
                 onChange={handleAdChange}
                 required
-                className="form-control"
+                className="myads-form-control"
               >
                 <option value="سكني">سكني</option>
                 <option value="تجاري">تجاري</option>
@@ -335,14 +335,14 @@ function MyAds() {
               </select>
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>الغرض</label>
               <select
                 name="purpose"
                 value={adFormData.purpose}
                 onChange={handleAdChange}
                 required
-                className="form-control"
+                className="myads-form-control"
               >
                 <option value="بيع">بيع</option>
                 <option value="استثمار">استثمار</option>
@@ -351,7 +351,7 @@ function MyAds() {
 
             {/* الحقول المشروطة حسب purpose */}
             {adFormData.purpose === 'بيع' && (
-              <div className="form-group">
+              <div className="myads-form-group">
                 <label>سعر المتر المربع (ريال)</label>
                 <input
                   type="number"
@@ -359,7 +359,7 @@ function MyAds() {
                   value={adFormData.price_per_sqm}
                   onChange={handleAdChange}
                   required
-                  className="form-control"
+                  className="myads-form-control"
                   placeholder="أدخل سعر المتر المربع"
                 />
               </div>
@@ -367,7 +367,7 @@ function MyAds() {
 
             {adFormData.purpose === 'استثمار' && (
               <>
-                <div className="form-group">
+                <div className="myads-form-group">
                   <label>مدة الاستثمار (شهر)</label>
                   <input
                     type="number"
@@ -375,11 +375,11 @@ function MyAds() {
                     value={adFormData.investment_duration}
                     onChange={handleAdChange}
                     required
-                    className="form-control"
+                    className="myads-form-control"
                     placeholder="أدخل مدة الاستثمار بالأشهر"
                   />
                 </div>
-                <div className="form-group">
+                <div className="myads-form-group">
                   <label>القيمة الاستثمارية المتوقعة (ريال)</label>
                   <input
                     type="number"
@@ -387,7 +387,7 @@ function MyAds() {
                     value={adFormData.estimated_investment_value}
                     onChange={handleAdChange}
                     required
-                    className="form-control"
+                    className="myads-form-control"
                     placeholder="أدخل القيمة الاستثمارية المتوقعة"
                   />
                 </div>
@@ -396,7 +396,7 @@ function MyAds() {
 
             {/* حقل agency_number للمستخدمين الوكلاء الشرعيين */}
             {currentUser?.user_type === 'وكيل شرعي' && (
-              <div className="form-group">
+              <div className="myads-form-group">
                 <label>رقم الوكالة</label>
                 <input
                   type="text"
@@ -404,14 +404,14 @@ function MyAds() {
                   value={adFormData.agency_number}
                   onChange={handleAdChange}
                   required
-                  className="form-control"
+                  className="myads-form-control"
                   placeholder="أدخل رقم الوكالة"
                 />
               </div>
             )}
 
             {/* المعلومات الهندسية */}
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>المساحة الإجمالية (م²)</label>
               <input
                 type="number"
@@ -419,65 +419,65 @@ function MyAds() {
                 value={adFormData.total_area}
                 onChange={handleAdChange}
                 required
-                className="form-control"
+                className="myads-form-control"
                 placeholder="أدخل المساحة الإجمالية"
                 step="0.01"
               />
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>الطول شمال (م)</label>
               <input
                 type="number"
                 name="length_north"
                 value={adFormData.length_north}
                 onChange={handleAdChange}
-                className="form-control"
+                className="myads-form-control"
                 placeholder="الطول شمال"
                 step="0.01"
               />
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>الطول جنوب (م)</label>
               <input
                 type="number"
                 name="length_south"
                 value={adFormData.length_south}
                 onChange={handleAdChange}
-                className="form-control"
+                className="myads-form-control"
                 placeholder="الطول جنوب"
                 step="0.01"
               />
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>الطول شرق (م)</label>
               <input
                 type="number"
                 name="length_east"
                 value={adFormData.length_east}
                 onChange={handleAdChange}
-                className="form-control"
+                className="myads-form-control"
                 placeholder="الطول شرق"
                 step="0.01"
               />
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>الطول غرب (م)</label>
               <input
                 type="number"
                 name="length_west"
                 value={adFormData.length_west}
                 onChange={handleAdChange}
-                className="form-control"
+                className="myads-form-control"
                 placeholder="الطول غرب"
                 step="0.01"
               />
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>رقم الصك</label>
               <input
                 type="text"
@@ -485,12 +485,12 @@ function MyAds() {
                 value={adFormData.deed_number}
                 onChange={handleAdChange}
                 required
-                className="form-control"
+                className="myads-form-control"
                 placeholder="أدخل رقم الصك"
               />
             </div>
 
-            <div className="form-group full-width">
+            <div className="myads-form-group full-width">
               <label>الموقع الجغرافي (وصف)</label>
               <input
                 type="text"
@@ -498,56 +498,56 @@ function MyAds() {
                 value={adFormData.geo_location_text}
                 onChange={handleAdChange}
                 required
-                className="form-control"
+                className="myads-form-control"
                 placeholder="أدخل وصف الموقع الجغرافي"
               />
             </div>
 
-            <div className="form-group full-width">
+            <div className="myads-form-group full-width">
               <label>الوصف</label>
               <textarea
                 name="description"
                 value={adFormData.description}
                 onChange={handleAdChange}
                 required
-                className="form-control"
+                className="myads-form-control"
                 rows="4"
                 placeholder="أدخل وصفاً مفصلاً عن الأرض"
               />
             </div>
 
             {/* رفع الملفات */}
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>الصورة الرئيسية</label>
-              <div className="file-input-wrapper">
+              <div className="myads-file-input-wrapper">
                 <input
                   type="file"
                   name="cover_image"
                   onChange={handleAdChange}
                   required
                   accept="image/*"
-                  className="form-control"
+                  className="myads-form-control"
                 />
               </div>
             </div>
 
-            <div className="form-group">
+            <div className="myads-form-group">
               <label>الصور الإضافية</label>
-              <div className="file-input-wrapper">
+              <div className="myads-file-input-wrapper">
                 <input
                   type="file"
                   name="images"
                   onChange={handleAdChange}
                   multiple
                   accept="image/*"
-                  className="form-control"
+                  className="myads-form-control"
                 />
                 <small>يمكنك رفع أكثر من صورة</small>
               </div>
             </div>
 
-            <div className="form-group full-width">
-              <label className="checkbox-container">
+            <div className="myads-form-group full-width">
+              <label className="myads-checkbox-container">
                 <input
                   type="checkbox"
                   name="legal_declaration"
@@ -555,16 +555,16 @@ function MyAds() {
                   onChange={handleAdChange}
                   required
                 />
-                <span className="checkmark"></span>
+                <span className="myads-checkmark"></span>
                 <span>أقر بأن جميع المعلومات المقدمة صحيحة وأتحمل المسؤولية القانونية</span>
               </label>
             </div>
           </div>
 
-          <div className="form-actions">
+          <div className="myads-form-actions">
             <button 
               type="button" 
-              className="btn btn-outline"
+              className="myads-btn myads-btn-outline"
               onClick={() => {
                 setShowAdForm(false);
                 resetForm();
@@ -575,7 +575,7 @@ function MyAds() {
             </button>
             <button 
               type="submit" 
-              className="btn btn-primary"
+              className="myads-btn myads-btn-primary"
               disabled={formLoading}
             >
               {formLoading ? 'جاري الإضافة...' : 'إضافة الأرض'}
@@ -588,59 +588,60 @@ function MyAds() {
 
   return (
     <div className="my-ads-page">
-      <div className="page-container">
-        <div className="header-row">
-          <h1 className="page-title">إعلاناتي</h1>
-          <button className="add-btn" onClick={() => setShowAdForm(true)}>
-            <FaPlus /> إضافة إعلان
-          </button>
-        </div>
-
-        <div className="search-bar">
-          <div className="search-input">
-            <FaSearch className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="ابحث في إعلاناتك..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <div className="myads-page-container">
+        <div className="myads-header-row">
+          <h1 className="myads-page-title">إعلاناتي</h1>
+          <div className="myads-header-controls">
+            <button className="myads-add-btn" onClick={() => setShowAdForm(true)}>
+              <FaPlus /> إضافة إعلان
+            </button>
+            <div className="myads-search-bar">
+              <div className="myads-search-input">
+                <FaSearch className="myads-search-icon" />
+                <input 
+                  type="text" 
+                  placeholder="ابحث في إعلاناتك..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="status-filter">
+        <div className="myads-status-filter">
           <button 
-            className={`status-btn ${activeStatus === 'الكل' ? 'active' : ''}`}
+            className={`myads-status-btn ${activeStatus === 'الكل' ? 'active' : ''}`}
             onClick={() => handleStatusChange('الكل')}
           >
             الكل
           </button>
-          <button 
-            className={`status-btn ${activeStatus === 'مقبول' ? 'active' : ''}`}
+          {/* <button 
+            className={`myads-status-btn ${activeStatus === 'مقبول' ? 'active' : ''}`}
             onClick={() => handleStatusChange('مقبول')}
           >
             مقبول
-          </button>
+          </button> */}
           <button 
-            className={`status-btn ${activeStatus === 'قيد المراجعة' ? 'active' : ''}`}
+            className={`myads-status-btn ${activeStatus === 'قيد المراجعة' ? 'active' : ''}`}
             onClick={() => handleStatusChange('قيد المراجعة')}
           >
             قيد المراجعة
           </button>
           <button 
-            className={`status-btn ${activeStatus === 'مرفوض' ? 'active' : ''}`}
+            className={`myads-status-btn ${activeStatus === 'مرفوض' ? 'active' : ''}`}
             onClick={() => handleStatusChange('مرفوض')}
           >
             مرفوض
           </button>
           <button 
-            className={`status-btn ${activeStatus === 'تم البيع' ? 'active' : ''}`}
+            className={`myads-status-btn ${activeStatus === 'تم البيع' ? 'active' : ''}`}
             onClick={() => handleStatusChange('تم البيع')}
           >
             تم البيع
           </button>
           <button 
-            className={`status-btn ${activeStatus === 'مفتوح' ? 'active' : ''}`}
+            className={`myads-status-btn ${activeStatus === 'مفتوح' ? 'active' : ''}`}
             onClick={() => handleStatusChange('مفتوح')}
           >
             مفتوح
@@ -648,58 +649,58 @@ function MyAds() {
         </div>
 
         {loading ? (
-          <div className="loading-state">
-            <div className="loader"></div>
+          <div className="myads-loading-state">
+            <div className="myads-loader"></div>
             <p>جاري تحميل الإعلانات...</p>
           </div>
         ) : error ? (
-          <div className="error-state">
-            <div className="error-icon">!</div>
+          <div className="myads-error-state">
+            <div className="myads-error-icon">!</div>
             <p>{error}</p>
-            <button className="btn btn-primary" onClick={() => fetchAds(activeStatus)}>
+            <button className="myads-btn myads-btn-primary" onClick={() => fetchAds(activeStatus)}>
               إعادة المحاولة
             </button>
           </div>
         ) : filteredAds.length > 0 ? (
-          <div className="ads-grid">
+          <div className="myads-grid">
             {filteredAds.map(ad => (
-              <div key={ad.id} className="ad-card">
-                <div className="ad-img">
+              <div key={ad.id} className="myads-card">
+                <div className="myads-img">
                   <img src={ad.cover_image_url || 'https://via.placeholder.com/300x150?text=لا+توجد+صورة'} alt={ad.title} />
                   {getStatusBadge(ad.status)}
                 </div>
-                <div className="ad-content">
-                  <h3 className="ad-title">{ad.title}</h3>
-                  <div className="ad-info">
-                    <div className="info-item">
-                      <span className="info-label">المدينة:</span>
-                      <span className="info-value">{ad.city}</span>
+                <div className="myads-content">
+                  <h3 className="myads-title">{ad.title}</h3>
+                  <div className="myads-info">
+                    <div className="myads-info-item">
+                      <span className="myads-info-label">المدينة:</span>
+                      <span className="myads-info-value">{ad.city}</span>
                     </div>
-                    <div className="info-item">
-                      <span className="info-label">المساحة:</span>
-                      <span className="info-value">{ad.total_area} م²</span>
+                    <div className="myads-info-item">
+                      <span className="myads-info-label">المساحة:</span>
+                      <span className="myads-info-value">{ad.total_area} م²</span>
                     </div>
                     {ad.purpose === 'بيع' ? (
-                      <div className="info-item">
-                        <span className="info-label">السعر:</span>
-                        <span className="info-value">{ad.price_per_sqm * ad.total_area} ريال</span>
+                      <div className="myads-info-item">
+                        <span className="myads-info-label">السعر:</span>
+                        <span className="myads-info-value">{ad.price_per_sqm * ad.total_area} ريال</span>
                       </div>
                     ) : (
-                      <div className="info-item">
-                        <span className="info-label">قيمة الاستثمار:</span>
-                        <span className="info-value">{ad.estimated_investment_value} ريال</span>
+                      <div className="myads-info-item">
+                        <span className="myads-info-label">قيمة الاستثمار:</span>
+                        <span className="myads-info-value">{ad.estimated_investment_value} ريال</span>
                       </div>
                     )}
                   </div>
-                  <p className="ad-desc">{ad.description.substring(0, 100)}...</p>
-                  <div className="ad-footer">
-                    <span className="ad-date">{new Date(ad.created_at).toLocaleDateString('ar-SA')}</span>
-                    <div className="ad-actions">
-                      <button className="action-btn edit-btn">
+                  <p className="myads-desc">{ad.description.substring(0, 100)}...</p>
+                  <div className="myads-footer">
+                    <span className="myads-date">{new Date(ad.created_at).toLocaleDateString('ar-SA')}</span>
+                    <div className="myads-actions">
+                      <button className="myads-action-btn myads-edit-btn">
                         <FaEdit />
                       </button>
                       <button 
-                        className="action-btn delete-btn"
+                        className="myads-action-btn myads-delete-btn"
                         onClick={() => deleteAd(ad.id)}
                       >
                         <FaTrash />
@@ -711,11 +712,11 @@ function MyAds() {
             ))}
           </div>
         ) : (
-          <div className="empty-state">
-            <div className="empty-icon">📝</div>
+          <div className="myads-empty-state">
+            <div className="myads-empty-icon">📝</div>
             <h3>لا توجد إعلانات</h3>
             <p>لم تقم بإضافة أي إعلانات بعد أو لا توجد إعلانات تطابق البحث</p>
-            <button className="btn btn-primary" onClick={() => setShowAdForm(true)}>
+            <button className="myads-btn myads-btn-primary" onClick={() => setShowAdForm(true)}>
               إضافة إعلان جديد
             </button>
           </div>

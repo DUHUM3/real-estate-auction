@@ -219,9 +219,9 @@ function Profile() {
 
   if (loading) {
     return (
-      <div className="profile-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
+      <div className="profileMaster-container">
+        <div className="profileLoading-container">
+          <div className="profileSpinner"></div>
           <p>جاري تحميل البيانات...</p>
         </div>
       </div>
@@ -230,11 +230,11 @@ function Profile() {
 
   if (!apiData) {
     return (
-      <div className="profile-container">
-        <div className="error-message">
-          <FiXCircle className="error-icon" />
+      <div className="profileMaster-container">
+        <div className="profileError-container">
+          <FiXCircle className="profileError-icon" />
           <p>حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى</p>
-          <button className="btn btn-primary" onClick={() => window.location.reload()}>
+          <button className="profileRetry-btn" onClick={() => window.location.reload()}>
             إعادة المحاولة
           </button>
         </div>
@@ -243,136 +243,132 @@ function Profile() {
   }
 
   return (
-    <div className="modern-profile-container">
+    <div className="profileMaster-container">
       {/* بطاقة المعلومات الرئيسية */}
-      <div className="profile-card main-info-card">
-        <div className="profile-header">
-          <div className="avatar-section">
-            <div className="avatar-container">
-              <div className="avatar">
-                <FiUser className="avatar-icon" />
-              </div>
-              <div className={`status-indicator ${apiData?.user?.status}`} 
-                   title={apiData?.user?.status === 'approved' ? 'مفعل' : 
-                          apiData?.user?.status === 'pending' ? 'قيد المراجعة' : 'غير مفعل'}>
-              </div>
+      <div className="profileHero-card">
+        <div className="profileHero-header">
+          <div className="profileHero-avatar">
+            <div className="profileHero-avatarMain">
+              <FiUser className="avatar-icon" />
             </div>
-            <div className="user-main-info">
-              <h2 className="user-name">{apiData.user.full_name || 'المستخدم'}</h2>
-              <div className="user-type-badge">
-                {getUserTypeIcon()}
-                <span>{renderUserTypeText()}</span>
-              </div>
-              <p className="user-email">
-                <FiMail className="info-icon" />
-                {apiData.user.email}
-              </p>
-              <div className="user-status">
-                <span className={`status-badge ${apiData?.user?.status}`}>
-                  {apiData?.user?.status === 'approved' ? 'مفعل' : 
-                   apiData?.user?.status === 'pending' ? 'قيد المراجعة' : 'غير مفعل'}
-                </span>
-              </div>
+            <div className={`profileHero-status ${apiData?.user?.status}`} 
+                 title={apiData?.user?.status === 'approved' ? 'مفعل' : 
+                        apiData?.user?.status === 'pending' ? 'قيد المراجعة' : 'غير مفعل'}>
             </div>
           </div>
-          <div className="profile-actions">
+          <div className="profileHero-info">
+            <h2 className="profileHero-name">{apiData.user.full_name || 'المستخدم'}</h2>
+            <div className="profileHero-badge">
+              {getUserTypeIcon()}
+              <span>{renderUserTypeText()}</span>
+            </div>
+            <div className="profileHero-contact">
+              <FiMail className="info-icon" />
+              <span>{apiData.user.email}</span>
+            </div>
+            <div className="profileHero-contact">
+              <FiPhone className="info-icon" />
+              <span>{apiData.user.phone || 'لم يتم إضافة رقم الجوال'}</span>
+            </div>
+          </div>
+          <div className="profileHero-actions">
             {!isEditing ? (
-              <button className="btn edit-btn" onClick={() => setIsEditing(true)}>
+              <button className="profileEdit-btn" onClick={() => setIsEditing(true)}>
                 <FiEdit2 className="btn-icon" />
                 <span className="btn-text">تعديل الملف الشخصي</span>
               </button>
             ) : (
-              <div className="edit-actions">
-                <button className="btn save-btn" onClick={handleSubmit}>
+              <>
+                <button className="profileEdit-btn profileSave-btn" onClick={handleSubmit}>
                   <FiSave className="btn-icon" />
                   <span className="btn-text">حفظ</span>
                 </button>
-                <button className="btn cancel-btn" onClick={handleCancel}>
+                <button className="profileEdit-btn profileCancel-btn" onClick={handleCancel}>
                   <FiX className="btn-icon" />
                   <span className="btn-text">إلغاء</span>
                 </button>
-              </div>
+              </>
             )}
           </div>
         </div>
       </div>
 
       {/* بطاقة الإحصائيات */}
-      <div className="profile-card stats-card">
-        <h3 className="card-title">
+      <div className="profileStats-card">
+        <h3 className="profileStats-title">
           <FiHome className="title-icon" />
           إحصائيات العقارات
         </h3>
         {statsLoading ? (
-          <div className="stats-loading">
-            <div className="loading-spinner-small"></div>
+          <div className="profileLoading-container">
+            <div className="profileSpinner"></div>
             جاري تحميل الإحصائيات...
           </div>
         ) : stats ? (
-          <div className="stats-container">
-            <div className="stat-item">
-              <div className="stat-icon total">
+          <div className="profileStats-grid">
+            <div className="profileStat-item">
+              <div className="profileStat-icon total">
                 <FiHome />
               </div>
-              <div className="stat-details">
-                <span className="stat-value">{stats.total}</span>
-                <span className="stat-label">إجمالي العقارات</span>
+              <div className="profileStat-details">
+                <span className="profileStat-value">{stats.total}</span>
+                <span className="profileStat-label">إجمالي العقارات</span>
               </div>
             </div>
-            <div className="stat-item">
-              <div className="stat-icon pending">
+            <div className="profileStat-item">
+              <div className="profileStat-icon pending">
                 <FiClock />
               </div>
-              <div className="stat-details">
-                <span className="stat-value">{stats.under_review}</span>
-                <span className="stat-label">قيد المراجعة</span>
+              <div className="profileStat-details">
+                <span className="profileStat-value">{stats.under_review}</span>
+                <span className="profileStat-label">قيد المراجعة</span>
               </div>
             </div>
-            <div className="stat-item">
-              <div className="stat-icon approved">
+            <div className="profileStat-item">
+              <div className="profileStat-icon approved">
                 <FiCheckCircle />
               </div>
-              <div className="stat-details">
-                <span className="stat-value">{stats.approved}</span>
-                <span className="stat-label">معتمدة</span>
+              <div className="profileStat-details">
+                <span className="profileStat-value">{stats.approved}</span>
+                <span className="profileStat-label">معتمدة</span>
               </div>
             </div>
-            <div className="stat-item">
-              <div className="stat-icon rejected">
+            <div className="profileStat-item">
+              <div className="profileStat-icon rejected">
                 <FiXCircle />
               </div>
-              <div className="stat-details">
-                <span className="stat-value">{stats.rejected}</span>
-                <span className="stat-label">مرفوضة</span>
+              <div className="profileStat-details">
+                <span className="profileStat-value">{stats.rejected}</span>
+                <span className="profileStat-label">مرفوضة</span>
               </div>
             </div>
-            <div className="stat-item">
-              <div className="stat-icon sold">
+            <div className="profileStat-item">
+              <div className="profileStat-icon sold">
                 <FiDollarSign />
               </div>
-              <div className="stat-details">
-                <span className="stat-value">{stats.sold}</span>
-                <span className="stat-label">تم بيعها</span>
+              <div className="profileStat-details">
+                <span className="profileStat-value">{stats.sold}</span>
+                <span className="profileStat-label">تم بيعها</span>
               </div>
             </div>
           </div>
         ) : (
-          <div className="stats-error">
-            <FiXCircle className="error-icon-small" />
+          <div className="profileError-container">
+            <FiXCircle className="profileError-icon" />
             تعذر تحميل الإحصائيات
           </div>
         )}
       </div>
 
       {/* المعلومات الشخصية */}
-      <div className="profile-card">
-        <h3 className="card-title">
+      <div className="profileInfo-card">
+        <h3 className="profileInfo-title">
           <FiUser className="title-icon" />
           المعلومات الشخصية
         </h3>
-        <div className="info-list">
-          <div className="info-item">
-            <div className="info-label">
+        <div className="profileInfo-list">
+          <div className="profileInfo-item">
+            <div className="profileInfo-label">
               <FiUser className="info-icon" />
               <span>الاسم الثلاثي</span>
             </div>
@@ -382,16 +378,16 @@ function Profile() {
                 name="full_name"
                 value={formData.full_name || ''}
                 onChange={handleChange}
-                className="edit-input"
+                className="profileEdit-input"
                 placeholder="أدخل اسمك الثلاثي"
               />
             ) : (
-              <span className="info-value">{apiData?.user?.full_name || 'غير محدد'}</span>
+              <span className="profileInfo-value">{apiData?.user?.full_name || 'غير محدد'}</span>
             )}
           </div>
 
-          <div className="info-item">
-            <div className="info-label">
+          <div className="profileInfo-item">
+            <div className="profileInfo-label">
               <FiMail className="info-icon" />
               <span>البريد الإلكتروني</span>
             </div>
@@ -401,16 +397,16 @@ function Profile() {
                 name="email"
                 value={formData.email || ''}
                 onChange={handleChange}
-                className="edit-input"
+                className="profileEdit-input"
                 placeholder="أدخل بريدك الإلكتروني"
               />
             ) : (
-              <span className="info-value">{apiData?.user?.email || 'غير محدد'}</span>
+              <span className="profileInfo-value">{apiData?.user?.email || 'غير محدد'}</span>
             )}
           </div>
 
-          <div className="info-item">
-            <div className="info-label">
+          <div className="profileInfo-item">
+            <div className="profileInfo-label">
               <FiPhone className="info-icon" />
               <span>رقم الجوال</span>
             </div>
@@ -420,17 +416,17 @@ function Profile() {
                 name="phone"
                 value={formData.phone || ''}
                 onChange={handleChange}
-                className="edit-input"
+                className="profileEdit-input"
                 placeholder="أدخل رقم جوالك"
               />
             ) : (
-              <span className="info-value">{apiData?.user?.phone || 'غير محدد'}</span>
+              <span className="profileInfo-value">{apiData?.user?.phone || 'غير محدد'}</span>
             )}
           </div>
 
           {isEditing && (
-            <div className="info-item">
-              <div className="info-label">
+            <div className="profileInfo-item">
+              <div className="profileInfo-label">
                 <MdAssignment className="info-icon" />
                 <span>نوع الحساب</span>
               </div>
@@ -438,7 +434,7 @@ function Profile() {
                 name="user_type"
                 value={formData.user_type || 'individual'}
                 onChange={handleChange}
-                className="edit-input select-input"
+                className="profileEdit-select"
               >
                 <option value="individual">فرد</option>
                 <option value="company">شركة</option>
@@ -451,14 +447,14 @@ function Profile() {
 
       {/* معلومات إضافية - تظهر فقط إذا كان لديه details أو في وضع التعديل وكان نوعه شركة */}
       {(hasDetails() || (isEditing && isCommercialEntity())) && (
-        <div className="profile-card">
-          <h3 className="card-title">
+        <div className="profileInfo-card">
+          <h3 className="profileInfo-title">
             <MdBusiness className="title-icon" />
             معلومات المنشأة
           </h3>
-          <div className="info-list">
-            <div className="info-item">
-              <div className="info-label">
+          <div className="profileInfo-list">
+            <div className="profileInfo-item">
+              <div className="profileInfo-label">
                 <FiBriefcase className="info-icon" />
                 <span>اسم المنشأة</span>
               </div>
@@ -468,18 +464,18 @@ function Profile() {
                   name="business_name"
                   value={formData.business_name || ''}
                   onChange={handleChange}
-                  className="edit-input"
+                  className="profileEdit-input"
                   placeholder="أدخل اسم المنشأة"
                 />
               ) : (
-                <span className="info-value">
+                <span className="profileInfo-value">
                   {apiData?.user?.details?.business_name || 'غير محدد'}
                 </span>
               )}
             </div>
 
-            <div className="info-item">
-              <div className="info-label">
+            <div className="profileInfo-item">
+              <div className="profileInfo-label">
                 <FiFileText className="info-icon" />
                 <span>السجل التجاري</span>
               </div>
@@ -489,18 +485,18 @@ function Profile() {
                   name="commercial_register"
                   value={formData.commercial_register || ''}
                   onChange={handleChange}
-                  className="edit-input"
+                  className="profileEdit-input"
                   placeholder="أدخل رقم السجل التجاري"
                 />
               ) : (
-                <span className="info-value">
+                <span className="profileInfo-value">
                   {apiData?.user?.details?.commercial_register || 'غير محدد'}
                 </span>
               )}
             </div>
 
-            <div className="info-item">
-              <div className="info-label">
+            <div className="profileInfo-item">
+              <div className="profileInfo-label">
                 <MdBadge className="info-icon" />
                 <span>رقم الهوية الوطنية</span>
               </div>
@@ -510,11 +506,11 @@ function Profile() {
                   name="national_id"
                   value={formData.national_id || ''}
                   onChange={handleChange}
-                  className="edit-input"
+                  className="profileEdit-input"
                   placeholder="أدخل رقم الهوية الوطنية"
                 />
               ) : (
-                <span className="info-value">
+                <span className="profileInfo-value">
                   {apiData?.user?.details?.national_id || 'غير محدد'}
                 </span>
               )}
@@ -525,19 +521,19 @@ function Profile() {
 
       {/* الوثائق والمستندات - تظهر فقط إذا كان هناك ملف تجاري */}
       {hasDetails() && apiData?.user?.details?.commercial_file && (
-        <div className="profile-card">
-          <h3 className="card-title">
+        <div className="profileDocs-card">
+          <h3 className="profileInfo-title">
             <FiFileText className="title-icon" />
             الوثائق والمستندات
           </h3>
-          <div className="documents-list">
-            <div className="document-item">
-              <div className="document-info">
+          <div className="profileDocs-list">
+            <div className="profileDoc-item">
+              <div className="profileDoc-info">
                 <FiFileText className="document-icon" />
-                <span className="document-name">السجل التجاري</span>
+                <span className="profileDoc-name">السجل التجاري</span>
               </div>
               <button
-                className="btn document-btn"
+                className="profileDoc-btn"
                 onClick={() => window.open(apiData.user.details.commercial_file, '_blank')}
               >
                 <FiFileText className="btn-icon" />

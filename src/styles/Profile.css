@@ -1,539 +1,606 @@
-/* Profile.css */
-:root {
-  --primary-color: #2c6bed;
-  --primary-light: #e6effb;
-  --secondary-color: #6c7a89;
-  --accent-color: #f9a825;
-  --success-color: #2ecc71;
-  --warning-color: #f1c40f;
-  --danger-color: #e74c3c;
-  --light-color: #f7f9fa;
-  --dark-color: #2c3e50;
-  --gray-color: #e0e0e0;
-  --border-radius: 12px;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* إصلاح المسافات والعناصر المختفية */
-.modern-profile-container {
-  max-width: 800px;
+/* ملف: styles/Profile.css */
+/* الحاوية الرئيسية */
+.profileMaster-container {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 15px;
-  font-family: 'Tajawal', 'Segoe UI', sans-serif;
-  margin-top: 20px; /* إضافة مسافة من الأعلى */
+  
+  padding: 16px;
+  min-height: 100vh;
+  background: var(--elegant-bg-light);
 }
 
-/* إصلاح بطاقة البروفايل */
-.profile-card {
-  background-color: #fff;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  padding: 20px;
+/* بطاقة الملف الشخصي الرئيسية */
+.profileHero-card {
+  background: linear-gradient(135deg, var(--elegant-primary) 0%, #1e4060 100%);
+  border-radius: var(--elegant-radius-lg);
+  top: 50px;
+  padding: 24px;
   margin-bottom: 20px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.profile-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-.card-title {
-  color: var(--dark-color);
-  font-size: 18px;
-  margin: 0 0 15px 0;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--gray-color);
+  color: white;
   position: relative;
+  overflow: hidden;
+  box-shadow: var(--elegant-shadow-md);
 }
 
-.card-title::after {
+.profileHero-card::before {
   content: '';
   position: absolute;
-  bottom: -1px;
-  right: 0;
-  width: 50px;
-  height: 3px;
-  background-color: var(--primary-color);
-  border-radius: 3px;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 183, 3, 0.1) 0%, transparent 70%);
+  animation: profileFloat 6s ease-in-out infinite;
 }
 
-/* إصلاح الهيدر للهاتف */
-.profile-header {
+@keyframes profileFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+.profileHero-header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start; /* تغيير من center إلى flex-start */
-  gap: 15px;
-  margin-bottom: 15px;
+  align-items: center;
+  
+  gap: 20px;
+  position: relative;
+  z-index: 2;
 }
 
-.avatar-container {
+.profileHero-avatar {
   position: relative;
   flex-shrink: 0;
 }
 
-.avatar {
-  width: 70px; /* تصغير الحجم للهاتف */
-  height: 70px;
-  background-color: var(--primary-color);
-  color: white;
+.profileHero-avatarMain {
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
+  background: linear-gradient(135deg, var(--elegant-secondary), var(--elegant-accent));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px; /* تصغير الخط */
-  font-weight: bold;
-  box-shadow: 0 4px 8px rgba(44, 107, 237, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.status-indicator {
-  position: absolute;
+.profileHero-avatarMain .avatar-icon {
+  font-size: 2rem;
+  color: white;
+}
+
+.profileHero-status {
+    top: 50px;
+
   bottom: 5px;
   right: 5px;
-  width: 12px; /* تصغير الحجم */
-  height: 12px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background-color: var(--warning-color);
   border: 2px solid white;
 }
 
-.user-main-info {
+.profileHero-status.approved {
+  background: #10b981;
+}
+
+.profileHero-status.pending {
+  background: #f59e0b;
+}
+
+.profileHero-status.rejected {
+  background: #ef4444;
+}
+
+.profileHero-info {
   flex: 1;
-  min-width: 0; /* مهم للهاتف */
 }
 
-.user-name {
-  margin: 0;
-  font-size: 20px; /* تصغير الخط */
-  color: var(--dark-color);
-  line-height: 1.2;
+.profileHero-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: white;
 }
 
-.user-type {
-  color: var(--secondary-color);
-  margin: 3px 0; /* تقليل المسافة */
-  font-size: 13px;
+.profileHero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  backdrop-filter: blur(10px);
 }
 
-.user-email {
-  color: var(--secondary-color);
-  margin: 3px 0;
-  font-size: 13px;
-  word-break: break-word; /* منع تجاوز النص */
+.profileHero-badge .user-type-icon {
+  font-size: 1rem;
 }
 
-.status-badge {
-  display: inline-block;
-  padding: 3px 8px; /* تصغير الحجم */
-  border-radius: 15px;
-  font-size: 11px;
-  font-weight: 500;
-  margin-top: 5px;
-}
-
-.status-badge.approved {
-  background-color: rgba(46, 204, 113, 0.1);
-  color: var(--success-color);
-}
-
-.status-badge.pending {
-  background-color: rgba(241, 196, 15, 0.1);
-  color: var(--warning-color);
-}
-
-.status-badge.rejected {
-  background-color: rgba(231, 76, 60, 0.1);
-  color: var(--danger-color);
-}
-
-/* إصلاح الأزرار للهاتف */
-.profile-actions {
+.profileHero-contact {
   display: flex;
+  align-items: center;
   gap: 8px;
-  width: 100%; /* جعلها تأخذ العرض كامل */
-  margin-top: 10px;
-  flex-wrap: wrap;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 4px;
 }
 
-.btn {
+.profileHero-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* أزرار التعديل */
+.profileEdit-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--elegant-radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all var(--elegant-transition);
+  backdrop-filter: blur(10px);
+}
+
+.profileEdit-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.profileSave-btn {
+  background: var(--elegant-secondary);
+  color: var(--elegant-primary);
+  border: none;
+}
+
+.profileSave-btn:hover {
+  background: #ffa502;
+  transform: translateY(-2px);
+}
+
+.profileCancel-btn {
+  background: rgba(239, 68, 68, 0.2);
+  color: white;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.profileCancel-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  transform: translateY(-2px);
+}
+
+/* بطاقة الإحصائيات */
+.profileStats-card {
+  background: var(--elegant-bg-white);
+  border-radius: var(--elegant-radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--elegant-shadow-sm);
+  border: 1px solid var(--elegant-border);
+}
+
+.profileStats-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--elegant-primary);
+  margin-bottom: 20px;
+}
+
+.profileStats-title .title-icon {
+  color: var(--elegant-secondary);
+  font-size: 1.3rem;
+}
+
+.profileStats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.profileStat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--elegant-bg-light);
+  border-radius: var(--elegant-radius-md);
+  transition: all var(--elegant-transition);
+  border: 1px solid transparent;
+}
+
+.profileStat-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--elegant-secondary);
+  box-shadow: var(--elegant-shadow-sm);
+}
+
+.profileStat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  padding: 8px 12px; /* تصغير الحجم */
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.profileStat-icon.total {
+  background: var(--elegant-secondary-light);
+  color: var(--elegant-secondary);
+}
+
+.profileStat-icon.pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.profileStat-icon.approved {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.profileStat-icon.rejected {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.profileStat-icon.sold {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.profileStat-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.profileStat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--elegant-primary);
+  line-height: 1;
+}
+
+.profileStat-label {
+  font-size: 0.8rem;
+  color: var(--elegant-text-light);
+  margin-top: 4px;
+}
+
+/* بطاقات المعلومات */
+.profileInfo-card {
+  background: var(--elegant-bg-white);
+  border-radius: var(--elegant-radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--elegant-shadow-sm);
+  border: 1px solid var(--elegant-border);
+}
+
+.profileInfo-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--elegant-primary);
+  margin-bottom: 20px;
+}
+
+.profileInfo-title .title-icon {
+  color: var(--elegant-secondary);
+  font-size: 1.3rem;
+}
+
+.profileInfo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profileInfo-item {
+  display: flex;
+  align-items: center;
+  justify-content: between;
+  padding: 16px;
+  background: var(--elegant-bg-light);
+  border-radius: var(--elegant-radius-md);
+  transition: all var(--elegant-transition);
+}
+
+.profileInfo-item:hover {
+  transform: translateX(5px);
+  border-right: 3px solid var(--elegant-secondary);
+}
+
+.profileInfo-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  font-weight: 600;
+  color: var(--elegant-primary);
+}
+
+.profileInfo-label .info-icon {
+  color: var(--elegant-secondary);
+  font-size: 1.1rem;
+}
+
+.profileInfo-value {
+  flex: 1;
+  text-align: left;
+  color: var(--elegant-text);
   font-weight: 500;
-  transition: all 0.3s ease;
-  font-size: 13px; /* تصغير الخط */
-  flex: 1; /* جعل الأزرار متساوية */
-  min-width: 80px; /* حد أدنى للعرض */
 }
 
-.edit-btn, .save-btn {
-  background-color: var(--primary-color);
-  color: white;
+/* حقول الإدخال */
+.profileEdit-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--elegant-border);
+  border-radius: var(--elegant-radius-md);
+  font-size: 0.9rem;
+  background: var(--elegant-bg-white);
+  transition: all var(--elegant-transition);
+  font-family: inherit;
 }
 
-.edit-btn:hover, .save-btn:hover {
-  background-color: #1e5dbe;
-  box-shadow: 0 4px 8px rgba(44, 107, 237, 0.3);
+.profileEdit-input:focus {
+  outline: none;
+  border-color: var(--elegant-secondary);
+  box-shadow: 0 0 0 3px var(--elegant-secondary-light);
 }
 
-.cancel-btn {
-  background-color: #f3f4f6;
-  color: var(--secondary-color);
+.profileEdit-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--elegant-border);
+  border-radius: var(--elegant-radius-md);
+  font-size: 0.9rem;
+  background: var(--elegant-bg-white);
+  transition: all var(--elegant-transition);
+  font-family: inherit;
+  cursor: pointer;
 }
 
-.cancel-btn:hover {
-  background-color: #e9ecef;
+.profileEdit-select:focus {
+  outline: none;
+  border-color: var(--elegant-secondary);
+  box-shadow: 0 0 0 3px var(--elegant-secondary-light);
 }
 
-.document-btn {
-  background-color: var(--primary-light);
-  color: var(--primary-color);
+/* بطاقة الوثائق */
+.profileDocs-card {
+  background: var(--elegant-bg-white);
+  border-radius: var(--elegant-radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--elegant-shadow-sm);
+  border: 1px solid var(--elegant-border);
 }
 
-.document-btn:hover {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-/* المعلومات */
-.info-list, .documents-list {
+.profileDocs-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.info-item, .document-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.info-item:last-child, .document-item:last-child {
-  border-bottom: none;
-}
-
-.info-label, .document-name {
-  color: var(--secondary-color);
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.info-value {
-  color: var(--dark-color);
-  font-weight: 500;
-  font-size: 14px;
-}
-
-/* حقول التعديل */
-.edit-input {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--gray-color);
-  transition: border 0.3s ease;
-  font-size: 14px;
-}
-
-.edit-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-.select-input {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c7a89' viewBox='0 0 16 16'%3E%3Cpath d='M8 10l4-4H4l4 4z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: left 10px center;
-  background-size: 14px;
-  padding-left: 32px;
-}
-
-/* إصلاح الإحصائيات للهاتف */
-.stats-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* عمودين للهاتف */
-  gap: 10px; /* تقليل المسافة */
-}
-
-.stat-item {
+.profileDoc-item {
   display: flex;
   align-items: center;
-  padding: 10px; /* تصغير الحشوة */
-  background-color: var(--light-color);
-  border-radius: 10px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  min-height: 60px; /* ارتفاع ثابت */
+  justify-content: between;
+  padding: 16px;
+  background: var(--elegant-bg-light);
+  border-radius: var(--elegant-radius-md);
+  transition: all var(--elegant-transition);
 }
 
-.stat-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.profileDoc-item:hover {
+  transform: translateX(5px);
+  border-right: 3px solid var(--elegant-secondary);
 }
 
-.stat-icon {
-  width: 35px; /* تصغير الحجم */
-  height: 35px;
-  border-radius: 8px;
+.profileDoc-info {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 16px; /* تصغير الأيقونة */
-  margin-left: 8px;
-  flex-shrink: 0;
-}
-
-.stat-icon.total {
-  background-color: rgba(44, 107, 237, 0.1);
-  color: var(--primary-color);
-}
-
-.stat-icon.pending {
-  background-color: rgba(241, 196, 15, 0.1);
-  color: var(--warning-color);
-}
-
-.stat-icon.approved {
-  background-color: rgba(46, 204, 113, 0.1);
-  color: var(--success-color);
-}
-
-.stat-icon.rejected {
-  background-color: rgba(231, 76, 60, 0.1);
-  color: var(--danger-color);
-}
-
-.stat-icon.sold {
-  background-color: rgba(155, 89, 182, 0.1);
-  color: #9b59b6;
-}
-
-.stat-details {
-  display: flex;
-  flex-direction: column;
+  gap: 10px;
   flex: 1;
-  min-width: 0; /* مهم للهاتف */
 }
 
-.stat-value {
-  font-size: 16px; /* تصغير الخط */
-  font-weight: bold;
-  color: var(--dark-color);
-  line-height: 1.2;
+.profileDoc-info .document-icon {
+  color: var(--elegant-secondary);
+  font-size: 1.2rem;
 }
 
-.stat-label {
-  font-size: 11px; /* تصغير الخط */
-  color: var(--secondary-color);
-  line-height: 1.2;
+.profileDoc-name {
+  font-weight: 600;
+  color: var(--elegant-primary);
 }
 
-/* حالة التحميل */
-.loading-spinner {
+.profileDoc-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--elegant-primary);
+  color: white;
+  border: none;
+  border-radius: var(--elegant-radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all var(--elegant-transition);
+}
+
+.profileDoc-btn:hover {
+  background: var(--elegant-accent);
+  transform: translateY(-1px);
+}
+
+/* حالات التحميل والخطأ */
+.profileLoading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 30px;
+  padding: 60px 20px;
   text-align: center;
 }
 
-.spinner {
-  width: 35px;
-  height: 35px;
-  border: 3px solid var(--gray-color);
+.profileSpinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid var(--elegant-bg-light);
+  border-top: 3px solid var(--elegant-secondary);
   border-radius: 50%;
-  border-top-color: var(--primary-color);
-  animation: spin 1s linear infinite;
-  margin-bottom: 12px;
+  animation: profileSpin 1s linear infinite;
+  margin-bottom: 16px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+@keyframes profileSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* رسالة الخطأ */
-.error-message {
+.profileError-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
   text-align: center;
-  padding: 30px 15px;
+  background: var(--elegant-bg-white);
+  border-radius: var(--elegant-radius-lg);
+  box-shadow: var(--elegant-shadow-sm);
 }
 
-.error-icon {
-  font-size: 40px;
-  margin-bottom: 12px;
-  display: block;
+.profileError-icon {
+  font-size: 3rem;
+  color: #ef4444;
+  margin-bottom: 16px;
 }
 
-/* تحسينات خاصة للهاتف */
-@media (max-width: 480px) {
-  .modern-profile-container {
-    padding: 10px;
-    margin-top: 10px;
+.profileRetry-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--elegant-primary);
+  color: white;
+  border: none;
+  border-radius: var(--elegant-radius-md);
+  font-weight: 600;
+  margin-top: 16px;
+  transition: all var(--elegant-transition);
+}
+
+.profileRetry-btn:hover {
+  background: var(--elegant-accent);
+  transform: translateY(-2px);
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 768px) {
+  .profileMaster-container {
+    padding: 12px;
   }
   
-  .profile-card {
-    padding: 15px;
-    margin-bottom: 15px;
+  .profileHero-card {
+    padding: 20px;
   }
   
-  .profile-header {
+  .profileHero-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .profileHero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .profileEdit-btn {
+    justify-content: center;
+  }
+  
+  .profileStats-grid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
   
-  .avatar {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-  }
-  
-  .user-name {
-    font-size: 18px;
-  }
-  
-  .user-type, .user-email {
-    font-size: 12px;
-  }
-  
-  .stats-container {
-    grid-template-columns: 1fr; /* عمود واحد للشاشات الصغيرة جداً */
+  .profileStat-item {
+    flex-direction: column;
+    text-align: center;
     gap: 8px;
+    padding: 12px;
   }
   
-  .stat-item {
-    padding: 8px;
-    min-height: 55px;
+  .profileInfo-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
   
-  .stat-icon {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
-    margin-left: 6px;
+  .profileInfo-value {
+    text-align: right;
+    width: 100%;
   }
   
-  .stat-value {
-    font-size: 15px;
+  .profileDoc-item {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
   }
   
-  .stat-label {
-    font-size: 10px;
-  }
-  
-  .btn {
-    padding: 7px 10px;
-    font-size: 12px;
-    min-width: 70px;
-  }
-  
-  .card-title {
-    font-size: 16px;
+  .profileDoc-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
-/* تحسينات للشاشات المتوسطة والكبيرة */
-@media (min-width: 768px) {
-  .modern-profile-container {
-    padding: 25px 20px;
-    margin-top: 30px;
+@media (max-width: 480px) {
+  .profileStats-grid {
+    grid-template-columns: 1fr;
   }
   
-  .profile-header {
-    flex-wrap: nowrap;
-    align-items: center;
+  .profileHero-avatarMain {
+    width: 70px;
+    height: 70px;
   }
   
-  .profile-actions {
-    width: auto;
-    margin-top: 0;
-    margin-right: auto;
+  .profileHero-name {
+    font-size: 1.3rem;
   }
   
-  .stats-container {
-    grid-template-columns: repeat(3, 1fr); /* 3 أعمدة للشاشات الكبيرة */
-    gap: 15px;
-  }
-  
-  .info-item {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: none;
-    padding: 5px 0;
-  }
-  
-  .info-label {
-    width: 140px;
-    flex-shrink: 0;
-    font-size: 14px;
-  }
-  
-  .info-value, .edit-input {
-    flex: 1;
-    text-align: left;
-  }
-  
-  .document-item {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: none;
+  .profileInfo-card,
+  .profileStats-card,
+  .profileDocs-card {
+    padding: 20px 16px;
   }
 }
 
-@media (min-width: 1024px) {
-  .stats-container {
-    grid-template-columns: repeat(5, 1fr); /* 5 أعمدة للشاشات الكبيرة جداً */
+/* تحسينات للوضع الداكن (اختياري) */
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --elegant-bg-light: #1a1a1a;
+    --elegant-bg-white: #2d2d2d;
+    --elegant-text: #e0e0e0;
+    --elegant-text-light: #a0a0a0;
+    --elegant-border: #404040;
+    --elegant-shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
+    --elegant-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
   }
-}
-
-/* تحسين تجربة التحميل والأخطاء */
-.stats-loading, .stats-error {
-  text-align: center;
-  padding: 15px;
-  color: var(--secondary-color);
-  background-color: var(--light-color);
-  border-radius: 8px;
-  font-size: 14px;
-}
-
-/* إصلاح مشكلة العناصر المختفية */
-.profile-section {
-  margin-bottom: 25px;
-}
-
-.section-title {
-  font-size: 20px;
-  color: var(--dark-color);
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-
-/* تحسينات إضافية للهاتف */
-.mobile-optimized {
-  -webkit-overflow-scrolling: touch; /* تحسين التمرير على iOS */
-}
-
-/* إصلاح مشكلة الترتيب في الهاتف */
-.profile-content {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* تحسين عرض الأزرار في وضع التعديل */
-.edit-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-  width: 100%;
-}
-
-.edit-actions .btn {
-  flex: 1;
-}
+} */
