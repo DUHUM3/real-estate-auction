@@ -7,7 +7,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Properties from './pages/PropertyList';
-import PropertyDetail from './pages/PropertyDetailsModal';
+import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import Favorites from './pages/Favorites';
 import CreateProperty from './pages/CreateProperty';
 import Profile from './pages/Profile';
@@ -48,7 +48,7 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/properties" element={<Properties />} />
-              <Route path="/property/:id" element={<PropertyDetail />} />
+              <Route path="/property/:id/:type" element={<PropertyDetailsPage />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/my-ads" element={<MyAds />} />
               <Route path="/my-lands" element={<Favorites />} />              

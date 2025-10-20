@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   FaSearch,
   FaShare,
@@ -18,13 +17,11 @@ import {
   FaCalendarDay
 } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
-import PropertyDetailsModal from './PropertyDetailsModal';
-import AuctionDetailsModal from './AuctionDetailsModal';
 import '../styles/PropertyList.css';
 
-
 const PropertiesPage = () => {
-    const location = useLocation();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // State variables
   const [properties, setProperties] = useState([]);
@@ -36,11 +33,10 @@ const PropertiesPage = () => {
   const [activeTab, setActiveTab] = useState('lands');
   const [showFilters, setShowFilters] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [favorites, setFavorites] = useState([]);
-  const [selectedProperty, setSelectedProperty] = useState(null);
-  const [selectedAuction, setSelectedAuction] = useState(null);
-  const [showPropertyModal, setShowPropertyModal] = useState(false);
-  const [showAuctionModal, setShowAuctionModal] = useState(false);
+  const [favorites, setFavorites] = useState({
+    properties: [],
+    auctions: []
+  });
 
   // Filter states for lands
   const [landFilters, setLandFilters] = useState({
@@ -74,7 +70,7 @@ const PropertiesPage = () => {
   const auctionStatuses = ['مفتوح', 'مغلق', 'معلق'];
 
   // Fetch data based on active tab
-useEffect(() => {
+  useEffect(() => {
     if (location.state?.searchFromHome && location.state?.searchQuery) {
       const searchQuery = location.state.searchQuery;
       
@@ -102,17 +98,17 @@ useEffect(() => {
     const savedAuctionFavorites = localStorage.getItem('auctionFavorites');
 
     if (savedPropertyFavorites) {
-      setFavorites({
-        ...favorites,
+      setFavorites(prev => ({
+        ...prev,
         properties: JSON.parse(savedPropertyFavorites)
-      });
+      }));
     }
 
     if (savedAuctionFavorites) {
-      setFavorites({
-        ...favorites,
+      setFavorites(prev => ({
+        ...prev,
         auctions: JSON.parse(savedAuctionFavorites)
-      });
+      }));
     }
   }, []);
 
@@ -127,15 +123,15 @@ useEffect(() => {
   }, [favorites]);
 
   // Fetch data when filters, tab, or page changes
-useEffect(() => {
-  if (activeTab === 'lands') {
-    fetchProperties();
-  } else {
-    fetchAuctions();
-  }
-}, [activeTab, currentPage, landFilters, auctionFilters]);
+  useEffect(() => {
+    if (activeTab === 'lands') {
+      fetchProperties();
+    } else {
+      fetchAuctions();
+    }
+  }, [activeTab, currentPage, landFilters, auctionFilters]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (location.state?.activeTab) {
       setActiveTab(location.state.activeTab);
       
@@ -163,60 +159,57 @@ useEffect(() => {
     }
   }, [location.state, activeTab]);
 
-  
-const fetchProperties = async () => {
-  try {
-    setLoading(true);
+  const fetchProperties = async () => {
+    try {
+      setLoading(true);
+      
+      const queryParams = new URLSearchParams();
+      
+      // إضافة الفلاتر بشكل صحيح
+      if (landFilters.region) queryParams.append('region', landFilters.region);
+      if (landFilters.purpose) queryParams.append('purpose', landFilters.purpose);
+      if (landFilters.search) queryParams.append('search', landFilters.search);
+      if (landFilters.city) queryParams.append('city', landFilters.city);
+      if (landFilters.land_type) queryParams.append('land_type', landFilters.land_type);
+      
+      // إضافة الباجينيشن
+      queryParams.append('page', currentPage);
 
-    const queryParams = new URLSearchParams();
-    Object.entries(landFilters).forEach(([key, value]) => {
-      if (value) queryParams.append(key, value);
-    });
+      const url = `https://shahin-tqay.onrender.com/api/properties?${queryParams}`;
+      const response = await fetch(url);
 
-    // إضافة البحث إذا كان موجوداً
-    if (landFilters.search) {
-      queryParams.append('search', landFilters.search);
+      if (!response.ok) {
+        throw new Error('فشل في جلب البيانات');
+      }
+
+      const data = await response.json();
+
+      if (data.status && data.data) {
+        setProperties(data.data.data || []);
+        setTotalPages(data.data.pagination?.last_page || 1);
+      } else {
+        setProperties([]);
+        setTotalPages(1);
+      }
+
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
     }
-
-    // Add pagination
-    queryParams.append('page', currentPage);
-
-    const url = `https://shahin-tqay.onrender.com/api/properties?${queryParams}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error('فشل في جلب البيانات');
-    }
-
-    const data = await response.json();
-
-    if (data.status && data.data) {
-      setProperties(data.data.data || []);
-      setTotalPages(data.data.pagination.last_page || 1);
-    } else {
-      setProperties([]);
-      setTotalPages(1);
-    }
-
-    setLoading(false);
-  } catch (error) {
-    setError(error.message);
-    setLoading(false);
-  }
-};
+  };
 
   const fetchAuctions = async () => {
     try {
       setLoading(true);
-
+      
       const queryParams = new URLSearchParams();
       
-      // Add auction filters
-      Object.entries(auctionFilters).forEach(([key, value]) => {
-        if (value) queryParams.append(key, value);
-      });
-
-      // Add pagination
+      // إضافة فلاتر المزادات بشكل صحيح
+      if (auctionFilters.search) queryParams.append('keyword', auctionFilters.search);
+      if (auctionFilters.status) queryParams.append('status', auctionFilters.status);
+      
+      // إضافة الباجينيشن
       queryParams.append('page', currentPage);
 
       const url = `https://shahin-tqay.onrender.com/api/auctions?${queryParams}`;
@@ -386,32 +379,14 @@ const fetchProperties = async () => {
     }
   };
 
-  // Open property details modal
+  // Open property details in new page
   const openPropertyDetails = (property) => {
-    setSelectedProperty(property);
-    setShowPropertyModal(true);
-    document.body.style.overflow = 'hidden';
+    navigate(`/property/${property.id}/land`);
   };
 
-  // Close property details modal
-  const closePropertyDetails = () => {
-    setShowPropertyModal(false);
-    setSelectedProperty(null);
-    document.body.style.overflow = 'auto';
-  };
-
-  // Open auction details modal
+  // Open auction details in new page
   const openAuctionDetails = (auction) => {
-    setSelectedAuction(auction);
-    setShowAuctionModal(true);
-    document.body.style.overflow = 'hidden';
-  };
-
-  // Close auction details modal
-  const closeAuctionDetails = () => {
-    setShowAuctionModal(false);
-    setSelectedAuction(null);
-    document.body.style.overflow = 'auto';
+    navigate(`/property/${auction.id}/auction`);
   };
 
   // Get property image URL
@@ -1011,28 +986,6 @@ const fetchProperties = async () => {
           {/* Pagination - Works for both tabs */}
           {renderPagination()}
         </div>
-
-        {/* Property Details Modal */}
-        {showPropertyModal && selectedProperty && (
-          <PropertyDetailsModal
-            property={selectedProperty}
-            onClose={closePropertyDetails}
-            isFavorite={favorites.properties?.includes(selectedProperty.id)}
-            onToggleFavorite={togglePropertyFavorite}
-            onShare={shareProperty}
-          />
-        )}
-
-        {/* Auction Details Modal */}
-        {showAuctionModal && selectedAuction && (
-          <AuctionDetailsModal
-            auction={selectedAuction}
-            onClose={closeAuctionDetails}
-            isFavorite={favorites.auctions?.includes(selectedAuction.id)}
-            onToggleFavorite={toggleAuctionFavorite}
-            onShare={shareAuction}
-          />
-        )}
       </div>
     </>
   );
