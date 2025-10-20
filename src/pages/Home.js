@@ -32,9 +32,11 @@ import {
   handleTouchEnd,
   FaLandmark
 } from 'react-icons/fa';
+import Login from './Login.js'; // تأكد من المسار الصحيح
 
 // مكون بطاقة الأرض
 const LandCard = ({
+  id,
   img,
   title,
   location,
@@ -42,16 +44,18 @@ const LandCard = ({
   area,
   landType,
   purpose,
-  auctionTitle
+  auctionTitle,
+  status,
+  onClick
 }) => (
-  <div className="land-card">
+  <div className="land-card" onClick={() => onClick && onClick(id)}>
     <div className="land-image">
-<img 
-  src={img || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"} 
-  alt={title || "أرض عقارية"} 
-/>
-
+      <img 
+        src={img || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"} 
+        alt={title || "أرض عقارية"} 
+      />
       <div className="land-tag">{landType}</div>
+      {status === "تم البيع" && <div className="sold-badge">تم البيع</div>}
       {auctionTitle && <div className="auction-badge">مزاد</div>}
       <div className="card-actions">
         <button className="action-btn save-btn">
@@ -89,6 +93,7 @@ const LandCard = ({
 
 // بطاقة المزاد
 const AuctionCard = ({
+  id,
   img,
   title,
   location,
@@ -98,18 +103,18 @@ const AuctionCard = ({
   endDate,
   auctionCompany,
   bidders,
-  daysLeft
+  daysLeft,
+  onClick
 }) => (
-  <div className="auction-card">
+  <div className="auction-card" onClick={() => onClick && onClick(id)}>
     <div className="auction-header">
       <span className="auction-company">{auctionCompany}</span>
     </div>
     <div className="auction-image">
-<img 
-  src={img || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"} 
-  alt={title || "أرض عقارية"} 
-/>
-
+      <img 
+        src={img || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"} 
+        alt={title || "أرض عقارية"} 
+      />
       <div className="auction-timer">
         <FaCalendarAlt className="timer-icon" /> {daysLeft} يوم متبقي
       </div>
@@ -151,41 +156,35 @@ const AuctionCard = ({
 );
 
 // مكون شريط العملاء المتحرك المعدل
-const ClientsSlider = () => {
-  const clientLogos = [
-    { id: 1, src: "/images/human.jpg", alt: "شعار عميل" },
-    { id: 2, src: "/images/client1.jpg", alt: "شعار عميل" },
-    { id: 3, src: "/images/client2.jpg", alt: "شعار عميل" },
-    { id: 4, src: "/images/client3.jpeg", alt: "شعار عميل" },
-    // { id: 5, src: "/images/client3.jpeg", alt: "شعار عميل" }
-  ];
-
+const ClientsSlider = ({ clients, onClientClick }) => {
   const [activeIndex, setActiveIndex] = useState(1);
-  const maxVisibleLogos = 3; // عدد العملاء المعروضين
+  const maxVisibleLogos = 3;
 
   const nextClient = () => {
-    setActiveIndex((prevIndex) => (prevIndex + 1) % clientLogos.length);
+    setActiveIndex((prevIndex) => (prevIndex + 1) % clients.length);
   };
 
   const prevClient = () => {
-    setActiveIndex((prevIndex) => (prevIndex - 1 + clientLogos.length) % clientLogos.length);
+    setActiveIndex((prevIndex) => (prevIndex - 1 + clients.length) % clients.length);
   };
 
-  // التهيئة الأولية والتحديث التلقائي
   useEffect(() => {
-    const interval = setInterval(nextClient, 3000);
-    return () => clearInterval(interval);
-  }, []);
+    if (clients.length > 0) {
+      const interval = setInterval(nextClient, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [clients]);
 
-  // إنشاء مصفوفة معدلة للعرض مع تطبيق النمط الدائري
   const getVisibleLogos = () => {
+    if (clients.length === 0) return [];
+    
     let visibleLogos = [];
     
     for (let i = 0; i < maxVisibleLogos; i++) {
-      const index = (activeIndex + i) % clientLogos.length;
+      const index = (activeIndex + i) % clients.length;
       visibleLogos.push({
-        ...clientLogos[index],
-        isActive: i === 1 // العنصر الأوسط هو النشط
+        ...clients[index],
+        isActive: i === 1
       });
     }
     
@@ -198,28 +197,35 @@ const ClientsSlider = () => {
         <div className="clients-box">
           <h3 className="clients-title">عملاؤنا المميزون</h3>
 
-          <div className="clients-slider-container">
-            <button className="client-nav-btn prev-btn" onClick={prevClient}>
-              <FaChevronRight />
-            </button>
-            
-            <div className="clients-slider">
-              <div className="clients-track">
-                {getVisibleLogos().map((logo) => (
-                  <div 
-                    key={logo.id} 
-                    className={`client-logo ${logo.isActive ? 'active' : 'inactive'}`}
-                  >
-                    <img src={logo.src} alt={logo.alt} />
-                  </div>
-                ))}
+          {clients.length > 0 ? (
+            <div className="clients-slider-container">
+              <button className="client-nav-btn prev-btn" onClick={prevClient}>
+                <FaChevronRight />
+              </button>
+              
+              <div className="clients-slider">
+                <div className="clients-track">
+                  {getVisibleLogos().map((client) => (
+                    <div 
+                      key={client.id} 
+                      className={`client-logo ${client.isActive ? 'active' : 'inactive'}`}
+                      onClick={() => onClientClick && onClientClick(client)}
+                    >
+                      <img src={client.logo} alt={client.name} />
+                    </div>
+                  ))}
+                </div>
               </div>
+              
+              <button className="client-nav-btn next-btn" onClick={nextClient}>
+                <FaChevronLeft />
+              </button>
             </div>
-            
-            <button className="client-nav-btn next-btn" onClick={nextClient}>
-              <FaChevronLeft />
-            </button>
-          </div>
+          ) : (
+            <div className="no-clients">
+              <p>لا توجد بيانات للعملاء في الوقت الحالي</p>
+            </div>
+          )}
 
           <p className="clients-subtitle">
             نفتخر بشراكتنا مع أكبر الشركات العقارية في المملكة
@@ -230,19 +236,26 @@ const ClientsSlider = () => {
   );
 };
 
-function Home({ onLoginClick }) { // إضافة onLoginClick كـ prop
-  const { currentUser } = useAuth(); // الحصول على currentUser من context
-  const navigate = useNavigate(); // استخدام useNavigate للتنقل
+function Home({ onLoginClick }) {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+    const [showLoginModal, setShowLoginModal] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [lands, setLands] = useState([]);
   const [auctions, setAuctions] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [clients, setClients] = useState([]);
+  const [isLoading, setIsLoading] = useState({
+    lands: false,
+    auctions: false,
+    clients: false
+  });
   const [showFilter, setShowFilter] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
-const [touchEnd, setTouchEnd] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage] = useState(6);
-   const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeService, setActiveService] = useState('large-lands');
@@ -260,35 +273,168 @@ const [touchEnd, setTouchEnd] = useState(null);
     endDate: '',
     maxDaysLeft: ''
   });
+  const [filtersApplied, setFiltersApplied] = useState([]);
 
-  // حساب العناصر المعروضة
+  // دوال جلب البيانات من الـ APIs
+  const fetchLands = async () => {
+    setIsLoading(prev => ({ ...prev, lands: true }));
+    try {
+      const response = await fetch('https://shahin-tqay.onrender.com/api/properties/properties/latest');
+      const data = await response.json();
+      
+      if (data.status && data.data) {
+        const formattedLands = data.data.map(land => ({
+          id: land.id,
+          img: land.cover_image ? `https://shahin-tqay.onrender.com/storage/${land.cover_image}` : null,
+          title: land.title,
+          location: `${land.region}، ${land.city}`,
+          price: land.price_per_sqm ? `${parseFloat(land.price_per_sqm).toLocaleString()}` : 'غير محدد',
+          area: land.total_area,
+          landType: land.land_type,
+          purpose: land.purpose,
+          status: land.status
+        }));
+        setLands(formattedLands);
+        setFiltersApplied(data.filters_applied || []);
+      }
+    } catch (error) {
+      console.error('Error fetching lands:', error);
+    } finally {
+      setIsLoading(prev => ({ ...prev, lands: false }));
+    }
+  };
+
+  const fetchAuctions = async () => {
+    setIsLoading(prev => ({ ...prev, auctions: true }));
+    try {
+      const response = await fetch('https://shahin-tqay.onrender.com/api/properties/auctions/latest');
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        const formattedAuctions = data.data.map(auction => {
+          const auctionDate = new Date(auction.auction_date);
+          const today = new Date();
+          const daysLeft = Math.ceil((auctionDate - today) / (1000 * 60 * 60 * 24));
+          
+          return {
+            id: auction.id,
+            img: auction.cover_image ? `https://shahin-tqay.onrender.com/storage/${auction.cover_image}` : null,
+            title: auction.title,
+            location: auction.address,
+            startPrice: "1,200,000", // يمكن تعديله حسب البيانات الفعلية
+            currentBid: "1,550,000", // يمكن تعديله حسب البيانات الفعلية
+            area: "800", // يمكن تعديله حسب البيانات الفعلية
+            endDate: auction.auction_date,
+            auctionCompany: auction.company?.auction_name || 'شركة المزاد',
+            bidders: Math.floor(Math.random() * 50) + 10, // رقم عشوائي للمثال
+            daysLeft: daysLeft > 0 ? daysLeft : 0
+          };
+        });
+        setAuctions(formattedAuctions);
+      }
+    } catch (error) {
+      console.error('Error fetching auctions:', error);
+    } finally {
+      setIsLoading(prev => ({ ...prev, auctions: false }));
+    }
+  };
+
+  const fetchClients = async () => {
+    setIsLoading(prev => ({ ...prev, clients: true }));
+    try {
+      const response = await fetch('https://shahin-tqay.onrender.com/api/clients/Featured');
+      const data = await response.json();
+      
+      if (Array.isArray(data)) {
+        const formattedClients = data.map(client => ({
+          id: client.id,
+          name: client.name,
+          logo: client.logo,
+          website: client.website
+        }));
+        setClients(formattedClients);
+      }
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+    } finally {
+      setIsLoading(prev => ({ ...prev, clients: false }));
+    }
+  };
+
+  // جلب البيانات عند تحميل المكون
+  useEffect(() => {
+    fetchLands();
+    fetchAuctions();
+    fetchClients();
+  }, []);
+
+  // تطبيق الفلاتر
+  const applyFilters = () => {
+    if (filterType === 'lands') {
+      fetchLands(); // في التطبيق الحقيقي، نرسل معاملات الفلتر إلى الـ API
+    } else {
+      fetchAuctions(); // في التطبيق الحقيقي، نرسل معاملات الفلتر إلى الـ API
+    }
+    setShowFilter(false);
+  };
+
+  // دوال التنقل بين الصفحات
+  const nextCard = () => {
+    setActiveTab((prev) => (prev === cardsData.length - 1 ? 0 : prev + 1));
+  };
+
+  const prevCard = () => {
+    setActiveTab((prev) => (prev === 0 ? cardsData.length - 1 : prev - 1));
+  };
+
+  // العناصر الحالية للعرض
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
   const displayedItems = filterType === 'lands' ? lands : auctions;
+  const currentItems = displayedItems.slice(startIndex, endIndex);
+
+  // معالجة النقر على العميل
+  const handleClientClick = (client) => {
+    if (client.website) {
+      window.open(client.website, '_blank');
+    }
+  };
+
+  // معالجة النقر على الأرض أو المزاد
+  const handlePropertyClick = (id) => {
+    if (filterType === 'lands') {
+      navigate(`/property/${id}`);
+    } else {
+      navigate(`/auction/${id}`);
+    }
+  };
 
   const minSwipeDistance = 50;
 
-const handleTouchStart = (e) => {
-  setTouchEnd(null);
-  setTouchStart(e.targetTouches[0].clientX);
-};
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
 
-const handleTouchMove = (e) => {
-  setTouchEnd(e.targetTouches[0].clientX);
-};
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
 
-const handleTouchEnd = () => {
-  if (!touchStart || !touchEnd) return;
-  
-  const distance = touchStart - touchEnd;
-  const isLeftSwipe = distance > minSwipeDistance;
-  const isRightSwipe = distance < -minSwipeDistance;
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
 
-  if (isLeftSwipe) {
-    nextCard();
-  } else if (isRightSwipe) {
-    prevCard();
-  }
-};
-    const cardsData = [
+    if (isLeftSwipe) {
+      nextCard();
+    } else if (isRightSwipe) {
+      prevCard();
+    }
+  };
+
+  const cardsData = [
     {
       id: 1,
       title: "الريادة في السوق",
@@ -357,115 +503,6 @@ const handleTouchEnd = () => {
     }
   ];
 
-  // دوال التنقل بين الصفحات
-   const nextCard = () => {
-    setActiveTab((prev) => (prev === cardsData.length - 1 ? 0 : prev + 1));
-  };
-
-  const prevCard = () => {
-    setActiveTab((prev) => (prev === 0 ? cardsData.length - 1 : prev - 1));
-  };
-
-  // العناصر الحالية للعرض
-  const startIndex = currentPage * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = displayedItems.slice(startIndex, endIndex);
-
-  // محاكاة جلب البيانات
-  useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      // بيانات الأراضي
-      setLands([
-        {
-          id: 1,
-          img: "",
-          title: "أرض سكنية مميزة",
-          location: "الرياض، حي النرجس",
-          price: "1,800,000",
-          area: "600",
-          landType: "سكني",
-          purpose: "بيع",
-        },
-        {
-          id: 2,
-          img: "",
-          title: "أرض تجارية على طريق الملك فهد",
-          location: "الرياض، طريق الملك فهد",
-          price: "3,200,000",
-          area: "1200",
-          landType: "تجاري",
-          purpose: "استثمار",
-        },
-        {
-          id: 3,
-          img: "",
-          title: "مزرعة استثمارية",
-          location: "الخرج، طريق المزارع",
-          price: "4,500,000",
-          area: "5000",
-          landType: "زراعي",
-          purpose: "استثمار",
-        },
-        {
-          id: 4,
-          img: "",
-          title: "أرض صناعية",
-          location: "الدمام، المدينة الصناعية",
-          price: "2,800,000",
-          area: "3000",
-          landType: "صناعي",
-          purpose: "بيع",
-        }
-      ]);
-
-      // بيانات المزادات
-      setAuctions([
-        {
-          id: 1,
-          img: "",
-          title: "أرض سكنية بموقع استراتيجي",
-          location: "جدة، حي الصفا",
-          startPrice: "1,200,000",
-          currentBid: "1,550,000",
-          area: "800",
-          endDate: "2024-12-30",
-          auctionCompany: "شركة الرياض للمزادات",
-          bidders: 24,
-          daysLeft: 15
-        },
-        {
-          id: 2,
-          img: "",
-          title: "مجمع تجاري متكامل",
-          location: "الدمام، حي الفيصلية",
-          startPrice: "5,000,000",
-          currentBid: "6,200,000",
-          area: "2000",
-          endDate: "2024-12-28",
-          auctionCompany: "شركة الشرقية للمزادات",
-          bidders: 32,
-          daysLeft: 12
-        },
-        {
-          id: 3,
-          img: "",
-          title: "أرض زراعية استثمارية",
-          location: "الخرج، المزارع",
-          startPrice: "3,500,000",
-          currentBid: "4,100,000",
-          area: "10000",
-          endDate: "2024-12-25",
-          auctionCompany: "مزاد العقار الإلكتروني",
-          bidders: 18,
-          daysLeft: 8
-        }
-      ]);
-
-      setIsLoading(false);
-    }, 1000);
-  }, []);
-
   // تغيير الشرائح للصور الخلفية
   useEffect(() => {
     const interval = setInterval(() => {
@@ -474,10 +511,18 @@ const handleTouchEnd = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log("البحث عن:", searchTerm);
-  };
+const handleSearch = (e) => {
+  e.preventDefault();
+  console.log("البحث عن:", searchTerm);
+  
+  // نقل إلى صفحة PropertiesPage مع قيمة البحث
+  navigate('/properties', { 
+    state: { 
+      searchQuery: searchTerm,
+      searchFromHome: true
+    }
+  });
+};
 
   const handleLandFilterChange = (field, value) => {
     setLandFilter(prev => ({
@@ -515,34 +560,32 @@ const handleTouchEnd = () => {
       ]
     }
   };
+  const handleSellLandClick = () => {
+    if (currentUser) {
+      // إذا كان المستخدم مسجلاً، التحويل إلى صفحة إضافة عقار
+      navigate('/my-ads');
+    } else {
+      // إذا لم يكن مسجلاً، عرض نموذج تسجيل الدخول
+      setShowLoginModal(true);
+    }
+  };
+
+  // دالة لإغلاق نموذج تسجيل الدخول
+  const handleCloseLogin = () => {
+    setShowLoginModal(false);
+  };
+
+  // دالة للتبديل إلى التسجيل (اختيارية)
+  const handleSwitchToRegister = () => {
+    setShowLoginModal(false);
+    // يمكنك إضافة منطق لعرض نموذج التسجيل هنا إذا كان لديك
+    navigate('/register');
+  };
 
   return (
     <div className="home-page">
-      {/* شريط العملاء المتحرك */}
-      {/* <div className="client-ticker">
-        <div className="ticker-content">
-          <div className="ticker-item">
-            <FaReact className="react-icon" />
-            <span>عملاؤنا مستمرون في الثقة بخدماتنا منذ أكثر من 15 عاماً</span>
-          </div>
-          <div className="ticker-item">
-            <FaReact className="react-icon" />
-            <span>أكثر من 5000 عميل راضٍ عن خدماتنا العقارية المتميزة</span>
-          </div>
-          <div className="ticker-item">
-            <FaReact className="react-icon" />
-            <span>شركاء النجاح مع أكبر شركات التطوير العقاري في المملكة</span>
-          </div>
-          <div className="ticker-item">
-            <FaReact className="react-icon" />
-            <span>نفخر بتقديم خدمات عقارية متكاملة بمعايير عالمية</span>
-          </div>
-        </div>
-      </div> */}
-
-            {/* قسم الهيرو مع خلفية متحركة */}
+      {/* قسم الهيرو مع خلفية متحركة */}
       <section className="hero-section" id="home">
-        {/* 🔹 الشريط المتحرك أصبح داخل قسم الهيرو */}
         <div className="client-ticker">
           <div className="ticker-content">
             <div className="ticker-item">
@@ -564,7 +607,6 @@ const handleTouchEnd = () => {
           </div>
         </div>
 
-
         <div className={`hero-background slide-${currentSlide}`}></div>
 
         <div className="hero-content container">
@@ -577,39 +619,34 @@ const handleTouchEnd = () => {
 
           <p>منصة متكاملة لشراء وبيع الأراضي والعقارات عبر مزادات إلكترونية آمنة وموثوقة</p>
 
-            <div className="search-filter">
-                  <form onSubmit={handleSearch} className="filter-form">
-                    <div className="filter-group">
-                      <FaSearch className="search-icon" />
-                      <input
-                        type="text"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                      <span className="typing-placeholder"></span>
-                    </div>
-                    <button type="submit" className="search-submit">بحث</button>
-                  </form>
-                </div>
+       <div className="search-filter">
+  <form onSubmit={handleSearch} className="filter-form">
+    <div className="filter-group">
+      <FaSearch className="search-icon" />
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="ابحث عن عقار أو مزاد..."
+      />
+    </div>
+    <button type="submit" className="search-submit">بحث</button>
+  </form>
+</div>
           
           {/* الأزرار خارج إطار البحث */}
           <div className="hero-buttons">
-            <button 
-              className="hero-btn primary-btn"
-              onClick={() => {
-                if (currentUser) {
-                  navigate('/create-listing');
-                } else {
-                  onLoginClick();
-                }
-              }}
-            >
-              <FaBullhorn className="btn-icon" />
-              <span className="btn-text">اعرض أرضك للبيع</span>
-            </button>
+        <button 
+        className="hero-btn primary-btn"
+        onClick={handleSellLandClick}
+      >
+        <FaBullhorn className="btn-icon" />
+        <span className="btn-text">اعرض أرضك للبيع</span>
+      </button>
+
             <button 
               className="hero-btn secondary-btn"
-              onClick={() => navigate('/investments')}
+              onClick={() => navigate('/Properties')}
             >
               <FaSearchDollar className="btn-icon" />
               <span className="btn-text">ابحث عن استثمار</span>
@@ -619,96 +656,92 @@ const handleTouchEnd = () => {
       </section>
 
       {/* قسم العملاء - المربع الفاصل */}
-      <ClientsSlider />
-
-  <section className="services-section">
-  <div className="container">
-    <h2 className="section-title">
-      استكشفوا خدماتنا
-      <div className="transparent-box"></div>
-    </h2>
+      <ClientsSlider clients={clients} onClientClick={handleClientClick} />
     
-    {/* مؤشر الخدمات للهاتف */}
-    <div className="mobile-service-indicator">
-      <div className="indicator-dots">
-        <span className={activeService === 'large-lands' ? 'active' : ''}></span>
-        <span className={activeService === 'auction-partnership' ? 'active' : ''}></span>
-      </div>
-    </div>
-
-    <div className="services-content">
-      {/* القائمة الجانبية (تظهر في الكمبيوتر فقط) */}
-      <div className="services-list">
-        <ul>
-          <li
-            className={activeService === 'large-lands' ? 'active' : ''}
-            onClick={() => setActiveService('large-lands')}
-          >
-            <FaLandmark className="service-icon" />
-            الأراضي الكبيرة
-          </li>
-          <li
-            className={activeService === 'auction-partnership' ? 'active' : ''}
-            onClick={() => setActiveService('auction-partnership')}
-          >
-            <FaGavel className="service-icon" />
-            شراكة مميزة مع شركات المزادات
-          </li>
-        </ul>
-      </div>
-
-      {/* البطاقة الرئيسية */}
-      <div className="service-details">
-        {/* رأس البطاقة مع الأيقونة */}
-        <div className="service-header">
-          <div className="service-icon-container">
-            {activeService === 'large-lands' ? 
-              <FaLandmark className="main-service-icon" /> : 
-              <FaGavel className="main-service-icon" />
-            }
-          </div>
-          <h3>{servicesData[activeService].title}</h3>
-        </div>
-
-        <p>{servicesData[activeService].description}</p>
-        
-        <ul className="sub-services">
-          {servicesData[activeService].features.map((feature, index) => (
-            <li key={index}>
-              <FaCheck className="check-icon" />
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
-        
-        <div className="service-actions">
-          <button className={`learn-more ${activeService === 'auction-partnership' ? 'auction-btn' : ''}`}>
-            <span className="arrow">←</span>
-            {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
-          </button>
+      {/* قسم الخدمات */}
+      <section className="services-section">
+        <div className="container">
+          <h2 className="section-title">
+            استكشفوا خدماتنا
+            <div className="transparent-box"></div>
+          </h2>
           
-          {/* أزرار التنقل للهاتف */}
-          <div className="mobile-nav">
-            <button 
-              className="mobile-nav-btn prev" 
-              onClick={() => setActiveService('large-lands')}
-              disabled={activeService === 'large-lands'}
-            >
-              <FaChevronRight />
-            </button>
-            <button 
-              className="mobile-nav-btn next" 
-              onClick={() => setActiveService('auction-partnership')}
-              disabled={activeService === 'auction-partnership'}
-            >
-              <FaChevronLeft />
-            </button>
+          <div className="mobile-service-indicator">
+            <div className="indicator-dots">
+              <span className={activeService === 'large-lands' ? 'active' : ''}></span>
+              <span className={activeService === 'auction-partnership' ? 'active' : ''}></span>
+            </div>
+          </div>
+
+          <div className="services-content">
+            <div className="services-list">
+              <ul>
+                <li
+                  className={activeService === 'large-lands' ? 'active' : ''}
+                  onClick={() => setActiveService('large-lands')}
+                >
+                  <FaLandmark className="service-icon" />
+                  الأراضي الكبيرة
+                </li>
+                <li
+                  className={activeService === 'auction-partnership' ? 'active' : ''}
+                  onClick={() => setActiveService('auction-partnership')}
+                >
+                  <FaGavel className="service-icon" />
+                  شراكة مميزة مع شركات المزادات
+                </li>
+              </ul>
+            </div>
+
+            <div className="service-details">
+              <div className="service-header">
+                <div className="service-icon-container">
+                  {activeService === 'large-lands' ? 
+                    <FaLandmark className="main-service-icon" /> : 
+                    <FaGavel className="main-service-icon" />
+                  }
+                </div>
+                <h3>{servicesData[activeService].title}</h3>
+              </div>
+
+              <p>{servicesData[activeService].description}</p>
+              
+              <ul className="sub-services">
+                {servicesData[activeService].features.map((feature, index) => (
+                  <li key={index}>
+                    <FaCheck className="check-icon" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="service-actions">
+                <button className={`learn-more ${activeService === 'auction-partnership' ? 'auction-btn' : ''}`}>
+                  <span className="arrow">←</span>
+                  {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
+                </button>
+                
+                <div className="mobile-nav">
+                  <button 
+                    className="mobile-nav-btn prev" 
+                    onClick={() => setActiveService('large-lands')}
+                    disabled={activeService === 'large-lands'}
+                  >
+                    <FaChevronRight />
+                  </button>
+                  <button 
+                    className="mobile-nav-btn next" 
+                    onClick={() => setActiveService('auction-partnership')}
+                    disabled={activeService === 'auction-partnership'}
+                  >
+                    <FaChevronLeft />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* قسم العقارات المحدث مع الفلاتر */}
       <section className="properties-section" id="properties">
@@ -718,6 +751,11 @@ const handleTouchEnd = () => {
               العقارات المتاحة
               <div className="transparent-box"></div>
             </h2>
+            {filtersApplied.length > 0 && (
+              <div className="filters-applied">
+                <span>الفلاتر المطبقة: {filtersApplied.join('، ')}</span>
+              </div>
+            )}
           </div>
 
           {/* شريط التبويب مع زر الفلتر */}
@@ -880,7 +918,7 @@ const handleTouchEnd = () => {
               )}
 
               <div className="filter-actions">
-                <button className="filter-btn">تطبيق الفلتر</button>
+                <button className="filter-btn" onClick={applyFilters}>تطبيق الفلتر</button>
                 <button
                   className="reset-btn"
                   onClick={() => {
@@ -908,44 +946,80 @@ const handleTouchEnd = () => {
             </div>
           </div>
 
-          {/* عرض البطاقات مع عناصر التحكم */}
+          {/* عرض البطاقات */}
           <div className="properties-container">
-            {/* <div className="properties-nav-container">
-              <button className="property-nav-btn prev-btn" onClick={prevPage}>
-                <FaChevronRight />
-              </button> */}
-
-              {/* <div className="properties-header-mobile">
-                <span className="properties-count">
-                  عرض {startIndex + 1}-{Math.min(endIndex, displayedItems.length)} من {displayedItems.length}
-                </span>
-              </div> */}
-
-              {/* <button className="property-nav-btn next-btn" onClick={nextPage}>
-                <FaChevronLeft />
-              </button> */}
-            {/* </div> */}
-
-            {isLoading ? (
+            {isLoading.lands || isLoading.auctions ? (
               <div className="loading">
                 <div className="loading-spinner"></div>
-                جاري تحميل العقارات...
+                {filterType === 'lands' ? 'جاري تحميل الأراضي...' : 'جاري تحميل المزادات...'}
               </div>
             ) : (
-              <div className="properties-grid">
-                {currentItems.map(item => (
-                  filterType === 'lands' ? (
-                    <LandCard key={item.id} {...item} />
+              <>
+                <div className="properties-grid">
+                  {currentItems.length > 0 ? (
+                    currentItems.map(item => (
+                      filterType === 'lands' ? (
+                        <LandCard 
+                          key={item.id} 
+                          {...item} 
+                          onClick={handlePropertyClick}
+                        />
+                      ) : (
+                        <AuctionCard 
+                          key={item.id} 
+                          {...item} 
+                          onClick={handlePropertyClick}
+                        />
+                      )
+                    ))
                   ) : (
-                    <AuctionCard key={item.id} {...item} />
-                  )
-                ))}
-              </div>
+                    <div className="no-data">
+                      <p>لا توجد {filterType === 'lands' ? 'أراضي' : 'مزادات'} متاحة في الوقت الحالي</p>
+                    </div>
+                  )}
+                </div>
+
+                {displayedItems.length > itemsPerPage && (
+                  <div className="pagination">
+                    <button 
+                      className="pagination-btn"
+                      disabled={currentPage === 0}
+                      onClick={() => setCurrentPage(prev => prev - 1)}
+                    >
+                      السابق
+                    </button>
+                    <span>الصفحة {currentPage + 1}</span>
+                    <button 
+                      className="pagination-btn"
+                      disabled={endIndex >= displayedItems.length}
+                      onClick={() => setCurrentPage(prev => prev + 1)}
+                    >
+                      التالي
+                    </button>
+                  </div>
+                )}
+              </>
             )}
 
             <div className="view-all">
-              <button className="view-all-btn">عرض الكل</button>
-            </div>
+  <button 
+    className="view-all-btn"
+    onClick={() => {
+      if (filterType === 'lands') {
+        navigate('/properties');
+      } else {
+        // الانتقال إلى صفحة PropertiesPage مع تحديد تبويب المزادات
+        navigate('/properties', { 
+          state: { 
+            activeTab: 'auctions'
+          }
+        });
+      }
+    }}
+  >
+    عرض الكل
+  </button>
+</div>
           </div>
         </div>
       </section>
@@ -1059,6 +1133,7 @@ const handleTouchEnd = () => {
     </div>
   </div>
 </section>
+ 
       {/* قسم اتصل بنا */}
      {/* قسم الاستشارة */}
 <section className="consultation-section" id="consultation">
@@ -1180,6 +1255,12 @@ const handleTouchEnd = () => {
           </div>
         </div>
       </section> */}
+        {showLoginModal && (
+        <Login 
+          onClose={handleCloseLogin}
+          onSwitchToRegister={handleSwitchToRegister}
+        />
+      )}
     </div>
   );
 };

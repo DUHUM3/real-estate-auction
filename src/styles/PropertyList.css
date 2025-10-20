@@ -434,11 +434,14 @@ button {
   padding: 16px;
 }
 
-.elegantFilters_grid {
+/* .elegantFilters_grid {
   display: grid;
+    top: 30px;
+
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-}
+
+} */
 
 .elegantFilter_group {
   display: flex;
@@ -598,11 +601,12 @@ button {
 /* Loading and Error */
 .elegantLoading_container,
 .elegantError_container {
-  padding: 40px 20px;
+  padding: 130px 110px;
+  /* top: 90px; */
   text-align: center;
-  background-color: var(--elegant-bg-white);
-  border-radius: var(--elegant-radius-md);
-  box-shadow: var(--elegant-shadow-sm);
+  /* background-color: var(--elegant-bg-white); */
+  /* border-radius: var(--elegant-radius-md); */
+  /* box-shadow: var(--elegant-shadow-sm); */
 }
 
 .elegantLoader {
@@ -809,4 +813,293 @@ button {
   .elegantProperty_card {
     margin: 0 20px;
   }
+}
+/* إضافة هذه الأنماط إلى ملف CSS الحالي */
+
+/* Auction Cards */
+.elegantAuctions_grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+
+  margin-bottom: 20px;
+}
+
+.elegantAuction_card {
+  background-color: var(--elegant-bg-white);
+  border-radius: var(--elegant-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--elegant-shadow-sm);
+  transition: all var(--elegant-transition);
+  position: relative;
+  cursor: pointer;
+      top: 70px;
+
+  border: 1px solid var(--elegant-border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0 8px;
+}
+
+.elegantAuction_card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--elegant-shadow-md);
+}
+
+.elegantAuction_image {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+
+.elegantAuction_image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.elegantAuction_card:hover .elegantAuction_image img {
+  transform: scale(1.05);
+}
+
+.elegantAuction_details {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.elegantAuction_details h3 {
+  font-size: 1rem;
+  margin: 0 0 4px 0;
+  color: var(--elegant-primary);
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.elegantAuction_company {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--elegant-text-light);
+  background: var(--elegant-secondary-light);
+  padding: 4px 8px;
+  border-radius: var(--elegant-radius-sm);
+  border: 1px solid rgba(255, 183, 3, 0.3);
+}
+
+.elegantAuction_company svg {
+  color: var(--elegant-secondary);
+  font-size: 0.8rem;
+}
+
+.elegantAuction_location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--elegant-text-light);
+}
+
+.elegantAuction_location svg {
+  color: var(--elegant-secondary);
+  font-size: 0.8rem;
+}
+
+.elegantAuction_schedule {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  padding: 8px 0;
+  border-top: 1px solid var(--elegant-border);
+  border-bottom: 1px solid var(--elegant-border);
+}
+
+.elegantSchedule_item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--elegant-primary);
+}
+
+.elegantSchedule_item svg {
+  color: var(--elegant-accent);
+  font-size: 0.75rem;
+}
+
+.elegantAuction_description {
+  font-size: 0.85rem;
+  color: var(--elegant-text-light);
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.elegantAuction_actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Status Badges للاستخدامات الجديدة */
+.elegantStatus_closed {
+  background-color: #6b7280;
+  color: white;
+}
+
+.elegantStatus_pending {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.elegantStatus_unknown {
+  background-color: #9ca3af;
+  color: white;
+}
+
+/* تحسينات للتاريخ في الفلاتر */
+.elegantFilter_group input[type="date"] {
+  font-family: inherit;
+  direction: ltr;
+  text-align: right;
+}
+
+.elegantFilter_group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}
+
+/* تحسينات للشبكة في الشاشات الكبيرة */
+@media (min-width: 768px) {
+  .elegantAuctions_grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .elegantAuction_image {
+    height: 180px;
+  }
+  
+  .elegantAuction_card {
+    margin: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .elegantAuctions_grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  
+  .elegantAuction_image {
+    height: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .elegantAuction_details {
+    padding: 12px;
+  }
+  
+  .elegantAuction_details h3 {
+    font-size: 0.9rem;
+  }
+  
+  .elegantAuction_image {
+    height: 140px;
+  }
+  
+  .elegantAuction_schedule {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .elegantAuction_description {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .elegantAuction_image {
+    height: 120px;
+  }
+  
+  .elegantAuction_details h3 {
+    font-size: 0.85rem;
+  }
+  
+  .elegantAuction_company,
+  .elegantAuction_location,
+  .elegantSchedule_item {
+    font-size: 0.75rem;
+  }
+  
+  .elegantAuction_card {
+    margin: 0 20px;
+  }
+}
+
+/* تحسينات للفلاتر في وضع المزادات */
+.elegantFilters_grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .elegantFilters_grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .elegantFilters_grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .elegantFilters_grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* تحسينات للبحث في المزادات */
+.elegantSearch_input input {
+  width: 100%;
+  padding: 12px 36px 12px 12px;
+  border-radius: var(--elegant-radius-md);
+  border: 1px solid var(--elegant-border);
+  font-size: 0.9rem;
+  transition: all var(--elegant-transition);
+  background: var(--elegant-bg-white);
+}
+
+.elegantSearch_input input:focus {
+  outline: none;
+  border-color: var(--elegant-secondary);
+  box-shadow: 0 0 0 2px var(--elegant-secondary-light);
+}
+
+/* تحسينات للبطاقات بشكل عام */
+.elegantProperty_card,
+.elegantAuction_card {
+  transition: all 0.3s ease;
+}
+
+.elegantProperty_card:hover,
+.elegantAuction_card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }

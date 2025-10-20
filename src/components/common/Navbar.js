@@ -35,9 +35,12 @@ function Navbar({ onLoginClick, onRegisterClick }) {
   const isLandOwner = () => {
     return currentUser?.user_type === 'مالك أرض';
   };
+   const isPropertyOwner = () => {
+    return currentUser?.user_type === 'وكيل عقارات';
+  };
 
   const isInvestor = () => {
-    return currentUser?.user_type === 'مستثمر';
+    return currentUser?.user_type === 'شركة مزادات';
   };
 
   // إغلاق القوائم عند النقر خارجها
@@ -279,7 +282,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                     )}
                     
                     {/* إذا كان مالك أرض أو مستثمر يعرض "عروضي" */}
-                    {(isLandOwner() || isInvestor()) && (
+                    {(isLandOwner() || isInvestor() || isPropertyOwner()) && (
                       <Link 
                         to="/my-offers" 
                         className="dropdown-item"
@@ -471,7 +474,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                 )}
 
                 {/* إذا كان مالك أرض أو مستثمر يعرض "عروضي" */}
-                {(isLandOwner() || isInvestor()) && (
+                {(isLandOwner() || isInvestor() || isPropertyOwner()) && (
                   <Link 
                     to="/my-offers" 
                     className="mobile-nav-link"

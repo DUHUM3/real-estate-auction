@@ -220,8 +220,8 @@ function Profile() {
   if (loading) {
     return (
       <div className="profileMaster-container">
-        <div className="profileLoading-container">
-          <div className="profileSpinner"></div>
+        <div className="elegantLoading_container">
+          <div className="elegantLoader"></div>
           <p>جاري تحميل البيانات...</p>
         </div>
       </div>
