@@ -107,7 +107,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
     }
     
     if (type === 'buy-land') {
-      navigate('/create-buy-request');
+      navigate('/land-requests');
     } else if (type === 'market-property') {
       navigate('/create-marketing-request');
     } else if (type === 'market-land') {
@@ -132,10 +132,21 @@ function Navbar({ onLoginClick, onRegisterClick }) {
         {/* الجزء الأيمن: الشعار + القوائم الرئيسية */}
         <div className="nav-right-section">
           {/* الشعار */}
-          <Link to="/" className="nav-logo" onClick={handleCloseMenu}>
-            <span className="logo-text">LOGO</span>
-          </Link>
-
+        {/* الشعار */}
+<Link to="/" className="nav-logo" onClick={handleCloseMenu}>
+  <img 
+    src="images/logo3.png" 
+    alt="Logo" 
+    className="logo-image"
+  />
+</Link>
+<Link to="/" className="nav-logo" onClick={handleCloseMenu}>
+  <img 
+    src="images/text.png" 
+    alt="Logo" 
+    className="logo-image"
+  />
+</Link>
           {/* القوائم الرئيسية - تظهر في الشريط العلوي */}
           <div className="nav-buttons-group">
             {/* الرئيسية */}

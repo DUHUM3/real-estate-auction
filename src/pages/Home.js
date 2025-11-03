@@ -619,20 +619,22 @@ const handleSearch = (e) => {
 
           <p>منصة متكاملة لشراء وبيع الأراضي والعقارات عبر مزادات إلكترونية آمنة وموثوقة</p>
 
-       <div className="search-filter">
-  <form onSubmit={handleSearch} className="filter-form">
-    <div className="filter-group">
-      <FaSearch className="search-icon" />
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="ابحث عن عقار أو مزاد..."
-      />
+   <div className="search-filter">
+      <form onSubmit={handleSearch} className="filter-form">
+        <div className="filter-group">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder=""
+          />
+          {/* نص البحث المتحرك بالـ CSS فقط */}
+          <div className="typing-placeholder"></div>
+        </div>
+        <button type="submit" className="search-submit">بحث</button>
+      </form>
     </div>
-    <button type="submit" className="search-submit">بحث</button>
-  </form>
-</div>
           
           {/* الأزرار خارج إطار البحث */}
           <div className="hero-buttons">
@@ -716,10 +718,10 @@ const handleSearch = (e) => {
               </ul>
               
               <div className="service-actions">
-                <button className={`learn-more ${activeService === 'auction-partnership' ? 'auction-btn' : ''}`}>
+                {/* <button className={`learn-more ${activeService === 'auction-partnership' ? 'auction-btn' : ''}`}>
                   <span className="arrow">←</span>
                   {activeService === 'large-lands' ? 'اعرض أرضك الكبيرة' : 'اعرض عقارك للمزاد'}
-                </button>
+                </button> */}
                 
                 <div className="mobile-nav">
                   <button 
@@ -1028,10 +1030,10 @@ const handleSearch = (e) => {
 <section className="why-us-section">
   <div className="container">
     <div className="section-header">
-      <h2 className="section-title">
+      {/* <h2 className="section-title">
         لماذا تختارنا؟
         <div className="transparent-box"></div>
-      </h2>
+      </h2> */}
     </div>
 
     {/* تصميم الكمبيوتر - بطاقة ملء الشاشة */}
@@ -1135,19 +1137,37 @@ const handleSearch = (e) => {
 </section>
  
       {/* قسم اتصل بنا */}
-     {/* قسم الاستشارة */}
-<section className="consultation-section" id="consultation">
+<section className="contact-section" id="contact">
   <div className="container">
     <div className="section-header">
       <h2 className="section-title">
-        هل تحتاج إلى استشارة؟
+        تواصل معنا
         <div className="transparent-box"></div>
       </h2>
-      <p>نحن هنا لمساعدتك في تحقيق أهدافك الاستثمارية</p>
+      {/* <p>نحن هنا لمساعدتك في تحقيق أهدافك الاستثمارية</p> */}
     </div>
 
-    <div className="consultation-form-container">
-      <form className="consultation-form">
+    <div className="contact-form-container">
+      <form className="contact-form">
+        {/* حقل سبب التواصل - تمت إضافته */}
+        <div className="form-group">
+          <label htmlFor="contact-reason">سبب التواصل *</label>
+          <select 
+            id="contact-reason" 
+            required
+            className="contact-select"
+          >
+            <option value="">اختر سبب التواصل</option>
+            <option value="استشارة عقارية">استشارة عقارية</option>
+            <option value="استفسار عن خدمة">استفسار عن خدمة</option>
+            <option value="شكوى أو اقتراح">شكوى أو اقتراح</option>
+            <option value="طلب شراء">طلب شراء</option>
+            <option value="طلب بيع">طلب بيع</option>
+            <option value="تعاون تجاري">تعاون تجاري</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+        </div>
+
         {/* حقل كيف يمكننا مساعدتك */}
         <div className="form-group">
           <label htmlFor="help">كيف يمكننا مساعدتك؟ *</label>
@@ -1231,8 +1251,8 @@ const handleSearch = (e) => {
           </div>
         </div>
 
-        <button type="submit" className="submit-consultation-btn">
-          إرسال طلب الاستشارة
+        <button type="submit" className="submit-contact-btn">
+          إرسال الرسالة
         </button>
       </form>
     </div>

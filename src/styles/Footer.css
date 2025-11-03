@@ -1,32 +1,44 @@
+/* ===== الفوتر المعدل ===== */
 .footer {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #1e4a6b 100%);
-  color: var(--background-white);
+  background: #ffffff;
+  color: #2c3e50;
   position: relative;
-  margin-top: 4rem;
+  margin-top: 0;
+  font-size: 0.9rem;
+  border-top: none;
 }
 
-/* الحواف المستديرة في الأعلى */
-.footer::before {
-  content: '';
+/* الموج في الأعلى */
+.footer-wave {
   position: absolute;
-  top: -20px;
+  top: -35px;
   left: 0;
-  right: 0;
-  height: 40px;
-  background: var(--background-white);
-  border-radius: 50% 50% 0 0;
-  box-shadow: var(--shadow-sm);
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  z-index: 1;
+}
+
+.footer-wave svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 35px;
+}
+
+.footer-wave .shape-fill {
+  fill: #ffffff;
 }
 
 .footer-container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 3rem 1.5rem 1.5rem;
+  padding: 3.5rem 1.5rem 1rem;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
-  gap: 2.5rem;
+  grid-template-columns: 1.5fr 1fr 1.2fr;
+  gap: 2rem;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* الشعار والوصف */
@@ -34,67 +46,67 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--secondary-color);
-  border-radius: var(--border-radius-md);
+  width: 35px;
+  height: 35px;
+  background: #3498db;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary-color);
-  font-size: 1.25rem;
+  color: white;
+  font-size: 1.1rem;
 }
 
 .logo-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--background-white);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
 }
 
 .footer-description {
-  color: rgba(255, 255, 255, 0.8);
+  color: #7f8c8d;
   line-height: 1.6;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
 }
 
 .social-links {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
 .social-link {
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--border-radius-md);
+  width: 32px;
+  height: 32px;
+  background: #f8f9fa;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--background-white);
+  color: #7f8c8d;
   text-decoration: none;
-  transition: all var(--transition-speed);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+  font-size: 0.9rem;
 }
 
 .social-link:hover {
-  background: var(--secondary-color);
-  color: var(--primary-color);
+  background: #3498db;
+  color: white;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  border-color: #3498db;
 }
 
 /* عناوين الأقسام */
 .footer-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 1.25rem;
-  color: var(--secondary-color);
+  margin-bottom: 1rem;
+  color: #2c3e50;
   position: relative;
   padding-bottom: 0.5rem;
 }
@@ -104,10 +116,10 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 40px;
+  width: 30px;
   height: 2px;
-  background: var(--secondary-color);
-  border-radius: var(--border-radius-sm);
+  background: #3498db;
+  border-radius: 2px;
 }
 
 /* روابط الفوتر */
@@ -118,105 +130,108 @@
 }
 
 .footer-links li {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
 }
 
 .footer-link {
-  color: rgba(255, 255, 255, 0.8);
+  color: #7f8c8d;
   text-decoration: none;
-  transition: all var(--transition-speed);
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  padding: 0.25rem 0;
+  font-size: 0.85rem;
+  padding: 0.2rem 0;
 }
 
 .footer-link:hover {
-  color: var(--secondary-color);
-  transform: translateX(-5px);
+  color: #3498db;
+  transform: translateX(-3px);
 }
 
 /* معلومات الاتصال */
 .contact-info {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .contact-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
+  gap: 0.6rem;
+  color: #7f8c8d;
+  font-size: 0.85rem;
 }
 
 .contact-icon {
-  color: var(--secondary-color);
-  font-size: 1rem;
-  min-width: 20px;
+  color: #3498db;
+  font-size: 0.9rem;
+  min-width: 16px;
 }
 
-/* الجزء السفلي */
+/* الجزء السفلي - صغير جداً */
 .footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1.5rem 0;
-  margin-top: 2rem;
+  border-top: 1px solid #e9ecef;
+  padding: 0.8rem 0;
+  margin-top: 1.5rem;
+  background: #f8f9fa;
 }
 
 .footer-bottom-container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .copyright {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.85rem;
+  color: #95a5a6;
+  font-size: 0.75rem;
   margin: 0;
 }
 
 .footer-bottom-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
 .bottom-link {
-  color: rgba(255, 255, 255, 0.7);
+  color: #95a5a6;
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: all var(--transition-speed);
+  gap: 0.3rem;
+  transition: all 0.3s ease;
 }
 
 .bottom-link:hover {
-  color: var(--secondary-color);
+  color: #3498db;
 }
 
 .link-icon {
-  font-size: 0.8rem;
+  font-size: 0.65rem;
 }
 
 /* التصميم المتجاوب للهواتف */
 @media (max-width: 768px) {
-  .footer-container {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 2.5rem 1rem 1rem;
+  .footer-wave {
+    top: -25px;
   }
 
-  .footer::before {
-    top: -15px;
-    height: 30px;
+  .footer-wave svg {
+    height: 25px;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 3rem 1rem 0.5rem;
   }
 
   .footer-logo {
@@ -228,7 +243,7 @@
 
   .footer-description {
     text-align: center;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .social-links {
@@ -244,51 +259,75 @@
     transform: translateX(50%);
   }
 
+  .footer-bottom {
+    padding: 0.6rem 0;
+  }
+
   .footer-bottom-container {
     flex-direction: column;
     text-align: center;
-    gap: 1rem;
+    gap: 0.4rem;
   }
 
   .footer-bottom-links {
     justify-content: center;
-    gap: 1rem;
+    gap: 0.8rem;
   }
 
   .contact-item {
     justify-content: center;
   }
+}
 
-  /* تحسينات إضافية للهواتف الصغيرة */
-  @media (max-width: 480px) {
-    .footer-container {
-      padding: 2rem 0.75rem 0.75rem;
-      gap: 1.5rem;
-    }
+/* تحسينات إضافية للهواتف الصغيرة */
+@media (max-width: 480px) {
+  .footer-container {
+    padding: 2.5rem 0.75rem 0.3rem;
+    gap: 1.2rem;
+  }
 
-    .footer::before {
-      top: -12px;
-      height: 24px;
-    }
+  .footer-wave {
+    top: -20px;
+  }
 
-    .social-links {
-      gap: 0.5rem;
-    }
+  .footer-wave svg {
+    height: 20px;
+  }
 
-    .social-link {
-      width: 32px;
-      height: 32px;
-      font-size: 0.9rem;
-    }
+  .social-links {
+    gap: 0.4rem;
+  }
 
-    .footer-bottom-links {
-      flex-direction: column;
-      gap: 0.75rem;
-    }
+  .social-link {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
 
-    .footer-link:hover {
-      transform: none;
-    }
+  .footer-bottom {
+    padding: 0.5rem 0;
+    margin-top: 1rem;
+  }
+
+  .footer-bottom-container {
+    padding: 0 0.75rem;
+  }
+
+  .footer-bottom-links {
+    flex-direction: row;
+    gap: 0.6rem;
+  }
+
+  .copyright {
+    font-size: 0.7rem;
+  }
+
+  .bottom-link {
+    font-size: 0.7rem;
+  }
+
+  .footer-link:hover {
+    transform: none;
   }
 }
 
@@ -302,7 +341,6 @@
 .footer-section:nth-child(1) { animation-delay: 0.1s; }
 .footer-section:nth-child(2) { animation-delay: 0.2s; }
 .footer-section:nth-child(3) { animation-delay: 0.3s; }
-.footer-section:nth-child(4) { animation-delay: 0.4s; }
 
 @keyframes fadeInUp {
   to {
@@ -314,6 +352,6 @@
 /* تحسينات للأجهزة ذات الشاشات الكبيرة */
 @media (min-width: 1200px) {
   .footer-container {
-    padding: 4rem 2rem 2rem;
+    padding: 4rem 2rem 1rem;
   }
 }

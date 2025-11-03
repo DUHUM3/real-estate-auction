@@ -3,11 +3,11 @@
 
 /* ===== الأساسيات ===== */
 :root {
-  --primary-color: #16354d;
+  --primary-color: #53a1dd;
   --secondary-color: #ffb703;
   --secondary-light: rgba(255, 183, 3, 0.15);
   --accent-color: #fb8500;
-  --text-color: #333;
+  --text-color: #333; 
   --text-light: #767676;
   --background-light: #f8f9fa;
   --background-white: #ffffff;
@@ -122,14 +122,14 @@ body {
 /* ===== قسم الهيرو ===== */
 .hero-section {
   position: relative;
-  height: 110vh; /* أطول قليلاً */
+  height: 110vh;
   overflow: hidden;
   color: white;
 }
 
 @media (max-width: 768px) {
   .hero-section {
-    height: 100vh !important; /* اختبار فقط */
+    height: 100vh !important;
   }
 }
 
@@ -147,30 +147,33 @@ body {
 
 /* ===== الصور ===== */
 .slide-2 {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+  background-image: linear-gradient(rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.20)),
     url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
 }
 
 .slide-0 {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+  background-image: linear-gradient(rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.20)),
     url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
 }
 
 .slide-1 {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+  background-image: linear-gradient(rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.10)),
     url('https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
 }
 
 /* ===== المحتوى ===== */
 .hero-content {
-  font-family: var(--font-ar); /* لتطبيق الخط العربي */
+  font-family: var(--font-ar);
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   padding-top: 60px;
-  animation: fadeInUp 1.3s ease both;
+  /* إزالة الحركة من الأسفل */
+  animation: none;
+  opacity: 1;
+  transform: none;
 }
 
 .hero-title-container {
@@ -185,11 +188,13 @@ body {
   color: white;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   letter-spacing: 0.5px;
-  animation: fadeIn 2s ease both;
+  /* إزالة الحركة */
+  animation: none;
+  opacity: 1;
 }
 
 .land-word {
-  color: var(--secondary-color);
+  color: var(--primary-color);
 }
 
 .hero-content p {
@@ -199,7 +204,9 @@ body {
   max-width: 600px;
   line-height: 1.8;
   opacity: 0.9;
-  animation: fadeIn 2.5s ease both;
+  /* إزالة الحركة */
+  animation: none;
+  opacity: 0.9;
 }
 
 /* ===== تصميم البحث العصري ===== */
@@ -211,7 +218,10 @@ body {
   padding: 16px 20px;
   backdrop-filter: blur(12px);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.35);
-  animation: fadeInUp 1.8s ease both;
+  /* إزالة الحركة من الأسفل */
+  animation: none;
+  opacity: 1;
+  transform: none;
   transition: all 0.3s ease;
 }
 
@@ -225,6 +235,7 @@ body {
   flex: 1;
   position: relative;
 }
+
 /* ===== إدخال البحث الناعم ===== */
 .filter-form input {
   width: 100%;
@@ -271,8 +282,9 @@ body {
 }
 
 .search-submit:hover {
-  background-color: #0f2d44;
+  background-color: white;
   transform: scale(1.05);
+  color: #53a1dd;
 }
 
 /* ===== النص المتحرك داخل حقل البحث ===== */
@@ -303,10 +315,10 @@ body {
 
 /* ===== تحسين الموبايل ===== */
 @media (max-width: 768px) {
-   .hero-content {
-    margin-top: -10px !important; /* رفع فعلي للأعلى */
+  .hero-content {
+    margin-top: -10px !important;
     padding-top: 0 !important;
-    transform: none !important; /* إلغاء أي تأثير قد يمنعه */
+    transform: none !important;
   }
 
   .title-with-decoration7 {
@@ -329,14 +341,14 @@ body {
   }
 
   .filter-form {
-    flex-direction: row; /* إبقاء التصميم أفقي */
+    flex-direction: row;
     gap: 8px;
     align-items: stretch;
   }
 
   .filter-group {
     flex: 1;
-    min-width: 0; /* يمنع التمدد الزائد */
+    min-width: 0;
   }
 
   .filter-form input {
@@ -361,9 +373,10 @@ body {
     margin: 0;
   }
 }
+
 @media (max-width: 480px) {
   .hero-content {
-    transform: translateY(-50px); /* رفع أكبر قليلاً على الشاشات الصغيرة */
+    transform: translateY(-50px);
   }
 
   .title-with-decoration7 {
@@ -398,17 +411,6 @@ body {
     height: 38px;
     min-width: 60px;
   }
-}
-
-/* ===== الحركات العامة ===== */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(25px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 /* عند الوقوف للكتابة أو التركيز على الحقل */
@@ -738,14 +740,14 @@ body {
 }
 
 .services-list li:hover {
-  border-color: #16354d;
+  border-color: #53a1dd;
   transform: translateX(-5px);
 }
 
 .services-list li.active {
-  background: #16354d;
+  background: #53a1dd;
   color: #fff;
-  border-color: #16354d;
+  border-color: #53a1dd;
 }
 
 .service-icon {
@@ -775,7 +777,7 @@ body {
 }
 
 .service-icon-container {
-  background: #16354d;
+  background: #53a1dd;
   width: 50px;
   height: 50px;
   border-radius: 10px;
@@ -791,7 +793,7 @@ body {
 }
 
 .service-title h3 {
-  color: #16354d;
+  color: #53a1dd;
   font-size: 1.4rem;
   margin: 0 0 8px 0;
   font-weight: 600;
@@ -845,7 +847,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #16354d;
+  background: #53a1dd;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -859,18 +861,20 @@ body {
 }
 
 .learn-more.auction-btn {
-  background: #1e4666;
+  background: #53a1dd;
   padding: 8px 18px;
   font-size: 0.85rem;
 }
 
 .learn-more:hover {
-  background: #1e4666;
+   background-color: white;
+  color: #53a1dd;
   transform: translateY(-1px);
 }
 
 .learn-more.auction-btn:hover {
-  background: #1e4666;
+ background-color: white;
+  color: #53a1dd;;
 }
 
 .learn-more .arrow {
@@ -891,7 +895,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #16354d;
+  background: #53a1dd;
   color: white;
   border: none;
   border-radius: 6px;
@@ -1203,7 +1207,8 @@ body {
 }
 
 .filter-toggle-btn:hover {
-  background-color: #0f2d44;
+  background-color: white;
+  color: #53a1dd;
   transform: translateY(-2px);
 }
 
@@ -1287,7 +1292,8 @@ body {
 }
 
 .filter-btn:hover {
-  background-color: #0f2d44;
+ background-color: white;
+  color: #53a1dd;
   transform: translateY(-2px);
 }
 
@@ -2325,19 +2331,18 @@ body {
   }
 }
 
-/* ===== قسم اتصل بنا ===== */
-/* ===== قسم الاستشارة ===== */
-.consultation-section {
+/* ===== قسم تواصل معنا ===== */
+.contact-section {
   padding: 80px 0;
   background: linear-gradient(135deg, var(--background-light) 0%, #f8f9fa 100%);
 }
 
-.consultation-form-container {
+.contact-form-container {
   max-width: 800px;
   margin: 0 auto;
 }
 
-.consultation-form {
+.contact-form {
   background: var(--background-white);
   padding: 40px;
   border-radius: var(--border-radius-lg);
@@ -2346,11 +2351,11 @@ body {
 }
 
 /* تحسينات عامة للحقول */
-.consultation-form .form-group {
+.contact-form .form-group {
   margin-bottom: 25px;
 }
 
-.consultation-form label {
+.contact-form label {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
@@ -2358,8 +2363,9 @@ body {
   font-size: 15px;
 }
 
-.consultation-form input,
-.consultation-form textarea {
+.contact-form input,
+.contact-form textarea,
+.contact-form select {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid var(--border-color);
@@ -2370,16 +2376,29 @@ body {
   background: var(--background-white);
 }
 
-.consultation-form input:focus,
-.consultation-form textarea:focus {
+.contact-form input:focus,
+.contact-form textarea:focus,
+.contact-form select:focus {
   outline: none;
   border-color: var(--secondary-color);
   box-shadow: 0 0 0 3px rgba(244, 158, 33, 0.1);
 }
 
-.consultation-form textarea {
+.contact-form textarea {
   resize: vertical;
   min-height: 120px;
+}
+
+/* تصميم حقل سبب التواصل */
+.contact-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 15px center;
+  background-size: 12px;
+  padding-right: 15px;
+  padding-left: 40px;
 }
 
 /* تصميم رفع الملفات */
@@ -2498,7 +2517,7 @@ body {
 }
 
 /* زر الإرسال */
-.submit-consultation-btn {
+.submit-contact-btn {
   background: linear-gradient(135deg, var(--primary-color), #0f2d44);
   color: white;
   border: none;
@@ -2514,14 +2533,14 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.submit-consultation-btn:hover {
+.submit-contact-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
 
 /* تصميم متجاوب */
 @media (max-width: 768px) {
-  .consultation-form {
+  .contact-form {
     padding: 25px 20px;
   }
   
@@ -2543,18 +2562,23 @@ body {
   .phone-group {
     max-width: 100%;
   }
+  
+  .contact-select {
+    background-position: left 12px center;
+    padding-left: 35px;
+  }
 }
 
 @media (max-width: 480px) {
-  .consultation-section {
+  .contact-section {
     padding: 60px 0;
   }
   
-  .consultation-form {
+  .contact-form {
     padding: 20px 15px;
   }
   
-  .submit-consultation-btn {
+  .submit-contact-btn {
     padding: 12px 25px;
     font-size: 15px;
   }
@@ -2712,5 +2736,487 @@ body {
   .newsletter-form button {
     border-radius: var(--border-radius-sm);
     padding: 10px;
+  }
+}
+
+/* /////////////////////////////////////////////////////////////////////////////App.css */
+
+
+.app-header {
+  background-color: #1e3a8a;
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.app-header h1 {
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.app-header nav ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  gap: 2rem;
+}
+
+.app-header nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.app-header nav a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.app-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* .app-footer {
+  background-color: #1e3a8a;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  margin-top: auto;
+} */
+
+/* Loading & Error States */
+.loading, .error, .not-found {
+  padding: 2rem;
+  text-align: center;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin: 2rem auto;
+  max-width: 500px;
+}
+
+.loading {
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.error {
+  color: #e11d48;
+}
+
+.not-found {
+  color: #9ca3af;
+}
+
+.error-message {
+  color: #e11d48;
+  margin: 0.5rem 0;
+  font-weight: 600;
+}
+
+.success-message {
+  background-color: #ecfdf5;
+  color: #047857;
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid #10b981;
+  margin: 1rem 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Requests List */
+.requests-container h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1e3a8a;
+  font-size: 1.8rem;
+}
+
+.filters-section {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.filters-section h3 {
+  margin-bottom: 1rem;
+  color: #1e3a8a;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.filters-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-button {
+  background-color: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  grid-column: 1 / -1;
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.filter-button:hover {
+  background-color: #1e40af;
+}
+
+.requests-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.request-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.request-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.request-card.open {
+  border-top: 4px solid #10b981;
+}
+
+.request-card.completed {
+  border-top: 4px solid #6b7280;
+}
+
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.request-header h3 {
+  color: #1e3a8a;
+  font-size: 1.2rem;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.open {
+  background-color: #ecfdf5;
+  color: #047857;
+}
+
+.status-badge.completed {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.request-info p {
+  margin-bottom: 0.25rem;
+  color: #4b5563;
+}
+
+.request-info strong {
+  color: #1f2937;
+}
+
+.request-description {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.request-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.view-details-button,
+.make-offer-button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  text-align: center;
+  transition: background-color 0.3s, color 0.3s;
+  flex: 1;
+}
+
+.view-details-button {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.view-details-button:hover {
+  background-color: #d1d5db;
+}
+
+.make-offer-button {
+  background-color: #1e3a8a;
+  color: white;
+}
+
+.make-offer-button:hover {
+  background-color: #1e40af;
+}
+
+.no-data {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+/* Request Details */
+.request-details-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.request-details-container h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1e3a8a;
+}
+
+.request-details-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.created-date {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item h3 {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.detail-item p {
+  color: #1f2937;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.description-section {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1.5rem;
+}
+
+.description-section h3 {
+  color: #1e3a8a;
+  margin-bottom: 0.75rem;
+}
+
+/* Offer Section */
+.offer-section {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.offer-section h3 {
+  color: #1e3a8a;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.offer-form textarea {
+  height: 120px;
+}
+
+.submit-offer-button {
+  background-color: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.submit-offer-button:hover {
+  background-color: #1e40af;
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.back-link a {
+  color: #1e3a8a;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+/* Create Request Form */
+.create-request-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.create-request-container h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1e3a8a;
+}
+
+.create-request-form {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 2rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.create-button,
+.cancel-button {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.create-button {
+  background-color: #1e3a8a;
+  color: white;
+  border: none;
+}
+
+.create-button:hover:not(:disabled) {
+  background-color: #1e40af;
+}
+
+.create-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background-color: white;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+}
+
+.cancel-button:hover {
+  background-color: #f3f4f6;
+}
+
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .app-content {
+    padding: 1rem;
+  }
+  
+  .requests-list {
+    grid-template-columns: 1fr;
   }
 }

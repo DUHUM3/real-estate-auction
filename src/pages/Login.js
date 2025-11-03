@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/AuthModal.css';
 
+// ✅ استيراد الأيقونات الاحترافية
+import { FiMail, FiLock, FiEye, FiEyeOff, FiX } from 'react-icons/fi';
+import { AiOutlineLogin } from 'react-icons/ai';
+
 function Login({ onClose, onSwitchToRegister }) {
   const [formData, setFormData] = useState({
     email: '',
@@ -10,7 +14,8 @@ function Login({ onClose, onSwitchToRegister }) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+  const [showPassword, setShowPassword] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -19,7 +24,11 @@ function Login({ onClose, onSwitchToRegister }) {
       ...formData,
       [e.target.name]: e.target.value
     });
-    setError(''); // مسح الخطأ عند تغيير المدخلات
+    setError('');
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -43,7 +52,6 @@ function Login({ onClose, onSwitchToRegister }) {
       const data = await response.json();
 
       if (response.ok) {
-        // تخزين البيانات المستلمة من API
         const userData = {
           id: data.user.id,
           full_name: data.user.full_name,
@@ -55,8 +63,7 @@ function Login({ onClose, onSwitchToRegister }) {
           token_type: data.token_type,
           expires_at: data.expires_at
         };
-        
-        // استدعاء دالة login من AuthContext لتخزين البيانات
+
         login(userData);
         navigate('/');
         if (onClose) onClose();
@@ -81,13 +88,21 @@ function Login({ onClose, onSwitchToRegister }) {
     <div className="auth-modal-overlay" onClick={handleOverlayClick}>
       <div className="auth-modal login-modal">
         <div className="auth-modal-header">
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className="close-btn" onClick={onClose}>
+            <FiX size={22} />
+          </button>
         </div>
-        
+
         <div className="auth-content">
-          {/* العنوان الرئيسي */}
+          {/* قسم الشعار */}
           <div className="auth-hero-section">
-            <h1 className="auth-main-title">منصة العقارات السعودية</h1>
+            <div className="logo-container">
+              <img
+                src="/images/logo2.png"
+                alt="منصة العقارات السعودية"
+                className="auth-logo"
+              />
+            </div>
             <p className="auth-subtitle">إبدأ رحلتك العقارية معنا</p>
             <div className="auth-divider"></div>
           </div>
@@ -97,8 +112,8 @@ function Login({ onClose, onSwitchToRegister }) {
             <button className="auth-option-btn active">
               تسجيل الدخول
             </button>
-            <button 
-              className="auth-option-btn" 
+            <button
+              className="auth-option-btn"
               onClick={onSwitchToRegister}
             >
               حساب جديد
@@ -116,34 +131,48 @@ function Login({ onClose, onSwitchToRegister }) {
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label className="form-label">البريد الإلكتروني</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="example@email.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="form-input"
-                disabled={loading}
-              />
+              <div className="input-with-icon">
+                {/* <FiMail className="input-icon" /> */}
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="example@email.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="form-input"
+                  disabled={loading}
+                />
+              </div>
             </div>
 
-            <div className="form-group">
+            <div className="form-group password-group">
               <label className="form-label">كلمة المرور</label>
-              <input
-                type="password"
-                name="password"
-                placeholder="........."
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className="form-input"
-                disabled={loading}
-              />
+              <div className="password-input-container">
+                {/* <FiLock className="input-icon" /> */}
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="........."
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="form-input password-input"
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={togglePasswordVisibility}
+                  disabled={loading}
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn-login-submit"
               disabled={loading}
             >

@@ -11,13 +11,19 @@ import {
   FaEnvelope,
   FaMapMarkerAlt,
   FaShieldAlt,
-  FaFileContract,
-  FaUndo
+  FaFileContract
 } from 'react-icons/fa';
 
 function Footer() {
   return (
     <footer className="footer">
+      {/* الموج في الأعلى */}
+      <div className="footer-wave">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" className="shape-fill"></path>
+        </svg>
+      </div>
+
       <div className="footer-container">
         {/* القسم الأول: الشعار والوصف */}
         <div className="footer-section">
@@ -25,10 +31,10 @@ function Footer() {
             <div className="logo-icon">
               <FaHome />
             </div>
-            <span className="logo-text">عقاركم</span>
+            <span className="logo-text">شاهين بلاس</span>
           </div>
           <p className="footer-description">
-            منصة مزادات العقارات الرائدة في العالم العربي. نوفر لكم تجربة آمنة وموثوقة لشراء وبيع العقارات عبر المزادات الإلكترونية.
+            منصة مزادات العقارات الرائدة في المملكة العربية السعودية. نوفر لكم تجربة آمنة وموثوقة لشراء وبيع الاراضي.
           </p>
           <div className="social-links">
             <a href="#" className="social-link" aria-label="Facebook">
@@ -57,18 +63,7 @@ function Footer() {
           </ul>
         </div>
 
-        {/* القسم الثالث: خدماتنا */}
-        <div className="footer-section">
-          <h3 className="footer-title">خدماتنا</h3>
-          <ul className="footer-links">
-            <li><a href="#" className="footer-link">مزادات العقارات</a></li>
-            <li><a href="#" className="footer-link">مزادات الأراضي</a></li>
-            <li><a href="#" className="footer-link">التقييم العقاري</a></li>
-            <li><a href="#" className="footer-link">الاستشارات</a></li>
-          </ul>
-        </div>
-
-        {/* القسم الرابع: معلومات الاتصال */}
+        {/* القسم الثالث: معلومات الاتصال */}
         <div className="footer-section">
           <h3 className="footer-title">معلومات الاتصال</h3>
           <div className="contact-info">
@@ -78,7 +73,7 @@ function Footer() {
             </div>
             <div className="contact-item">
               <FaEnvelope className="contact-icon" />
-              <span>info@aqarkom.com</span>
+              <span>info@shahinplace.com</span>
             </div>
             <div className="contact-item">
               <FaMapMarkerAlt className="contact-icon" />
@@ -91,7 +86,7 @@ function Footer() {
       {/* الجزء السفلي من الفوتر */}
       <div className="footer-bottom">
         <div className="footer-bottom-container">
-          <p className="copyright">&copy; 2025 عقاركم. جميع الحقوق محفوظة.</p>
+          <p className="copyright">&copy; 2025 شاهين بلاس. جميع الحقوق محفوظة.</p>
           <div className="footer-bottom-links">
             <a href="#" className="bottom-link">
               <FaShieldAlt className="link-icon" />
@@ -101,10 +96,6 @@ function Footer() {
               <FaFileContract className="link-icon" />
               شروط الاستخدام
             </a>
-            {/* <a href="#" className="bottom-link">
-              <FaUndo className="link-icon" />
-              سياسة الاسترجاع
-            </a> */}
           </div>
         </div>
       </div>

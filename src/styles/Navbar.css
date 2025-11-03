@@ -6,8 +6,8 @@
   top: 0;
   left: 0;
   width: 100%;
-  background: #16354d; /* اللون الجديد عندما يكون في الأعلى */
-  color: #ffffff; /* النصوص بيضاء عندما يكون في الأعلى */
+  background: #53a1dd; /* اللون الجديد عندما يكون في الأعلى */
+  color: #ffffff;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
   z-index: 1000;
   transition: all 0.4s ease-in-out;
@@ -15,10 +15,10 @@
 }
 
 .navbar.scrolled {
-  background: rgba(255, 255, 255, 0.98); /* أبيض عند التمرير */
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  color: #16354d; /* النصوص تصبح باللون 16354d عند التمرير */
+  color: #53a1dd; /* النصوص تصبح باللون 53a1dd عند التمرير */
 }
 
 /* 🌟 الحاوية */
@@ -57,23 +57,23 @@
   gap: 0.5rem;
   text-decoration: none;
   font-weight: 700;
-  color: #ffffff; /* أبيض عندما يكون في الأعلى */
   transition: all 0.3s ease;
-  font-size: 1.3rem;
   margin-left: 0;
 }
 
-.navbar.scrolled .nav-logo {
-  color: #16354d; /* يتغير إلى 16354d عند التمرير */
+.logo-image {
+  height: 40px;
+  width: auto;
+  filter: brightness(0) invert(1);
+  transition: all 0.3s ease;
+}
+
+.navbar.scrolled .logo-image {
+  filter: brightness(0) saturate(100%) invert(44%) sepia(68%) saturate(1304%) hue-rotate(176deg) brightness(93%) contrast(91%);
 }
 
 .nav-logo:hover {
   transform: translateY(-2px);
-  color: #e0e0e0; /* لون فاتح عند hover عندما يكون في الأعلى */
-}
-
-.navbar.scrolled .nav-logo:hover {
-  color: #0f2d44; /* لون أغمق عند hover عند التمرير */
 }
 
 /* 🌟 القائمة الرئيسية */
@@ -97,7 +97,7 @@
   position: relative;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #ffffff; /* أبيض عندما يكون في الأعلى */
+  color: #ffffff;
   text-decoration: none;
   padding: 0.5rem 0.8rem;
   transition: all 0.3s ease;
@@ -110,35 +110,35 @@
 }
 
 .navbar.scrolled .nav-link {
-  color: #16354d; /* يتغير إلى 16354d عند التمرير */
+  color: #53a1dd;
 }
 
 .link-icon {
   margin-left: 8px;
   font-size: 1rem;
-  color: inherit; /* يرث لون النص */
+  color: inherit;
 }
 
 .nav-link:hover {
-  color: #e0e0e0; /* لون فاتح عند hover عندما يكون في الأعلى */
-  background: rgba(255, 255, 255, 0.1); /* خلفية شفافة فاتحة */
+  color: #e0e0e0;
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-1px);
 }
 
 .navbar.scrolled .nav-link:hover {
-  color: #0f2d44; /* لون أغمق عند hover عند التمرير */
-  background: rgba(22, 53, 77, 0.05); /* خلفية شفافة من اللون الأساسي */
+  color: #3a7cb7;
+  background: rgba(83, 161, 221, 0.05);
 }
 
 .nav-link.active {
-  color: #ffffff; /* أبيض عندما يكون في الأعلى */
-  background: rgba(255, 255, 255, 0.15); /* خلفية شفافة فاتحة */
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
   font-weight: 600;
 }
 
 .navbar.scrolled .nav-link.active {
-  color: #16354d; /* يتغير إلى 16354d عند التمرير */
-  background: rgba(22, 53, 77, 0.1); /* خلفية شفافة من اللون الأساسي */
+  color: #53a1dd;
+  background: rgba(83, 161, 221, 0.1);
 }
 
 .nav-link.active::after {
@@ -149,12 +149,12 @@
   transform: translateX(-50%);
   width: 30px;
   height: 2px;
-  background: #ffffff; /* أبيض عندما يكون في الأعلى */
+  background: #ffffff;
   border-radius: 2px;
 }
 
 .navbar.scrolled .nav-link.active::after {
-  background: #16354d; /* يتغير إلى 16354d عند التمرير */
+  background: #53a1dd;
 }
 
 /* 🌟 أزرار المصادقة */
@@ -166,7 +166,7 @@
 
 .login-btn {
   background: linear-gradient(135deg, #ffffff, #f0f0f0);
-  color: #16354d !important; /* نص باللون 16354d */
+  color: #53a1dd !important;
   padding: 0.5rem 0.9rem;
   border-radius: 20px;
   border: 2px solid #ffffff;
@@ -181,15 +181,15 @@
 }
 
 .navbar.scrolled .login-btn {
-  background: linear-gradient(135deg, #16354d, #0f2d44);
-  color: #ffffff !important; /* أبيض عند التمرير */
-  border: 2px solid #16354d;
-  box-shadow: 0 2px 8px rgba(22, 53, 77, 0.3);
+  background: linear-gradient(135deg, #53a1dd, #3a7cb7);
+  color: #ffffff !important;
+  border: 2px solid #53a1dd;
+  box-shadow: 0 2px 8px rgba(83, 161, 221, 0.3);
 }
 
 .register-btn {
   background: transparent;
-  color: #ffffff !important; /* أبيض عندما يكون في الأعلى */
+  color: #ffffff !important;
   padding: 0.5rem 0.9rem;
   border-radius: 20px;
   border: 2px solid #ffffff;
@@ -203,19 +203,19 @@
 }
 
 .navbar.scrolled .register-btn {
-  color: #16354d !important; /* يتغير إلى 16354d عند التمرير */
-  border: 2px solid #16354d;
+  color: #53a1dd !important;
+  border: 2px solid #53a1dd;
 }
 
 .register-btn:hover {
   background: #ffffff;
-  color: #16354d !important; /* عند hover يصبح النص 16354d */
+  color: #53a1dd !important;
   transform: translateY(-2px);
 }
 
 .navbar.scrolled .register-btn:hover {
-  background: #16354d;
-  color: #ffffff !important; /* عند hover يصبح النص أبيض */
+  background: #53a1dd;
+  color: #ffffff !important;
 }
 
 .login-icon, .register-icon {
@@ -229,8 +229,8 @@
 }
 
 .navbar.scrolled .login-btn:hover {
-  background: linear-gradient(135deg, #0f2d44, #0a2438);
-  box-shadow: 0 4px 12px rgba(22, 53, 77, 0.4);
+  background: linear-gradient(135deg, #3a7cb7, #2d6ba3);
+  box-shadow: 0 4px 12px rgba(83, 161, 221, 0.4);
 }
 
 /* 🌟 زر القائمة (الهاتف) */
@@ -250,21 +250,21 @@
   display: block;
   width: 100%;
   height: 3px;
-  background: #ffffff; /* أبيض عندما يكون في الأعلى */
+  background: #ffffff;
   border-radius: 3px;
   transition: all 0.3s ease;
 }
 
 .navbar.scrolled .mobile-menu-btn span {
-  background: #16354d; /* يتغير إلى 16354d عند التمرير */
+  background: #53a1dd;
 }
 
 .mobile-menu-btn:hover span {
-  background: #e0e0e0; /* لون فاتح عند hover عندما يكون في الأعلى */
+  background: #e0e0e0;
 }
 
 .navbar.scrolled .mobile-menu-btn:hover span {
-  background: #0f2d44; /* لون أغمق عند hover عند التمرير */
+  background: #3a7cb7;
 }
 
 /* 🌟 القائمة المنسدلة */
@@ -323,7 +323,7 @@
 
 .dropdown-item:hover {
   background-color: #f8f9fa;
-  color: #16354d; /* اللون الجديد */
+  color: #53a1dd;
 }
 
 .dropdown-item:last-child {
@@ -333,7 +333,7 @@
 .dropdown-icon {
   margin-left: 12px;
   font-size: 1rem;
-  color: #16354d; /* اللون الجديد */
+  color: #53a1dd;
 }
 
 /* 🌟 الإشعارات */
@@ -352,20 +352,20 @@
 }
 
 .notification-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* شفافية فاتحة عندما يكون في الأعلى */
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .navbar.scrolled .notification-btn:hover {
-  background-color: rgba(22, 53, 77, 0.1); /* شفافية من اللون الأساسي عند التمرير */
+  background-color: rgba(83, 161, 221, 0.1);
 }
 
 .notification-icon {
   font-size: 1.2rem;
-  color: #ffffff; /* أبيض عندما يكون في الأعلى */
+  color: #ffffff;
 }
 
 .navbar.scrolled .notification-icon {
-  color: #16354d; /* يتغير إلى 16354d عند التمرير */
+  color: #53a1dd;
 }
 
 .notification-badge {
@@ -407,7 +407,7 @@
 .notifications-header h3 {
   margin: 0 0 4px 0;
   font-size: 16px;
-  color: #16354d; /* اللون الجديد */
+  color: #53a1dd;
 }
 
 .notifications-count {
@@ -420,14 +420,13 @@
   overflow-y: auto;
 }
 
-/* إخفاء شريط التمرير للإشعارات */
 .hide-scrollbar {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
 }
 
 .notification-item {
@@ -467,7 +466,7 @@
   text-align: center;
   padding: 12px;
   background: #f8f9fa;
-  color: #16354d; /* اللون الجديد */
+  color: #53a1dd;
   text-decoration: none;
   border-top: 1px solid #f0f0f0;
   font-size: 14px;
@@ -495,18 +494,18 @@
 }
 
 .user-profile-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* شفافية فاتحة عندما يكون في الأعلى */
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .navbar.scrolled .user-profile-btn:hover {
-  background-color: rgba(22, 53, 77, 0.1); /* شفافية من اللون الأساسي عند التمرير */
+  background-color: rgba(83, 161, 221, 0.1);
 }
 
 .user-avatar {
   width: 36px;
   height: 36px;
-  background: #ffffff; /* أبيض عندما يكون في الأعلى */
-  color: #16354d; /* نص باللون 16354d */
+  background: #ffffff;
+  color: #53a1dd;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -517,9 +516,9 @@
 }
 
 .navbar.scrolled .user-avatar {
-  background: #16354d; /* يتغير إلى 16354d عند التمرير */
-  color: #ffffff; /* نص أبيض عند التمرير */
-  box-shadow: 0 2px 8px rgba(22, 53, 77, 0.3);
+  background: #53a1dd;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(83, 161, 221, 0.3);
 }
 
 .avatar-icon {
@@ -528,7 +527,7 @@
 
 .user-name {
   font-size: 14px;
-  color: #16354d; /* أبيض عندما يكون في الأعلى */
+  color: #ffffff;
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -536,7 +535,7 @@
 }
 
 .navbar.scrolled .user-name {
-  color: #16354d; /* يتغير إلى 16354d عند التمرير */
+  color: #53a1dd;
 }
 
 .user-dropdown {
@@ -621,7 +620,6 @@
     margin: 0;
   }
 
-  /* إظهار الأزرار في القائمة المنسدلة للهاتف */
   .nav-menu .nav-buttons-group {
     display: flex;
     flex-direction: column;
@@ -636,7 +634,6 @@
     display: flex;
   }
 
-  /* زر الإغلاق (X) */
   .close-btn {
     position: absolute;
     top: 1.5rem;
@@ -644,7 +641,7 @@
     background: none;
     border: none;
     font-size: 2rem;
-    color: #16354d; /* اللون الجديد */
+    color: #53a1dd;
     cursor: pointer;
     transition: color 0.3s ease;
   }
@@ -657,7 +654,6 @@
     padding: 0.8rem 1rem;
   }
   
-  /* في وضع الهاتف */
   .dropdown-menu,
   .notifications-dropdown,
   .user-dropdown {
@@ -677,7 +673,6 @@
     display: block;
   }
   
-  /* أزرار المصادقة في الهاتف */
   .auth-buttons {
     flex-direction: column;
     width: 100%;
@@ -689,7 +684,6 @@
     justify-content: center;
   }
   
-  /* إخفاء اسم المستخدم في الهاتف */
   .user-name {
     display: none;
   }
@@ -735,11 +729,11 @@
 /* 🌟 تحسينات للشريط العلوي في الهاتف */
 @media (max-width: 900px) {
   .top-bar-controls {
-    display: none; /* إخفاء في الهاتف */
+    display: none;
   }
   
   .top-auth-buttons {
-    display: none; /* إخفاء في الهاتف */
+    display: none;
   }
   
   .nav-buttons-group {
@@ -762,77 +756,6 @@
   .mobile-overlay {
     display: none;
   }
-}
-
-/* 🌟 تحسينات لأيقونات المستخدم والإشعارات في الشريط */
-.user-profile-btn {
-  display: flex;
-  align-items: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 20px;
-  transition: all 0.2s;
-  gap: 8px;
-}
-
-.user-profile-btn:hover {
-  background-color: #16354d;
-}
-
-.user-avatar {
-  width: 36px;
-  height: 36px;
-  background: #767676;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
-}
-
-.avatar-icon {
-  font-size: 1rem;
-}
-
-.user-name {
-  font-size: 14px;
-  color: #333;
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* 🌟 القوائم المنسدلة في الشريط العلوي */
-.notifications-dropdown {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-  width: 320px;
-  max-height: 400px;
-  overflow: hidden;
-  z-index: 1001;
-}
-
-.user-dropdown {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-  min-width: 220px;
-  z-index: 1001;
-  animation: fadeIn 0.2s ease-in-out;
 }
 
 /* 🌟 القائمة الجانبية للهاتف */
@@ -876,7 +799,7 @@
   margin: 0;
   font-size: 1.2rem;
   color: #333;
-margin-left: 100px;
+  margin-left: 100px;
   margin-right: auto;
 }
 
@@ -884,7 +807,7 @@ margin-left: 100px;
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: #1976d2;
+  color: #53a1dd;
   cursor: pointer;
   padding: 0.5rem;
 }
@@ -926,12 +849,12 @@ margin-left: 100px;
 
 .mobile-nav-link:hover {
   background: #f8f9fa;
-  color: #1976d2;
+  color: #53a1dd;
 }
 
 .mobile-nav-link.active {
-  background: rgba(25, 118, 210, 0.1);
-  color: #1976d2;
+  background: rgba(83, 161, 221, 0.1);
+  color: #53a1dd;
   font-weight: 600;
 }
 
@@ -982,7 +905,7 @@ margin-left: 100px;
 
 .mobile-dropdown-item:hover {
   background: #e9ecef;
-  color: #1976d2;
+  color: #53a1dd;
 }
 
 .mobile-dropdown-item .dropdown-icon {
@@ -1003,7 +926,7 @@ margin-left: 100px;
 .mobile-user-avatar {
   width: 40px;
   height: 40px;
-  background: #1976d2;
+  background: #53a1dd;
   color: white;
   border-radius: 50%;
   display: flex;

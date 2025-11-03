@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/AuthModal.css';
 import axios from 'axios';
+import { FiMail, FiLock, FiEye, FiEyeOff, FiX } from 'react-icons/fi';
+
 
 function Register({ onClose, onSwitchToLogin }) {
   const [userTypeId, setUserTypeId] = useState(1);
@@ -301,13 +303,20 @@ function Register({ onClose, onSwitchToLogin }) {
     <div className="auth-modal-overlay" onClick={handleOverlayClick}>
       <div className="auth-modal register-modal">
         <div className="auth-modal-header">
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className="close-btn" onClick={onClose}>            <FiX size={22} />
+          </button>
         </div>
         
         <div className="auth-content">
-          {/* العنوان الرئيسي */}
+          {/* قسم الشعار */}
           <div className="auth-hero-section">
-            <h1 className="auth-main-title">منصة العقارات السعودية</h1>
+            <div className="logo-container">
+              <img 
+                src="/images/logo2.png" 
+                alt="منصة العقارات السعودية" 
+                className="auth-logo"
+              />
+            </div>
             <p className="auth-subtitle">إبدأ رحلتك العقارية معنا</p>
             <div className="auth-divider"></div>
           </div>

@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import Properties from './pages/PropertyList';
 import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import Favorites from './pages/Favorites';
+import LandRequestsList from './pages/LandRequestsList';
 import CreateProperty from './pages/CreateProperty';
 import Profile from './pages/Profile';
 import MyAds from './pages/MyAds';
@@ -50,6 +51,7 @@ function App() {
               <Route path="/properties" element={<Properties />} />
               <Route path="/property/:id/:type" element={<PropertyDetailsPage />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/land-requests" element={<LandRequestsList />} />
               <Route path="/my-ads" element={<MyAds />} />
               <Route path="/my-lands" element={<Favorites />} />              
               <Route path="/create-property" element={<CreateProperty />} />

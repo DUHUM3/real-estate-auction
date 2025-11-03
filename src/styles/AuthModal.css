@@ -15,35 +15,43 @@
   z-index: 1000;
   backdrop-filter: blur(4px);
   animation: fadeIn 0.2s ease-out;
-  padding: 25px; /* زيادة كبيرة في المسافة من الأطراف */
+  padding: 20px;
   direction: rtl;
 }
 
-/* تصميم النافذة الرئيسية - محسّن للمسافات */
+/* تصميم النافذة الرئيسية */
 .auth-modal {
   background: var(--background-white);
-  border-radius: 14px; /* زوايا أكثر نعومة */
+  border-radius: 14px;
   box-shadow: var(--shadow-soft);
   width: 100%;
-  max-width: 380px; /* زيادة العرض قليلاً */
+  max-width: 420px;
+  max-height: 90vh;
   animation: slideUp 0.3s ease;
   position: relative;
   font-family: var(--font-ar);
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  margin: auto; /* تأكيد المركز */
+  margin: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .auth-modal-header {
-  padding: 12px 16px 0; /* زيادة المسافة الداخلية */
+  padding: 12px 16px 0;
   display: flex;
   justify-content: flex-end;
+  position: sticky;
+  top: 0;
+  background: var(--background-white);
+  z-index: 10;
+  flex-shrink: 0;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 20px; /* أكبر قليلاً */
+  font-size: 20px;
   cursor: pointer;
   color: var(--text-light);
   width: 28px;
@@ -60,83 +68,72 @@
   color: var(--primary-color);
 }
 
-/* محتوى النموذج - مسافات محسنة */
+/* محتوى النموذج */
 .auth-content {
-  padding: 0 20px 20px; /* زيادة المسافة من الجوانب */
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
 }
 
-/* العنوان الرئيسي - مسافات أفضل */
+/* قسم الشعار */
+.logo-container {
+  text-align: center;
+  margin-bottom: 12px;
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+
+.auth-logo {
+  max-width: 180px;
+  height: auto;
+  max-height: 80px;
+  object-fit: contain;
+}
+
 .auth-hero-section {
   text-align: center;
-  margin-bottom: 16px; /* زيادة المسافة */
+  margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
-}
-
-.auth-main-title {
-  font-size: 1.1rem; /* زيادة طفيفة في الحجم */
-  font-weight: 300;
-  font-family: var(--font-ar);
-  color: var(--primary-color);
-  margin: 0 0 6px 0;
-  line-height: 1.3;
+  flex-shrink: 0;
 }
 
 .auth-subtitle {
-  font-size: 0.8rem; /* زيادة طفيفة */
+  font-size: 0.8rem;
   font-family: var(--font-lt);
   color: var(--text-light);
-  margin: 0 0 10px 0;
+  margin: 0;
   line-height: 1.4;
 }
 
 .auth-divider {
-  width: 35px; /* أوسع قليلاً */
+  width: 35px;
   height: 2px;
   background: var(--secondary-color);
-  margin: 0 auto;
+  margin: 8px auto 0;
   border-radius: 1px;
 }
 
-/* قسم الترحيب - مسافات محسنة */
-.auth-welcome-section {
-  text-align: center;
-  margin-bottom: 16px; /* زيادة المسافة */
-}
-
-.auth-welcome-title {
-  font-size: 0.95rem; /* زيادة طفيفة */
-  font-weight: 600;
-  color: var(--primary-color);
-  margin: 0 0 6px 0;
-  font-family: var(--font-ar);
-}
-
-.auth-welcome-text {
-  font-size: 0.75rem; /* زيادة طفيفة */
-  color: var(--text-light);
-  margin: 0;
-  font-family: var(--font-lt);
-  line-height: 1.4;
-}
-
-/* خيارات التسجيل - مسافات محسنة */
+/* خيارات التسجيل */
 .auth-options {
   display: flex;
   background: var(--background-light);
   border-radius: var(--border-radius);
-  padding: 4px; /* زيادة المسافة الداخلية */
-  margin-bottom: 18px; /* زيادة المسافة */
+  padding: 4px;
+  margin-bottom: 16px;
   gap: 2px;
+  flex-shrink: 0;
 }
 
 .auth-option-btn {
   flex: 1;
-  padding: 8px 12px; /* زيادة المسافة الداخلية */
+  padding: 8px 12px;
   border: none;
   background: transparent;
-  border-radius: 8px; /* زوايا أكثر نعومة */
-  font-size: 0.8rem; /* زيادة طفيفة */
+  border-radius: 8px;
+  font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
@@ -150,16 +147,83 @@
   box-shadow: 0 2px 4px rgba(22, 53, 77, 0.2);
 }
 
-.auth-option-btn:not(.active):hover {
-  background: rgba(22, 53, 77, 0.05);
-  color: var(--primary-color);
+/* قسم نوع المستخدم */
+.user-type-section {
+  margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
-/* نموذج تسجيل الدخول - مسافات محسنة */
+.user-type-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2316354d' d='M6 8.5L1.5 4l1-1L6 6.5 9.5 3l1 1z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 14px center;
+  background-size: 12px;
+  padding-right: 12px;
+  padding-left: 35px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: var(--font-ar);
+  min-height: 42px;
+}
+
+.user-type-info {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(22, 53, 77, 0.05);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  text-align: center;
+  font-family: var(--font-lt);
+  line-height: 1.4;
+}
+
+/* حاوية التمرير للنموذج */
+.form-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0 -20px;
+  padding: 0 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-light);
+  scroll-behavior: smooth;
+  min-height: 200px;
+}
+
+.form-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.form-scroll-container::-webkit-scrollbar-track {
+  background: var(--background-light);
+  border-radius: 3px;
+}
+
+.form-scroll-container::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 3px;
+}
+
+.form-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #0f2d44;
+}
+
+/* نموذج التسجيل */
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 14px; /* زيادة المسافة بين الحقول */
+  gap: 16px;
+  padding: 10px 0 20px;
+  min-height: min-content;
+}
+
+/* تنظيم الحقول في صفوف */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 0;
 }
 
 .form-group {
@@ -169,24 +233,24 @@
 }
 
 .form-label {
-  font-size: 0.8rem; /* زيادة طفيفة */
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--primary-color);
-  margin-bottom: 6px; /* زيادة المسافة */
+  margin-bottom: 6px;
   font-family: var(--font-ar);
 }
 
 .form-input {
   width: 100%;
-  padding: 10px 12px; /* زيادة المسافة الداخلية */
+  padding: 10px 12px;
   border: 1px solid var(--border-color);
-  border-radius: 8px; /* زوايا أكثر نعومة */
-  font-size: 0.85rem; /* زيادة طفيفة */
+  border-radius: 8px;
+  font-size: 0.85rem;
   transition: var(--transition);
   box-sizing: border-box;
   font-family: var(--font-ar);
   background-color: #fcfcfc;
-  min-height: 42px; /* ارتفاع مناسب لللمس */
+  min-height: 42px;
 }
 
 .form-input:focus {
@@ -198,31 +262,134 @@
 
 .form-input::placeholder {
   color: #a0a4a8;
-  font-size: 0.8rem; /* زيادة طفيفة */
+  font-size: 0.8rem;
   font-family: var(--font-ar);
 }
 
-/* زر تسجيل الدخول - مسافات محسنة */
+/* مجموعة كلمة المرور مع العين */
+.password-group {
+  position: relative;
+}
+
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  padding-right: 45px !important;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: var(--transition);
+  color: var(--text-light);
+  z-index: 2;
+}
+
+.password-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--primary-color);
+}
+
+.password-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* حقل رفع الملفات */
+.form-input-file {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  transition: var(--transition);
+  background-color: var(--background-light);
+  box-sizing: border-box;
+  font-family: var(--font-ar);
+  cursor: pointer;
+  min-height: 42px;
+}
+
+.form-input-file:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  border-style: solid;
+}
+
+/* أزرار التسجيل */
 .btn-login-submit, .btn-register-submit {
   width: 100%;
-  padding: 11px 16px; /* زيادة المسافة الداخلية */
+  padding: 12px 16px;
   background: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 8px; /* زوايا أكثر نعومة */
-  font-size: 0.9rem; /* زيادة طفيفة */
+  border-radius: 8px;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
   font-family: var(--font-ar);
-  margin-top: 8px; /* زيادة المسافة */
+  margin-top: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  min-height: 46px; /* ارتفاع مناسب لللمس */
+  min-height: 46px;
+  flex-shrink: 0;
 }
 
-.btn-login-submit:hover, .btn-register-submit:hover {
-  background: #0f2d44;
+.btn-login-submit:hover:not(:disabled), .btn-register-submit:hover:not(:disabled) {
+  background: white;
+  color: #53a1dd;
   box-shadow: 0 4px 8px rgba(22, 53, 77, 0.2);
+}
+
+.btn-login-submit:disabled, .btn-register-submit:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* زر التسجيل في نموذج التسجيل */
+.btn-register-submit {
+  position: sticky;
+  bottom: 0;
+  background: var(--primary-color);
+  z-index: 5;
+  margin-bottom: 0;
+}
+
+/* رسائل الخطأ والنجاح */
+.error-message {
+  background-color: #fee;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.success-message {
+  background-color: #f0f9ff;
+  border: 1px solid #b3e0ff;
+  color: #0066cc;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
 /* الأنيميشن */
@@ -236,111 +403,40 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* تخصيص نموذج التسجيل */
-.register-modal {
-  max-width: 400px; /* زيادة العرض */
-}
-
-/* قسم نوع المستخدم - مسافات محسنة */
-.user-type-section {
-  margin-bottom: 18px; /* زيادة المسافة */
-}
-
-.user-type-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2316354d' d='M6 8.5L1.5 4l1-1L6 6.5 9.5 3l1 1z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: left 14px center;
-  background-size: 12px;
-  padding-right: 12px;
-  padding-left: 35px;
-  cursor: pointer;
-  font-size: 0.85rem; /* زيادة طفيفة */
-  font-family: var(--font-ar);
-  min-height: 42px; /* ارتفاع مناسب لللمس */
-}
-
-.user-type-info {
-  margin-top: 8px; /* زيادة المسافة */
-  padding: 8px 12px; /* زيادة المسافة الداخلية */
-  background: rgba(22, 53, 77, 0.05);
-  border-radius: 6px;
-  font-size: 0.75rem; /* زيادة طفيفة */
-  color: var(--primary-color);
-  text-align: center;
-  font-family: var(--font-lt);
-  line-height: 1.4;
-}
-
-/* حقل رفع الملفات - مسافات محسنة */
-.form-input-file {
-  width: 100%;
-  padding: 9px 12px; /* زيادة المسافة الداخلية */
-  border: 1px dashed var(--border-color);
-  border-radius: 8px; /* زوايا أكثر نعومة */
-  font-size: 0.8rem; /* زيادة طفيفة */
-  transition: var(--transition);
-  background-color: var(--background-light);
-  box-sizing: border-box;
-  font-family: var(--font-ar);
-  cursor: pointer;
-  min-height: 42px; /* ارتفاع مناسب لللمس */
-}
-
-.form-input-file:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  border-style: solid;
-}
-
-/* تنظيم الحقول في صفوف */
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px; /* زيادة المسافة بين الحقول */
-  margin-bottom: 12px; /* زيادة المسافة */
-}
-
-/* حاوية التمرير للنموذج - مسافات محسنة */
-.form-scroll-container {
-  max-height: 350px; /* زيادة الارتفاع قليلاً */
-  overflow-y: auto;
-  margin: 0 -20px; /* تطابق مع padding الجانبي */
-  padding: 0 20px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scroll-behavior: smooth;
-}
-
-.form-scroll-container::-webkit-scrollbar {
-  display: none;
-}
-
-/* تحسينات للهواتف - مسافات أكبر */
+/* تحسينات للهواتف */
 @media (max-width: 480px) {
   .auth-modal-overlay {
-    padding: 35px; /* مسافة كبيرة من الأطراف */
-    align-items: center; /* محاذاة في المركز */
+    padding: 15px;
+    align-items: center;
   }
   
   .auth-modal {
     max-width: 100%;
     border-radius: 12px;
-    margin: 0; /* إزالة أي margin إضافي */
+    max-height: 85vh;
   }
   
   .form-row {
-    grid-template-columns: 1fr; /* عمود واحد في الهاتف */
-    gap: 14px; /* زيادة المسافة */
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
   
-  /* تحسينات إضافية للشاشات الصغيرة */
   .auth-content {
-    padding: 0 18px 18px;
+    padding: 0 16px 16px;
+  }
+  
+  .form-scroll-container {
+    margin: 0 -16px;
+    padding: 0 16px;
   }
   
   .form-input {
-    font-size: 16px; /* منع التكبير التلقائي في iOS */
+    font-size: 16px;
+  }
+  
+  .auth-logo {
+    max-width: 150px;
+    max-height: 60px;
   }
 }
 
@@ -356,47 +452,15 @@
   mask-image: linear-gradient(
     to bottom,
     transparent 0%,
-    black 10px,
-    black calc(100% - 10px),
+    black 20px,
+    black calc(100% - 20px),
     transparent 100%
   );
 }
 
-/* تحسينات إضافية لتجنب المشاكل في الشاشات المختلفة */
-@media (max-height: 600px) {
-  .auth-modal-overlay {
-    align-items: flex-start;
-    padding-top: 30px;
-    padding-bottom: 30px;
+/* تحسينات للشاشات المتوسطة */
+@media (min-width: 768px) {
+  .auth-modal {
+    max-width: 440px;
   }
-  
-  .form-scroll-container {
-    max-height: 300px;
-  }
-}
-
-/* تأكيد المركز في جميع الأحوال */
-.auth-modal-overlay {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-}
-
-.auth-modal {
-  margin: 0 auto !important;
-}
-.error-message {
-  background-color: #fee;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  text-align: center;
-  font-size: 14px;
-}
-
-.btn-login-submit:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
 }
