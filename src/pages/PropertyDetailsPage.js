@@ -12,7 +12,10 @@ import {
   FaClock,
   FaExpand,
   FaArrowRight,
-  FaArrowLeft as FaLeft
+  FaArrowLeft as FaLeft,
+  FaPhone,
+  FaEnvelope,
+  FaUser
 } from 'react-icons/fa';
 import '../styles/PropertyDetailsModal.css';
 
@@ -25,6 +28,17 @@ const PropertyDetailsPage = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showInterestForm, setShowInterestForm] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: '',
+    phone: '',
+    email: '',
+    message: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState(null);
+  const token = localStorage.getItem('token');
+
 
   useEffect(() => {
     fetchData();
@@ -38,7 +52,19 @@ const PropertyDetailsPage = () => {
         ? `https://shahin-tqay.onrender.com/api/properties/${id}`
         : `https://shahin-tqay.onrender.com/api/auctions/${id}`;
 
-      const response = await fetch(url);
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      // إضافة الـ token إذا كان موجوداً
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers
+      });
       
       if (!response.ok) {
         throw new Error('فشل في جلب البيانات');
@@ -95,7 +121,7 @@ const PropertyDetailsPage = () => {
     }
   };
 
-  // Clean up quotes from JSON strings - نفس الدالة في AuctionDetailsModal
+  // Clean up quotes from JSON strings
   const cleanText = (text) => {
     if (typeof text === 'string') {
       return text.replace(/"/g, '');
@@ -141,6 +167,78 @@ const PropertyDetailsPage = () => {
       }
     }
     return images;
+  };
+  
+  const handleShowInterestForm = () => {
+    setShowInterestForm(true);
+  };
+  
+  const handleCloseInterestForm = () => {
+    setShowInterestForm(false);
+    setSubmitResult(null);
+  };
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleSubmitInterest = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setSubmitResult(null);
+    
+    try {
+      const requestData = {
+        ...formData,
+        property_id: parseInt(id),
+      };
+      
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      // إضافة الـ token إذا كان موجوداً
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch('https://shahin-tqay.onrender.com/api/interested', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(requestData),
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        setSubmitResult({
+          success: true,
+          message: 'تم إرسال طلب الاهتمام بنجاح'
+        });
+        setFormData({
+          full_name: '',
+          phone: '',
+          email: '',
+          message: ''
+        });
+      } else {
+        setSubmitResult({
+          success: false,
+          message: result.message || 'حدث خطأ أثناء إرسال الطلب'
+        });
+      }
+    } catch (error) {
+      setSubmitResult({
+        success: false,
+        message: 'حدث خطأ في الاتصال بالخادم'
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -360,7 +458,7 @@ const PropertyDetailsPage = () => {
           <p>{type === 'land' ? data.description : cleanText(data.description)}</p>
         </div>
 
-        {/* Map Section - باستخدام نفس طريقة AuctionDetailsModal بدون API Key */}
+        {/* Map Section */}
         {(type === 'land' && data.geo_location_map) || (type === 'auction' && data.latitude && data.longitude) ? (
           <div className="elegantMap_section">
             <h3>الموقع على الخريطة</h3>
@@ -412,7 +510,112 @@ const PropertyDetailsPage = () => {
             </div>
           </div>
         )}
+        
+        {/* Interest Button */}
+        <div className="elegantInterest_section">
+          <button 
+            className="elegantInterest_btn" 
+            onClick={handleShowInterestForm}
+          >
+            تقديم اهتمام
+          </button>
+        </div>
       </div>
+
+      {/* Interest Form Modal */}
+      {showInterestForm && (
+        <div className="elegantForm_modal">
+          <div className="elegantForm_content">
+            <button 
+              className="elegantModal_close" 
+              onClick={handleCloseInterestForm}
+            >
+              ✕
+            </button>
+            <h3>تقديم اهتمام بالعقار</h3>
+            
+            {submitResult ? (
+              <div className={`elegantSubmit_result ${submitResult.success ? 'success' : 'error'}`}>
+                <p>{submitResult.message}</p>
+                {submitResult.success ? (
+                  <button onClick={handleCloseInterestForm} className="elegantCloseResult_btn">إغلاق</button>
+                ) : (
+                  <button onClick={() => setSubmitResult(null)} className="elegantTryAgain_btn">حاول مرة أخرى</button>
+                )}
+              </div>
+            ) : (
+              <form onSubmit={handleSubmitInterest}>
+                <div className="elegantForm_group">
+                  <label>
+                    <FaUser />
+                    <span>الاسم الكامل</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="full_name"
+                    value={formData.full_name}
+                    onChange={handleInputChange}
+                    placeholder="أدخل الاسم الكامل"
+                    required
+                  />
+                </div>
+                
+                <div className="elegantForm_group">
+                  <label>
+                    <FaPhone />
+                    <span>رقم الهاتف</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="أدخل رقم الهاتف"
+                    required
+                  />
+                </div>
+                
+                <div className="elegantForm_group">
+                  <label>
+                    <FaEnvelope />
+                    <span>البريد الإلكتروني</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="أدخل البريد الإلكتروني"
+                    required
+                  />
+                </div>
+                
+                <div className="elegantForm_group">
+                  <label>
+                    <span>رسالة</span>
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    placeholder="أدخل رسالتك أو استفسارك هنا"
+                    rows={4}
+                    required
+                  />
+                </div>
+                
+                <button 
+                  type="submit" 
+                  className="elegantSubmit_btn"
+                  disabled={submitting}
+                >
+                  {submitting ? 'جاري الإرسال...' : 'إرسال الطلب'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Image Modal */}
       {showImageModal && images.length > 0 && (

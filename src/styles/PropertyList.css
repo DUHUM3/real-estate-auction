@@ -1,5 +1,5 @@
 :root {
-  --elegant-primary: #16354d;
+  --elegant-primary: #53a1dd;
   --elegant-secondary: #ffb703;
   --elegant-secondary-light: rgba(255, 183, 3, 0.15);
   --elegant-accent: #fb8500;
@@ -18,9 +18,6 @@
 
 body {
   font-family: 'Tajawal', 'Cairo', sans-serif;
-  color: var(--elegant-text);
-  background-color: var(--elegant-bg-light);
-  line-height: 1.6;
   direction: rtl;
 }
 

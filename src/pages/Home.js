@@ -506,7 +506,7 @@ function Home({ onLoginClick }) {
   // تغيير الشرائح للصور الخلفية
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % 3);
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % 2);
     }, 5000);
     return () => clearInterval(interval);
   }, []);

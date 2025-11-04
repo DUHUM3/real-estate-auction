@@ -129,27 +129,25 @@ function Navbar({ onLoginClick, onRegisterClick }) {
   return (
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className="nav-container">
-        {/* الجزء الأيمن: الشعار + القوائم الرئيسية */}
-        <div className="nav-right-section">
-          {/* الشعار */}
-        {/* الشعار */}
-<Link to="/" className="nav-logo" onClick={handleCloseMenu}>
-  <img 
-    src="images/logo3.png" 
-    alt="Logo" 
-    className="logo-image"
-  />
-</Link>
-<Link to="/" className="nav-logo" onClick={handleCloseMenu}>
-  <img 
-    src="images/text.png" 
-    alt="Logo" 
-    className="logo-image"
-  />
-</Link>
-          {/* القوائم الرئيسية - تظهر في الشريط العلوي */}
+        {/* الشعار - يظهر في الكمبيوتر على اليمين وفي الهاتف على اليسار */}
+        <div className="logo-section">
+          <Link to="/" className="nav-logo" onClick={handleCloseMenu}>
+            <img 
+              src="images/logo3.png" 
+              alt="Logo" 
+              className="logo-image"
+            />
+            <img 
+              src="images/text.png" 
+              alt="Logo" 
+              className="logo-image"
+            />
+          </Link>
+        </div>
+
+        {/* القوائم الرئيسية - تظهر في الكمبيوتر فقط */}
+        <div className="nav-menu-section">
           <div className="nav-buttons-group">
-            {/* الرئيسية */}
             <Link 
               to="/" 
               className={`nav-link ${isActive('/') ? 'active' : ''}`} 
@@ -159,7 +157,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
               الرئيسية
             </Link>
 
-            {/* العقارات والمزادات */}
             <Link 
               to="/properties" 
               className={`nav-link ${isActive('/properties') ? 'active' : ''}`}
@@ -169,7 +166,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
               العقارات والمزادات
             </Link>
 
-            {/* قائمة طلب شراء/تسويق */}
             <div className="nav-dropdown" ref={requestMenuRef}>
               <button 
                 className={`nav-link dropdown-toggle ${showRequestMenu ? 'active' : ''}`}
@@ -201,12 +197,10 @@ function Navbar({ onLoginClick, onRegisterClick }) {
           </div>
         </div>
 
-        {/* الجزء الأيسر: أزرار المستخدم أو التسجيل والدخول */}
-        <div className="nav-left-section">
-          {/* عناصر الشريط العلوي - تظهر في جميع الأجهزة */}
+        {/* الأقسام الجانبية - تظهر في الكمبيوتر فقط */}
+        <div className="nav-controls-section">
           {currentUser ? (
-            <div className="top-bar-controls">
-              {/* أيقونة الإشعارات */}
+            <div className="user-controls">
               <div className="notifications-container" ref={notificationsRef}>
                 <button 
                   className="notification-btn"
@@ -249,7 +243,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                 )}
               </div>
 
-              {/* قائمة المستخدم */}
               <div className="user-menu-container" ref={userMenuRef}>
                 <button 
                   className="user-profile-btn"
@@ -271,7 +264,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                       الملف الشخصي
                     </Link>
                     
-                    {/* إذا كان المستخدم عام يعرض "طلباتي"، وإلا يعرض "إعلاناتي" */}
                     {isGeneralUser() ? (
                       <Link 
                         to="/my-requests" 
@@ -292,7 +284,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                       </Link>
                     )}
                     
-                    {/* إذا كان مالك أرض أو مستثمر يعرض "عروضي" */}
                     {(isLandOwner() || isInvestor() || isPropertyOwner()) && (
                       <Link 
                         to="/my-offers" 
@@ -336,8 +327,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
               </div>
             </div>
           ) : (
-            /* أزرار التسجيل والدخول للشريط العلوي */
-            <div className="top-auth-buttons">
+            <div className="auth-buttons">
               <button 
                 className="nav-link register-btn"
                 onClick={() => {
@@ -360,7 +350,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
             </div>
           )}
 
-          {/* زر القائمة الجانبية للهاتف */}
+          {/* أيقونة القائمة الجانبية - تظهر في الهاتف فقط على اليمين */}
           <button 
             className="mobile-menu-btn" 
             onClick={handleMobileMenuToggle}
@@ -390,7 +380,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
           </div>
 
           <div className="mobile-sidebar-content">
-            {/* القوائم الأساسية */}
             <div className="mobile-nav-section">
               <Link 
                 to="/" 
@@ -410,7 +399,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                 العقارات والمزادات
               </Link>
 
-              {/* قائمة الطلبات في الجانبية */}
               <div className="mobile-nav-dropdown">
                 <button 
                   className={`mobile-nav-link dropdown-toggle ${showRequestMenu ? 'active' : ''}`}
@@ -441,84 +429,53 @@ function Navbar({ onLoginClick, onRegisterClick }) {
               </div>
             </div>
 
-            {/* قسم المستخدم في القائمة الجانبية - للمسجلين فقط */}
             {currentUser && (
               <div className="mobile-user-section">
-                <div className="mobile-user-info">
-                  <div className="mobile-user-avatar">
-                    <FaUser className="avatar-icon" />
-                  </div>
-                  <span className="mobile-user-name">
-                    مرحباً، {currentUser.full_name || currentUser.email?.split('@')[0]}
-                  </span>
-                  <span className="mobile-user-type">({currentUser.user_type})</span>
-                </div>
+                  {/* <div className="mobile-user-info">
+                    <div className="mobile-user-avatar">
+                      <FaUser className="avatar-icon" />
+                    </div>
+                    <span className="mobile-user-name">
+                      مرحباً، {currentUser.full_name || currentUser.email?.split('@')[0]}
+                    </span>
+                    <span className="mobile-user-type">({currentUser.user_type})</span>
+                  </div> */}
 
-                <Link 
-                  to="/profile" 
-                  className="mobile-nav-link"
-                  onClick={handleCloseMenu}
-                >
+                <Link to="/profile" className="mobile-nav-link" onClick={handleCloseMenu}>
                   <FaUser className="link-icon" />
                   الملف الشخصي
                 </Link>
 
-                {/* إذا كان المستخدم عام يعرض "طلباتي"، وإلا يعرض "إعلاناتي" */}
                 {isGeneralUser() ? (
-                  <Link 
-                    to="/my-requests" 
-                    className="mobile-nav-link"
-                    onClick={handleCloseMenu}
-                  >
+                  <Link to="/my-requests" className="mobile-nav-link" onClick={handleCloseMenu}>
                     <FaListAlt className="link-icon" />
                     طلباتي
                   </Link>
                 ) : (
-                  <Link 
-                    to="/my-ads" 
-                    className="mobile-nav-link"
-                    onClick={handleCloseMenu}
-                  >
+                  <Link to="/my-ads" className="mobile-nav-link" onClick={handleCloseMenu}>
                     <FaBriefcase className="link-icon" />
                     إعلاناتي
                   </Link>
                 )}
 
-                {/* إذا كان مالك أرض أو مستثمر يعرض "عروضي" */}
                 {(isLandOwner() || isInvestor() || isPropertyOwner()) && (
-                  <Link 
-                    to="/my-offers" 
-                    className="mobile-nav-link"
-                    onClick={handleCloseMenu}
-                  >
+                  <Link to="/my-offers" className="mobile-nav-link" onClick={handleCloseMenu}>
                     <FaHandshake className="link-icon" />
                     عروضي
                   </Link>
                 )}
 
-                <Link 
-                  to="/my-lands" 
-                  className="mobile-nav-link"
-                  onClick={handleCloseMenu}
-                >
+                <Link to="/my-lands" className="mobile-nav-link" onClick={handleCloseMenu}>
                   <FaHeart className="link-icon" />
                   المفضلة
                 </Link>
 
-                <Link 
-                  to="/settings" 
-                  className="mobile-nav-link"
-                  onClick={handleCloseMenu}
-                >
+                <Link to="/settings" className="mobile-nav-link" onClick={handleCloseMenu}>
                   <FaCog className="link-icon" />
                   الإعدادات
                 </Link>
 
-                <Link 
-                  to="/notifications" 
-                  className="mobile-nav-link"
-                  onClick={handleCloseMenu}
-                >
+                <Link to="/notifications" className="mobile-nav-link" onClick={handleCloseMenu}>
                   <FaBell className="link-icon" />
                   الإشعارات
                   {unreadNotifications > 0 && (
@@ -526,17 +483,13 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                   )}
                 </Link>
 
-                <button 
-                  onClick={handleLogout} 
-                  className="mobile-nav-link logout-btn"
-                >
+                <button onClick={handleLogout} className="mobile-nav-link logout-btn">
                   <FaSignOutAlt className="link-icon" />
                   تسجيل خروج
                 </button>
               </div>
             )}
 
-            {/* قسم التسجيل للغير مسجلين */}
             {!currentUser && (
               <div className="mobile-auth-section">
                 <button 
@@ -565,12 +518,8 @@ function Navbar({ onLoginClick, onRegisterClick }) {
           </div>
         </div>
 
-        {/* Overlay للقائمة الجانبية */}
         {isMobileMenuOpen && (
-          <div 
-            className="mobile-overlay"
-            onClick={handleCloseMenu}
-          ></div>
+          <div className="mobile-overlay" onClick={handleCloseMenu}></div>
         )}
       </div>
     </nav>
