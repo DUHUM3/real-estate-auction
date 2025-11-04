@@ -990,7 +990,7 @@ button {
     padding: 6px 10px;
     margin-bottom: 10px;
     top: 0;
-        margin-top: 33px; /* ✅ إنزال بسيط أكثر على الشاشات الصغيرة */
+        margin-top: 34px; /* ✅ إنزال بسيط أكثر على الشاشات الصغيرة */
   }
 
   .shahinSearch_input input {
