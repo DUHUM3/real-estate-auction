@@ -1,19 +1,19 @@
 :root {
-  --elegant-primary: #53a1dd;
-  --elegant-secondary: #ffb703;
-  --elegant-secondary-light: rgba(255, 183, 3, 0.15);
-  --elegant-accent: #fb8500;
-  --elegant-text: #333;
-  --elegant-text-light: #767676;
-  --elegant-bg-light: #f8f9fa;
-  --elegant-bg-white: #ffffff;
-  --elegant-border: #eaeaea;
-  --elegant-shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
-  --elegant-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
-  --elegant-radius-sm: 4px;
-  --elegant-radius-md: 8px;
-  --elegant-radius-lg: 16px;
-  --elegant-transition: 0.3s;
+  --shahin-primary: #53a1dd;
+  --shahin-secondary: #ffb703;
+  --shahin-secondary-light: rgba(255, 183, 3, 0.15);
+  --shahin-accent: #fb8500;
+  --shahin-text: #333;
+  --shahin-text-light: #767676;
+  --shahin-bg-light: #f8f9fa;
+  --shahin-bg-white: #ffffff;
+  --shahin-border: #eaeaea;
+  --shahin-shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --shahin-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --shahin-radius-sm: 4px;
+  --shahin-radius-md: 8px;
+  --shahin-radius-lg: 16px;
+  --shahin-transition: 0.3s;
 }
 
 body {
@@ -27,7 +27,7 @@ button {
 }
 
 /* Container */
-.elegantProperties_container {
+.shahinProperties_container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0;
@@ -35,25 +35,30 @@ button {
 }
 
 /* إضافة مسافة علوية فارغة لمنع التداخل مع شريط التنقل */
-.elegantProperties_container::before {
+.shahinProperties_container::before {
   content: '';
   display: block;
-  height: 20px; /* مسافة فارغة من الأعلى */
+  height: 20px;
 }
 
 /* Search and Filter */
-.elegantSearch_filter {
-  background-color: var(--elegant-bg-white);
+.shahinSearch_filter {
+  background-color: var(--shahin-bg-white);
   padding: 12px 16px;
-  border-radius: var(--elegant-radius-md);
-  box-shadow: var(--elegant-shadow-sm);
+  border-radius: var(--shahin-radius-md);
+  box-shadow: var(--shahin-shadow-sm);
   position: sticky;
-  top: 80px; /* تغيير من 10px إلى 70px أو أكثر حسب ارتفاع شريط التنقل */
+  top: 70px;
   z-index: 99;
   margin-bottom: 16px;
+  transition: transform 0.3s ease-in-out;
 }
 
-.elegantSearch_bar {
+.shahinSearch_filter.shahinHideFilter {
+  transform: translateY(-100%);
+}
+
+.shahinSearch_bar {
   display: flex;
   gap: 8px;
   width: 100%;
@@ -61,161 +66,161 @@ button {
   margin-bottom: 10px;
 }
 
-.elegantSearch_input {
+.shahinSearch_input {
   position: relative;
   flex-grow: 1;
 }
 
-.elegantSearch_icon {
+.shahinSearch_icon {
   position: absolute;
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--elegant-text-light);
+  color: var(--shahin-text-light);
   font-size: 0.9rem;
 }
 
-.elegantSearch_input input {
+.shahinSearch_input input {
   width: 100%;
   padding: 12px 36px 12px 12px;
-  border-radius: var(--elegant-radius-md);
-  border: 1px solid var(--elegant-border);
+  border-radius: var(--shahin-radius-md);
+  border: 1px solid var(--shahin-border);
   font-size: 0.9rem;
-  transition: all var(--elegant-transition);
-  background: var(--elegant-bg-white);
+
+  transition: all var(--shahin-transition);
+  background: var(--shahin-bg-white);
 }
 
-.elegantSearch_input input:focus {
+.shahinSearch_input input:focus {
   outline: none;
-  border-color: var(--elegant-secondary);
-  box-shadow: 0 0 0 2px var(--elegant-secondary-light);
+  border-color: var(--shahin-secondary);
+  box-shadow: 0 0 0 2px var(--shahin-secondary-light);
 }
 
 /* Filter Button */
-.elegantFilter_toggle {
+.shahinFilter_toggle {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   padding: 12px 16px;
-  background-color: var(--elegant-primary);
-  color: white;
-  border: none;
-  border-radius: var(--elegant-radius-md);
+  background-color: #ffffff;
+  color: var(--shahin-primary);
+  border: 1px solid var(--shahin-primary);
+  border-radius: var(--shahin-radius-md);
   font-weight: 600;
   font-size: 0.85rem;
-  transition: all var(--elegant-transition);
+  transition: all var(--shahin-transition);
   min-width: 50px;
 }
 
-.elegantFilter_toggle:hover {
-  background-color: var(--elegant-accent);
+.shahinFilter_toggle:hover {
+  background-color: var(--shahin-secondary-light);
 }
 
 /* Tabs */
-.elegantTabs {
+.shahinTabs {
   display: flex;
   width: 100%;
   gap: 8px;
   margin-top: 4px;
 }
 
-.elegantTabs button {
+.shahinTabs button {
   flex: 1;
   padding: 10px 5px;
   border: none;
-  background-color: var(--elegant-bg-light);
-  color: var(--elegant-text);
-  border-radius: var(--elegant-radius-md);
+  background-color: var(--shahin-bg-light);
+  color: var(--shahin-text);
+  border-radius: var(--shahin-radius-md);
   font-weight: 600;
   font-size: 0.85rem;
-  transition: all var(--elegant-transition);
-  border: 1px solid var(--elegant-border);
+  transition: all var(--shahin-transition);
+  border: 1px solid var(--shahin-border);
 }
 
-.elegantTabs button.elegantActive {
-  background-color: var(--elegant-primary);
-  color: white;
-  border-color: var(--elegant-primary);
+.shahinTabs button.shahinActive {
+  background-color: #ffffff;
+  color: var(--shahin-primary);
+  border-color: var(--shahin-primary);
 }
 
-.elegantTabs button:not(.elegantActive):hover {
-  background-color: var(--elegant-secondary-light);
-  border-color: var(--elegant-secondary);
+.shahinTabs button:not(.shahinActive):hover {
+  background-color: var(--shahin-secondary-light);
+  border-color: var(--shahin-secondary);
 }
 
 /* Content Area */
-.elegantContent_area {
+.shahinContent_area {
   padding: 8px 0;
 }
 
 /* Properties Grid */
-.elegantProperties_grid {
+.shahinProperties_grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+
   margin-bottom: 20px;
 }
 
 /* Property Card */
-.elegantProperty_card {
-    top: 60px;
-
-  background-color: var(--elegant-bg-white);
-  border-radius: var(--elegant-radius-lg);
+.shahinProperty_card {
+  background-color: var(--shahin-bg-white);
+  border-radius: var(--shahin-radius-lg);
   overflow: hidden;
-  box-shadow: var(--elegant-shadow-sm);
-  transition: all var(--elegant-transition);
+  box-shadow: var(--shahin-shadow-sm);
+  transition: all var(--shahin-transition);
   position: relative;
   cursor: pointer;
-  border: 1px solid var(--elegant-border);
+  border: 1px solid var(--shahin-border);
   display: flex;
+  top: 10%;
   flex-direction: column;
   height: 100%;
-  /* إضافة مسافة جانبية للبطاقات في الهواتف */
   margin: 0 8px;
 }
 
-.elegantProperty_card:hover {
+.shahinProperty_card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--elegant-shadow-md);
+  box-shadow: var(--shahin-shadow-md);
 }
 
-.elegantProperty_image {
+.shahinProperty_image {
   position: relative;
-  height: 160px;
+  height: 200px;
   overflow: hidden;
   background-color: #f0f0f0;
 }
 
-.elegantProperty_image img {
+.shahinProperty_image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
 }
 
-.elegantProperty_card:hover .elegantProperty_image img {
+.shahinProperty_card:hover .shahinProperty_image img {
   transform: scale(1.05);
 }
 
-.elegantPlaceholder_image {
+.shahinPlaceholder_image {
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, var(--elegant-primary), #2c4d6b);
-  color: var(--elegant-secondary);
-  font-size: 2rem;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  color: var(--shahin-primary);
+  font-size: 3rem;
 }
 
-.elegantStatus_badge {
+.shahinStatus_badge {
   position: absolute;
   top: 10px;
   right: 10px;
   padding: 4px 8px;
-  border-radius: var(--elegant-radius-sm);
+  border-radius: var(--shahin-radius-sm);
   font-size: 0.7rem;
   font-weight: 700;
   z-index: 2;
@@ -223,22 +228,22 @@ button {
   letter-spacing: 0.5px;
 }
 
-.elegantStatus_open {
+.shahinStatus_open {
   background-color: #10b981;
   color: white;
 }
 
-.elegantStatus_sold {
+.shahinStatus_sold {
   background-color: #ef4444;
   color: white;
 }
 
-.elegantStatus_reserved {
+.shahinStatus_reserved {
   background-color: #f59e0b;
   color: white;
 }
 
-.elegantFavorite_btn {
+.shahinFavorite_btn {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -250,24 +255,24 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--elegant-text-light);
+  color: var(--shahin-text-light);
   font-size: 1rem;
-  transition: all var(--elegant-transition);
+  transition: all var(--shahin-transition);
   z-index: 2;
-  box-shadow: var(--elegant-shadow-sm);
+  box-shadow: var(--shahin-shadow-sm);
 }
 
-.elegantFavorite_btn.elegantActive {
+.shahinFavorite_btn.shahinActive {
   color: #ef4444;
 }
 
-.elegantFavorite_btn:hover {
+.shahinFavorite_btn:hover {
   transform: scale(1.1);
   background-color: white;
 }
 
 /* Property Details */
-.elegantProperty_details {
+.shahinProperty_details {
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -275,240 +280,238 @@ button {
   flex: 1;
 }
 
-.elegantProperty_details h3 {
+.shahinProperty_details h3 {
   font-size: 1rem;
   margin: 0 0 4px 0;
-  color: var(--elegant-primary);
+  color: var(--shahin-primary);
   line-height: 1.3;
   font-weight: 700;
 }
 
-.elegantProperty_location {
+.shahinProperty_location {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 0.85rem;
-  color: var(--elegant-text-light);
+  color: var(--shahin-text-light);
 }
 
-.elegantProperty_location svg {
-  color: var(--elegant-secondary);
+.shahinProperty_location svg {
+  color: var(--shahin-secondary);
   font-size: 0.8rem;
 }
 
-.elegantLocation_detail {
+.shahinLocation_detail {
   font-size: 0.75rem;
-  color: var(--elegant-text-light);
+  color: var(--shahin-text-light);
 }
 
-.elegantProperty_specs {
+.shahinProperty_specs {
   display: flex;
   justify-content: space-between;
   margin: 8px 0;
   padding: 8px 0;
-  border-top: 1px solid var(--elegant-border);
-  border-bottom: 1px solid var(--elegant-border);
+  border-top: 1px solid var(--shahin-border);
+  border-bottom: 1px solid var(--shahin-border);
 }
 
-.elegantSpec {
+.shahinSpec {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--elegant-primary);
+  color: var(--shahin-primary);
 }
 
-.elegantSpec svg {
-  color: var(--elegant-secondary);
+.shahinSpec svg {
+  color: var(--shahin-secondary);
   font-size: 0.8rem;
 }
 
-.elegantTotal_price {
+.shahinTotal_price {
   font-size: 0.9rem;
-  color: var(--elegant-accent);
+  color: var(--shahin-accent);
   font-weight: 700;
   text-align: center;
-  background: var(--elegant-secondary-light);
+  background: var(--shahin-secondary-light);
   padding: 6px 8px;
-  border-radius: var(--elegant-radius-sm);
+  border-radius: var(--shahin-radius-sm);
   border: 1px solid rgba(255, 183, 3, 0.3);
 }
 
-.elegantProperty_type {
+.shahinProperty_type {
   display: flex;
   gap: 6px;
   margin-top: 4px;
   flex-wrap: wrap;
 }
 
-.elegantTag {
+.shahinTag {
   font-size: 0.7rem;
   padding: 3px 8px;
-  border-radius: var(--elegant-radius-sm);
-  background-color: var(--elegant-secondary-light);
-  color: var(--elegant-primary);
+  border-radius: var(--shahin-radius-sm);
+  background-color: var(--shahin-secondary-light);
+  color: var(--shahin-primary);
   font-weight: 700;
 }
 
-.elegantTag.سكني {
+.shahinTag.سكني {
   background-color: rgba(22, 53, 77, 0.1);
-  color: var(--elegant-primary);
+  color: var(--shahin-primary);
 }
 
-.elegantTag.تجاري {
+.shahinTag.تجاري {
   background-color: rgba(255, 183, 3, 0.2);
   color: #b38202;
 }
 
-.elegantTag.صناعي {
+.shahinTag.صناعي {
   background-color: rgba(251, 133, 0, 0.2);
   color: #c26a00;
 }
 
-.elegantTag.زراعي {
+.shahinTag.زراعي {
   background-color: rgba(16, 185, 129, 0.2);
   color: #0d9c6d;
 }
 
-.elegantTag.elegantPurpose {
-  background-color: var(--elegant-primary);
-  color: white;
+.shahinTag.shahinPurpose {
+  background-color: #ffffff;
+  color: var(--shahin-primary);
+  border: 1px solid var(--shahin-primary);
 }
 
-.elegantProperty_actions {
+.shahinProperty_actions {
   display: flex;
   gap: 8px;
   margin-top: 12px;
 }
 
-.elegantAction_btn {
+.shahinAction_btn {
   flex: 1;
   padding: 8px 10px;
-  border-radius: var(--elegant-radius-md);
+  border-radius: var(--shahin-radius-md);
   font-size: 0.85rem;
   font-weight: 700;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 5px;
-  transition: all var(--elegant-transition);
-  border: none;
+  transition: all var(--shahin-transition);
   min-height: 36px;
+  background-color: #ffffff;
 }
 
-.elegantDetails_btn {
-  background-color: var(--elegant-primary);
-  color: white;
+.shahinDetails_btn {
+  color: var(--shahin-primary);
+  border: 1px solid var(--shahin-primary);
 }
 
-.elegantDetails_btn:hover {
-  background-color: #0f2538;
-  transform: translateY(-1px);
+.shahinDetails_btn:hover {
+  background-color: var(--shahin-secondary-light);
 }
 
-.elegantShare_btn {
-  background-color: var(--elegant-bg-light);
-  color: var(--elegant-text);
-  border: 1px solid var(--elegant-border);
+.shahinShare_btn {
+  color: var(--shahin-text);
+  border: 1px solid var(--shahin-border);
 }
 
-.elegantShare_btn:hover {
-  background-color: var(--elegant-border);
-  transform: translateY(-1px);
+.shahinShare_btn:hover {
+  background-color: var(--shahin-bg-light);
 }
 
 /* Filters */
-.elegantFilters_container {
-  background-color: var(--elegant-bg-white);
-  border-radius: var(--elegant-radius-md);
-  box-shadow: var(--elegant-shadow-sm);
+.shahinFilters_container {
+  background-color: var(--shahin-bg-white);
+  border-radius: var(--shahin-radius-md);
+  box-shadow: var(--shahin-shadow-sm);
   margin-bottom: 16px;
   overflow: hidden;
 }
 
-.elegantFilters_content {
+.shahinFilters_content {
   padding: 16px;
 }
 
-/* .elegantFilters_grid {
-  display: grid;
-    top: 30px;
-
-  grid-template-columns: repeat(2, 1fr);
+.shahinFilters_row {
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
+  margin-bottom: 12px;
+}
 
-} */
-
-.elegantFilter_group {
+.shahinFilter_group {
+  flex: 1 1 calc(16.666% - 12px);
+  min-width: 150px;
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.elegantFilter_group label {
+.shahinFilter_group label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--elegant-text);
+  color: var(--shahin-text);
 }
 
-.elegantFilter_group input,
-.elegantFilter_group select {
+.shahinFilter_group input,
+.shahinFilter_group select {
   padding: 10px 12px;
-  border-radius: var(--elegant-radius-md);
-  border: 1px solid var(--elegant-border);
-  background-color: var(--elegant-bg-white);
+  border-radius: var(--shahin-radius-md);
+  border: 1px solid var(--shahin-border);
+  background-color: var(--shahin-bg-white);
   font-size: 0.85rem;
-  transition: all var(--elegant-transition);
+  transition: all var(--shahin-transition);
 }
 
-.elegantFilter_group input:focus,
-.elegantFilter_group select:focus {
+.shahinFilter_group input:focus,
+.shahinFilter_group select:focus {
   outline: none;
-  border-color: var(--elegant-secondary);
-  box-shadow: 0 0 0 2px var(--elegant-secondary-light);
+  border-color: var(--shahin-secondary);
+  box-shadow: 0 0 0 2px var(--shahin-secondary-light);
 }
 
-.elegantFilter_actions {
+.shahinFilter_actions {
   display: flex;
   gap: 10px;
   margin-top: 16px;
 }
 
-.elegantReset_btn {
+.shahinReset_btn {
   flex: 1;
   padding: 10px;
-  background-color: var(--elegant-bg-light);
-  border: 1px solid var(--elegant-border);
-  color: var(--elegant-text);
-  border-radius: var(--elegant-radius-md);
+  background-color: var(--shahin-bg-light);
+  border: 1px solid var(--shahin-border);
+  color: var(--shahin-text);
+  border-radius: var(--shahin-radius-md);
   font-weight: 600;
   font-size: 0.85rem;
-  transition: all var(--elegant-transition);
+  transition: all var(--shahin-transition);
 }
 
-.elegantApply_btn {
+.shahinApply_btn {
   flex: 1;
   padding: 10px;
-  background-color: var(--elegant-primary);
-  border: none;
-  color: white;
-  border-radius: var(--elegant-radius-md);
+  background-color: #ffffff;
+  border: 1px solid var(--shahin-primary);
+  color: var(--shahin-primary);
+  border-radius: var(--shahin-radius-md);
   font-weight: 600;
   font-size: 0.85rem;
-  transition: all var(--elegant-transition);
+  transition: all var(--shahin-transition);
 }
 
-.elegantReset_btn:hover {
-  background-color: var(--elegant-border);
+.shahinReset_btn:hover {
+  background-color: var(--shahin-border);
 }
 
-.elegantApply_btn:hover {
-  background-color: var(--elegant-accent);
+.shahinApply_btn:hover {
+  background-color: var(--shahin-secondary-light);
 }
 
 /* Mobile Filter Sidebar */
-.elegantOverlay {
+.shahinOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -518,351 +521,175 @@ button {
   z-index: 998;
   visibility: hidden;
   opacity: 0;
-  transition: all var(--elegant-transition);
+  transition: all var(--shahin-transition);
 }
 
-.elegantOverlay.elegantActive {
+.shahinOverlay.shahinActive {
   visibility: visible;
   opacity: 1;
 }
 
-.elegantMobileFilter_sidebar {
+.shahinMobileFilter_sidebar {
   position: fixed;
   top: 0;
   bottom: 0;
   right: -100%;
   width: 90%;
   max-width: 350px;
-  background-color: var(--elegant-bg-white);
+  background-color: var(--shahin-bg-white);
   z-index: 999;
   overflow-y: auto;
-  transition: right var(--elegant-transition);
-  box-shadow: var(--elegant-shadow-md);
+  transition: right var(--shahin-transition);
+  box-shadow: var(--shahin-shadow-md);
   display: flex;
   flex-direction: column;
 }
 
-.elegantMobileFilter_sidebar.elegantActive {
+.shahinMobileFilter_sidebar.shahinActive {
   right: 0;
 }
 
-.elegantSidebar_header {
+.shahinSidebar_header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  border-bottom: 1px solid var(--elegant-border);
-  background: var(--elegant-primary);
-  color: white;
+  border-bottom: 1px solid var(--shahin-border);
+  background: #ffffff;
+  color: var(--shahin-primary);
+  border-right: 3px solid var(--shahin-primary);
 }
 
-.elegantSidebar_header h3 {
-  color: white;
+.shahinSidebar_header h3 {
+  color: var(--shahin-primary);
   margin: 0;
   font-size: 1.1rem;
 }
 
-.elegantClose_sidebar {
+.shahinClose_sidebar {
   background: none;
   border: none;
   font-size: 1.2rem;
-  color: white;
+  color: var(--shahin-primary);
   padding: 5px;
 }
 
 /* Empty State */
-.elegantEmpty_state {
+.shahinEmpty_state {
   padding: 40px 20px;
   text-align: center;
-  background-color: var(--elegant-bg-white);
-  border-radius: var(--elegant-radius-md);
-  box-shadow: var(--elegant-shadow-sm);
+  background-color: var(--shahin-bg-white);
+  border-radius: var(--shahin-radius-md);
+  box-shadow: var(--shahin-shadow-sm);
 }
 
-.elegantEmpty_state p {
+.shahinEmpty_state p {
   margin-bottom: 16px;
-  color: var(--elegant-text-light);
+  color: var(--shahin-text-light);
   font-size: 0.95rem;
 }
 
-.elegantEmpty_state button {
+.shahinEmpty_state button {
   padding: 10px 20px;
-  background-color: var(--elegant-primary);
-  color: white;
-  border: none;
-  border-radius: var(--elegant-radius-md);
+  background-color: #ffffff;
+  color: var(--shahin-primary);
+  border: 1px solid var(--shahin-primary);
+  border-radius: var(--shahin-radius-md);
   font-weight: 500;
   font-size: 0.9rem;
 }
 
 /* Loading and Error */
-.elegantLoading_container,
-.elegantError_container {
+.shahinLoading_container,
+.shahinError_container {
   padding: 130px 110px;
-  /* top: 90px; */
   text-align: center;
-  /* background-color: var(--elegant-bg-white); */
-  /* border-radius: var(--elegant-radius-md); */
-  /* box-shadow: var(--elegant-shadow-sm); */
 }
 
-.elegantLoader {
+.shahinLoader {
   display: inline-block;
   width: 40px;
   height: 40px;
-  border: 3px solid var(--elegant-bg-light);
+  border: 3px solid var(--shahin-bg-light);
   border-radius: 50%;
-  border-top: 3px solid var(--elegant-secondary);
-  animation: elegantSpin 1s linear infinite;
+  border-top: 3px solid var(--shahin-primary);
+  animation: shahinSpin 1s linear infinite;
   margin-bottom: 16px;
 }
 
-@keyframes elegantSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes shahinSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-.elegantError_container p {
+.shahinError_container p {
   margin-bottom: 16px;
   color: #ef4444;
   font-size: 0.95rem;
 }
 
-.elegantError_container button {
+.shahinError_container button {
   padding: 10px 20px;
-  background-color: var(--elegant-primary);
-  color: white;
-  border: none;
-  border-radius: var(--elegant-radius-md);
+  background-color: #ffffff;
+  color: var(--shahin-primary);
+  border: 1px solid var(--shahin-primary);
+  border-radius: var(--shahin-radius-md);
   font-weight: 500;
   font-size: 0.9rem;
 }
 
 /* Auctions */
-.elegantAuctions_comingSoon {
-  padding: 40px 20px;
-  text-align: center;
-  background-color: var(--elegant-bg-white);
-  border-radius: var(--elegant-radius-md);
-  box-shadow: var(--elegant-shadow-sm);
-}
-
-.elegantAuctions_comingSoon h2 {
-  margin-bottom: 16px;
-  color: var(--elegant-primary);
-  font-size: 1.2rem;
-}
-
-.elegantAuctions_comingSoon p {
-  color: var(--elegant-text-light);
-  font-size: 0.95rem;
-}
-
-/* Pagination */
-.elegantPagination {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-  margin-top: 24px;
-  flex-wrap: wrap;
-}
-
-.elegantPagination button {
-  min-width: 36px;
-  height: 36px;
-  padding: 0 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: var(--elegant-radius-md);
-  border: 1px solid var(--elegant-border);
-  background-color: var(--elegant-bg-white);
-  transition: all var(--elegant-transition);
-  font-size: 0.85rem;
-}
-
-.elegantPagination button.elegantActive {
-  background-color: var(--elegant-primary);
-  color: white;
-  border-color: var(--elegant-primary);
-}
-
-.elegantPagination button:not(.elegantActive):hover {
-  background-color: var(--elegant-secondary-light);
-  border-color: var(--elegant-secondary);
-}
-
-.elegantPagination button:disabled {
-  color: var(--elegant-border);
-  cursor: not-allowed;
-}
-
-/* Responsive Design */
-@media (min-width: 768px) {
-  .elegantProperties_grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-  
-  .elegantFilters_grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .elegantProperty_image {
-    height: 180px;
-  }
-  
-  /* إزالة المسافات الجانبية في الشاشات الكبيرة */
-  .elegantProperty_card {
-    margin: 0;
-  }
-}
-
-@media (min-width: 1024px) {
-  .elegantProperties_grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-  
-  .elegantFilters_grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  
-  .elegantProperty_image {
-    height: 200px;
-  }
-}
-
-@media (max-width: 768px) {
-  .elegantProperty_details {
-    padding: 12px;
-  }
-  
-  .elegantProperty_details h3 {
-    font-size: 0.9rem;
-  }
-  
-  .elegantProperty_image {
-    height: 140px;
-  }
-  
-  .elegantSearch_filter {
-    padding: 10px 12px;
-  }
-  
-  .elegantSearch_input input {
-    padding: 10px 36px 10px 10px;
-  }
-  
-  .elegantFilter_toggle {
-    padding: 10px 12px;
-  }
-  
-  .elegantTabs button {
-    padding: 8px 5px;
-    font-size: 0.8rem;
-  }
-  
-  .elegantAction_btn {
-    font-size: 0.8rem;
-    padding: 6px 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .elegantProperty_image {
-    height: 120px;
-  }
-  
-  .elegantProperty_details h3 {
-    font-size: 0.85rem;
-  }
-  
-  .elegantProperty_location, 
-  .elegantSpec {
-    font-size: 0.75rem;
-  }
-  
-  .elegantTotal_price {
-    font-size: 0.8rem;
-  }
-  
-  .elegantTag {
-    font-size: 0.65rem;
-    padding: 2px 6px;
-  }
-  
-  .elegantAction_btn {
-    font-size: 0.75rem;
-    min-height: 34px;
-  }
-  
-  .elegantFilters_grid {
-    grid-template-columns: 1fr;
-  }
-  
-  /* زيادة المسافة العلوية في الهواتف الصغيرة */
-  .elegantProperties_container::before {
-    height: 15px;
-  }
-  
-  /* زيادة المسافة الجانبية للبطاقات في الهواتف الصغيرة */
-  .elegantProperty_card {
-    margin: 0 20px;
-  }
-}
-/* إضافة هذه الأنماط إلى ملف CSS الحالي */
-
-/* Auction Cards */
-.elegantAuctions_grid {
+.shahinAuctions_grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-
   margin-bottom: 20px;
 }
 
-.elegantAuction_card {
-  background-color: var(--elegant-bg-white);
-  border-radius: var(--elegant-radius-lg);
+.shahinAuction_card {
+  background-color: var(--shahin-bg-white);
+  border-radius: var(--shahin-radius-lg);
   overflow: hidden;
-  box-shadow: var(--elegant-shadow-sm);
-  transition: all var(--elegant-transition);
+  box-shadow: var(--shahin-shadow-sm);
+  transition: all var(--shahin-transition);
   position: relative;
   cursor: pointer;
-      top: 70px;
-
-  border: 1px solid var(--elegant-border);
+  border: 1px solid var(--shahin-border);
   display: flex;
   flex-direction: column;
   height: 100%;
   margin: 0 8px;
 }
 
-.elegantAuction_card:hover {
+.shahinAuction_card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--elegant-shadow-md);
+  box-shadow: var(--shahin-shadow-md);
 }
 
-.elegantAuction_image {
+.shahinAuction_image {
   position: relative;
-  height: 160px;
+  height: 200px;
   overflow: hidden;
   background-color: #f0f0f0;
 }
 
-.elegantAuction_image img {
+.shahinAuction_image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
 }
 
-.elegantAuction_card:hover .elegantAuction_image img {
+.shahinAuction_card:hover .shahinAuction_image img {
   transform: scale(1.05);
 }
 
-.elegantAuction_details {
+.shahinAuction_details {
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -870,70 +697,70 @@ button {
   flex: 1;
 }
 
-.elegantAuction_details h3 {
+.shahinAuction_details h3 {
   font-size: 1rem;
   margin: 0 0 4px 0;
-  color: var(--elegant-primary);
+  color: var(--shahin-primary);
   line-height: 1.3;
   font-weight: 700;
 }
 
-.elegantAuction_company {
+.shahinAuction_company {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 0.85rem;
-  color: var(--elegant-text-light);
-  background: var(--elegant-secondary-light);
+  color: var(--shahin-text-light);
+  background: var(--shahin-secondary-light);
   padding: 4px 8px;
-  border-radius: var(--elegant-radius-sm);
+  border-radius: var(--shahin-radius-sm);
   border: 1px solid rgba(255, 183, 3, 0.3);
 }
 
-.elegantAuction_company svg {
-  color: var(--elegant-secondary);
+.shahinAuction_company svg {
+  color: var(--shahin-secondary);
   font-size: 0.8rem;
 }
 
-.elegantAuction_location {
+.shahinAuction_location {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 0.85rem;
-  color: var(--elegant-text-light);
+  color: var(--shahin-text-light);
 }
 
-.elegantAuction_location svg {
-  color: var(--elegant-secondary);
+.shahinAuction_location svg {
+  color: var(--shahin-secondary);
   font-size: 0.8rem;
 }
 
-.elegantAuction_schedule {
+.shahinAuction_schedule {
   display: flex;
   justify-content: space-between;
   margin: 8px 0;
   padding: 8px 0;
-  border-top: 1px solid var(--elegant-border);
-  border-bottom: 1px solid var(--elegant-border);
+  border-top: 1px solid var(--shahin-border);
+  border-bottom: 1px solid var(--shahin-border);
 }
 
-.elegantSchedule_item {
+.shahinSchedule_item {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--elegant-primary);
+  color: var(--shahin-primary);
 }
 
-.elegantSchedule_item svg {
-  color: var(--elegant-accent);
+.shahinSchedule_item svg {
+  color: var(--shahin-accent);
   font-size: 0.75rem;
 }
 
-.elegantAuction_description {
+.shahinAuction_description {
   font-size: 0.85rem;
-  color: var(--elegant-text-light);
+  color: var(--shahin-text-light);
   line-height: 1.4;
   margin: 0;
   display: -webkit-box;
@@ -942,161 +769,272 @@ button {
   overflow: hidden;
 }
 
-.elegantAuction_actions {
+.shahinAuction_actions {
   display: flex;
   gap: 8px;
   margin-top: 12px;
 }
 
 /* Status Badges للاستخدامات الجديدة */
-.elegantStatus_closed {
+.shahinStatus_closed {
   background-color: #6b7280;
   color: white;
 }
 
-.elegantStatus_pending {
+.shahinStatus_pending {
   background-color: #f59e0b;
   color: white;
 }
 
-.elegantStatus_unknown {
+.shahinStatus_unknown {
   background-color: #9ca3af;
   color: white;
 }
 
 /* تحسينات للتاريخ في الفلاتر */
-.elegantFilter_group input[type="date"] {
+.shahinFilter_group input[type="date"] {
   font-family: inherit;
   direction: ltr;
   text-align: right;
 }
 
-.elegantFilter_group input[type="date"]::-webkit-calendar-picker-indicator {
+.shahinFilter_group input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(0.5);
   cursor: pointer;
 }
 
-/* تحسينات للشبكة في الشاشات الكبيرة */
+/* Pagination */
+.shahinPagination {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.shahinPagination button {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--shahin-radius-md);
+  border: 1px solid var(--shahin-primary);
+  background-color: #ffffff;
+  color: var(--shahin-primary);
+  transition: all var(--shahin-transition);
+  font-size: 0.85rem;
+}
+
+.shahinPagination button.shahinActive {
+  background-color: var(--shahin-secondary-light);
+  border-color: var(--shahin-primary);
+}
+
+.shahinPagination button:not(.shahinActive):hover {
+  background-color: var(--shahin-secondary-light);
+}
+
+.shahinPagination button:disabled {
+  color: var(--shahin-border);
+  border-color: var(--shahin-border);
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
 @media (min-width: 768px) {
-  .elegantAuctions_grid {
+
+  .shahinProperties_grid,
+  .shahinAuctions_grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
-  
-  .elegantAuction_image {
-    height: 180px;
-  }
-  
-  .elegantAuction_card {
+
+  .shahinProperty_card,
+  .shahinAuction_card {
     margin: 0;
   }
 }
 
 @media (min-width: 1024px) {
-  .elegantAuctions_grid {
+
+  .shahinProperties_grid,
+  .shahinAuctions_grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
-  }
-  
-  .elegantAuction_image {
-    height: 200px;
   }
 }
 
 @media (max-width: 768px) {
-  .elegantAuction_details {
+
+  .shahinProperty_details,
+  .shahinAuction_details {
     padding: 12px;
   }
-  
-  .elegantAuction_details h3 {
+
+  .shahinProperty_details h3,
+  .shahinAuction_details h3 {
     font-size: 0.9rem;
   }
-  
-  .elegantAuction_image {
-    height: 140px;
-  }
-  
-  .elegantAuction_schedule {
+
+  .shahinAuction_schedule {
     flex-direction: column;
     gap: 6px;
   }
-  
-  .elegantAuction_description {
+
+  .shahinAuction_description {
     font-size: 0.8rem;
   }
+
+  .shahinFilter_group {
+    flex: 1 1 calc(50% - 12px);
+  }
 }
 
 @media (max-width: 480px) {
-  .elegantAuction_image {
-    height: 120px;
+
+  .shahinProperty_image,
+  .shahinAuction_image {
+    height: 160px;
   }
-  
-  .elegantAuction_details h3 {
+
+  .shahinProperty_details h3,
+  .shahinAuction_details h3 {
     font-size: 0.85rem;
   }
-  
-  .elegantAuction_company,
-  .elegantAuction_location,
-  .elegantSchedule_item {
+
+  .shahinProperty_location,
+  .shahinSpec,
+  .shahinAuction_company,
+  .shahinAuction_location,
+  .shahinSchedule_item {
     font-size: 0.75rem;
   }
-  
-  .elegantAuction_card {
-    margin: 0 20px;
+
+  .shahinTotal_price {
+    font-size: 0.8rem;
+  }
+
+  .shahinTag {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+
+  .shahinAction_btn {
+    font-size: 0.75rem;
+    min-height: 34px;
+  }
+
+  .shahinFilter_group {
+    flex: 1 1 100%;
   }
 }
 
-/* تحسينات للفلاتر في وضع المزادات */
-.elegantFilters_grid {
-  display: grid;
-
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+/* تحسينات للشكل العام */
+.shahinAuction_image .shahinPlaceholder_image,
+.shahinProperty_image .shahinPlaceholder_image {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@media (min-width: 768px) {
-  .elegantFilters_grid {
-    grid-template-columns: repeat(3, 1fr);
+.shahinProperties_container {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 20px;
+}
+
+/* تقليل ارتفاع مربع الفلترة على الهواتف */
+@media (max-width: 768px) {
+  .shahinSearch_filter {
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    top: 0;
+        margin-top: 15px; /* ✅ إنزال بسيط أكثر على الشاشات الصغيرة */
   }
-}
 
-@media (min-width: 1024px) {
-  .elegantFilters_grid {
-    grid-template-columns: repeat(4, 1fr);
+  .shahinSearch_bar {
+    margin-bottom: 8px;
+  }
+
+  .shahinSearch_input input {
+    padding: 10px 32px 10px 10px;
+    font-size: 0.85rem;
+  }
+
+  .shahinFilter_toggle {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    min-width: 45px;
+  }
+
+  .shahinTabs {
+    margin-top: 2px;
+  }
+
+  .shahinTabs button {
+    padding: 8px 4px;
+    font-size: 0.8rem;
+  }
+
+  /* تقليل المساحة بين الفلترة والمحتوى */
+  .shahinContent_area {
+    padding: 4px 0;
   }
 }
 
 @media (max-width: 480px) {
-  .elegantFilters_grid {
-    grid-template-columns: 1fr;
+  .shahinSearch_filter {
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    top: 0;
+        margin-top: 33px; /* ✅ إنزال بسيط أكثر على الشاشات الصغيرة */
+  }
+
+  .shahinSearch_input input {
+    padding: 8px 28px 8px 8px;
+    font-size: 0.8rem;
+  }
+
+  .shahinFilter_toggle {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    min-width: 40px;
+  }
+
+  .shahinTabs button {
+    padding: 6px 3px;
+    font-size: 0.75rem;
+  }
+
+  /* ضمان عدم تداخل البطاقات مع الفوتر */
+  .shahinProperties_grid,
+  .shahinAuctions_grid {
+    margin-bottom: 15px;
   }
 }
 
-/* تحسينات للبحث في المزادات */
-.elegantSearch_input input {
-  width: 100%;
-  padding: 12px 36px 12px 12px;
-  border-radius: var(--elegant-radius-md);
-  border: 1px solid var(--elegant-border);
-  font-size: 0.9rem;
-  transition: all var(--elegant-transition);
-  background: var(--elegant-bg-white);
+/* منع التداخل مع الفوتر */
+.shahinProperties_container::after {
+  content: '';
+  display: block;
+  clear: both;
 }
 
-.elegantSearch_input input:focus {
-  outline: none;
-  border-color: var(--elegant-secondary);
-  box-shadow: 0 0 0 2px var(--elegant-secondary-light);
-}
+/* تحسين المسافات للبطاقات على الهواتف */
+@media (max-width: 768px) {
 
-/* تحسينات للبطاقات بشكل عام */
-.elegantProperty_card,
-.elegantAuction_card {
-  transition: all 0.3s ease;
-}
+  .shahinProperty_card,
+  .shahinAuction_card {
+    margin: 0 4px 8px 4px;
+    top: 0;
+    
+  }
 
-.elegantProperty_card:hover,
-.elegantAuction_card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  .shahinProperties_grid,
+  .shahinAuctions_grid {
+    gap: 12px;
+  }
 }

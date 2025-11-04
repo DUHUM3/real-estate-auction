@@ -206,7 +206,7 @@ const PropertyDetailsPage = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('https://shahin-tqay.onrender.com/api/interested', {
+      const response = await fetch('https://shahin-tqay.onrender.com/api/user/interested', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(requestData),

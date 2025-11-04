@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   FaSearch,
@@ -14,7 +14,9 @@ import {
   FaClock,
   FaCalendarAlt,
   FaBuilding,
-  FaCalendarDay
+  FaCalendarDay,
+  FaImage,
+  FaHome
 } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 import '../styles/PropertyList.css';
@@ -22,6 +24,8 @@ import '../styles/PropertyList.css';
 const PropertiesPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const filterBarRef = useRef(null);
+  const lastScrollTop = useRef(0);
 
   // State variables
   const [properties, setProperties] = useState([]);
@@ -37,6 +41,7 @@ const PropertiesPage = () => {
     properties: [],
     auctions: []
   });
+  const [hideFilterBar, setHideFilterBar] = useState(false);
 
   // Filter states for lands
   const [landFilters, setLandFilters] = useState({
@@ -68,6 +73,27 @@ const PropertiesPage = () => {
   const landTypes = ['سكني', 'تجاري', 'صناعي', 'زراعي'];
   const purposes = ['بيع', 'استثمار'];
   const auctionStatuses = ['مفتوح', 'مغلق', 'معلق'];
+
+  // Handle scroll to hide/show filter bar
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (scrollTop > lastScrollTop.current && scrollTop > 100) {
+        // Scrolling down
+        setHideFilterBar(true);
+      } else {
+        // Scrolling up
+        setHideFilterBar(false);
+      }
+      lastScrollTop.current = scrollTop;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Fetch data based on active tab
   useEffect(() => {
@@ -463,20 +489,20 @@ const PropertiesPage = () => {
   // Get status badge class
   const getStatusBadgeClass = (status) => {
     switch(status) {
-      case 'مفتوح': return 'elegantStatus_open';
-      case 'تم البيع': return 'elegantStatus_sold';
-      case 'محجوز': return 'elegantStatus_reserved';
-      case 'مغلق': return 'elegantStatus_closed';
-      case 'معلق': return 'elegantStatus_pending';
-      default: return 'elegantStatus_unknown';
+      case 'مفتوح': return 'shahinStatus_open';
+      case 'تم البيع': return 'shahinStatus_sold';
+      case 'محجوز': return 'shahinStatus_reserved';
+      case 'مغلق': return 'shahinStatus_closed';
+      case 'معلق': return 'shahinStatus_pending';
+      default: return 'shahinStatus_unknown';
     }
   };
 
   // Land Filters Component
   const LandFiltersContent = () => (
-    <div className="elegantFilters_content">
-      <div className="elegantFilters_grid">
-        <div className="elegantFilter_group">
+    <div className="shahinFilters_content">
+      <div className="shahinFilters_row">
+        <div className="shahinFilter_group">
           <label>المنطقة</label>
           <select name="region" value={landFilters.region} onChange={handleLandFilterChange}>
             <option value="">كل المناطق</option>
@@ -486,7 +512,7 @@ const PropertiesPage = () => {
           </select>
         </div>
 
-        <div className="elegantFilter_group">
+        <div className="shahinFilter_group">
           <label>المدينة</label>
           <input
             type="text"
@@ -497,7 +523,7 @@ const PropertiesPage = () => {
           />
         </div>
 
-        <div className="elegantFilter_group">
+        <div className="shahinFilter_group">
           <label>نوع الأرض</label>
           <select name="land_type" value={landFilters.land_type} onChange={handleLandFilterChange}>
             <option value="">كل الأنواع</option>
@@ -507,7 +533,7 @@ const PropertiesPage = () => {
           </select>
         </div>
 
-        <div className="elegantFilter_group">
+        <div className="shahinFilter_group">
           <label>الغرض</label>
           <select name="purpose" value={landFilters.purpose} onChange={handleLandFilterChange}>
             <option value="">جميع الأغراض</option>
@@ -517,74 +543,26 @@ const PropertiesPage = () => {
           </select>
         </div>
 
-        <div className="elegantFilter_group">
-          <label>المساحة من (م²)</label>
-          <input
-            type="number"
-            name="min_area"
-            placeholder="الحد الأدنى"
-            value={landFilters.min_area}
-            onChange={handleLandFilterChange}
-          />
-        </div>
-
-        <div className="elegantFilter_group">
-          <label>المساحة إلى (م²)</label>
-          <input
-            type="number"
-            name="max_area"
-            placeholder="الحد الأقصى"
-            value={landFilters.max_area}
-            onChange={handleLandFilterChange}
-          />
-        </div>
-
-        {landFilters.purpose !== 'استثمار' && (
+        {window.innerWidth >= 768 && (
           <>
-            <div className="elegantFilter_group">
-              <label>السعر من (ريال/م²)</label>
+            <div className="shahinFilter_group">
+              <label>المساحة من (م²)</label>
               <input
                 type="number"
-                name="min_price"
+                name="min_area"
                 placeholder="الحد الأدنى"
-                value={landFilters.min_price}
+                value={landFilters.min_area}
                 onChange={handleLandFilterChange}
               />
             </div>
 
-            <div className="elegantFilter_group">
-              <label>السعر إلى (ريال/م²)</label>
+            <div className="shahinFilter_group">
+              <label>المساحة إلى (م²)</label>
               <input
                 type="number"
-                name="max_price"
+                name="max_area"
                 placeholder="الحد الأقصى"
-                value={landFilters.max_price}
-                onChange={handleLandFilterChange}
-              />
-            </div>
-          </>
-        )}
-
-        {landFilters.purpose === 'استثمار' && (
-          <>
-            <div className="elegantFilter_group">
-              <label>قيمة الاستثمار من (ريال)</label>
-              <input
-                type="number"
-                name="min_investment"
-                placeholder="الحد الأدنى"
-                value={landFilters.min_investment}
-                onChange={handleLandFilterChange}
-              />
-            </div>
-
-            <div className="elegantFilter_group">
-              <label>قيمة الاستثمار إلى (ريال)</label>
-              <input
-                type="number"
-                name="max_investment"
-                placeholder="الحد الأقصى"
-                value={landFilters.max_investment}
+                value={landFilters.max_area}
                 onChange={handleLandFilterChange}
               />
             </div>
@@ -592,18 +570,70 @@ const PropertiesPage = () => {
         )}
       </div>
 
-      <div className="elegantFilter_actions">
-        <button className="elegantReset_btn" onClick={resetFilters}>إعادة تعيين</button>
-        <button className="elegantApply_btn" onClick={applyFilters}>تطبيق الفلتر</button>
+      {window.innerWidth < 768 && (
+        <div className="shahinFilters_row">
+          <div className="shahinFilter_group">
+            <label>المساحة من (م²)</label>
+            <input
+              type="number"
+              name="min_area"
+              placeholder="الحد الأدنى"
+              value={landFilters.min_area}
+              onChange={handleLandFilterChange}
+            />
+          </div>
+
+          <div className="shahinFilter_group">
+            <label>المساحة إلى (م²)</label>
+            <input
+              type="number"
+              name="max_area"
+              placeholder="الحد الأقصى"
+              value={landFilters.max_area}
+              onChange={handleLandFilterChange}
+            />
+          </div>
+
+          {landFilters.purpose !== 'استثمار' && (
+            <>
+              <div className="shahinFilter_group">
+                <label>السعر من (ريال/م²)</label>
+                <input
+                  type="number"
+                  name="min_price"
+                  placeholder="الحد الأدنى"
+                  value={landFilters.min_price}
+                  onChange={handleLandFilterChange}
+                />
+              </div>
+
+              <div className="shahinFilter_group">
+                <label>السعر إلى (ريال/م²)</label>
+                <input
+                  type="number"
+                  name="max_price"
+                  placeholder="الحد الأقصى"
+                  value={landFilters.max_price}
+                  onChange={handleLandFilterChange}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      <div className="shahinFilter_actions">
+        <button className="shahinReset_btn" onClick={resetFilters}>إعادة تعيين</button>
+        <button className="shahinApply_btn" onClick={applyFilters}>تطبيق الفلتر</button>
       </div>
     </div>
   );
 
   // Auction Filters Component
   const AuctionFiltersContent = () => (
-    <div className="elegantFilters_content">
-      <div className="elegantFilters_grid">
-        <div className="elegantFilter_group">
+    <div className="shahinFilters_content">
+      <div className="shahinFilters_row">
+        <div className="shahinFilter_group">
           <label>البحث في المزادات</label>
           <input
             type="text"
@@ -614,7 +644,7 @@ const PropertiesPage = () => {
           />
         </div>
 
-        <div className="elegantFilter_group">
+        <div className="shahinFilter_group">
           <label>حالة المزاد</label>
           <select name="status" value={auctionFilters.status} onChange={handleAuctionFilterChange}>
             <option value="">جميع الحالات</option>
@@ -624,7 +654,7 @@ const PropertiesPage = () => {
           </select>
         </div>
 
-        <div className="elegantFilter_group">
+        <div className="shahinFilter_group">
           <label>اسم الشركة</label>
           <input
             type="text"
@@ -635,41 +665,80 @@ const PropertiesPage = () => {
           />
         </div>
 
-        <div className="elegantFilter_group">
-          <label>العنوان</label>
-          <input
-            type="text"
-            name="address"
-            placeholder="موقع المزاد"
-            value={auctionFilters.address}
-            onChange={handleAuctionFilterChange}
-          />
-        </div>
+        {window.innerWidth >= 768 && (
+          <>
+            <div className="shahinFilter_group">
+              <label>العنوان</label>
+              <input
+                type="text"
+                name="address"
+                placeholder="موقع المزاد"
+                value={auctionFilters.address}
+                onChange={handleAuctionFilterChange}
+              />
+            </div>
 
-        <div className="elegantFilter_group">
-          <label>من تاريخ</label>
-          <input
-            type="date"
-            name="date_from"
-            value={auctionFilters.date_from}
-            onChange={handleAuctionFilterChange}
-          />
-        </div>
+            <div className="shahinFilter_group">
+              <label>من تاريخ</label>
+              <input
+                type="date"
+                name="date_from"
+                value={auctionFilters.date_from}
+                onChange={handleAuctionFilterChange}
+              />
+            </div>
 
-        <div className="elegantFilter_group">
-          <label>إلى تاريخ</label>
-          <input
-            type="date"
-            name="date_to"
-            value={auctionFilters.date_to}
-            onChange={handleAuctionFilterChange}
-          />
-        </div>
+            <div className="shahinFilter_group">
+              <label>إلى تاريخ</label>
+              <input
+                type="date"
+                name="date_to"
+                value={auctionFilters.date_to}
+                onChange={handleAuctionFilterChange}
+              />
+            </div>
+          </>
+        )}
       </div>
 
-      <div className="elegantFilter_actions">
-        <button className="elegantReset_btn" onClick={resetFilters}>إعادة تعيين</button>
-        <button className="elegantApply_btn" onClick={applyFilters}>تطبيق الفلتر</button>
+      {window.innerWidth < 768 && (
+        <div className="shahinFilters_row">
+          <div className="shahinFilter_group">
+            <label>العنوان</label>
+            <input
+              type="text"
+              name="address"
+              placeholder="موقع المزاد"
+              value={auctionFilters.address}
+              onChange={handleAuctionFilterChange}
+            />
+          </div>
+
+          <div className="shahinFilter_group">
+            <label>من تاريخ</label>
+            <input
+              type="date"
+              name="date_from"
+              value={auctionFilters.date_from}
+              onChange={handleAuctionFilterChange}
+            />
+          </div>
+
+          <div className="shahinFilter_group">
+            <label>إلى تاريخ</label>
+            <input
+              type="date"
+              name="date_to"
+              value={auctionFilters.date_to}
+              onChange={handleAuctionFilterChange}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="shahinFilter_actions">
+        <button className="shahinReset_btn" onClick={resetFilters}>إعادة تعيين</button>
+        <button className="shahinApply_btn" onClick={applyFilters}>تطبيق الفلتر</button>
       </div>
     </div>
   );
@@ -679,8 +748,8 @@ const PropertiesPage = () => {
     if (totalPages <= 1) return null;
 
     return (
-      <div className="elegantPagination">
-        <button onClick={prevPage} disabled={currentPage === 1} className="elegantPage_arrow">
+      <div className="shahinPagination">
+        <button onClick={prevPage} disabled={currentPage === 1} className="shahinPage_arrow">
           <FaArrowRight />
         </button>
 
@@ -697,7 +766,7 @@ const PropertiesPage = () => {
               <button
                 key={pageNum}
                 onClick={() => paginate(pageNum)}
-                className={currentPage === pageNum ? 'elegantActive' : ''}
+                className={currentPage === pageNum ? 'shahinActive' : ''}
               >
                 {pageNum}
               </button>
@@ -706,7 +775,7 @@ const PropertiesPage = () => {
             pageNum === currentPage - 2 ||
             pageNum === currentPage + 2
           ) {
-            return <span key={pageNum} className="elegantEllipsis">...</span>;
+            return <span key={pageNum} className="shahinEllipsis">...</span>;
           }
           return null;
         })}
@@ -714,7 +783,7 @@ const PropertiesPage = () => {
         <button
           onClick={nextPage}
           disabled={currentPage === totalPages}
-          className="elegantPage_arrow"
+          className="shahinPage_arrow"
         >
           <FaArrowLeft />
         </button>
@@ -724,11 +793,11 @@ const PropertiesPage = () => {
 
   return (
     <>
-      <div className="elegantProperties_container">
-        <div className="elegantSearch_filter">
-          <div className="elegantSearch_bar">
-            <div className="elegantSearch_input">
-              <FaSearch className="elegantSearch_icon" />
+      <div className="shahinProperties_container">
+        <div className={`shahinSearch_filter ${hideFilterBar ? 'shahinHideFilter' : ''}`} ref={filterBarRef}>
+          <div className="shahinSearch_bar">
+            <div className="shahinSearch_input">
+              <FaSearch className="shahinSearch_icon" />
               <input
                 type="text"
                 placeholder={activeTab === 'lands' ? "البحث عن أراضي..." : "البحث عن مزادات..."}
@@ -738,7 +807,7 @@ const PropertiesPage = () => {
               />
             </div>
             <button
-              className="elegantFilter_toggle"
+              className="shahinFilter_toggle"
               onClick={() => window.innerWidth < 768 ? setShowMobileFilters(true) : setShowFilters(!showFilters)}
             >
               {showFilters ? <MdClose /> : <FaFilter />}
@@ -746,9 +815,9 @@ const PropertiesPage = () => {
             </button>
           </div>
 
-          <div className="elegantTabs">
+          <div className="shahinTabs">
             <button
-              className={activeTab === 'lands' ? 'elegantActive' : ''}
+              className={activeTab === 'lands' ? 'shahinActive' : ''}
               onClick={() => {
                 setActiveTab('lands');
                 setCurrentPage(1);
@@ -757,7 +826,7 @@ const PropertiesPage = () => {
               الأراضي
             </button>
             <button
-              className={activeTab === 'auctions' ? 'elegantActive' : ''}
+              className={activeTab === 'auctions' ? 'shahinActive' : ''}
               onClick={() => {
                 setActiveTab('auctions');
                 setCurrentPage(1);
@@ -770,18 +839,18 @@ const PropertiesPage = () => {
 
         {/* Desktop Filters */}
         {showFilters && window.innerWidth >= 768 && (
-          <div className="elegantFilters_container elegantDesktop">
+          <div className="shahinFilters_container shahinDesktop">
             {activeTab === 'lands' ? <LandFiltersContent /> : <AuctionFiltersContent />}
           </div>
         )}
 
         {/* Mobile Filter Sidebar */}
         <>
-          <div className={`elegantOverlay ${showMobileFilters ? 'elegantActive' : ''}`} onClick={() => setShowMobileFilters(false)}></div>
-          <div className={`elegantMobileFilter_sidebar ${showMobileFilters ? 'elegantActive' : ''}`}>
-            <div className="elegantSidebar_header">
+          <div className={`shahinOverlay ${showMobileFilters ? 'shahinActive' : ''}`} onClick={() => setShowMobileFilters(false)}></div>
+          <div className={`shahinMobileFilter_sidebar ${showMobileFilters ? 'shahinActive' : ''}`}>
+            <div className="shahinSidebar_header">
               <h3>🔍 فلاتر البحث</h3>
-              <button className="elegantClose_sidebar" onClick={() => setShowMobileFilters(false)}>
+              <button className="shahinClose_sidebar" onClick={() => setShowMobileFilters(false)}>
                 <FaTimes />
               </button>
             </div>
@@ -790,68 +859,68 @@ const PropertiesPage = () => {
         </>
 
         {/* Main Content */}
-        <div className="elegantContent_area">
+        <div className="shahinContent_area">
           {activeTab === 'lands' ? (
             <>
               {loading ? (
-                <div className="elegantLoading_container">
-                  <div className="elegantLoader"></div>
+                <div className="shahinLoading_container">
+                  <div className="shahinLoader"></div>
                   <p>جاري تحميل الأراضي...</p>
                 </div>
               ) : error ? (
-                <div className="elegantError_container">
+                <div className="shahinError_container">
                   <p>حدث خطأ: {error}</p>
                   <button onClick={() => window.location.reload()}>إعادة المحاولة</button>
                 </div>
               ) : properties.length === 0 ? (
-                <div className="elegantEmpty_state">
+                <div className="shahinEmpty_state">
                   <p>لم يتم العثور على أي أراضٍ تطابق معايير البحث</p>
                   <button onClick={resetFilters}>إعادة تعيين الفلتر</button>
                 </div>
               ) : (
-                <div className="elegantProperties_grid">
+                <div className="shahinProperties_grid">
                   {properties.map((property) => (
                     <div
                       key={property.id}
-                      className="elegantProperty_card"
+                      className="shahinProperty_card"
                       onClick={() => openPropertyDetails(property)}
                     >
-                      <div className="elegantProperty_image">
+                      <div className="shahinProperty_image">
                         {getPropertyImageUrl(property) ? (
                           <img src={getPropertyImageUrl(property)} alt={property.title} />
                         ) : (
-                          <div className="elegantPlaceholder_image">
-                            <FaMapMarkerAlt />
+                          <div className="shahinPlaceholder_image">
+                            <FaHome />
                           </div>
                         )}
-                        <div className={`elegantStatus_badge ${getStatusBadgeClass(property.status)}`}>
+                        <div className={`shahinStatus_badge ${getStatusBadgeClass(property.status)}`}>
                           {property.status}
                         </div>
                         <button
-                          className={`elegantFavorite_btn ${favorites.properties?.includes(property.id) ? 'elegantActive' : ''}`}
+                          className={`shahinFavorite_btn ${favorites.properties?.includes(property.id) ? 'shahinActive' : ''}`}
                           onClick={(e) => togglePropertyFavorite(property.id, e)}
                         >
                           <FaHeart />
                         </button>
                       </div>
 
-                      <div className="elegantProperty_details">
+                      <div className="shahinProperty_details">
                         <h3>{property.title}</h3>
 
-                        <div className="elegantProperty_location">
+                        <div className="shahinProperty_location">
                           <FaMapMarkerAlt />
                           <span>{property.region} - {property.city}</span>
                           {property.geo_location_text && (
-                            <span className="elegantLocation_detail">({property.geo_location_text})</span>
+                            <span className="shahinLocation_detail">({property.geo_location_text})</span>
                           )}
                         </div>
 
-                        <div className="elegantProperty_specs">
-                          <div className="elegantSpec">
+                        <div className="shahinProperty_specs">
+                          <div className="shahinSpec">
                             <FaRulerCombined />
                             <span>{formatPrice(property.total_area)} م²</span>
                           </div>
-                          <div className="elegantSpec">
+                          <div className="shahinSpec">
                             <FaMoneyBillWave />
                             <span>
                               {property.purpose === 'بيع'
@@ -862,24 +931,24 @@ const PropertiesPage = () => {
                         </div>
 
                         {property.purpose === 'بيع' && property.price_per_sqm && property.total_area && (
-                          <div className="elegantTotal_price">
+                          <div className="shahinTotal_price">
                             <strong>السعر الإجمالي: {formatPrice(calculateTotalPrice(property))} ر.س</strong>
                           </div>
                         )}
 
-                        <div className="elegantProperty_type">
-                          <span className={`elegantTag ${property.land_type?.toLowerCase()}`}>
+                        <div className="shahinProperty_type">
+                          <span className={`shahinTag ${property.land_type?.toLowerCase()}`}>
                             {property.land_type}
                           </span>
-                          <span className={`elegantTag elegantPurpose ${property.purpose?.toLowerCase()}`}>
+                          <span className={`shahinTag shahinPurpose ${property.purpose?.toLowerCase()}`}>
                             {property.purpose}
                           </span>
                         </div>
 
-                        <div className="elegantProperty_actions">
-                          <button className="elegantAction_btn elegantDetails_btn">تفاصيل</button>
+                        <div className="shahinProperty_actions">
+                          <button className="shahinAction_btn shahinDetails_btn">تفاصيل</button>
                           <button
-                            className="elegantAction_btn elegantShare_btn"
+                            className="shahinAction_btn shahinShare_btn"
                             onClick={(e) => shareProperty(property, e)}
                           >
                             <FaShare /> مشاركة
@@ -895,81 +964,81 @@ const PropertiesPage = () => {
             /* Auctions Tab Content */
             <>
               {loading ? (
-                <div className="elegantLoading_container">
-                  <div className="elegantLoader"></div>
+                <div className="shahinLoading_container">
+                  <div className="shahinLoader"></div>
                   <p>جاري تحميل المزادات...</p>
                 </div>
               ) : error ? (
-                <div className="elegantError_container">
+                <div className="shahinError_container">
                   <p>حدث خطأ: {error}</p>
                   <button onClick={() => window.location.reload()}>إعادة المحاولة</button>
                 </div>
               ) : auctions.length === 0 ? (
-                <div className="elegantEmpty_state">
+                <div className="shahinEmpty_state">
                   <p>لا توجد مزادات متاحة حالياً</p>
                   <button onClick={resetFilters}>إعادة تعيين الفلتر</button>
                 </div>
               ) : (
-                <div className="elegantAuctions_grid">
+                <div className="shahinAuctions_grid">
                   {auctions.map((auction) => (
                     <div
                       key={auction.id}
-                      className="elegantAuction_card"
+                      className="shahinAuction_card"
                       onClick={() => openAuctionDetails(auction)}
                     >
-                      <div className="elegantAuction_image">
+                      <div className="shahinAuction_image">
                         {getAuctionImageUrl(auction) ? (
                           <img src={getAuctionImageUrl(auction)} alt={auction.title.replace(/"/g, '')} />
                         ) : (
-                          <div className="elegantPlaceholder_image">
-                            <FaBuilding />
+                          <div className="shahinPlaceholder_image">
+                            <FaImage />
                           </div>
                         )}
-                        <div className={`elegantStatus_badge ${getStatusBadgeClass(auction.status)}`}>
+                        <div className={`shahinStatus_badge ${getStatusBadgeClass(auction.status)}`}>
                           {auction.status}
                         </div>
                         <button
-                          className={`elegantFavorite_btn ${favorites.auctions?.includes(auction.id) ? 'elegantActive' : ''}`}
+                          className={`shahinFavorite_btn ${favorites.auctions?.includes(auction.id) ? 'shahinActive' : ''}`}
                           onClick={(e) => toggleAuctionFavorite(auction.id, e)}
                         >
                           <FaHeart />
                         </button>
                       </div>
 
-                      <div className="elegantAuction_details">
+                      <div className="shahinAuction_details">
                         <h3>{auction.title.replace(/"/g, '')}</h3>
 
                         {auction.company && (
-                          <div className="elegantAuction_company">
+                          <div className="shahinAuction_company">
                             <FaBuilding />
                             <span>{auction.company.auction_name}</span>
                           </div>
                         )}
 
-                        <div className="elegantAuction_location">
+                        <div className="shahinAuction_location">
                           <FaMapMarkerAlt />
                           <span>{auction.address.replace(/"/g, '')}</span>
                         </div>
 
-                        <div className="elegantAuction_schedule">
-                          <div className="elegantSchedule_item">
+                        <div className="shahinAuction_schedule">
+                          <div className="shahinSchedule_item">
                             <FaCalendarDay />
                             <span>{formatDate(auction.auction_date)}</span>
                           </div>
-                          <div className="elegantSchedule_item">
+                          <div className="shahinSchedule_item">
                             <FaClock />
                             <span>{formatTime(auction.start_time)}</span>
                           </div>
                         </div>
 
-                        <p className="elegantAuction_description">
+                        <p className="shahinAuction_description">
                           {auction.description.replace(/"/g, '')}
                         </p>
 
-                        <div className="elegantAuction_actions">
-                          <button className="elegantAction_btn elegantDetails_btn">تفاصيل</button>
+                        <div className="shahinAuction_actions">
+                          <button className="shahinAction_btn shahinDetails_btn">تفاصيل</button>
                           <button
-                            className="elegantAction_btn elegantShare_btn"
+                            className="shahinAction_btn shahinShare_btn"
                             onClick={(e) => shareAuction(auction, e)}
                           >
                             <FaShare /> مشاركة
