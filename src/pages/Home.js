@@ -980,7 +980,7 @@ const handleSearch = (e) => {
                     </div>
                   )}
                 </div>
-
+{/* 
                 {displayedItems.length > itemsPerPage && (
                   <div className="pagination">
                     <button 
@@ -999,7 +999,7 @@ const handleSearch = (e) => {
                       التالي
                     </button>
                   </div>
-                )}
+                )} */}
               </>
             )}
 

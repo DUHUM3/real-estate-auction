@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { FaUser, FaBell, FaSignOutAlt, FaHeart, FaCog, FaPlus, FaChartBar, FaMapMarked, FaBriefcase, FaShoppingCart, FaBullhorn, FaListAlt, FaHandshake } from 'react-icons/fa';
 import { BsHouseFill } from 'react-icons/bs';
+import { fetchLatestNotifications, markNotificationAsRead } from '../../services/notificationService';
 import '../../styles/Navbar.css';
 
 function Navbar({ onLoginClick, onRegisterClick }) {
   const { currentUser, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -19,6 +22,37 @@ function Navbar({ onLoginClick, onRegisterClick }) {
   const notificationsRef = useRef(null);
   const requestMenuRef = useRef(null);
 
+  // جلب الإشعارات باستخدام React Query v5
+  const {
+    data: notificationsData,
+    isLoading: notificationsLoading,
+    isError: notificationsError,
+    refetch: refetchNotifications
+  } = useQuery({
+    queryKey: ['latestNotifications'],
+    queryFn: fetchLatestNotifications,
+    enabled: !!currentUser,
+    refetchInterval: 60000,
+  });
+
+  // استخدام mutation بتنسيق v5
+  const markAsReadMutation = useMutation({
+    mutationFn: markNotificationAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['latestNotifications'] });
+      queryClient.invalidateQueries({ queryKey: ['allNotifications'] });
+    },
+  });
+
+  // معالجة النقر على الإشعار
+  const handleNotificationClick = (notification) => {
+    if (!notification.read_at) {
+      markAsReadMutation.mutate(notification.id);
+    }
+    
+    navigate('/notifications', { state: { selectedNotification: notification.id } });
+    setShowNotifications(false);
+  };
   const handleLogout = () => {
     logout();
     setIsMobileMenuOpen(false);
@@ -35,7 +69,8 @@ function Navbar({ onLoginClick, onRegisterClick }) {
   const isLandOwner = () => {
     return currentUser?.user_type === 'مالك أرض';
   };
-   const isPropertyOwner = () => {
+  
+  const isPropertyOwner = () => {
     return currentUser?.user_type === 'وكيل عقارات';
   };
 
@@ -105,7 +140,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
       onLoginClick();
       return;
     }
-    
+
     if (type === 'buy-land') {
       navigate('/land-requests');
     } else if (type === 'market-property') {
@@ -117,14 +152,9 @@ function Navbar({ onLoginClick, onRegisterClick }) {
     setShowRequestMenu(false);
   };
 
-  // بيانات تجريبية للإشعارات
-  const notifications = [
-    { id: 1, title: 'طلب شراء جديد', message: 'لديك طلب شراء جديد يحتاج المراجعة', time: 'منذ 5 دقائق', read: false },
-    { id: 2, title: 'مزاد جديد', message: 'تم إضافة عقار جديد للمزاد', time: 'منذ ساعة', read: false },
-    { id: 3, title: 'عرض مكتمل', message: 'تم بيع العقار في المزاد', time: 'منذ يوم', read: true }
-  ];
-
-  const unreadNotifications = notifications.filter(notif => !notif.read).length;
+  // حساب عدد الإشعارات غير المقروءة
+  const notifications = notificationsData?.data || [];
+  const unreadNotifications = notifications.filter(notif => !notif.read_at).length;
 
   return (
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
@@ -132,16 +162,8 @@ function Navbar({ onLoginClick, onRegisterClick }) {
         {/* الشعار - يظهر في الكمبيوتر على اليمين وفي الهاتف على اليسار */}
         <div className="logo-section">
           <Link to="/" className="nav-logo" onClick={handleCloseMenu}>
-            <img 
-              src="images/logo3.png" 
-              alt="Logo" 
-              className="logo-image"
-            />
-            <img 
-              src="images/text.png" 
-              alt="Logo" 
-              className="logo-image"
-            />
+            <img src="images/logo3.png" alt="Logo" className="logo-image" />
+            <img src="images/text.png" alt="Logo" className="logo-image" />
           </Link>
         </div>
 
@@ -219,18 +241,35 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                       <span className="notifications-count">{unreadNotifications} غير مقروء</span>
                     </div>
                     <div className="notifications-list hide-scrollbar">
-                      {notifications.map(notification => (
-                        <div 
-                          key={notification.id} 
-                          className={`notification-item ${notification.read ? 'read' : 'unread'}`}
-                        >
-                          <div className="notification-content">
-                            <h4>{notification.title}</h4>
-                            <p>{notification.message}</p>
-                            <span className="notification-time">{notification.time}</span>
+                      {notificationsLoading ? (
+                        <div className="loading-notifications">جاري التحميل...</div>
+                      ) : notificationsError ? (
+                        <div className="error-notifications">حدث خطأ في تحميل الإشعارات</div>
+                      ) : notifications.length === 0 ? (
+                        <div className="empty-notifications">لا توجد إشعارات</div>
+                      ) : (
+                        notifications.map(notification => (
+                          <div 
+                            key={notification.id} 
+                            className={`notification-item ${notification.read_at ? 'read' : 'unread'}`}
+                            onClick={() => handleNotificationClick(notification)}
+                          >
+                            <div className="notification-content">
+                              <h4>{notification.data.title}</h4>
+                              <p>{notification.data.body}</p>
+                              <span className="notification-time">
+                                {new Date(notification.data.created_at).toLocaleString('ar-SA', {
+                                  year: 'numeric',
+                                  month: 'numeric',
+                                  day: 'numeric',
+                                  hour: 'numeric',
+                                  minute: 'numeric'
+                                })}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      )}
                     </div>
                     <Link 
                       to="/notifications" 
@@ -431,16 +470,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
 
             {currentUser && (
               <div className="mobile-user-section">
-                  {/* <div className="mobile-user-info">
-                    <div className="mobile-user-avatar">
-                      <FaUser className="avatar-icon" />
-                    </div>
-                    <span className="mobile-user-name">
-                      مرحباً، {currentUser.full_name || currentUser.email?.split('@')[0]}
-                    </span>
-                    <span className="mobile-user-type">({currentUser.user_type})</span>
-                  </div> */}
-
                 <Link to="/profile" className="mobile-nav-link" onClick={handleCloseMenu}>
                   <FaUser className="link-icon" />
                   الملف الشخصي
