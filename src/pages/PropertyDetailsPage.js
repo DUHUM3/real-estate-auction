@@ -273,7 +273,7 @@ const PropertyDetailsPage = () => {
   return (
     <div className="elegantDetails_container">
       {/* Header */}
-      <div className="elegantDetails_header">
+      {/* <div className="elegantDetails_header">
         <button className="elegantBack_btn" onClick={() => navigate(-1)}>
           <FaArrowLeft />
           العودة
@@ -289,7 +289,7 @@ const PropertyDetailsPage = () => {
             <FaShare />
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* Image Gallery */}
       <div className="elegantImage_gallery">
