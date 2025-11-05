@@ -166,12 +166,12 @@
 
 .login-btn {
   background: linear-gradient(135deg, #ffffff, #f0f0f0);
-  color: #53a1dd !important;
+  color: #ffffff !important; /* تأكيد لون النص الأزرق */
   padding: 0.5rem 0.9rem;
   border-radius: 20px;
   border: 2px solid #ffffff;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600; /* زيادة سماكة الخط لتحسين القراءة */
   font-size: 0.9rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
@@ -182,19 +182,20 @@
 
 .navbar.scrolled .login-btn {
   background: linear-gradient(135deg, #53a1dd, #3a7cb7);
-  color: #ffffff !important;
+  color: #ffffff !important; /* تأكيد لون النص الأبيض عند التمرير */
   border: 2px solid #53a1dd;
   box-shadow: 0 2px 8px rgba(83, 161, 221, 0.3);
 }
 
+/* إصلاح زر التسجيل الجديد */
 .register-btn {
   background: transparent;
-  color: #ffffff !important;
+  color: #ffffff !important; /* تأكيد لون النص الأبيض */
   padding: 0.5rem 0.9rem;
   border-radius: 20px;
   border: 2px solid #ffffff;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600; /* زيادة سماكة الخط */
   font-size: 0.9rem;
   transition: all 0.3s ease;
   display: flex;
@@ -203,7 +204,7 @@
 }
 
 .navbar.scrolled .register-btn {
-  color: #53a1dd !important;
+  color: #53a1dd !important; /* تأكيد لون النص الأزرق عند التمرير */
   border: 2px solid #53a1dd;
 }
 
@@ -331,11 +332,34 @@
 }
 
 .dropdown-icon {
-  margin-left: 12px;
-  font-size: 1rem;
-  color: #53a1dd;
+  margin-left: 12px !important;
+  margin-right: 0 !important;
 }
 
+.mobile-nav-link, .mobile-dropdown-item {
+  color: #333 !important; /* ضمان لون النص */
+  text-align: right !important;
+}
+
+/* تحسين التباين لضمان رؤية النص */
+.mobile-dropdown-toggle {
+  color: #333 !important;
+  font-weight: 600 !important;
+}
+
+/* تصحيح موضع الشارة في الإشعارات */
+.notification-badge {
+  right: -3px !important;
+  left: auto !important;
+}
+
+/* تصحيح اتجاه القائمة المنسدلة للإشعارات والمستخدم */
+.notifications-dropdown, 
+.user-dropdown {
+  right: 0 !important;
+  left: auto !important;
+  text-align: right !important;
+}
 /* 🌟 الإشعارات */
 .notifications-container {
   position: relative;
@@ -704,9 +728,10 @@
     font-size: 0.85rem;
   }
   
-  .login-text, .register-text {
-    display: none;
-  }
+.login-text, .register-text {
+  color: inherit !important;
+  font-weight: 600;
+}
   
   .login-icon, .register-icon {
     margin: 0;
@@ -762,19 +787,21 @@
 .mobile-sidebar {
   position: fixed;
   top: 0;
-  right: -100%;
+  right: -100%; /* تغيير من left إلى right */
+  left: auto; /* إزالة left */
   width: 320px;
   height: 100vh;
   background: #ffffff;
   z-index: 1002;
-  transition: right 0.3s ease-in-out;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  transition: right 0.3s ease-in-out; /* تغيير من left إلى right */
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15); /* عكس اتجاه الظل */
   display: flex;
   flex-direction: column;
 }
 
 .mobile-sidebar.active {
-  right: 0;
+  right: 0; /* تغيير من left إلى right */
+  left: auto;
 }
 
 .mobile-overlay {
@@ -859,9 +886,11 @@
 }
 
 .mobile-nav-link .link-icon {
-  margin-left: 12px;
+  margin-left: 12px !important;
+  margin-right: 0 !important;
   font-size: 1.2rem;
 }
+
 
 /* 🌟 القوائم المنسدلة في الجانبية */
 .mobile-nav-dropdown {
@@ -909,10 +938,10 @@
 }
 
 .mobile-dropdown-item .dropdown-icon {
-  margin-left: 10px;
+  margin-left: 10px !important;
+  margin-right: 0 !important;
   font-size: 1rem;
 }
-
 /* 🌟 معلومات المستخدم في الجانبية */
 .mobile-user-info {
   display: flex;
@@ -1086,11 +1115,11 @@
 }
 
 .link-icon {
-  margin-right: 8px;
+  margin-left: 8px !important;
+  margin-right: 0 !important;
   font-size: 1rem;
   color: inherit;
 }
-
 .nav-link:hover {
   color: #e0e0e0;
   background: rgba(255, 255, 255, 0.1);

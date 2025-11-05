@@ -13,8 +13,7 @@ import {
   FiCheckCircle,
   FiXCircle,
   FiDollarSign,
-  FiBriefcase,
-  FiMapPin
+  FiBriefcase
 } from 'react-icons/fi';
 import { 
   MdBusiness, 
@@ -50,7 +49,6 @@ function Profile() {
           const data = await response.json();
           setApiData(data);
           
-          // تعبئة formData بالبيانات من API مع التحقق من وجود details
           const initialFormData = {
             full_name: data.user.full_name || '',
             email: data.user.email || '',
@@ -58,7 +56,6 @@ function Profile() {
             user_type: data.user.user_type || 'individual',
           };
 
-          // إضافة بيانات details فقط إذا كانت موجودة
           if (data.user.details) {
             initialFormData.business_name = data.user.details.business_name || '';
             initialFormData.commercial_register = data.user.details.commercial_register || '';
@@ -117,7 +114,6 @@ function Profile() {
     try {
       const token = localStorage.getItem('token');
       
-      // إعداد البيانات للإرسال
       const submitData = {
         full_name: formData.full_name,
         email: formData.email,
@@ -125,7 +121,6 @@ function Profile() {
         user_type: formData.user_type
       };
 
-      // إضافة بيانات details إذا كانت موجودة
       if (formData.business_name || formData.commercial_register || formData.national_id) {
         submitData.details = {
           business_name: formData.business_name,
@@ -146,7 +141,6 @@ function Profile() {
       if (response.ok) {
         updateUser(formData);
         setIsEditing(false);
-        // تحديث البيانات المعروضة
         const updatedResponse = await fetch('https://shahin-tqay.onrender.com/api/profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -165,7 +159,6 @@ function Profile() {
   };
 
   const handleCancel = () => {
-    // إعادة تعيين البيانات من API مع التحقق من وجود details
     if (apiData) {
       const resetFormData = {
         full_name: apiData.user.full_name || '',
@@ -185,12 +178,10 @@ function Profile() {
     setIsEditing(false);
   };
 
-  // دالة للتحقق إذا كان المستخدم لديه بيانات details
   const hasDetails = () => {
     return apiData?.user?.details !== null && apiData?.user?.details !== undefined;
   };
 
-  // دالة للتحقق إذا كان المستخدم من نوع "جهة تجارية"
   const isCommercialEntity = () => {
     return apiData?.user?.user_type === 'جهة تجارية' || formData.user_type === 'company' || formData.user_type === 'جهة تجارية';
   };
@@ -212,16 +203,16 @@ function Profile() {
   const getUserTypeIcon = () => {
     const userType = apiData?.user?.user_type;
     if (userType === 'company' || userType === 'جهة تجارية') {
-      return <MdBusiness className="user-type-icon" />;
+      return <MdBusiness className="profile-type-icon" />;
     }
-    return <MdPerson className="user-type-icon" />;
+    return <MdPerson className="profile-type-icon" />;
   };
 
   if (loading) {
     return (
-      <div className="profileMaster-container">
-        <div className="elegantLoading_container">
-          <div className="elegantLoader"></div>
+      <div className="profile-container">
+        <div className="profile-loading">
+          <div className="profile-spinner"></div>
           <p>جاري تحميل البيانات...</p>
         </div>
       </div>
@@ -230,11 +221,11 @@ function Profile() {
 
   if (!apiData) {
     return (
-      <div className="profileMaster-container">
-        <div className="profileError-container">
-          <FiXCircle className="profileError-icon" />
-          <p>حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى</p>
-          <button className="profileRetry-btn" onClick={() => window.location.reload()}>
+      <div className="profile-container">
+        <div className="profile-error">
+          <FiXCircle className="error-icon" />
+          <p>حدث خطأ في جلب البيانات</p>
+          <button className="retry-btn" onClick={() => window.location.reload()}>
             إعادة المحاولة
           </button>
         </div>
@@ -243,133 +234,130 @@ function Profile() {
   }
 
   return (
-    <div className="profileMaster-container">
+    <div className="profile-container">
       {/* بطاقة المعلومات الرئيسية */}
-      <div className="profileHero-card">
-        <div className="profileHero-header">
-          <div className="profileHero-avatar">
-            <div className="profileHero-avatarMain">
-              <FiUser className="avatar-icon" />
-            </div>
-            <div className={`profileHero-status ${apiData?.user?.status}`} 
-                 title={apiData?.user?.status === 'approved' ? 'مفعل' : 
-                        apiData?.user?.status === 'pending' ? 'قيد المراجعة' : 'غير مفعل'}>
-            </div>
+      <div className="profile-header">
+        <div className="profile-avatar-section">
+          <div className="avatar-circle">
+            <FiUser className="avatar-icon2" />
           </div>
-          <div className="profileHero-info">
-            <h2 className="profileHero-name">{apiData.user.full_name || 'المستخدم'}</h2>
-            <div className="profileHero-badge">
-              {getUserTypeIcon()}
-              <span>{renderUserTypeText()}</span>
-            </div>
-            <div className="profileHero-contact">
-              <FiMail className="info-icon" />
-              <span>{apiData.user.email}</span>
-            </div>
-            <div className="profileHero-contact">
-              <FiPhone className="info-icon" />
-              <span>{apiData.user.phone || 'لم يتم إضافة رقم الجوال'}</span>
-            </div>
+          <div className={`status-dot ${apiData?.user?.status}`}></div>
+        </div>
+        
+        <div className="profile-info">
+          <h2 className="profile-name">{apiData.user.full_name || 'المستخدم'}</h2>
+          <div className="profile-type">
+            {getUserTypeIcon()}
+            <span>{renderUserTypeText()}</span>
           </div>
-          <div className="profileHero-actions">
-            {!isEditing ? (
-              <button className="profileEdit-btn" onClick={() => setIsEditing(true)}>
-                <FiEdit2 className="btn-icon" />
-                <span className="btn-text">تعديل الملف الشخصي</span>
+          <div className="profile-contact">
+            <FiMail className="contact-icon" />
+            <span>{apiData.user.email}</span>
+          </div>
+          <div className="profile-contact">
+            <FiPhone className="contact-icon" />
+            <span>{apiData.user.phone || 'لم يتم إضافة رقم الجوال'}</span>
+          </div>
+        </div>
+
+        <div className="profile-actions">
+          {!isEditing ? (
+            <button className="edit-btn" onClick={() => setIsEditing(true)}>
+              <FiEdit2 />
+              <span>تعديل</span>
+            </button>
+          ) : (
+            <div className="action-buttons">
+              <button className="save-btn" onClick={handleSubmit}>
+                <FiSave />
+                <span>حفظ</span>
               </button>
-            ) : (
-              <>
-                <button className="profileEdit-btn profileSave-btn" onClick={handleSubmit}>
-                  <FiSave className="btn-icon" />
-                  <span className="btn-text">حفظ</span>
-                </button>
-                <button className="profileEdit-btn profileCancel-btn" onClick={handleCancel}>
-                  <FiX className="btn-icon" />
-                  <span className="btn-text">إلغاء</span>
-                </button>
-              </>
-            )}
-          </div>
+              <button className="cancel-btn" onClick={handleCancel}>
+                <FiX />
+                <span>إلغاء</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* بطاقة الإحصائيات */}
-      <div className="profileStats-card">
-        <h3 className="profileStats-title">
+      <div className="stats-section">
+        <h3 className="section-title">
           <FiHome className="title-icon" />
           إحصائيات العقارات
         </h3>
         {statsLoading ? (
-          <div className="profileLoading-container">
-            <div className="profileSpinner"></div>
-            جاري تحميل الإحصائيات...
+          <div className="stats-loading">
+            <div className="loading-spinner"></div>
+            <span>جاري التحميل...</span>
           </div>
         ) : stats ? (
-          <div className="profileStats-grid">
-            <div className="profileStat-item">
-              <div className="profileStat-icon total">
+          <div className="stats-grid">
+            <div className="stat-item">
+              <div className="stat-icon total">
                 <FiHome />
               </div>
-              <div className="profileStat-details">
-                <span className="profileStat-value">{stats.total}</span>
-                <span className="profileStat-label">إجمالي العقارات</span>
+              <div className="stat-content">
+                <span className="stat-number">{stats.total}</span>
+                <span className="stat-label">الإجمالي</span>
               </div>
             </div>
-            <div className="profileStat-item">
-              <div className="profileStat-icon pending">
+            <div className="stat-item">
+              <div className="stat-icon pending">
                 <FiClock />
               </div>
-              <div className="profileStat-details">
-                <span className="profileStat-value">{stats.under_review}</span>
-                <span className="profileStat-label">قيد المراجعة</span>
+              <div className="stat-content">
+                <span className="stat-number">{stats.under_review}</span>
+                <span className="stat-label">قيد المراجعة</span>
               </div>
             </div>
-            <div className="profileStat-item">
-              <div className="profileStat-icon approved">
+            <div className="stat-item">
+              <div className="stat-icon approved">
                 <FiCheckCircle />
               </div>
-              <div className="profileStat-details">
-                <span className="profileStat-value">{stats.approved}</span>
-                <span className="profileStat-label">معتمدة</span>
+              <div className="stat-content">
+                <span className="stat-number">{stats.approved}</span>
+                <span className="stat-label">معتمدة</span>
               </div>
             </div>
-            <div className="profileStat-item">
-              <div className="profileStat-icon rejected">
+            <div className="stat-item">
+              <div className="stat-icon rejected">
                 <FiXCircle />
               </div>
-              <div className="profileStat-details">
-                <span className="profileStat-value">{stats.rejected}</span>
-                <span className="profileStat-label">مرفوضة</span>
+              <div className="stat-content">
+                <span className="stat-number">{stats.rejected}</span>
+                <span className="stat-label">مرفوضة</span>
               </div>
             </div>
-            <div className="profileStat-item">
-              <div className="profileStat-icon sold">
+            <div className="stat-item">
+              <div className="stat-icon sold">
                 <FiDollarSign />
               </div>
-              <div className="profileStat-details">
-                <span className="profileStat-value">{stats.sold}</span>
-                <span className="profileStat-label">تم بيعها</span>
+              <div className="stat-content">
+                <span className="stat-number">{stats.sold}</span>
+                <span className="stat-label">تم بيعها</span>
               </div>
             </div>
           </div>
         ) : (
-          <div className="profileError-container">
-            <FiXCircle className="profileError-icon" />
-            تعذر تحميل الإحصائيات
+          <div className="stats-error">
+            <FiXCircle />
+            <span>تعذر تحميل الإحصائيات</span>
           </div>
         )}
       </div>
 
       {/* المعلومات الشخصية */}
-      <div className="profileInfo-card">
-        <h3 className="profileInfo-title">
+      <div className="info-section">
+        <h3 className="section-title">
           <FiUser className="title-icon" />
           المعلومات الشخصية
         </h3>
-        <div className="profileInfo-list">
-          <div className="profileInfo-item">
-            <div className="profileInfo-label">
-              <FiUser className="info-icon" />
+        <div className="info-list">
+          <div className="info-item">
+            <div className="info-label">
+              <FiUser className="label-icon" />
               <span>الاسم الثلاثي</span>
             </div>
             {isEditing ? (
@@ -378,17 +366,17 @@ function Profile() {
                 name="full_name"
                 value={formData.full_name || ''}
                 onChange={handleChange}
-                className="profileEdit-input"
+                className="input-field"
                 placeholder="أدخل اسمك الثلاثي"
               />
             ) : (
-              <span className="profileInfo-value">{apiData?.user?.full_name || 'غير محدد'}</span>
+              <span className="info-value">{apiData?.user?.full_name || 'غير محدد'}</span>
             )}
           </div>
 
-          <div className="profileInfo-item">
-            <div className="profileInfo-label">
-              <FiMail className="info-icon" />
+          <div className="info-item">
+            <div className="info-label">
+              <FiMail className="label-icon" />
               <span>البريد الإلكتروني</span>
             </div>
             {isEditing ? (
@@ -397,17 +385,17 @@ function Profile() {
                 name="email"
                 value={formData.email || ''}
                 onChange={handleChange}
-                className="profileEdit-input"
+                className="input-field"
                 placeholder="أدخل بريدك الإلكتروني"
               />
             ) : (
-              <span className="profileInfo-value">{apiData?.user?.email || 'غير محدد'}</span>
+              <span className="info-value">{apiData?.user?.email || 'غير محدد'}</span>
             )}
           </div>
 
-          <div className="profileInfo-item">
-            <div className="profileInfo-label">
-              <FiPhone className="info-icon" />
+          <div className="info-item">
+            <div className="info-label">
+              <FiPhone className="label-icon" />
               <span>رقم الجوال</span>
             </div>
             {isEditing ? (
@@ -416,25 +404,25 @@ function Profile() {
                 name="phone"
                 value={formData.phone || ''}
                 onChange={handleChange}
-                className="profileEdit-input"
+                className="input-field"
                 placeholder="أدخل رقم جوالك"
               />
             ) : (
-              <span className="profileInfo-value">{apiData?.user?.phone || 'غير محدد'}</span>
+              <span className="info-value">{apiData?.user?.phone || 'غير محدد'}</span>
             )}
           </div>
 
           {isEditing && (
-            <div className="profileInfo-item">
-              <div className="profileInfo-label">
-                <MdAssignment className="info-icon" />
+            <div className="info-item">
+              <div className="info-label">
+                <MdAssignment className="label-icon" />
                 <span>نوع الحساب</span>
               </div>
               <select 
                 name="user_type"
                 value={formData.user_type || 'individual'}
                 onChange={handleChange}
-                className="profileEdit-select"
+                className="select-field"
               >
                 <option value="individual">فرد</option>
                 <option value="company">شركة</option>
@@ -445,17 +433,17 @@ function Profile() {
         </div>
       </div>
 
-      {/* معلومات إضافية - تظهر فقط إذا كان لديه details أو في وضع التعديل وكان نوعه شركة */}
+      {/* معلومات إضافية */}
       {(hasDetails() || (isEditing && isCommercialEntity())) && (
-        <div className="profileInfo-card">
-          <h3 className="profileInfo-title">
+        <div className="info-section">
+          <h3 className="section-title">
             <MdBusiness className="title-icon" />
             معلومات المنشأة
           </h3>
-          <div className="profileInfo-list">
-            <div className="profileInfo-item">
-              <div className="profileInfo-label">
-                <FiBriefcase className="info-icon" />
+          <div className="info-list">
+            <div className="info-item">
+              <div className="info-label">
+                <FiBriefcase className="label-icon" />
                 <span>اسم المنشأة</span>
               </div>
               {isEditing ? (
@@ -464,19 +452,19 @@ function Profile() {
                   name="business_name"
                   value={formData.business_name || ''}
                   onChange={handleChange}
-                  className="profileEdit-input"
+                  className="input-field"
                   placeholder="أدخل اسم المنشأة"
                 />
               ) : (
-                <span className="profileInfo-value">
+                <span className="info-value">
                   {apiData?.user?.details?.business_name || 'غير محدد'}
                 </span>
               )}
             </div>
 
-            <div className="profileInfo-item">
-              <div className="profileInfo-label">
-                <FiFileText className="info-icon" />
+            <div className="info-item">
+              <div className="info-label">
+                <FiFileText className="label-icon" />
                 <span>السجل التجاري</span>
               </div>
               {isEditing ? (
@@ -485,19 +473,19 @@ function Profile() {
                   name="commercial_register"
                   value={formData.commercial_register || ''}
                   onChange={handleChange}
-                  className="profileEdit-input"
+                  className="input-field"
                   placeholder="أدخل رقم السجل التجاري"
                 />
               ) : (
-                <span className="profileInfo-value">
+                <span className="info-value">
                   {apiData?.user?.details?.commercial_register || 'غير محدد'}
                 </span>
               )}
             </div>
 
-            <div className="profileInfo-item">
-              <div className="profileInfo-label">
-                <MdBadge className="info-icon" />
+            <div className="info-item">
+              <div className="info-label">
+                <MdBadge className="label-icon" />
                 <span>رقم الهوية الوطنية</span>
               </div>
               {isEditing ? (
@@ -506,11 +494,11 @@ function Profile() {
                   name="national_id"
                   value={formData.national_id || ''}
                   onChange={handleChange}
-                  className="profileEdit-input"
+                  className="input-field"
                   placeholder="أدخل رقم الهوية الوطنية"
                 />
               ) : (
-                <span className="profileInfo-value">
+                <span className="info-value">
                   {apiData?.user?.details?.national_id || 'غير محدد'}
                 </span>
               )}
@@ -519,25 +507,25 @@ function Profile() {
         </div>
       )}
 
-      {/* الوثائق والمستندات - تظهر فقط إذا كان هناك ملف تجاري */}
+      {/* الوثائق والمستندات */}
       {hasDetails() && apiData?.user?.details?.commercial_file && (
-        <div className="profileDocs-card">
-          <h3 className="profileInfo-title">
+        <div className="docs-section">
+          <h3 className="section-title">
             <FiFileText className="title-icon" />
             الوثائق والمستندات
           </h3>
-          <div className="profileDocs-list">
-            <div className="profileDoc-item">
-              <div className="profileDoc-info">
-                <FiFileText className="document-icon" />
-                <span className="profileDoc-name">السجل التجاري</span>
+          <div className="docs-list">
+            <div className="doc-item">
+              <div className="doc-info">
+                <FiFileText className="doc-icon" />
+                <span className="doc-name">السجل التجاري</span>
               </div>
               <button
-                className="profileDoc-btn"
+                className="doc-btn"
                 onClick={() => window.open(apiData.user.details.commercial_file, '_blank')}
               >
-                <FiFileText className="btn-icon" />
-                <span className="btn-text">عرض المستند</span>
+                <FiFileText />
+                <span>عرض المستند</span>
               </button>
             </div>
           </div>

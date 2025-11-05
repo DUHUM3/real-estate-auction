@@ -11,6 +11,10 @@ import Properties from './pages/PropertyList';
 import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import Favorites from './pages/Favorites';
 import LandRequestsList from './pages/LandRequestsList';
+import Interests from './pages/Interests';
+import LandRequestDetails from './pages/LandRequestDetails';
+import CreateLandRequest from './pages/CreateLandRequest';
+import MarketingRequest from './pages/AuctionRequest';
 import CreateProperty from './pages/CreateProperty';
 import Profile from './pages/Profile';
 import MyAds from './pages/MyAds';
@@ -66,6 +70,10 @@ function App() {
                 <Route path="/property/:id/:type" element={<PropertyDetailsPage />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/land-requests" element={<LandRequestsList />} />
+            <Route path="/requests/:id" element={<LandRequestDetails />} />
+            <Route path="/create-request" element={<CreateLandRequest />} />
+<Route path="/marketing-request" element={<MarketingRequest />} />
+<Route path="/interests" element={<Interests />} />
                 <Route path="/my-ads" element={<MyAds />} />
                 <Route path="/my-lands" element={<Favorites />} />
                 <Route path="/create-property" element={<CreateProperty />} />

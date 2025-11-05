@@ -15,7 +15,8 @@ import {
   FaArrowLeft as FaLeft,
   FaPhone,
   FaEnvelope,
-  FaUser
+  FaUser,
+  FaTimes
 } from 'react-icons/fa';
 import '../styles/PropertyDetailsModal.css';
 
@@ -39,58 +40,102 @@ const PropertyDetailsPage = () => {
   const [submitResult, setSubmitResult] = useState(null);
   const token = localStorage.getItem('token');
 
+useEffect(() => {
+  fetchData();
+  checkFavoriteStatus();
+  
+  // التحقق من وجود token عند تحميل المكون
+  const token = localStorage.getItem('token');
+  if (token) {
+    console.log('تم العثور على token:', token.substring(0, 20) + '...');
+  } else {
+    console.log('لا يوجد token - المستخدم غير مسجل الدخول');
+  }
+}, [id, type]);
 
-  useEffect(() => {
-    fetchData();
-    checkFavoriteStatus();
-  }, [id, type]);
+const fetchData = async () => {
+  try {
+    setLoading(true);
+    const url = type === 'land' 
+      ? `https://shahin-tqay.onrender.com/api/properties/${id}`
+      : `https://shahin-tqay.onrender.com/api/auctions/${id}`;
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const url = type === 'land' 
-        ? `https://shahin-tqay.onrender.com/api/properties/${id}`
-        : `https://shahin-tqay.onrender.com/api/auctions/${id}`;
+    const headers = {
+      'Content-Type': 'application/json',
+    };
 
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-
-      // إضافة الـ token إذا كان موجوداً
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: headers
-      });
-      
-      if (!response.ok) {
-        throw new Error('فشل في جلب البيانات');
-      }
-
-      const result = await response.json();
-      
-      if ((type === 'land' && result.status) || (type === 'auction' && result.success)) {
-        setData(type === 'land' ? result.data : result.data);
-      } else {
-        throw new Error('البيانات غير متوفرة');
-      }
-      
-      setLoading(false);
-    } catch (error) {
-      setError(error.message);
-      setLoading(false);
+    // إضافة الـ token في كل عملية
+    const token = localStorage.getItem('token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
-  };
 
-  const checkFavoriteStatus = () => {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers
+    });
+    
+    if (!response.ok) {
+      throw new Error('فشل في جلب البيانات');
+    }
+
+    const result = await response.json();
+    
+    if ((type === 'land' && result.status) || (type === 'auction' && result.success)) {
+      setData(type === 'land' ? result.data : result.data);
+    } else {
+      throw new Error('البيانات غير متوفرة');
+    }
+    
+    setLoading(false);
+  } catch (error) {
+    setError(error.message);
+    setLoading(false);
+  }
+};
+
+  const checkFavoriteStatus = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // إذا لم يكن هناك token، استخدم localStorage فقط
+      const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
+      setIsFavorite(favorites.includes(parseInt(id)));
+      return;
+    }
+
+    // إذا كان هناك token، تحقق من السيرفر
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+
+    const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/${type}/${id}`, {
+      method: 'GET',
+      headers: headers
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      setIsFavorite(result.isFavorite || false);
+    } else {
+      // Fallback إلى localStorage إذا فشل الطلب
+      const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
+      setIsFavorite(favorites.includes(parseInt(id)));
+    }
+  } catch (error) {
+    console.error('خطأ في التحقق من المفضلة:', error);
+    // Fallback إلى localStorage
     const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
     setIsFavorite(favorites.includes(parseInt(id)));
-  };
+  }
+};
 
-  const toggleFavorite = () => {
+const toggleFavorite = async () => {
+  const token = localStorage.getItem('token');
+  
+  if (!token) {
+    // إذا لم يكن هناك token، استخدم localStorage فقط
     const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
     let newFavorites;
 
@@ -102,7 +147,54 @@ const PropertyDetailsPage = () => {
 
     localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
     setIsFavorite(!isFavorite);
-  };
+    return;
+  }
+
+  try {
+    // إذا كان هناك token، استخدم الـ API
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+
+    const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/${type}/${id}`, {
+      method: isFavorite ? 'DELETE' : 'POST',
+      headers: headers
+    });
+
+    if (response.ok) {
+      setIsFavorite(!isFavorite);
+      
+      // تحديث localStorage أيضاً للحفاظ على التزامن
+      const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
+      let newFavorites;
+
+      if (isFavorite) {
+        newFavorites = favorites.filter(favId => favId !== parseInt(id));
+      } else {
+        newFavorites = [...favorites, parseInt(id)];
+      }
+
+      localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
+    } else {
+      throw new Error('فشل في تحديث المفضلة');
+    }
+  } catch (error) {
+    console.error('خطأ في تحديث المفضلة:', error);
+    // Fallback إلى localStorage
+    const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
+    let newFavorites;
+
+    if (isFavorite) {
+      newFavorites = favorites.filter(favId => favId !== parseInt(id));
+    } else {
+      newFavorites = [...favorites, parseInt(id)];
+    }
+
+    localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
+    setIsFavorite(!isFavorite);
+  }
+};
 
   const shareItem = () => {
     const shareData = {
@@ -121,7 +213,6 @@ const PropertyDetailsPage = () => {
     }
   };
 
-  // Clean up quotes from JSON strings
   const cleanText = (text) => {
     if (typeof text === 'string') {
       return text.replace(/"/g, '');
@@ -176,6 +267,12 @@ const PropertyDetailsPage = () => {
   const handleCloseInterestForm = () => {
     setShowInterestForm(false);
     setSubmitResult(null);
+    setFormData({
+      full_name: '',
+      phone: '',
+      email: '',
+      message: ''
+    });
   };
   
   const handleInputChange = (e) => {
@@ -186,60 +283,71 @@ const PropertyDetailsPage = () => {
     }));
   };
   
-  const handleSubmitInterest = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setSubmitResult(null);
+ const handleSubmitInterest = async (e) => {
+  e.preventDefault();
+  setSubmitting(true);
+  setSubmitResult(null);
+  
+  try {
+    const requestData = {
+      ...formData,
+      property_id: parseInt(id),
+    };
     
-    try {
-      const requestData = {
-        ...formData,
-        property_id: parseInt(id),
-      };
-      
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+    const headers = {
+      'Content-Type': 'application/json',
+    };
 
-      // إضافة الـ token إذا كان موجوداً
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+    // الحصول على الـ token وإضافته في كل عملية
+    const token = localStorage.getItem('token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
 
-      const response = await fetch('https://shahin-tqay.onrender.com/api/user/interested', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(requestData),
+    console.log('إرسال البيانات:', requestData);
+    console.log('الـ Token المستخدم:', token ? 'موجود' : 'غير موجود');
+
+    const response = await fetch('https://shahin-tqay.onrender.com/api/user/interested', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(requestData),
+    });
+    
+    const result = await response.json();
+    console.log('استجابة السيرفر:', result);
+    
+    if (response.ok && result.success) {
+      setSubmitResult({
+        success: true,
+        message: result.message || 'تم إرسال طلب الاهتمام بنجاح'
+      });
+      setFormData({
+        full_name: '',
+        phone: '',
+        email: '',
+        message: ''
       });
       
-      const result = await response.json();
-      
-      if (response.ok) {
-        setSubmitResult({
-          success: true,
-          message: 'تم إرسال طلب الاهتمام بنجاح'
-        });
-        setFormData({
-          full_name: '',
-          phone: '',
-          email: '',
-          message: ''
-        });
-      } else {
-        setSubmitResult({
-          success: false,
-          message: result.message || 'حدث خطأ أثناء إرسال الطلب'
-        });
-      }
-    } catch (error) {
+      setTimeout(() => {
+        setShowInterestForm(false);
+      }, 3000);
+    } else {
+      // عرض رسالة الخطأ من الـ backend بشكل مباشر
       setSubmitResult({
         success: false,
-        message: 'حدث خطأ في الاتصال بالخادم'
+        message: result.message || result.error || 'حدث خطأ أثناء إرسال الطلب'
       });
-    } finally {
-      setSubmitting(false);
     }
-  };
+  } catch (error) {
+    console.error('خطأ في الاتصال:', error);
+    setSubmitResult({
+      success: false,
+      message: 'حدث خطأ في الاتصال بالخادم'
+    });
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (loading) {
     return (
@@ -273,8 +381,8 @@ const PropertyDetailsPage = () => {
   return (
     <div className="elegantDetails_container">
       {/* Header */}
-      {/* <div className="elegantDetails_header">
-        <button className="elegantBack_btn" onClick={() => navigate(-1)}>
+      <div className="elegantDetails_header">
+        <button onClick={() => navigate(-1)} className="elegantBack_btn">
           <FaArrowLeft />
           العودة
         </button>
@@ -289,7 +397,7 @@ const PropertyDetailsPage = () => {
             <FaShare />
           </button>
         </div>
-      </div> */}
+      </div>
 
       {/* Image Gallery */}
       <div className="elegantImage_gallery">
@@ -458,34 +566,6 @@ const PropertyDetailsPage = () => {
           <p>{type === 'land' ? data.description : cleanText(data.description)}</p>
         </div>
 
-        {/* Map Section */}
-        {(type === 'land' && data.geo_location_map) || (type === 'auction' && data.latitude && data.longitude) ? (
-          <div className="elegantMap_section">
-            <h3>الموقع على الخريطة</h3>
-            <div className="elegantMap_container">
-              {type === 'land' && data.geo_location_map ? (
-                <iframe
-                  title="موقع الأرض"
-                  width="100%"
-                  height="300"
-                  frameBorder="0"
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(data.geo_location_map)}&z=15&output=embed`}
-                  allowFullScreen
-                ></iframe>
-              ) : type === 'auction' && data.latitude && data.longitude ? (
-                <iframe
-                  title="موقع المزاد"
-                  width="100%"
-                  height="300"
-                  frameBorder="0"
-                  src={`https://maps.google.com/maps?q=${data.latitude},${data.longitude}&z=15&output=embed`}
-                  allowFullScreen
-                ></iframe>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
-
         {/* Additional Details */}
         {type === 'land' && (
           <div className="elegantAdditional_section">
@@ -530,20 +610,27 @@ const PropertyDetailsPage = () => {
               className="elegantModal_close" 
               onClick={handleCloseInterestForm}
             >
-              ✕
+              <FaTimes />
             </button>
             <h3>تقديم اهتمام بالعقار</h3>
             
-            {submitResult ? (
-              <div className={`elegantSubmit_result ${submitResult.success ? 'success' : 'error'}`}>
-                <p>{submitResult.message}</p>
-                {submitResult.success ? (
-                  <button onClick={handleCloseInterestForm} className="elegantCloseResult_btn">إغلاق</button>
-                ) : (
-                  <button onClick={() => setSubmitResult(null)} className="elegantTryAgain_btn">حاول مرة أخرى</button>
-                )}
-              </div>
-            ) : (
+        {submitResult ? (
+  <div className={`elegantSubmit_result ${submitResult.success ? 'success' : 'error'}`}>
+    <p>{submitResult.message}</p>
+    {submitResult.success ? (
+      <button onClick={handleCloseInterestForm} className="elegantCloseResult_btn">
+        إغلاق
+      </button>
+    ) : (
+      <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+        <button onClick={() => setSubmitResult(null)} className="elegantTryAgain_btn">
+          حاول مرة أخرى
+        </button>
+       
+      </div>
+    )}
+  </div>
+) : (
               <form onSubmit={handleSubmitInterest}>
                 <div className="elegantForm_group">
                   <label>
@@ -625,7 +712,7 @@ const PropertyDetailsPage = () => {
               className="elegantModal_close"
               onClick={() => setShowImageModal(false)}
             >
-              ✕
+              <FaTimes />
             </button>
             <img src={getImageUrl(images[selectedImage])} alt="Modal" />
             {images.length > 1 && (

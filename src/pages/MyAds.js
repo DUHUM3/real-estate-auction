@@ -855,9 +855,9 @@ function MyAds() {
     <div className="my-ads-page">
       <div className="myads-page-container">
         <div className="myads-header-row">
-          <h1 className="myads-page-title">
+          {/* <h1 className="myads-page-title">
             {currentUser?.user_type === 'شركة مزادات' ? 'مزاداتي' : 'إعلاناتي'}
-          </h1>
+          </h1> */}
           <div className="myads-header-controls">
             <button className="myads-add-btn" onClick={() => setShowAdForm(true)}>
               <FaPlus /> 

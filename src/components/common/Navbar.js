@@ -325,7 +325,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                     
                     {(isLandOwner() || isInvestor() || isPropertyOwner()) && (
                       <Link 
-                        to="/my-offers" 
+                        to="/interests" 
                         className="dropdown-item"
                         onClick={() => setShowUserMenu(false)}
                       >
@@ -488,7 +488,7 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                 )}
 
                 {(isLandOwner() || isInvestor() || isPropertyOwner()) && (
-                  <Link to="/my-offers" className="mobile-nav-link" onClick={handleCloseMenu}>
+                  <Link to="/interests" className="mobile-nav-link" onClick={handleCloseMenu}>
                     <FaHandshake className="link-icon" />
                     عروضي
                   </Link>

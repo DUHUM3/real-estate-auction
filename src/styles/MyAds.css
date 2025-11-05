@@ -1,66 +1,73 @@
+
+
+/* الحاوية الرئيسية */
 .my-ads-page {
   min-height: 100vh;
+  background: var(--background-light);
 }
 
 .myads-page-container {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 80px 16px 20px;
 }
 
-/* Header - تصميم جديد لجعل الزر والشريط في نفس السطر */
+/* رأس الصفحة */
 .myads-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
+  background: var(--background-white);
+  border-radius: var(--border-radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .myads-page-title {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary-color);
-  width: 100%; /* يجعل العنوان يأخذ السطر كاملاً */
+  color: var(--text-color);
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.myads-page-title::before {
+  content: "📋";
+  font-size: 1.4rem;
 }
 
 .myads-header-controls {
   display: flex;
+  gap: 16px;
   align-items: center;
-  gap: 1rem;
-  width: 100%;
-  flex-direction: row; /* الاتجاه الافقي */
+  flex-wrap: wrap;
 }
 
 .myads-add-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background-color: var(--primary-color);
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 0.7rem 1.2rem;
-  font-weight: 600;
+  border-radius: var(--border-radius-md);
   font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transition-speed);
   white-space: nowrap;
-  flex-shrink: 0;
-  order: 2; /* يجعل الزر على اليمين */
 }
 
 .myads-add-btn:hover {
-  background-color: var(--primary-dark);
+  background: #3a8bc8;
+  transform: translateY(-1px);
 }
 
-/* Search Bar - تعديل ليأخذ المساحة المتبقية */
 .myads-search-bar {
-  margin-bottom: 0;
   flex: 1;
-  min-width: 200px;
-  order: 1; /* يجعل شريط البحث على اليسار */
+  min-width: 250px;
 }
 
 .myads-search-input {
@@ -70,35 +77,36 @@
 
 .myads-search-icon {
   position: absolute;
-  left: 1rem;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-secondary);
+  color: var(--text-light);
+  font-size: 0.9rem;
 }
 
 .myads-search-input input {
   width: 100%;
-  padding: 0.8rem 1rem 0.8rem 2.5rem;
+  padding: 10px 40px 10px 12px;
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  border-radius: var(--border-radius-md);
   font-size: 0.9rem;
-  transition: all 0.2s ease;
+  background: var(--background-white);
+  transition: var(--transition-speed);
 }
 
 .myads-search-input input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px var(--primary-light);
+  box-shadow: 0 0 0 2px rgba(83, 161, 221, 0.1);
 }
 
-/* Status Filter */
+/* تصفية الحالة */
 .myads-status-filter {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
+  margin-bottom: 20px;
   overflow-x: auto;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
   scrollbar-width: none;
 }
 
@@ -107,65 +115,57 @@
 }
 
 .myads-status-btn {
-  background-color: white;
+  padding: 8px 16px;
+  background: var(--background-white);
   color: var(--text-color);
   border: 1px solid var(--border-color);
-  border-radius: 50px;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  white-space: nowrap;
+  border-radius: var(--border-radius-md);
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transition-speed);
+  white-space: nowrap;
 }
 
 .myads-status-btn.active {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+  background: var(--primary-color);
   color: white;
+  border-color: var(--primary-color);
 }
 
-/* Ads Grid */
+.myads-status-btn:hover {
+  background: var(--background-light);
+}
+
+.myads-status-btn.active:hover {
+  background: #3a8bc8;
+}
+
+/* شبكة الإعلانات */
 .myads-grid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
 }
 
-@media (min-width: 640px) {
-  .myads-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .myads-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .myads-page-title {
-    font-size: 1.8rem;
-  }
-}
-
-/* Ad Card */
+/* بطاقة الإعلان */
 .myads-card {
-  background-color: var(--card-color);
-  border-radius: var(--border-radius);
+  background: var(--background-white);
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: all 0.2s ease;
-  position: relative;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: var(--transition-speed);
 }
 
 .myads-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .myads-img {
-  height: 180px;
-  width: 100%;
   position: relative;
+  height: 200px;
   overflow: hidden;
 }
 
@@ -173,86 +173,82 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.myads-card:hover .myads-img img {
-  transform: scale(1.05);
 }
 
 .myads-status-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 0.25rem 0.75rem;
-  border-radius: 50px;
+  top: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
   z-index: 1;
   color: white;
 }
 
-.myads-status-approved {
-  background-color: var(--success-color);
-}
-
 .myads-status-pending {
-  background-color: var(--pending-color);
+  background: rgba(245, 158, 11, 0.9);
 }
 
 .myads-status-rejected {
-  background-color: var(--danger-color);
+  background: rgba(239, 68, 68, 0.9);
 }
 
 .myads-status-sold {
-  background-color: var(--secondary-color);
+  background: rgba(16, 185, 129, 0.9);
 }
 
 .myads-status-open {
-  background-color: var(--primary-color);
+  background: rgba(59, 130, 246, 0.9);
 }
 
-/* Ad Content */
+.myads-status-closed {
+  background: rgba(107, 114, 128, 0.9);
+}
+
+/* محتوى البطاقة */
 .myads-content {
-  padding: 1rem;
+  padding: 16px;
 }
 
 .myads-title {
   font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0 0 12px 0;
+  line-height: 1.4;
 }
 
 .myads-info {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .myads-info-item {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   font-size: 0.85rem;
 }
 
 .myads-info-label {
-  color: var(--text-secondary);
+  color: var(--text-light);
   font-weight: 500;
 }
 
 .myads-info-value {
+  color: var(--text-color);
   font-weight: 600;
 }
 
 .myads-desc {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
+  color: var(--text-light);
+  font-size: 0.85rem;
   line-height: 1.5;
+  margin-bottom: 16px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -261,20 +257,20 @@
 
 .myads-footer {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding-top: 0.75rem;
+  align-items: center;
+  padding-top: 12px;
   border-top: 1px solid var(--border-color);
 }
 
 .myads-date {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  font-size: 0.8rem;
+  color: var(--text-light);
 }
 
 .myads-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 6px;
 }
 
 .myads-action-btn {
@@ -283,106 +279,182 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  border: 1px solid var(--border-color);
-  background-color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transition-speed);
+  font-size: 0.8rem;
+}
+
+.myads-edit-btn {
+  background: var(--background-light);
+  color: var(--text-color);
 }
 
 .myads-edit-btn:hover {
-  background-color: var(--primary-light);
-  color: var(--primary-color);
-  border-color: var(--primary-color);
+  background: var(--primary-color);
+  color: white;
+}
+
+.myads-delete-btn {
+  background: var(--background-light);
+  color: var(--text-color);
 }
 
 .myads-delete-btn:hover {
-  background-color: #ffebee;
-  color: var(--danger-color);
-  border-color: var(--danger-color);
+  background: #ef4444;
+  color: white;
+}
+
+/* حالات التحميل */
+.elegantLoading_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background: var(--background-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.elegantLoader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--background-light);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Error State */
+/* حالة الخطأ */
 .myads-error-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
-  gap: 1rem;
-  padding: 2rem;
+  padding: 60px 20px;
   text-align: center;
+  background: var(--background-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .myads-error-icon {
   width: 50px;
   height: 50px;
-  background-color: #ffebee;
-  color: var(--danger-color);
+  background: #ef4444;
+  color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: bold;
+  margin-bottom: 16px;
 }
 
-/* Empty State */
+.myads-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-speed);
+  margin-top: 16px;
+}
+
+.myads-btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.myads-btn-primary:hover {
+  background: #3a8bc8;
+}
+
+/* حالة عدم وجود بيانات */
 .myads-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
-  gap: 1rem;
-  padding: 2rem;
+  padding: 60px 20px;
   text-align: center;
+  background: var(--background-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .myads-empty-icon {
-  font-size: 50px;
-  margin-bottom: 1rem;
+  font-size: 3rem;
+  margin-bottom: 16px;
 }
 
-/* Form Overlay */
+.myads-empty-state h3 {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  margin: 0 0 8px 0;
+}
+
+.myads-empty-state p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin: 0 0 20px 0;
+}
+
+/* نموذج الإضافة */
 .myads-form-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
-  padding: 1rem;
+  z-index: 1000;
+  padding: 20px;
 }
 
 .myads-form-modal {
-  background-color: white;
-  border-radius: var(--border-radius);
+  background: var(--background-white);
+  border-radius: var(--border-radius-lg);
   width: 100%;
-  max-width: 700px;
+  max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .myads-form-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
-  background-color: white;
+  background: var(--background-white);
   z-index: 1;
+}
+
+.myads-form-header h3 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.2rem;
 }
 
 .myads-close-btn {
@@ -396,31 +468,25 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  transition: var(--transition-speed);
 }
 
 .myads-close-btn:hover {
-  background-color: #f5f5f5;
+  background: var(--background-light);
 }
 
-/* Ad Form */
 .myads-form {
-  padding: 1.5rem;
+  padding: 20px;
 }
 
 .myads-form-grid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1rem;
-}
-
-@media (min-width: 640px) {
-  .myads-form-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
 }
 
 .myads-form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .myads-form-group.full-width {
@@ -429,31 +495,38 @@
 
 .myads-form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 0.9rem;
 }
 
 .myads-form-control {
   width: 100%;
-  padding: 0.7rem 1rem;
+  padding: 10px 12px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition: all 0.2s ease;
+  border-radius: var(--border-radius-md);
+  font-size: 0.9rem;
+  background: var(--background-white);
+  transition: var(--transition-speed);
+  font-family: inherit;
 }
 
 .myads-form-control:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px var(--primary-light);
+  box-shadow: 0 0 0 2px rgba(83, 161, 221, 0.1);
 }
 
-.myads-file-input-wrapper {
-  position: relative;
+.myads-form-control[type="file"] {
+  padding: 8px;
 }
 
-.myads-file-input-wrapper input[type="file"] {
-  padding: 0.5rem;
+.myads-file-input-wrapper small {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-light);
+  font-size: 0.8rem;
 }
 
 /* Checkbox */
@@ -463,6 +536,7 @@
   position: relative;
   padding-right: 35px;
   cursor: pointer;
+  font-size: 0.9rem;
   user-select: none;
 }
 
@@ -513,102 +587,118 @@
   transform: rotate(45deg);
 }
 
-/* Form Actions */
+/* أزرار النموذج */
 .myads-form-actions {
   display: flex;
-  gap: 1rem;
+  gap: 12px;
   justify-content: flex-end;
-  margin-top: 2rem;
-}
-
-.myads-btn {
-  padding: 0.7rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  font-size: 0.95rem;
-}
-
-.myads-btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.myads-btn-primary:hover {
-  background-color: var(--primary-dark);
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
 }
 
 .myads-btn-outline {
-  background-color: transparent;
+  background: var(--background-white);
   color: var(--text-color);
   border: 1px solid var(--border-color);
+  padding: 10px 20px;
+  border-radius: var(--border-radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-speed);
 }
 
-.myads-btn-outline:hover {
-  background-color: #f5f5f5;
+.myads-btn-outline:hover:not(:disabled) {
+  background: var(--background-light);
 }
 
-.myads-btn:disabled {
+.myads-btn-outline:disabled, .myads-btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* تحسينات للاستجابة على الشاشات الصغيرة - التعديل الجديد */
-@media (max-width: 767px) {
+/* التصميم المتجاوب للهواتف */
+@media (max-width: 768px) {
+  .myads-page-container {
+    padding: 70px 12px 16px;
+  }
+  
   .myads-header-controls {
-    flex-direction: row; /* يبقى أفقي في الهاتف */
-    justify-content: space-between;
-    gap: 0.75rem;
+    flex-direction: column;
+    align-items: stretch;
   }
   
   .myads-search-bar {
-    order: 1; /* البحث على اليسار */
-    flex: 1;
-    margin-left: 0;
-    margin-right: auto;
+    min-width: auto;
   }
   
-  .myads-add-btn {
-    order: 2; /* الزر على اليمين */
-    flex-shrink: 0;
-    margin-right: 0;
+  .myads-grid {
+    grid-template-columns: 1fr;
   }
   
-  /* تحسين المسافات في الهاتف */
-  .myads-header-row {
-    gap: 0.75rem;
+  .myads-form-grid {
+    grid-template-columns: 1fr;
   }
   
-  .myads-add-btn {
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
+  .myads-form-modal {
+    margin: 10px;
+    max-height: 95vh;
   }
   
-  .myads-search-input input {
-    padding: 0.7rem 0.9rem 0.7rem 2.3rem;
+  .myads-form {
+    padding: 16px;
+  }
+  
+  .myads-form-actions {
+    flex-direction: column;
+  }
+  
+  .myads-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
 }
 
-/* تحسين إضافي للشاشات الصغيرة جداً */
+@media (max-width: 480px) {
+  .myads-page-container {
+    padding: 70px 8px 12px;
+  }
+  
+  .myads-header-row {
+    padding: 16px;
+  }
+  
+  .myads-page-title {
+    font-size: 1.1rem;
+  }
+  
+  .myads-card {
+    margin-bottom: 16px;
+  }
+  
+  .myads-status-filter {
+    gap: 6px;
+  }
+  
+  .myads-status-btn {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+}
+
+/* تحسينات إضافية للشاشات الصغيرة */
 @media (max-width: 360px) {
-  .myads-header-controls {
-    gap: 0.5rem;
-  }
-  
-  .myads-add-btn {
-    padding: 0.5rem 0.8rem;
-    font-size: 0.8rem;
-  }
-  
   .myads-add-btn span {
-    display: none; /* إخفاء النص في الشاشات الصغيرة جداً */
+    display: none;
   }
   
-  .myads-add-btn::before {
-    content: "+"; /* إظهار علامة الزائد فقط */
-    font-size: 1rem;
-    font-weight: bold;
+  .myads-add-btn::after {
+    content: "إضافة";
+  }
+  
+  .myads-grid {
+    grid-template-columns: 1fr;
   }
 }
