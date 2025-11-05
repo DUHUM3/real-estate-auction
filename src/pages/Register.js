@@ -313,7 +313,7 @@ function Register({ onClose, onSwitchToLogin }) {
             <div className="logo-container">
               <img 
                 src="/images/logo2.png" 
-                alt="منصة العقارات السعودية" 
+                alt="منصة الاراضي السعودية" 
                 className="auth-logo"
               />
             </div>

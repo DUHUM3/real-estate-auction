@@ -16,11 +16,9 @@ function Navbar({ onLoginClick, onRegisterClick }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showRequestMenu, setShowRequestMenu] = useState(false);
   const mobileMenuRef = useRef(null);
   const userMenuRef = useRef(null);
   const notificationsRef = useRef(null);
-  const requestMenuRef = useRef(null);
 
   // جلب الإشعارات باستخدام React Query v5
   const {
@@ -90,9 +88,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
       if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
         setShowNotifications(false);
       }
-      if (requestMenuRef.current && !requestMenuRef.current.contains(event.target)) {
-        setShowRequestMenu(false);
-      }
     };
 
     const handleEscapeKey = (event) => {
@@ -100,7 +95,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
         setIsMobileMenuOpen(false);
         setShowUserMenu(false);
         setShowNotifications(false);
-        setShowRequestMenu(false);
       }
     };
 
@@ -126,7 +120,6 @@ function Navbar({ onLoginClick, onRegisterClick }) {
 
   const handleCloseMenu = () => {
     setIsMobileMenuOpen(false);
-    setShowRequestMenu(false);
     setShowUserMenu(false);
     setShowNotifications(false);
   };
@@ -135,21 +128,13 @@ function Navbar({ onLoginClick, onRegisterClick }) {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const handleCreateRequest = (type) => {
+  const handleCreateRequest = () => {
     if (!currentUser) {
       onLoginClick();
       return;
     }
-
-    if (type === 'buy-land') {
-      navigate('/land-requests');
-    } else if (type === 'market-property') {
-      navigate('/create-marketing-request');
-    } else if (type === 'market-land') {
-      navigate('/create-land-marketing');
-    }
+    navigate('/land-requests');
     setIsMobileMenuOpen(false);
-    setShowRequestMenu(false);
   };
 
   // حساب عدد الإشعارات غير المقروءة
@@ -185,37 +170,16 @@ function Navbar({ onLoginClick, onRegisterClick }) {
               onClick={handleCloseMenu}
             >
               <FaMapMarked className="link-icon" />
-              العقارات والمزادات
+              الاراضي والمزادات
             </Link>
 
-            <div className="nav-dropdown" ref={requestMenuRef}>
-              <button 
-                className={`nav-link dropdown-toggle ${showRequestMenu ? 'active' : ''}`}
-                onClick={() => setShowRequestMenu(!showRequestMenu)}
-              >
-                <FaPlus className="link-icon" />
-                طلب شراء / تسويق
-              </button>
-              
-              {showRequestMenu && (
-                <div className="dropdown-menu">
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => handleCreateRequest('buy-land')}
-                  >
-                    <FaShoppingCart className="dropdown-icon" />
-                    طلب شراء أرض
-                  </button>
-                  <button 
-                    className="dropdown-item"
-                    onClick={() => handleCreateRequest('market-property')}
-                  >
-                    <FaBullhorn className="dropdown-icon" />
-                    طلب تسويق عقار
-                  </button>
-                </div>
-              )}
-            </div>
+            <button 
+              className="nav-link"
+              onClick={handleCreateRequest}
+            >
+              <FaPlus className="link-icon" />
+              طلب شراء / تسويق
+            </button>
           </div>
         </div>
 
@@ -334,23 +298,23 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                       </Link>
                     )}
                     
-                    <Link 
+                    {/* <Link 
                       to="/my-lands" 
                       className="dropdown-item"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <FaHeart className="dropdown-icon" />
                       المفضلة
-                    </Link>
+                    </Link> */}
                     
-                    <Link 
+                    {/* <Link 
                       to="/settings" 
                       className="dropdown-item"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <FaCog className="dropdown-icon" />
                       الإعدادات
-                    </Link>
+                    </Link> */}
                     
                     <hr className="dropdown-divider" />
                     
@@ -435,37 +399,16 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                 onClick={handleCloseMenu}
               >
                 <FaMapMarked className="link-icon" />
-                العقارات والمزادات
+                الاراضي والمزادات
               </Link>
 
-              <div className="mobile-nav-dropdown">
-                <button 
-                  className={`mobile-nav-link dropdown-toggle ${showRequestMenu ? 'active' : ''}`}
-                  onClick={() => setShowRequestMenu(!showRequestMenu)}
-                >
-                  <FaPlus className="link-icon" />
-                  طلب شراء / تسويق
-                </button>
-                
-                {showRequestMenu && (
-                  <div className="mobile-dropdown-menu">
-                    <button 
-                      className="mobile-dropdown-item"
-                      onClick={() => handleCreateRequest('buy-land')}
-                    >
-                      <FaShoppingCart className="dropdown-icon" />
-                      طلب شراء أرض
-                    </button>
-                    <button 
-                      className="mobile-dropdown-item"
-                      onClick={() => handleCreateRequest('market-property')}
-                    >
-                      <FaBullhorn className="dropdown-icon" />
-                      طلب تسويق عقار
-                    </button>
-                  </div>
-                )}
-              </div>
+              <button 
+                className="mobile-nav-link"
+                onClick={handleCreateRequest}
+              >
+                <FaPlus className="link-icon" />
+                طلب شراء / تسويق
+              </button>
             </div>
 
             {currentUser && (
@@ -493,16 +436,16 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                     عروضي
                   </Link>
                 )}
-
+{/* 
                 <Link to="/my-lands" className="mobile-nav-link" onClick={handleCloseMenu}>
                   <FaHeart className="link-icon" />
                   المفضلة
-                </Link>
+                </Link> */}
 
-                <Link to="/settings" className="mobile-nav-link" onClick={handleCloseMenu}>
+                {/* <Link to="/settings" className="mobile-nav-link" onClick={handleCloseMenu}>
                   <FaCog className="link-icon" />
                   الإعدادات
-                </Link>
+                </Link> */}
 
                 <Link to="/notifications" className="mobile-nav-link" onClick={handleCloseMenu}>
                   <FaBell className="link-icon" />

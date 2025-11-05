@@ -22,7 +22,7 @@ function Dashboard() {
           <p className="stat-number">5</p>
         </div>
         <div className="stat-card">
-          <h3>العقارات المضافة</h3>
+          <h3>الاراضي المضافة</h3>
           <p className="stat-number">3</p>
         </div>
         <div className="stat-card">
@@ -38,7 +38,7 @@ function Dashboard() {
         </Link>
         
         <Link to="/properties" className="action-card">
-          <h3>استعرض العقارات</h3>
+          <h3>استعرض الاراضي</h3>
           <p>اشترك في المزايدات</p>
         </Link>
         

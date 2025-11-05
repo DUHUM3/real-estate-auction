@@ -1040,7 +1040,7 @@ body {
 }
 
 
-/* ===== قسم العقارات ===== */
+/* ===== قسم الاراضي ===== */
 .properties-section {
   padding: 80px 0;
   background-color: var(--background-light);
@@ -1055,7 +1055,7 @@ body {
   gap: 15px;
 }
 
-/* أزرار التنقل في قسم العقارات */
+/* أزرار التنقل في قسم الاراضي */
 .properties-nav-container {
   display: flex;
   justify-content: space-between;
@@ -1098,7 +1098,7 @@ body {
   font-size: 14px;
 }
 
-/* للهاتف المحمول - قسم العقارات */
+/* للهاتف المحمول - قسم الاراضي */
 @media (max-width: 768px) {
   .properties-grid {
     display: flex;
@@ -1307,7 +1307,7 @@ body {
   transform: translateY(-2px);
 }
 
-/* حاوية العقارات */
+/* حاوية الاراضي */
 .properties-container {
   position: relative;
 }
@@ -1355,7 +1355,7 @@ body {
   font-size: 14px;
 }
 
-/* شبكة العقارات مع دعم السحب في الكمبيوتر */
+/* شبكة الاراضي مع دعم السحب في الكمبيوتر */
 .properties-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -3161,4 +3161,129 @@ body {
   .interest-card {
     padding: 1rem;
   }
+}
+/* تحسينات للأجهزة الصغيرة  لماذا تخترنا*/
+/* تصميم الهاتف - الحل النهائي */
+.mobile-why-us {
+  display: none;
+}
+
+.mobile-cards-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.mobile-why-card {
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.mobile-why-card.active {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.mobile-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.mobile-nav-arrow {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.mobile-nav-arrow:hover {
+  background: #0056b3;
+}
+
+.mobile-indicators {
+  display: flex;
+  gap: 8px;
+}
+
+.mobile-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: #ddd;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mobile-indicator.active {
+  background: #007bff;
+  transform: scale(1.2);
+}
+
+/* الوسائط المتعددة */
+@media (max-width: 768px) {
+  .mobile-why-us {
+    display: block;
+  }
+  
+  .desktop-why-us {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-why-us {
+    display: none;
+  }
+  
+  .desktop-why-us {
+    display: block;
+  }
+}
+/*  shahinMarketing_btn  ================================================================*/
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  flex-wrap: nowrap; /* يمنع نزول الأزرار تحت بعض */
+}
+
+.shahinMarketing_btn {
+  flex: 1; /* يجعل كل زر بنفس الحجم */
+  background: white;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-width: 0; /* يمنع تمدد الزر الزائد في الشاشات الصغيرة */
+}
+
+.shahinMarketing_btn:hover {
+  background: #3b82f6;
+  color: white;
+  transform: translateY(-2px);
 }

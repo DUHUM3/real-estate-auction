@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FaPlus, FaEdit, FaTrash, FaFilter, FaSearch } from 'react-icons/fa';
+import { 
+  FaPlus, 
+  FaEdit, 
+  FaTrash, 
+  FaFilter, 
+  FaSearch, 
+  FaTag,           // ✅ أيقونة للمزادات
+  FaClipboardList, // ✅ أيقونة للإعلانات
+  FaExclamationTriangle // ✅ أيقونة للخطأ
+} from 'react-icons/fa';
 import '../styles/MyAds.css';
 
 function MyAds() {
@@ -47,7 +56,9 @@ function MyAds() {
       };
     } else {
       return {
-        base: 'https://shahin-tqay.onrender.com/api/user/properties/my',
+        base: 'https://shahin-tqay.onrender.com/api/user/properties',  // تم تغيير الرابط للإنشاء
+        create: 'https://shahin-tqay.onrender.com/api/user/properties',
+        list: 'https://shahin-tqay.onrender.com/api/user/properties/my',
         status: (status) => `https://shahin-tqay.onrender.com/api/user/properties/status/${status}`,
         single: (id) => `https://shahin-tqay.onrender.com/api/user/properties/${id}`
       };
@@ -61,7 +72,7 @@ function MyAds() {
       const token = localStorage.getItem('token');
       const urls = getApiUrls();
       
-      let url = urls.base;
+      let url = currentUser?.user_type === 'شركة مزادات' ? urls.base : urls.list;
       
       // إذا كان هناك تصفية بالحالة ولم يكن المستخدم شركة مزادات
       if (status !== 'الكل' && currentUser?.user_type !== 'شركة مزادات') {
@@ -167,15 +178,19 @@ function MyAds() {
           });
         }
       } else {
-        // حقول الأراضي (الكود الأصلي)
-        const fields = [
+        // حقول الأراضي المشتركة
+        const commonFields = [
           'announcement_number', 'region', 'city', 'title', 'land_type', 'purpose',
           'geo_location_text', 'total_area', 'length_north', 'length_south', 
           'length_east', 'length_west', 'description', 'deed_number', 'legal_declaration'
         ];
 
-        fields.forEach(field => {
-          formData.append(field, adFormData[field]);
+        commonFields.forEach(field => {
+          if (typeof adFormData[field] === 'boolean') {
+            formData.append(field, adFormData[field] ? 'true' : 'false');
+          } else if (adFormData[field] !== null && adFormData[field] !== undefined) {
+            formData.append(field, adFormData[field]);
+          }
         });
 
         // إضافة الحقول المشروطة حسب purpose
@@ -184,11 +199,11 @@ function MyAds() {
         } else if (adFormData.purpose === 'استثمار') {
           formData.append('investment_duration', adFormData.investment_duration);
           formData.append('estimated_investment_value', adFormData.estimated_investment_value);
-        }
-
-        // إضافة agency_number إذا كان المستخدم وكيل شرعي
-        if (currentUser?.user_type === 'وكيل شرعي') {
-          formData.append('agency_number', adFormData.agency_number);
+          
+          // إضافة agency_number إذا كان المستخدم وكيل شرعي
+          if (currentUser?.user_type === 'وكيل شرعي' && adFormData.agency_number) {
+            formData.append('agency_number', adFormData.agency_number);
+          }
         }
 
         // إضافة الصور
@@ -203,7 +218,7 @@ function MyAds() {
         }
       }
 
-      const response = await fetch(urls.base, {
+      const response = await fetch(currentUser?.user_type === 'شركة مزادات' ? urls.base : urls.create, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -521,16 +536,16 @@ function MyAds() {
     </div>
   );
 
-  // نموذج الأراضي (النموذج الأصلي)
+  // نموذج الأراضي (مُحدّث لدعم الشاشات الصغيرة والمتطلبات الجديدة)
   const renderPropertyForm = () => (
     <div className="myads-form-overlay">
-      <div className="myads-form-modal">
+      <div className="myads-form-modal myads-compact-form">
         <div className="myads-form-header">
           <h3>إضافة أرض جديدة</h3>
           <button className="myads-close-btn" onClick={() => setShowAdForm(false)}>&times;</button>
         </div>
         <form onSubmit={handleAddAd} className="myads-form">
-          <div className="myads-form-grid">
+          <div className="myads-form-grid myads-mobile-grid">
             {/* المعلومات الأساسية */}
             <div className="myads-form-group">
               <label>رقم الإعلان</label>
@@ -776,14 +791,14 @@ function MyAds() {
                 onChange={handleAdChange}
                 required
                 className="myads-form-control"
-                rows="4"
+                rows="3"
                 placeholder="أدخل وصفاً مفصلاً عن الأرض"
               />
             </div>
 
             {/* رفع الملفات */}
             <div className="myads-form-group">
-              <label>الصورة الرئيسية</label>
+              <label>الصورة الرئيسية *</label>
               <div className="myads-file-input-wrapper">
                 <input
                   type="file"
@@ -924,9 +939,11 @@ function MyAds() {
               }
             </p>
           </div>
-        ) : error ? (
+      ) : error ? (
           <div className="myads-error-state">
-            <div className="myads-error-icon">!</div>
+            <div className="myads-error-icon">
+              <FaExclamationTriangle /> {/* ✅ أيقونة للخطأ */}
+            </div>
             <p>{error}</p>
             <button className="myads-btn myads-btn-primary" onClick={() => fetchAds(activeStatus)}>
               إعادة المحاولة
@@ -1018,9 +1035,13 @@ function MyAds() {
             ))}
           </div>
         ) : (
-          <div className="myads-empty-state">
+           <div className="myads-empty-state">
             <div className="myads-empty-icon">
-              {currentUser?.user_type === 'شركة مزادات' ? '🏷️' : '📝'}
+              {currentUser?.user_type === 'شركة مزادات' ? (
+                <FaTag size={48} /> // ✅ أيقونة للمزادات
+              ) : (
+                <FaClipboardList size={48} /> // ✅ أيقونة للإعلانات
+              )}
             </div>
             <h3>
               {currentUser?.user_type === 'شركة مزادات' ? 'لا توجد مزادات' : 'لا توجد إعلانات'}

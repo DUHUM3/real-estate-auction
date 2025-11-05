@@ -27,9 +27,6 @@ import {
   FaFilter,
   FaChevronRight,
   FaChevronLeft,
-  handleTouchStart,
-  handleTouchMove,
-  handleTouchEnd,
   FaLandmark
 } from 'react-icons/fa';
 import Login from './Login.js'; // تأكد من المسار الصحيح
@@ -260,6 +257,7 @@ function Home({ onLoginClick }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeService, setActiveService] = useState('large-lands');
   const [filterType, setFilterType] = useState('lands');
+  
   const [landFilter, setLandFilter] = useState({
     propertyType: '',
     city: '',
@@ -411,28 +409,35 @@ function Home({ onLoginClick }) {
 
   const minSwipeDistance = 50;
 
-  const handleTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
+// دوال معالجة السحب للهاتف
+const handleTouchStart = (e) => {
+  setTouchStart(e.targetTouches[0].clientX);
+};
 
-  const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
+const handleTouchMove = (e) => {
+  setTouchEnd(e.targetTouches[0].clientX);
+};
 
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+const handleTouchEnd = () => {
+  if (!touchStart || !touchEnd) return;
+  
+  const distance = touchStart - touchEnd;
+  const minSwipeDistance = 50;
+  
+  const isLeftSwipe = distance > minSwipeDistance;
+  const isRightSwipe = distance < -minSwipeDistance;
 
-    if (isLeftSwipe) {
-      nextCard();
-    } else if (isRightSwipe) {
-      prevCard();
-    }
-  };
+  if (isLeftSwipe) {
+    nextCard();
+  } else if (isRightSwipe) {
+    prevCard();
+  }
+  
+  // إعادة تعيين القيم
+  setTouchStart(null);
+  setTouchEnd(null);
+};
+
 
   const cardsData = [
     {
@@ -555,7 +560,7 @@ const handleSearch = (e) => {
       features: [
         'فلل ومنازل وعمائر',
         'أراضي ومزارع ومصانع',
-        'جميع أنواع العقارات والمشاريع',
+        'جميع أنواع الاراضي والمشاريع',
         'علاقة قوية مع شركات المزادات المعتمدة'
       ]
     }
@@ -617,7 +622,7 @@ const handleSearch = (e) => {
             </div>
           </div>
 
-          <p>منصة متكاملة لشراء وبيع الأراضي والعقارات عبر مزادات إلكترونية آمنة وموثوقة</p>
+          <p>منصة متكاملة لشراء وبيع الأراضي والاراضي عبر مزادات إلكترونية آمنة وموثوقة</p>
 
    <div className="search-filter">
       <form onSubmit={handleSearch} className="filter-form">
@@ -745,12 +750,12 @@ const handleSearch = (e) => {
         </div>
       </section>
 
-      {/* قسم العقارات المحدث مع الفلاتر */}
+      {/* قسم الاراضي المحدث مع الفلاتر */}
       <section className="properties-section" id="properties">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">
-              العقارات المتاحة
+              الاراضي المتاحة
               <div className="transparent-box"></div>
             </h2>
             {filtersApplied.length > 0 && (
@@ -980,26 +985,6 @@ const handleSearch = (e) => {
                     </div>
                   )}
                 </div>
-{/* 
-                {displayedItems.length > itemsPerPage && (
-                  <div className="pagination">
-                    <button 
-                      className="pagination-btn"
-                      disabled={currentPage === 0}
-                      onClick={() => setCurrentPage(prev => prev - 1)}
-                    >
-                      السابق
-                    </button>
-                    <span>الصفحة {currentPage + 1}</span>
-                    <button 
-                      className="pagination-btn"
-                      disabled={endIndex >= displayedItems.length}
-                      onClick={() => setCurrentPage(prev => prev + 1)}
-                    >
-                      التالي
-                    </button>
-                  </div>
-                )} */}
               </>
             )}
 
@@ -1027,16 +1012,17 @@ const handleSearch = (e) => {
       </section>
 
     {/* قسم لماذا تختارنا - تصميم معدل مع إصلاح المشاكل */}
+{/* قسم لماذا تختارنا - الحل النهائي */}
 <section className="why-us-section">
   <div className="container">
     <div className="section-header">
-      {/* <h2 className="section-title">
+      <h2 className="section-title">
         لماذا تختارنا؟
         <div className="transparent-box"></div>
-      </h2> */}
+      </h2>
     </div>
 
-    {/* تصميم الكمبيوتر - بطاقة ملء الشاشة */}
+    {/* تصميم الكمبيوتر */}
     <div className="desktop-why-us">
       <div className="full-screen-card">
         <div className="card-content">
@@ -1060,7 +1046,6 @@ const handleSearch = (e) => {
           </div>
         </div>
         
-        {/* شريط التنقل في الأسفل */}
         <div className="card-navigation">
           <div className="nav-arrows">
             <button className="nav-arrow prev" onClick={prevCard}>
@@ -1086,50 +1071,55 @@ const handleSearch = (e) => {
       </div>
     </div>
 
-    {/* تصميم الهاتف - عرض بطاقة واحدة مع إمكانية التمرير والسحب */}
+    {/* تصميم الهاتف - الحل الجديد */}
     <div className="mobile-why-us">
-      <div className="mobile-cards-container">
-        <div 
-          className="mobile-cards-track" 
-          style={{ transform: `translateX(-${activeTab * 100}%)` }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {cardsData.map((card, index) => (
-            <div 
-              key={card.id} 
-              className="mobile-why-card"
-            >
-              <div className="card-icon">
-                {card.icon}
-              </div>
-              <h3>{card.title}</h3>
-              <p>{card.description}</p>
-              <div className="card-details">
-                <h4>تفاصيل إضافية:</h4>
-                <ul>
-                  {card.details.map((detail, idx) => (
-                    <li key={idx}>
-                      <FaCheck className="check-icon" />
-                      {detail}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+      <div className="mobile-cards-wrapper">
+        {cardsData.map((card, index) => (
+          <div 
+            key={card.id} 
+            className={`mobile-why-card ${activeTab === index ? 'active' : ''}`}
+            style={{
+              display: activeTab === index ? 'block' : 'none'
+            }}
+          >
+            <div className="card-icon">
+              {card.icon}
             </div>
-          ))}
-        </div>
+            <h3>{card.title}</h3>
+            <p className="card-description">{card.description}</p>
+            <div className="card-details">
+              <h4>تفاصيل إضافية:</h4>
+              <ul>
+                {card.details.map((detail, idx) => (
+                  <li key={idx}>
+                    <FaCheck className="check-icon" />
+                    {detail}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
         
-        {/* مؤشرات التمرير */}
-        <div className="mobile-indicators">
-          {cardsData.map((_, index) => (
-            <button
-              key={index}
-              className={`mobile-indicator ${activeTab === index ? 'active' : ''}`}
-              onClick={() => setActiveTab(index)}
-            ></button>
-          ))}
+        {/* التنقل */}
+        <div className="mobile-navigation">
+          <button className="mobile-nav-arrow prev" onClick={prevCard}>
+            <FaChevronRight />
+          </button>
+          
+          <div className="mobile-indicators">
+            {cardsData.map((_, index) => (
+              <button
+                key={index}
+                className={`mobile-indicator ${activeTab === index ? 'active' : ''}`}
+                onClick={() => setActiveTab(index)}
+              ></button>
+            ))}
+          </div>
+          
+          <button className="mobile-nav-arrow next" onClick={nextCard}>
+            <FaChevronLeft />
+          </button>
         </div>
       </div>
     </div>

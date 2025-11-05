@@ -36,13 +36,18 @@ const queryClient = new QueryClient({
   },
 });
 
+// إنشاء Context لإدارة نافذة تسجيل الدخول
+export const ModalContext = React.createContext();
+
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [afterLoginCallback, setAfterLoginCallback] = useState(null);
 
-  const openLogin = () => {
+  const openLogin = (callback = null) => {
     setShowRegister(false);
     setShowLogin(true);
+    setAfterLoginCallback(() => callback);
   };
 
   const openRegister = () => {
@@ -53,48 +58,69 @@ function App() {
   const closeModals = () => {
     setShowLogin(false);
     setShowRegister(false);
+    setAfterLoginCallback(null);
+  };
+
+  // دالة يتم استدعاؤها بعد تسجيل الدخول بنجاح
+  const handleLoginSuccess = () => {
+    if (afterLoginCallback) {
+      afterLoginCallback();
+    }
+    closeModals();
+  };
+
+  const modalContextValue = {
+    openLogin,
+    openRegister,
+    closeModals
   };
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router>
-          <div className="App">
-            <Navbar onLoginClick={openLogin} onRegisterClick={openRegister} />
-            <main>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/properties" element={<Properties />} />
-                <Route path="/property/:id/:type" element={<PropertyDetailsPage />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/land-requests" element={<LandRequestsList />} />
-            <Route path="/requests/:id" element={<LandRequestDetails />} />
-            <Route path="/create-request" element={<CreateLandRequest />} />
-<Route path="/marketing-request" element={<MarketingRequest />} />
-<Route path="/interests" element={<Interests />} />
-                <Route path="/my-ads" element={<MyAds />} />
-                <Route path="/my-lands" element={<Favorites />} />
-                <Route path="/create-property" element={<CreateProperty />} />
-                <Route path="/auction/:id" element={<AuctionRoom />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/notifications" element={<Notifications />} />
-              </Routes>
-            </main>
-            <Footer />
+        <ModalContext.Provider value={modalContextValue}>
+          <Router>
+            <div className="App">
+              <Navbar onLoginClick={openLogin} onRegisterClick={openRegister} />
+              <main>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/properties" element={<Properties />} />
+                  <Route path="/property/:id/:type" element={<PropertyDetailsPage />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/land-requests" element={<LandRequestsList />} />
+                  <Route path="/requests/:id" element={<LandRequestDetails />} />
+                  <Route path="/create-request" element={<CreateLandRequest />} />
+                  <Route path="/marketing-request" element={<MarketingRequest />} />
+                  <Route path="/interests" element={<Interests />} />
+                  <Route path="/my-ads" element={<MyAds />} />
+                  <Route path="/my-lands" element={<Favorites />} />
+                  <Route path="/create-property" element={<CreateProperty />} />
+                  <Route path="/auction/:id" element={<AuctionRoom />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                </Routes>
+              </main>
+              <Footer />
 
-            {/* مودال تسجيل الدخول */}
-            {showLogin && (
-              <Login onClose={closeModals} onSwitchToRegister={openRegister} />
-            )}
+              {/* مودال تسجيل الدخول */}
+              {showLogin && (
+                <Login 
+                  onClose={closeModals} 
+                  onSwitchToRegister={openRegister}
+                  onLoginSuccess={handleLoginSuccess}
+                />
+              )}
 
-            {/* مودال إنشاء الحساب */}
-            {showRegister && (
-              <Register onClose={closeModals} onSwitchToLogin={openLogin} />
-            )}
-          </div>
-        </Router>
+              {/* مودال إنشاء الحساب */}
+              {showRegister && (
+                <Register onClose={closeModals} onSwitchToLogin={openLogin} />
+              )}
+            </div>
+          </Router>
+        </ModalContext.Provider>
       </AuthProvider>
     </QueryClientProvider>
   );

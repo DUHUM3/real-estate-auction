@@ -702,3 +702,76 @@
     grid-template-columns: 1fr;
   }
 }
+/* تحسينات الفورم المضغوط */
+.myads-compact-form {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* تكوين الشبكة للشاشات الصغيرة */
+.myads-mobile-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.myads-mobile-grid .myads-form-group {
+  margin-bottom: 10px;
+}
+
+.myads-mobile-grid .myads-form-group label {
+  font-size: 0.85rem;
+}
+
+.myads-mobile-grid .myads-form-control {
+  padding: 8px 10px;
+  font-size: 0.85rem;
+}
+
+/* تحسينات إضافية للشاشات المختلفة */
+@media (max-width: 768px) {
+  .myads-form-modal {
+    max-width: 95%;
+  }
+  
+  .myads-mobile-grid {
+    grid-template-columns: repeat(2, 1fr); /* صفان في كل صف للهاتف */
+    gap: 8px;
+  }
+  
+  .myads-form-group.full-width {
+    grid-column: 1 / span 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .myads-mobile-grid {
+    grid-template-columns: repeat(2, 1fr); /* الحفاظ على صفين حتى في الشاشات الصغيرة */
+    gap: 6px;
+  }
+  
+  .myads-form-header {
+    padding: 15px 10px;
+  }
+  
+  .myads-form {
+    padding: 10px;
+  }
+}
+
+/* تقليل حجم الهوامش والحشو في النموذج */
+.myads-compact-form .myads-form {
+  padding: 15px;
+}
+
+.myads-compact-form .myads-form-header {
+  padding: 15px;
+}
+
+.myads-compact-form .myads-form-actions {
+  margin-top: 15px;
+  padding-top: 15px;
+}
+
+.myads-compact-form .myads-form-group textarea {
+  min-height: 80px;
+}

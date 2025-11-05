@@ -117,7 +117,7 @@ function Interests() {
             <h3>لا توجد اهتمامات</h3>
             <p>لم تقم بالتعبير عن اهتمامك بأي عقار حتى الآن</p>
             <Link to="/properties" className="browse-btn">
-              تصفح العقارات
+              تصفح الاراضي
             </Link>
           </div>
         ) : (

@@ -661,6 +661,7 @@ button {
   cursor: pointer;
   border: 1px solid var(--shahin-border);
   display: flex;
+  top: 35px;
   flex-direction: column;
   height: 100%;
   margin: 0 8px;
@@ -1024,17 +1025,18 @@ button {
 }
 
 /* تحسين المسافات للبطاقات على الهواتف */
+/* تحسين المسافات للبطاقات على الهواتف */
+/* تحسين المسافات للبطاقات على الهواتف */
 @media (max-width: 768px) {
-
   .shahinProperty_card,
   .shahinAuction_card {
-    margin: 0 4px 8px 4px;
+    margin: 8px; /* ✅ مسافة 8px من جميع الجوانب */
     top: 0;
-    
   }
 
   .shahinProperties_grid,
   .shahinAuctions_grid {
     gap: 12px;
+    padding: 0 12px; /* ✅ مسافة داخلية للشبكة */
   }
 }

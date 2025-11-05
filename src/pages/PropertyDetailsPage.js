@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ModalContext } from '../App'; // تأكد من المسار الصحيح
+
 import {
   FaMapMarkerAlt,
   FaRulerCombined,
@@ -23,6 +25,8 @@ import '../styles/PropertyDetailsModal.css';
 const PropertyDetailsPage = () => {
   const { id, type } = useParams();
   const navigate = useNavigate();
+  const { openLogin } = useContext(ModalContext); // استخدام Context
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,59 +44,57 @@ const PropertyDetailsPage = () => {
   const [submitResult, setSubmitResult] = useState(null);
   const token = localStorage.getItem('token');
 
-useEffect(() => {
-  fetchData();
-  checkFavoriteStatus();
-  
-  // التحقق من وجود token عند تحميل المكون
-  const token = localStorage.getItem('token');
-  if (token) {
-    console.log('تم العثور على token:', token.substring(0, 20) + '...');
-  } else {
-    console.log('لا يوجد token - المستخدم غير مسجل الدخول');
-  }
-}, [id, type]);
-
-const fetchData = async () => {
-  try {
-    setLoading(true);
-    const url = type === 'land' 
-      ? `https://shahin-tqay.onrender.com/api/properties/${id}`
-      : `https://shahin-tqay.onrender.com/api/auctions/${id}`;
-
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-
-    // إضافة الـ token في كل عملية
+  useEffect(() => {
+    fetchData();
+    checkFavoriteStatus();
+    
     const token = localStorage.getItem('token');
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: headers
-    });
-    
-    if (!response.ok) {
-      throw new Error('فشل في جلب البيانات');
-    }
-
-    const result = await response.json();
-    
-    if ((type === 'land' && result.status) || (type === 'auction' && result.success)) {
-      setData(type === 'land' ? result.data : result.data);
+      console.log('تم العثور على token:', token.substring(0, 20) + '...');
     } else {
-      throw new Error('البيانات غير متوفرة');
+      console.log('لا يوجد token - المستخدم غير مسجل الدخول');
     }
-    
-    setLoading(false);
-  } catch (error) {
-    setError(error.message);
-    setLoading(false);
-  }
-};
+  }, [id, type]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const url = type === 'land' 
+        ? `https://shahin-tqay.onrender.com/api/properties/${id}`
+        : `https://shahin-tqay.onrender.com/api/auctions/${id}`;
+
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      const token = localStorage.getItem('token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers
+      });
+      
+      if (!response.ok) {
+        throw new Error('فشل في جلب البيانات');
+      }
+
+      const result = await response.json();
+      
+      if ((type === 'land' && result.status) || (type === 'auction' && result.success)) {
+        setData(type === 'land' ? result.data : result.data);
+      } else {
+        throw new Error('البيانات غير متوفرة');
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
 
   const checkFavoriteStatus = async () => {
   try {
@@ -260,7 +262,24 @@ const toggleFavorite = async () => {
     return images;
   };
   
-  const handleShowInterestForm = () => {
+
+const handleShowInterestForm = () => {
+    const token = localStorage.getItem('token');
+    console.log('التحقق من token في handleShowInterestForm:', token);
+    
+    if (!token) {
+      // إذا لم يكن المستخدم مسجل الدخول، افتح نافذة تسجيل الدخول
+      console.log('المستخدم غير مسجل الدخول - فتح نافذة تسجيل الدخول');
+      openLogin(() => {
+        // هذه الدالة ستنفذ بعد تسجيل الدخول بنجاح
+        console.log('تم تسجيل الدخول بنجاح - فتح فورم الاهتمام');
+        setShowInterestForm(true);
+      });
+      return;
+    }
+    
+    // إذا كان مسجل الدخول، اعرض فورم الاهتمام مباشرة
+    console.log('المستخدم مسجل الدخول - عرض فورم الاهتمام مباشرة');
     setShowInterestForm(true);
   };
   
@@ -461,7 +480,7 @@ const toggleFavorite = async () => {
       </div>
 
       {/* Main Content */}
-      <div className="elegantDetails_content">
+          <div className="elegantDetails_content">
         {/* Title and Basic Info */}
         <div className="elegantTitle_section">
           <h1>{type === 'land' ? data.title : cleanText(data.title)}</h1>
@@ -469,7 +488,6 @@ const toggleFavorite = async () => {
             {data.status}
           </div>
         </div>
-
         {/* Location */}
         <div className="elegantLocation_section">
           <FaMapMarkerAlt className="elegantSection_icon" />
@@ -592,14 +610,16 @@ const toggleFavorite = async () => {
         )}
         
         {/* Interest Button */}
-        <div className="elegantInterest_section">
-          <button 
-            className="elegantInterest_btn" 
-            onClick={handleShowInterestForm}
-          >
-            تقديم اهتمام
-          </button>
-        </div>
+      {type === 'land' && (
+          <div className="elegantInterest_section">
+            <button 
+              className="elegantInterest_btn" 
+              onClick={handleShowInterestForm}
+            >
+              تقديم اهتمام
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Interest Form Modal */}
@@ -699,40 +719,6 @@ const toggleFavorite = async () => {
                   {submitting ? 'جاري الإرسال...' : 'إرسال الطلب'}
                 </button>
               </form>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Image Modal */}
-      {showImageModal && images.length > 0 && (
-        <div className="elegantImage_modal">
-          <div className="elegantModal_content">
-            <button 
-              className="elegantModal_close"
-              onClick={() => setShowImageModal(false)}
-            >
-              <FaTimes />
-            </button>
-            <img src={getImageUrl(images[selectedImage])} alt="Modal" />
-            {images.length > 1 && (
-              <>
-                <button 
-                  className="elegantModal_nav elegantModal_prev"
-                  onClick={() => setSelectedImage(prev => prev === 0 ? images.length - 1 : prev - 1)}
-                >
-                  ‹
-                </button>
-                <button 
-                  className="elegantModal_nav elegantModal_next"
-                  onClick={() => setSelectedImage(prev => (prev + 1) % images.length)}
-                >
-                  ›
-                </button>
-                <div className="elegantGallery_count">
-                  {selectedImage + 1} / {images.length}
-                </div>
-              </>
             )}
           </div>
         </div>

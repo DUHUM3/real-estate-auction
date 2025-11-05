@@ -45,13 +45,13 @@ function Footer() {
         {/* المحتوى الرئيسي في عمود واحد */}
         <div className="footer-content">
           <p className="footer-description">
-            منصة مزادات العقارات الرائدة في المملكة العربية السعودية.
+            منصة مزادات الاراضي الرائدة في المملكة العربية السعودية.
           </p>
           
           {/* روابط سريعة في صف أفقي */}
           <div className="quick-links">
             <Link to="/" className="quick-link">الرئيسية</Link>
-            <Link to="/properties" className="quick-link">العقارات</Link>
+            <Link to="/properties" className="quick-link">الاراضي</Link>
             <Link to="/about" className="quick-link">عن المنصة</Link>
             <Link to="/contact" className="quick-link">اتصل بنا</Link>
           </div>

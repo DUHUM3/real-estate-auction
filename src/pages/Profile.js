@@ -285,7 +285,7 @@ function Profile() {
       <div className="stats-section">
         <h3 className="section-title">
           <FiHome className="title-icon" />
-          إحصائيات العقارات
+          إحصائيات الاراضي
         </h3>
         {statsLoading ? (
           <div className="stats-loading">
