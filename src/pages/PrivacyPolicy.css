@@ -1,0 +1,366 @@
+/* PrivacyPolicy.css */
+.privacy-policy-container {
+  direction: rtl;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.privacy-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.privacy-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.effective-date {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-section h2 {
+  color: #1a237e;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.sections-sidebar {
+  flex: 0 0 300px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.sections-sidebar h3 {
+  margin-top: 0;
+  color: #1a237e;
+  border-bottom: 2px solid #e8eaf6;
+  padding-bottom: 10px;
+}
+
+.sections-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sections-sidebar li {
+  padding: 12px 15px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.sections-sidebar li:hover {
+  background-color: #e8eaf6;
+}
+
+.sections-sidebar li.active {
+  background-color: #1a237e;
+  color: white;
+}
+
+.sections-sidebar li span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  background-color: #3f51b5;
+  color: white;
+  border-radius: 50%;
+  margin-left: 10px;
+  font-size: 0.8rem;
+}
+
+.sections-sidebar li.active span {
+  background-color: white;
+  color: #1a237e;
+}
+
+.section-content {
+  flex: 1;
+  background-color: white;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  border-bottom: 2px solid #e8eaf6;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: #1a237e;
+  display: flex;
+  align-items: center;
+}
+
+.section-number {
+  background-color: #1a237e;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 15px;
+  font-size: 1rem;
+}
+
+.section-text p {
+  margin-bottom: 15px;
+  text-align: justify;
+}
+
+.section-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e8eaf6;
+}
+
+.nav-button {
+  padding: 10px 20px;
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.nav-button:hover {
+  background-color: #1a237e;
+}
+
+.nav-button.prev {
+  order: 2;
+}
+
+.nav-button.next {
+  order: 1;
+}
+
+.privacy-footer {
+  text-align: center;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  color: #666;
+}
+
+.privacy-footer p {
+  margin: 5px 0;
+}
+
+/* تصميم متجاوب للهواتف */
+@media (max-width: 768px) {
+  .privacy-policy-container {
+    padding: 10px;
+  }
+  
+  .privacy-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .content-wrapper {
+    flex-direction: column;
+  }
+  
+  .sections-sidebar {
+    flex: none;
+    position: static;
+  }
+  
+  .section-content {
+    padding: 20px;
+  }
+  
+  .section-header h2 {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .section-number {
+    margin-left: 0;
+    margin-bottom: 10px;
+  }
+  
+  .section-navigation {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .nav-button.prev, .nav-button.next {
+    order: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .privacy-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .welcome-section h2 {
+    font-size: 1.2rem;
+  }
+  
+  .sections-sidebar {
+    padding: 15px;
+  }
+  
+  .section-content {
+    padding: 15px;
+  }
+}
+
+
+
+/*///////////////////////////////////////////////////// الإشعارات */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid #28a745;
+  max-width: 400px;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.notification.error {
+  border-left-color: #dc3545;
+}
+
+.notification-content {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.notification-message {
+  color: #333;
+  font-weight: 500;
+  margin-right: 10px;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-close:hover {
+  color: #333;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* أزرار المفضلة */
+.favorite-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #666;
+}
+
+.favorite-btn:hover {
+  background: white;
+  color: #ffc107;
+  transform: scale(1.1);
+}
+
+.favorite-btn.active {
+  background: white;
+  color: #ffc107;
+}
+
+.favorite-btn.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* إزالة أيقونة المشاركة من CSS السابق إذا كانت موجودة */
+.share-btn {
+  display: none;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}

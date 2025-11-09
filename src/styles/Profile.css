@@ -160,7 +160,7 @@
   border: 1px solid var(--border-color);
 }
 
-.section-title {
+/* .section-title {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -168,7 +168,7 @@
   font-weight: 700;
   color: var(--text-color);
   margin-bottom: 12px;
-}
+} */
 
 .title-icon {
   color: var(--primary-color);

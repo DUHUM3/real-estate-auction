@@ -73,11 +73,11 @@ function Footer() {
         <div className="footer-bottom">
           <p className="copyright">&copy; 2025 شاهين بلاس</p>
           <div className="footer-bottom-links">
-            <a href="#" className="bottom-link">
+            <a href="/privacy-policy" className="bottom-link">
               <FaShieldAlt className="link-icon" />
               سياسة الخصوصية
             </a>
-            <a href="#" className="bottom-link">
+            <a href="/terms-of-service" className="bottom-link">
               <FaFileContract className="link-icon" />
               شروط الاستخدام
             </a>

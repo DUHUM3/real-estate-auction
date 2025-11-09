@@ -15,6 +15,8 @@ import Interests from './pages/Interests';
 import LandRequestDetails from './pages/LandRequestDetails';
 import CreateLandRequest from './pages/CreateLandRequest';
 import MarketingRequest from './pages/AuctionRequest';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import CreateProperty from './pages/CreateProperty';
 import Profile from './pages/Profile';
 import MyAds from './pages/MyAds';
@@ -98,6 +100,8 @@ function App() {
                   <Route path="/my-ads" element={<MyAds />} />
                   <Route path="/my-lands" element={<Favorites />} />
                   <Route path="/create-property" element={<CreateProperty />} />
+                  <Route path="/terms-of-service" element={<TermsOfService />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                   <Route path="/auction/:id" element={<AuctionRoom />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/notifications" element={<Notifications />} />
