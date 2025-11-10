@@ -3287,3 +3287,401 @@ body {
   color: white;
   transform: translateY(-2px);
 }
+/* ===== قسم انشاء طلب ارض ======================================================================================  ===== */
+
+/* src/pages/CreateLandRequest.css */
+
+.elegantCreate_container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* الهيدر */
+.elegantCreate_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  padding: 0 10px;
+}
+
+.elegantBack_btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 20px;
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.elegantBack_btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  transform: translateX(-2px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.1);
+}
+
+.elegantHeader_title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.elegantHeader_title span:first-child {
+  font-size: 28px;
+}
+
+/* المحتوى الرئيسي */
+.elegantCreate_content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: calc(100vh - 100px);
+}
+
+.elegantCreate_card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f5f9;
+  width: 100%;
+  max-width: 1000px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.elegantCreate_card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+/* عنوان البطاقة */
+.elegantCard_title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 35px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f8fafc;
+}
+
+.elegantCard_icon {
+  color: #3b82f6;
+  font-size: 28px;
+  background: #eff6ff;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.elegantCard_title h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* النموذج */
+.elegantCreate_form {
+  width: 100%;
+}
+
+.elegantForm_rows {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* الصفوف - تصميم متجاوب */
+.elegantForm_row {
+  display: grid;
+  gap: 25px;
+}
+
+/* الكمبيوتر: 3 حقول في الصف */
+@media (min-width: 1025px) {
+  .elegantForm_row {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  
+  /* الصف الأول: المنطقة والمدينة والغرض */
+  .elegantForm_row:first-child {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  
+  /* الصف الثاني: النوع والمساحة (يأخذ مساحة مضاعفة) */
+  .elegantForm_row:nth-child(2) {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+/* التابلت: 2 حقول في الصف */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .elegantForm_row {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .elegantForm_row:nth-child(2) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* الهاتف: حقل واحد في الصف */
+@media (max-width: 768px) {
+  .elegantForm_row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* الحقول الفردية التي تأخذ الصف كاملاً */
+.elegantForm_fullRow {
+  grid-column: 1 / -1;
+}
+
+.elegantForm_group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.elegantForm_label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 5px;
+}
+
+.elegantForm_label_icon {
+  color: #3b82f6;
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+}
+
+/* الحقول */
+.elegantForm_select,
+.elegantForm_input,
+.elegantForm_textarea {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  color: #1e293b;
+  box-sizing: border-box;
+}
+
+.elegantForm_select:focus,
+.elegantForm_input:focus,
+.elegantForm_textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.elegantForm_select:hover,
+.elegantForm_input:hover,
+.elegantForm_textarea:hover {
+  border-color: #cbd5e1;
+}
+
+.elegantForm_select:disabled {
+  background-color: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.elegantForm_textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+/* رسالة الخطأ */
+.elegantError_message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+  font-weight: 500;
+}
+
+.elegantError_icon {
+  font-size: 18px;
+}
+
+/* أزرار النموذج */
+.elegantForm_actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 2px solid #f8fafc;
+}
+
+.elegantSubmit_btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 18px 30px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.elegantSubmit_btn:hover:not(:disabled) {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.elegantSubmit_btn:active {
+  transform: translateY(0);
+}
+
+.elegantSubmit_btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.elegantCancel_btn {
+  flex: 0.5;
+  background: #ffffff;
+  color: #64748b;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 30px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.elegantCancel_btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #475569;
+  transform: translateY(-1px);
+}
+
+/* التحميل */
+.elegantLoading_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.elegantLoader {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.elegantLoading_text {
+  font-size: 18px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* تحسينات للشاشات الصغيرة */
+@media (max-width: 768px) {
+  .elegantCreate_container {
+    padding: 15px;
+  }
+  
+  .elegantCreate_card {
+    padding: 25px;
+    border-radius: 16px;
+  }
+  
+  .elegantCard_title {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .elegantCard_title h2 {
+    font-size: 24px;
+  }
+  
+  .elegantForm_actions {
+    flex-direction: column;
+  }
+  
+  .elegantCancel_btn {
+    flex: 1;
+  }
+  
+  .elegantHeader_title {
+    font-size: 20px;
+  }
+  
+  .elegantBack_btn {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .elegantCreate_card {
+    padding: 20px;
+  }
+  
+  .elegantForm_select,
+  .elegantForm_input,
+  .elegantForm_textarea {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+  
+  .elegantSubmit_btn,
+  .elegantCancel_btn {
+    padding: 16px 20px;
+    font-size: 16px;
+  }
+}
+

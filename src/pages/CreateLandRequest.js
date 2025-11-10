@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaArrowRight, FaPlusCircle, FaMapMarkerAlt, FaCity, FaHandshake, FaBuilding, FaRuler, FaStickyNote } from 'react-icons/fa';
 
 function CreateLandRequest() {
   const navigate = useNavigate();
@@ -127,7 +126,7 @@ function CreateLandRequest() {
       {/* الهيدر */}
       <header className="elegantCreate_header">
         <button onClick={() => navigate(-1)} className="elegantBack_btn">
-          <FaArrowRight /> العودة
+           العودة
         </button>
         
         <div className="elegantHeader_title">
@@ -141,134 +140,136 @@ function CreateLandRequest() {
         <div className="elegantCreate_card">
           {/* عنوان البطاقة */}
           <div className="elegantCard_title">
-            <span className="elegantCard_icon"><FaPlusCircle /></span>
+            <span className="elegantCard_icon"></span>
             <h2>إضافة طلب جديد</h2>
           </div>
 
           {/* النموذج */}
-          <form onSubmit={handleSubmit} className="elegantCreate_form">
-            <div className="elegantForm_rows">
-              {/* الصف الأول: المنطقة والمدينة */}
-              <div className="elegantForm_row">
-                <div className="elegantForm_group">
-                  <label htmlFor="region" className="elegantForm_label">
-                    <span className="elegantForm_label_icon"><FaMapMarkerAlt /></span>
-                    المنطقة:
-                  </label>
-                  <select 
-                    id="region" 
-                    name="region" 
-                    value={formData.region} 
-                    onChange={handleChange} 
-                    className="elegantForm_select"
-                    required
-                  >
-                    <option value="">اختر المنطقة</option>
-                    {regions.map(region => (
-                      <option key={region} value={region}>{region}</option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="elegantForm_group">
-                  <label htmlFor="city" className="elegantForm_label">
-                    <span className="elegantForm_label_icon"><FaCity /></span>
-                    المدينة:
-                  </label>
-                  <select 
-                    id="city" 
-                    name="city" 
-                    value={formData.city} 
-                    onChange={handleChange} 
-                    className="elegantForm_select"
-                    required 
-                    disabled={!formData.region}
-                  >
-                    <option value="">اختر المدينة</option>
-                    {availableCities.map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+      <form onSubmit={handleSubmit} className="elegantCreate_form">
+  <div className="elegantForm_rows">
+    {/* الصف الأول: 3 حقول في الكمبيوتر، 2 في التابلت، 1 في الهاتف */}
+    <div className="elegantForm_row">
+      <div className="elegantForm_group">
+        <label htmlFor="region" className="elegantForm_label">
+          <span className="elegantForm_label_icon"></span>
+          المنطقة:
+        </label>
+        <select 
+          id="region" 
+          name="region" 
+          value={formData.region} 
+          onChange={handleChange} 
+          className="elegantForm_select"
+          required
+        >
+          <option value="">اختر المنطقة</option>
+          {regions.map(region => (
+            <option key={region} value={region}>{region}</option>
+          ))}
+        </select>
+      </div>
+      
+      <div className="elegantForm_group">
+        <label htmlFor="city" className="elegantForm_label">
+          <span className="elegantForm_label_icon"></span>
+          المدينة:
+        </label>
+        <select 
+          id="city" 
+          name="city" 
+          value={formData.city} 
+          onChange={handleChange} 
+          className="elegantForm_select"
+          required 
+          disabled={!formData.region}
+        >
+          <option value="">اختر المدينة</option>
+          {availableCities.map(city => (
+            <option key={city} value={city}>{city}</option>
+          ))}
+        </select>
+      </div>
 
-              {/* الصف الثاني: الغرض والنوع */}
-              <div className="elegantForm_row">
-                <div className="elegantForm_group">
-                  <label htmlFor="purpose" className="elegantForm_label">
-                    <span className="elegantForm_label_icon"><FaHandshake /></span>
-                    الغرض:
-                  </label>
-                  <select 
-                    id="purpose" 
-                    name="purpose" 
-                    value={formData.purpose} 
-                    onChange={handleChange} 
-                    className="elegantForm_select"
-                    required
-                  >
-                    <option value="sale">بيع</option>
-                    <option value="rent">إيجار</option>
-                  </select>
-                </div>
-                
-                <div className="elegantForm_group">
-                  <label htmlFor="type" className="elegantForm_label">
-                    <span className="elegantForm_label_icon"><FaBuilding /></span>
-                    النوع:
-                  </label>
-                  <select 
-                    id="type" 
-                    name="type" 
-                    value={formData.type} 
-                    onChange={handleChange} 
-                    className="elegantForm_select"
-                    required
-                  >
-                    <option value="residential">سكني</option>
-                    <option value="commercial">تجاري</option>
-                    <option value="agricultural">زراعي</option>
-                  </select>
-                </div>
-              </div>
+      <div className="elegantForm_group">
+        <label htmlFor="purpose" className="elegantForm_label">
+          <span className="elegantForm_label_icon"></span>
+          الغرض:
+        </label>
+        <select 
+          id="purpose" 
+          name="purpose" 
+          value={formData.purpose} 
+          onChange={handleChange} 
+          className="elegantForm_select"
+          required
+        >
+          <option value="sale">بيع</option>
+          <option value="rent">إيجار</option>
+        </select>
+      </div>
+    </div>
 
-              {/* حقل المساحة */}
-              <div className="elegantForm_group">
-                <label htmlFor="area" className="elegantForm_label">
-                  <span className="elegantForm_label_icon"><FaRuler /></span>
-                  المساحة (م²):
-                </label>
-                <input
-                  type="number" 
-                  id="area" 
-                  name="area" 
-                  value={formData.area} 
-                  onChange={handleChange}
-                  className="elegantForm_input"
-                  placeholder="أدخل المساحة بالمتر المربع" 
-                  min="1" 
-                  required
-                />
-              </div>
+    {/* الصف الثاني: 2 حقول في الكمبيوتر، 2 في التابلت، 1 في الهاتف */}
+    <div className="elegantForm_row">
+      <div className="elegantForm_group">
+        <label htmlFor="type" className="elegantForm_label">
+          <span className="elegantForm_label_icon"></span>
+          النوع:
+        </label>
+        <select 
+          id="type" 
+          name="type" 
+          value={formData.type} 
+          onChange={handleChange} 
+          className="elegantForm_select"
+          required
+        >
+          <option value="residential">سكني</option>
+          <option value="commercial">تجاري</option>
+          <option value="agricultural">زراعي</option>
+        </select>
+      </div>
+      
+      <div className="elegantForm_group">
+        <label htmlFor="area" className="elegantForm_label">
+          <span className="elegantForm_label_icon"></span>
+          المساحة (م²):
+        </label>
+        <input
+          type="number" 
+          id="area" 
+          name="area" 
+          value={formData.area} 
+          onChange={handleChange}
+          className="elegantForm_input"
+          placeholder="أدخل المساحة بالمتر المربع" 
+          min="1" 
+          required
+        />
+      </div>
+    </div>
 
-              {/* حقل الوصف */}
-              <div className="elegantForm_group">
-                <label htmlFor="description" className="elegantForm_label">
-                  <span className="elegantForm_label_icon"><FaStickyNote /></span>
-                  الوصف:
-                </label>
-                <textarea
-                  id="description" 
-                  name="description" 
-                  value={formData.description} 
-                  onChange={handleChange}
-                  className="elegantForm_textarea"
-                  placeholder="أدخل وصف مفصل للطلب..." 
-                  rows="4" 
-                  required
-                />
-              </div>
-            </div>
+    {/* الصف الثالث: الوصف يأخذ الصف كاملاً */}
+    <div className="elegantForm_row">
+      <div className="elegantForm_group elegantForm_fullRow">
+        <label htmlFor="description" className="elegantForm_label">
+          <span className="elegantForm_label_icon"></span>
+          الوصف:
+        </label>
+        <textarea
+          id="description" 
+          name="description" 
+          value={formData.description} 
+          onChange={handleChange}
+          className="elegantForm_textarea"
+          placeholder="أدخل وصف مفصل للطلب..." 
+          rows="4" 
+          required
+        />
+      </div>
+    </div>
+  </div>
+
 
             {/* رسالة الخطأ */}
             {error && (
@@ -285,7 +286,7 @@ function CreateLandRequest() {
                 className="elegantSubmit_btn" 
                 disabled={loading}
               >
-                <FaPlusCircle />
+               
                 {loading ? 'جاري الإنشاء...' : 'إنشاء الطلب'}
               </button>
               <button 

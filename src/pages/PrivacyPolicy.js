@@ -152,16 +152,10 @@ const PrivacyPolicy = () => {
 
   return (
     <div className="privacy-policy-container">
-      <div className="privacy-header">
-        <h1>سياسة الخصوصية</h1>
-        <div className="effective-date">
-          <span>تاريخ السريان: 2025</span>
-        </div>
-      </div>
       
-      <div className="welcome-section">
+      {/* <div className="welcome-section">
         <h2>مرحبا بكم في سياسة الخصوصية لموقع وتطبيق "شاهين بلس"</h2>
-      </div>
+      </div> */}
       
       <div className="content-wrapper">
         <div className="sections-sidebar">

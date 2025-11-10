@@ -1,5 +1,3 @@
-
-
 /* الحاوية الرئيسية */
 .my-ads-page {
   min-height: 100vh;
@@ -414,7 +412,7 @@
   margin: 0 0 20px 0;
 }
 
-/* نموذج الإضافة */
+/* نموذج الإضافة - تحسينات الحجم */
 .myads-form-overlay {
   position: fixed;
   top: 0;
@@ -426,44 +424,173 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
+  padding: 10px;
 }
 
 .myads-form-modal {
   background: var(--background-white);
   border-radius: var(--border-radius-lg);
   width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
+  max-width: 600px; /* تصغير العرض الأقصى */
+  max-height: 85vh; /* تقليل الارتفاع الأقصى */
   overflow-y: auto;
   box-shadow: var(--shadow-md);
+}
+
+/* تحسينات شاشة الخطوات - إصلاح مشكلة الأرقام */
+.myads-form-stepper {
+  max-width: 550px; /* تصغير أقصى عرض */
+  max-height: 85vh;
+}
+
+.form-progress-container {
+  padding: 12px 15px; /* تقليل الحشو */
+  background: #f8fafc;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.form-progress-steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+}
+
+.form-progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  z-index: 2; /* زيادة z-index لمنع التداخل */
+}
+
+.form-progress-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  width: 100%;
+  right: 50%;
+  height: 2px;
+  background: var(--border-color);
+  z-index: 1; /* خلف الأرقام */
+}
+
+.form-progress-step.active:not(:last-child)::after {
+  background: var(--primary-color);
+}
+
+.step-number {
+  width: 28px; /* تصغير حجم الدائرة */
+  height: 28px;
+  border-radius: 50%;
+  background: var(--border-color);
+  color: var(--background-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem; /* تصغير حجم الخط */
+  font-weight: 600;
+  margin-bottom: 5px;
+  z-index: 3; /* أعلى من الخط */
+  transition: background-color 0.3s ease;
+}
+
+.form-progress-step.active .step-number {
+  background: var(--primary-color);
+}
+
+.step-text {
+  font-size: 0.7rem; /* تصغير حجم الخط */
+  color: var(--text-light);
+  font-weight: 500;
+  text-align: center;
+  transition: color 0.3s ease;
+  line-height: 1.2;
+}
+
+.form-progress-step.active .step-text {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.myads-form-step {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* شاشة إكمال النموذج */
+.form-completion {
+  padding: 25px 15px; /* تقليل الحشو */
+  text-align: center;
+}
+
+.form-completion-icon {
+  width: 60px; /* تصغير الحجم */
+  height: 60px;
+  background: #10b981;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem; /* تصغير حجم الأيقونة */
+  margin: 0 auto 15px;
+}
+
+.form-completion h3 {
+  font-size: 1.1rem; /* تصغير حجم الخط */
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
+
+.form-completion p {
+  color: var(--text-light);
+  margin-bottom: 15px;
+  font-size: 0.85rem; /* تصغير حجم الخط */
+}
+
+/* ملخص السعر */
+.price-summary {
+  margin-top: 6px;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 0.85rem; /* تصغير حجم الخط */
 }
 
 .myads-form-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 15px; /* تقليل الحشو */
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   background: var(--background-white);
-  z-index: 1;
+  z-index: 11; /* أعلى من شريط التقدم */
 }
 
 .myads-form-header h3 {
   margin: 0;
   color: var(--text-color);
-  font-size: 1.2rem;
+  font-size: 1.1rem; /* تصغير حجم الخط */
 }
 
 .myads-close-btn {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.3rem; /* تصغير حجم الأيقونة */
   cursor: pointer;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -476,17 +603,18 @@
 }
 
 .myads-form {
-  padding: 20px;
+  padding: 15px; /* تقليل الحشو */
 }
 
+/* تحسينات شبكة الحقول لجعلها أصغر */
 .myads-form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* تصغير الحجم الأدنى */
+  gap: 12px; /* تقليل المسافة بين الحقول */
 }
 
 .myads-form-group {
-  margin-bottom: 16px;
+  margin-bottom: 12px; /* تقليل المسافة السفلية */
 }
 
 .myads-form-group.full-width {
@@ -495,21 +623,22 @@
 
 .myads-form-group label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 5px; /* تقليل المسافة */
   font-weight: 600;
   color: var(--text-color);
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* تصغير حجم الخط */
 }
 
 .myads-form-control {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 10px; /* تقليل الحشو الداخلي */
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-md);
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* تصغير حجم الخط */
   background: var(--background-white);
   transition: var(--transition-speed);
   font-family: inherit;
+  height: 38px; /* تحديد ارتفاع ثابت */
 }
 
 .myads-form-control:focus {
@@ -519,24 +648,31 @@
 }
 
 .myads-form-control[type="file"] {
-  padding: 8px;
+  padding: 6px;
+  height: auto;
 }
 
 .myads-file-input-wrapper small {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
   color: var(--text-light);
-  font-size: 0.8rem;
+  font-size: 0.75rem; /* تصغير حجم الخط */
 }
 
-/* Checkbox */
+/* Textarea أصغر */
+.myads-form-control textarea {
+  min-height: 70px; /* تقليل الارتفاع الأدنى */
+  resize: vertical;
+}
+
+/* Checkbox أصغر */
 .myads-checkbox-container {
   display: flex;
   align-items: center;
   position: relative;
-  padding-right: 35px;
+  padding-right: 30px; /* تقليل المسافة */
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* تصغير حجم الخط */
   user-select: none;
 }
 
@@ -551,11 +687,11 @@
   position: absolute;
   right: 0;
   top: 0;
-  height: 20px;
-  width: 20px;
+  height: 18px; /* تصغير الحجم */
+  width: 18px;
   background-color: #fff;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .myads-checkbox-container:hover input ~ .myads-checkmark {
@@ -578,39 +714,53 @@
 }
 
 .myads-checkbox-container .myads-checkmark:after {
-  right: 7px;
-  top: 3px;
-  width: 5px;
-  height: 10px;
+  right: 6px; /* تعديل الموضع */
+  top: 2px;
+  width: 4px;
+  height: 8px;
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
 
-/* أزرار النموذج */
+/* أزرار النموذج أصغر */
 .myads-form-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: flex-end;
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 20px;
+  padding-top: 15px;
   border-top: 1px solid var(--border-color);
+}
+
+.myads-btn-outline, .myads-btn-primary {
+  padding: 8px 16px; /* تقليل الحشو */
+  border-radius: var(--border-radius-md);
+  font-size: 0.85rem; /* تصغير حجم الخط */
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-speed);
+  height: 36px; /* تحديد ارتفاع ثابت */
 }
 
 .myads-btn-outline {
   background: var(--background-white);
   color: var(--text-color);
   border: 1px solid var(--border-color);
-  padding: 10px 20px;
-  border-radius: var(--border-radius-md);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition-speed);
 }
 
 .myads-btn-outline:hover:not(:disabled) {
   background: var(--background-light);
+}
+
+.myads-btn-primary {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.myads-btn-primary:hover {
+  background: #3a8bc8;
 }
 
 .myads-btn-outline:disabled, .myads-btn-primary:disabled {
@@ -618,7 +768,7 @@
   cursor: not-allowed;
 }
 
-/* التصميم المتجاوب للهواتف */
+/* التصميم المتجاوب للهواتف - تحسينات إضافية */
 @media (max-width: 768px) {
   .myads-page-container {
     padding: 70px 12px 16px;
@@ -639,15 +789,17 @@
   
   .myads-form-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
   
   .myads-form-modal {
-    margin: 10px;
-    max-height: 95vh;
+    margin: 5px;
+    max-height: 90vh; /* تقليل الارتفاع في الهاتف */
+    max-width: 95%;
   }
   
   .myads-form {
-    padding: 16px;
+    padding: 12px;
   }
   
   .myads-form-actions {
@@ -659,6 +811,29 @@
     align-items: flex-start;
     gap: 4px;
   }
+  
+  .step-text {
+    font-size: 0.65rem;
+  }
+  
+  /* منع النموذج من الظهور طويلاً جداً في الهاتف */
+  .myads-form-control {
+    padding: 7px 9px;
+    font-size: 0.8rem;
+    height: 36px;
+  }
+  
+  .myads-form-group {
+    margin-bottom: 10px;
+  }
+  
+  .myads-form-group label {
+    font-size: 0.8rem;
+  }
+  
+  .myads-form-control textarea {
+    min-height: 60px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -667,7 +842,7 @@
   }
   
   .myads-header-row {
-    padding: 16px;
+    padding: 12px;
   }
   
   .myads-page-title {
@@ -675,16 +850,48 @@
   }
   
   .myads-card {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   
   .myads-status-filter {
-    gap: 6px;
+    gap: 4px;
   }
   
   .myads-status-btn {
-    padding: 6px 12px;
+    padding: 5px 10px;
+    font-size: 0.7rem;
+  }
+  
+  .step-number {
+    width: 24px;
+    height: 24px;
     font-size: 0.75rem;
+  }
+  
+  .step-text {
+    font-size: 0.6rem;
+  }
+  
+  /* تحسينات إضافية للهواتف الصغيرة */
+  .myads-form-modal {
+    max-height: 88vh;
+  }
+  
+  .form-progress-container {
+    padding: 10px 12px;
+  }
+  
+  .myads-form-header {
+    padding: 12px 10px;
+  }
+  
+  .myads-form {
+    padding: 10px;
+  }
+  
+  .myads-form-actions {
+    margin-top: 15px;
+    padding-top: 12px;
   }
 }
 
@@ -701,30 +908,49 @@
   .myads-grid {
     grid-template-columns: 1fr;
   }
+  
+  .form-progress-step:not(:last-child)::after {
+    top: 12px;
+  }
+  
+  /* تحسينات إضافية للفورم في الشاشات الصغيرة جداً */
+  .myads-form-control {
+    padding: 6px 8px;
+    font-size: 0.75rem;
+    height: 34px;
+  }
+  
+  .myads-btn-outline, .myads-btn-primary {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    height: 34px;
+  }
 }
+
 /* تحسينات الفورم المضغوط */
 .myads-compact-form {
-  max-width: 700px;
+  max-width: 550px;
   margin: 0 auto;
 }
 
 /* تكوين الشبكة للشاشات الصغيرة */
 .myads-mobile-grid {
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 8px;
 }
 
 .myads-mobile-grid .myads-form-group {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .myads-mobile-grid .myads-form-group label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .myads-mobile-grid .myads-form-control {
-  padding: 8px 10px;
-  font-size: 0.85rem;
+  padding: 7px 9px;
+  font-size: 0.8rem;
+  height: 34px;
 }
 
 /* تحسينات إضافية للشاشات المختلفة */
@@ -734,8 +960,8 @@
   }
   
   .myads-mobile-grid {
-    grid-template-columns: repeat(2, 1fr); /* صفان في كل صف للهاتف */
-    gap: 8px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
   }
   
   .myads-form-group.full-width {
@@ -745,33 +971,43 @@
 
 @media (max-width: 480px) {
   .myads-mobile-grid {
-    grid-template-columns: repeat(2, 1fr); /* الحفاظ على صفين حتى في الشاشات الصغيرة */
-    gap: 6px;
+    grid-template-columns: 1fr; /* صف واحد في الهواتف الصغيرة */
+    gap: 5px;
   }
   
-  .myads-form-header {
-    padding: 15px 10px;
-  }
-  
-  .myads-form {
-    padding: 10px;
+  .myads-form-group.full-width {
+    grid-column: 1;
   }
 }
 
 /* تقليل حجم الهوامش والحشو في النموذج */
 .myads-compact-form .myads-form {
-  padding: 15px;
+  padding: 12px;
 }
 
 .myads-compact-form .myads-form-header {
-  padding: 15px;
+  padding: 12px;
 }
 
 .myads-compact-form .myads-form-actions {
-  margin-top: 15px;
-  padding-top: 15px;
+  margin-top: 12px;
+  padding-top: 12px;
 }
 
 .myads-compact-form .myads-form-group textarea {
-  min-height: 80px;
+  min-height: 60px;
+}
+
+/* إصلاح مشكلة أرقام الخطوات - التأكد من ظهورها بشكل صحيح */
+.form-progress-step {
+  min-width: 60px; /* تحديد عرض أدنى لكل خطوة */
+}
+
+.step-number {
+  box-shadow: 0 0 0 2px var(--background-white); /* إضافة ظل أبيض حول الأرقام */
+}
+
+/* تحسينات إضافية لمنع التداخل */
+.form-progress-container {
+  backdrop-filter: blur(5px); /* تأثير ضبابي خفيف للخلفية */
 }
