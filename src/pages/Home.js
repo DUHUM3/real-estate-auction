@@ -81,7 +81,7 @@ const LandCard = ({
   };
 
   return (
-    <div className="land-card" onClick={() => onClick && onClick(id)}>
+    <div className="land-card" onClick={() => onClick && onClick(id, 'land')}>
       <div className="land-image">
         <img 
           src={img || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"} 
@@ -118,9 +118,16 @@ const LandCard = ({
         <div className="land-price">
           <FaMoneyBillWave className="price-icon" /> {price} ريال
         </div>
-        <button className="view-btn">
-          {auctionTitle ? 'المشاركة في المزاد' : 'عرض التفاصيل'}
-        </button>
+       // في مكون LandCard، قم بتعديل الزر
+<button 
+  className="view-btn"
+  onClick={(e) => {
+    e.stopPropagation(); // منع تنفيذ النقر على البطاقة
+    onClick && onClick(id, 'land');
+  }}
+>
+  {auctionTitle ? 'المشاركة في المزاد' : 'عرض التفاصيل'}
+</button>
       </div>
     </div>
   );
@@ -168,7 +175,7 @@ const AuctionCard = ({
   };
 
   return (
-    <div className="auction-card" onClick={() => onClick && onClick(id)}>
+    <div className="auction-card" onClick={() => onClick && onClick(id, 'auction')}>
       <div className="auction-header">
         <span className="auction-company">{auctionCompany}</span>
       </div>
@@ -201,8 +208,15 @@ const AuctionCard = ({
           <span><FaUsers className="details-icon" /> {bidders} مزايد</span>
         </div>
         <div className="auction-actions">
-          <button className="details-btn">تفاصيل المزاد</button>
-        </div>
+<button 
+  className="details-btn"
+  onClick={(e) => {
+    e.stopPropagation(); // منع تنفيذ النقر على البطاقة
+    onClick && onClick(id, 'auction');
+  }}
+>
+  تفاصيل المزاد
+</button>        </div>
       </div>
     </div>
   );
@@ -548,13 +562,19 @@ const handleToggleFavorite = async (id, isFavorite, type) => {
   };
 
   // معالجة النقر على الأرض أو المزاد
-  const handlePropertyClick = (id) => {
-    if (filterType === 'lands') {
-      navigate(`/property/${id}`);
-    } else {
-      navigate(`/auction/${id}`);
-    }
-  };
+// في مكون Home، قم بتحديث دالة handlePropertyClick
+const handlePropertyClick = (id, type = null) => {
+  // إذا لم يتم تحديد النوع، استخدم filterType الحالي
+  const itemType = type || filterType;
+  
+  console.log('التنقل إلى التفاصيل:', { id, type: itemType });
+  
+  if (itemType === 'lands' || itemType === 'land') {
+    navigate(`/property/${id}/land`);
+  } else {
+    navigate(`/property/${id}/auction`);
+  }
+};
 
   const minSwipeDistance = 50;
 
@@ -1100,9 +1120,9 @@ const handleToggleFavorite = async (id, isFavorite, type) => {
               </div>
             ) : (
               <>
+// في جزء العرض في مكون Home، قم بتحديث الـ onClick
 <div className="properties-grid">
   {currentItems.length > 0 ? (
- // في جزء العرض
     currentItems.map(item => (
       filterType === 'lands' ? (
         <LandCard 
@@ -1110,7 +1130,7 @@ const handleToggleFavorite = async (id, isFavorite, type) => {
           {...item} 
           onClick={handlePropertyClick}
           onToggleFavorite={handleToggleFavorite}
-          isFavorite={item.is_favorite || false} // استخدام is_favorite بدلاً من isFavorite
+          isFavorite={item.is_favorite || false}
         />
       ) : (
         <AuctionCard 
@@ -1118,16 +1138,16 @@ const handleToggleFavorite = async (id, isFavorite, type) => {
           {...item} 
           onClick={handlePropertyClick}
           onToggleFavorite={handleToggleFavorite}
-          isFavorite={item.is_favorite || false} // استخدام is_favorite بدلاً من isFavorite
+          isFavorite={item.is_favorite || false}
         />
       )
     ))
   ) : (
-                    <div className="no-data">
-                      <p>لا توجد {filterType === 'lands' ? 'أراضي' : 'مزادات'} متاحة في الوقت الحالي</p>
-                    </div>
-                  )}
-                </div>
+    <div className="no-data">
+      <p>لا توجد {filterType === 'lands' ? 'أراضي' : 'مزادات'} متاحة في الوقت الحالي</p>
+    </div>
+  )}
+</div>
               </>
             )}
 

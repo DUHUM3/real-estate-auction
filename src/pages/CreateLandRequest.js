@@ -204,7 +204,7 @@ function CreateLandRequest() {
           required
         >
           <option value="sale">بيع</option>
-          <option value="rent">إيجار</option>
+          <option value="investment">استثمار</option>
         </select>
       </div>
     </div>
@@ -242,7 +242,7 @@ function CreateLandRequest() {
           value={formData.area} 
           onChange={handleChange}
           className="elegantForm_input"
-          placeholder="أدخل المساحة بالمتر المربع" 
+          placeholder="أدخل المساحة بالمتر المربع اكبر 5000" 
           min="1" 
           required
         />

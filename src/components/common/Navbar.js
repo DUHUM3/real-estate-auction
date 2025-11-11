@@ -269,12 +269,12 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                     
                     {isGeneralUser() ? (
                       <Link 
-                        to="/my-requests" 
+                        to="/interests" 
                         className="dropdown-item"
                         onClick={() => setShowUserMenu(false)}
                       >
                         <FaListAlt className="dropdown-icon" />
-                        طلباتي
+                        اهتماماتي
                       </Link>
                     ) : (
                       <Link 
@@ -298,14 +298,14 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                       </Link>
                     )}
                     
-                    {/* <Link 
+                    <Link 
                       to="/my-lands" 
                       className="dropdown-item"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <FaHeart className="dropdown-icon" />
                       المفضلة
-                    </Link> */}
+                    </Link>
                     
                     {/* <Link 
                       to="/settings" 
@@ -419,9 +419,9 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                 </Link>
 
                 {isGeneralUser() ? (
-                  <Link to="/my-requests" className="mobile-nav-link" onClick={handleCloseMenu}>
+                  <Link to="/interests" className="mobile-nav-link" onClick={handleCloseMenu}>
                     <FaListAlt className="link-icon" />
-                    طلباتي
+                    اهتماماتي
                   </Link>
                 ) : (
                   <Link to="/my-ads" className="mobile-nav-link" onClick={handleCloseMenu}>
@@ -436,11 +436,11 @@ function Navbar({ onLoginClick, onRegisterClick }) {
                     عروضي
                   </Link>
                 )}
-{/* 
+
                 <Link to="/my-lands" className="mobile-nav-link" onClick={handleCloseMenu}>
                   <FaHeart className="link-icon" />
                   المفضلة
-                </Link> */}
+                </Link>
 
                 {/* <Link to="/settings" className="mobile-nav-link" onClick={handleCloseMenu}>
                   <FaCog className="link-icon" />

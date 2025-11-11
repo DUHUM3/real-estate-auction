@@ -1,374 +1,417 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import '../styles/Favorites.css';
+import { Link, useNavigate } from 'react-router-dom';
+import { 
+  FiHeart, 
+  FiMapPin,
+  FiDollarSign,
+  FiCalendar,
+  FiEye,
+  FiHome,
+  FiX,
+  FiTrash2,
+  
+  FiClock
+} from 'react-icons/fi';
+// import '../styles/Interests.css'; // نفس الـ CSS المستخدم في الاهتمامات
 
 function Favorites() {
-  const { currentUser } = useAuth();
   const [favorites, setFavorites] = useState([]);
-  const [activeTab, setActiveTab] = useState('lands'); // lands, auctions
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [removingId, setRemovingId] = useState(null);
+  const navigate = useNavigate();
 
-  // محاكاة بيانات المفضلة
+  // جلب بيانات المفضلة
   useEffect(() => {
-    const loadFavorites = () => {
-      const sampleFavorites = {
-        lands: [
-          {
-            id: 1,
-            title: 'أرض سكنية في حي الربيع',
-            description: 'أرض سكنية ممتازة بمساحة 600 متر، موقع استراتيجي قريب من الخدمات',
-            price: '500,000',
-            area: '600',
-            location: 'حي الربيع، الرياض',
-            type: 'سكنية',
-            image: '/api/placeholder/300/200',
-            dateAdded: '2024-01-15',
-            seller: 'أحمد محمد',
-            contact: '0551234567'
-          },
-          {
-            id: 2,
-            title: 'مزرعة للبيع في الخرج',
-            description: 'مزرعة بها بئر وأشجار مثمرة، مساحة كبيرة مناسبة للاستثمار الزراعي',
-            price: '1,200,000',
-            area: '5000',
-            location: 'الخرج',
-            type: 'زراعية',
-            image: '/api/placeholder/300/200',
-            dateAdded: '2024-01-10',
-            seller: 'شركة الأراضي الزراعية',
-            contact: '0509876543'
-          },
-          {
-            id: 3,
-            title: 'أرض تجارية على شارع الملك فهد',
-            description: 'أرض تجارية بموقع مميز على الشارع الرئيسي، مناسبة للمشاريع التجارية',
-            price: '2,500,000',
-            area: '800',
-            location: 'شارع الملك فهد، الرياض',
-            type: 'تجارية',
-            image: '/api/placeholder/300/200',
-            dateAdded: '2024-01-08',
-            seller: 'مؤسسة العقار المتميز',
-            contact: '0545554444'
-          }
-        ],
-        auctions: [
-          {
-            id: 101,
-            title: 'مزاد أرض تجارية بموقع مميز',
-            description: 'أرض تجارية في موقع استراتيجي، مزاد علني لمدة 7 أيام',
-            startPrice: '300,000',
-            currentBid: '450,000',
-            minBid: '10,000',
-            endDate: '2024-02-01',
-            timeLeft: '15 يوم',
-            bidders: 12,
-            area: '700',
-            location: 'حي النخيل، جدة',
-            type: 'تجارية',
-            image: '/api/placeholder/300/200',
-            dateAdded: '2024-01-12'
-          },
-          {
-            id: 102,
-            title: 'مزاد مزرعة نموذجية',
-            description: 'مزرعة نموذجية مجهزة بكامل الخدمات، مزاد إلكتروني',
-            startPrice: '800,000',
-            currentBid: '950,000',
-            minBid: '25,000',
-            endDate: '2024-01-28',
-            timeLeft: '3 أيام',
-            bidders: 8,
-            area: '3000',
-            location: 'الدمام',
-            type: 'زراعية',
-            image: '/api/placeholder/300/200',
-            dateAdded: '2024-01-14'
-          }
-        ]
-      };
-      
-      setFavorites(sampleFavorites);
-      setLoading(false);
-    };
-
-    loadFavorites();
+    fetchFavorites();
   }, []);
 
-  const removeFromFavorites = (id, type) => {
-    if (window.confirm('هل أنت متأكد من إزالة هذا العنصر من المفضلة؟')) {
-      setFavorites(prev => ({
-        ...prev,
-        [type]: prev[type].filter(item => item.id !== id)
-      }));
-    }
-  };
-
-  const clearAllFavorites = () => {
-    if (window.confirm('هل أنت متأكد من حذف جميع العناصر من المفضلة؟')) {
-      setFavorites({
-        lands: [],
-        auctions: []
+  const fetchFavorites = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch('https://shahin-tqay.onrender.com/api/favorites', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('بيانات المفضلة:', data); // للتصحيح
+        setFavorites(data.favorites || []);
+      } else {
+        throw new Error('فشل في جلب البيانات');
+      }
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      setError('حدث خطأ في جلب البيانات');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const contactSeller = (contactInfo) => {
-    alert(`رقم التواصل: ${contactInfo}`);
+  // دالة لإزالة من المفضلة بناءً على النوع
+  const removeFavorite = async (favorite, e) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    try {
+      setRemovingId(favorite.id);
+      const token = localStorage.getItem('token');
+      
+      let url = '';
+      if (favorite.favoritable_type === 'App\\Models\\Property') {
+        url = `https://shahin-tqay.onrender.com/api/favorites/property/${favorite.favoritable_id}`;
+      } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
+        url = `https://shahin-tqay.onrender.com/api/favorites/auction/${favorite.favoritable_id}`;
+      } else {
+        throw new Error('نوع العنصر غير معروف');
+      }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        // إزالة العنصر من القائمة محلياً
+        setFavorites(prev => prev.filter(fav => fav.id !== favorite.id));
+      } else {
+        throw new Error('فشل في إزالة العنصر');
+      }
+    } catch (error) {
+      console.error('Error removing favorite:', error);
+      alert('حدث خطأ أثناء إزالة العنصر من المفضلة');
+    } finally {
+      setRemovingId(null);
+    }
   };
 
+  // دالة للانتقال إلى صفحة تفاصيل العنصر بناءً على النوع
+  const handleViewItem = (id, type = null) => {
+    // تحديد النوع بناءً على favoritable_type
+    let itemType = type;
+    if (!itemType) {
+      // البحث عن العنصر في المفضلة لتحديد نوعه
+      const favoriteItem = favorites.find(fav => fav.favoritable_id === id);
+      if (favoriteItem) {
+        if (favoriteItem.favoritable_type === 'App\\Models\\Property') {
+          itemType = 'land';
+        } else if (favoriteItem.favoritable_type === 'App\\Models\\Auction') {
+          itemType = 'auction';
+        }
+      }
+    }
+    
+    console.log('التنقل إلى التفاصيل:', { id, type: itemType });
+    
+    if (itemType === 'lands' || itemType === 'land') {
+      navigate(`/property/${id}/land`);
+    } else {
+      navigate(`/property/${id}/auction`);
+    }
+  };
+
+  // تنسيق السعر
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('ar-SA').format(price);
+    if (!price) return '0';
+    return parseFloat(price).toLocaleString('ar-SA');
   };
 
-  const renderLandCard = (land) => (
-    <div key={land.id} className="favorite-card">
-      <div className="card-image">
-        <img src={land.image} alt={land.title} />
-        <button 
-          className="remove-btn"
-          onClick={() => removeFromFavorites(land.id, 'lands')}
-          title="إزالة من المفضلة"
-        >
-          ♥
-        </button>
-      </div>
-      
-      <div className="card-content">
-        <div className="card-header">
-          <h3 className="card-title">{land.title}</h3>
-          <span className="property-type">{land.type}</span>
-        </div>
-        
-        <p className="card-description">{land.description}</p>
-        
-        <div className="card-details">
-          <div className="detail-row">
-            <div className="detail-item">
-              <span className="detail-label">السعر:</span>
-              <span className="detail-value price">{formatPrice(land.price)} ريال</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">المساحة:</span>
-              <span className="detail-value">{land.area} م²</span>
-            </div>
-          </div>
-          
-          <div className="detail-row">
-            <div className="detail-item">
-              <span className="detail-label">الموقع:</span>
-              <span className="detail-value location">{land.location}</span>
-            </div>
-          </div>
-          
-          <div className="detail-row">
-            <div className="detail-item">
-              <span className="detail-label">البائع:</span>
-              <span className="detail-value">{land.seller}</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card-footer">
-          <span className="added-date">أضيف في: {land.dateAdded}</span>
-          <div className="card-actions">
-            <button 
-              className="btn btn-outline"
-              onClick={() => contactSeller(land.contact)}
-            >
-              تواصل مع البائع
-            </button>
-            <button className="btn btn-primary">
-              عرض التفاصيل
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  // تنسيق التاريخ
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(date);
+    } catch (e) {
+      return dateString;
+    }
+  };
 
-  const renderAuctionCard = (auction) => (
-    <div key={auction.id} className="favorite-card auction-card">
-      <div className="card-image">
-        <img src={auction.image} alt={auction.title} />
-        <div className="auction-badge">مزاد</div>
-        <button 
-          className="remove-btn"
-          onClick={() => removeFromFavorites(auction.id, 'auctions')}
-          title="إزالة من المفضلة"
-        >
-          ♥
-        </button>
-      </div>
-      
-      <div className="card-content">
-        <div className="card-header">
-          <h3 className="card-title">{auction.title}</h3>
-          <span className="property-type">{auction.type}</span>
-        </div>
-        
-        <p className="card-description">{auction.description}</p>
-        
-        <div className="card-details">
-          <div className="detail-row">
-            <div className="detail-item">
-              <span className="detail-label">سعر البدء:</span>
-              <span className="detail-value">{formatPrice(auction.startPrice)} ريال</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">السعر الحالي:</span>
-              <span className="detail-value price">{formatPrice(auction.currentBid)} ريال</span>
-            </div>
-          </div>
-          
-          <div className="detail-row">
-            <div className="detail-item">
-              <span className="detail-label">أقل مزايدة:</span>
-              <span className="detail-value">{formatPrice(auction.minBid)} ريال</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">المساحة:</span>
-              <span className="detail-value">{auction.area} م²</span>
-            </div>
-          </div>
-          
-          <div className="detail-row">
-            <div className="detail-item">
-              <span className="detail-label">الموقع:</span>
-              <span className="detail-value location">{auction.location}</span>
-            </div>
-          </div>
-          
-          <div className="auction-info">
-            <div className="auction-stats">
-              <div className="stat">
-                <span className="stat-label">المزايدين:</span>
-                <span className="stat-value">{auction.bidders}</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">متبقي:</span>
-                <span className="stat-value time-left">{auction.timeLeft}</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">ينتهي:</span>
-                <span className="stat-value">{auction.endDate}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card-footer">
-          <span className="added-date">أضيف في: {auction.dateAdded}</span>
-          <div className="card-actions">
-            <button className="btn btn-outline">
-              مشاهدة المزاد
-            </button>
-            <button className="btn btn-primary">
-              المشاركة بالمزايدة
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  // تنسيق الوقت
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    return timeString.substring(0, 5); // إرجاع فقط الساعات والدقائق
+  };
 
-  const currentFavorites = favorites[activeTab] || [];
+  // حساب السعر الإجمالي للأرض
+  const calculateTotalPrice = (property) => {
+    if (property.total_area && property.price_per_sqm) {
+      return parseFloat(property.total_area) * parseFloat(property.price_per_sqm);
+    }
+    return 0;
+  };
+
+  // الحصول على عنوان العنصر بناءً على النوع
+  const getItemTitle = (favorite) => {
+    if (favorite.favoritable_type === 'App\\Models\\Property') {
+      return favorite.favoritable.title || `أرض ${favorite.favoritable.land_type}`;
+    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
+      return favorite.favoritable.title || 'مزاد';
+    }
+    return 'عنصر';
+  };
+
+  // الحصول على أيقونة العنصر بناءً على النوع
+  const getItemIcon = (favorite) => {
+    if (favorite.favoritable_type === 'App\\Models\\Property') {
+      return <FiHome className="detail-icon" />;
+    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
+      return <FiClock className="detail-icon" />;
+    }
+    return <FiHeart className="detail-icon" />;
+  };
+
+  // الحصول على نوع العنصر كنص
+  const getItemType = (favorite) => {
+    if (favorite.favoritable_type === 'App\\Models\\Property') {
+      return 'أرض';
+    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
+      return 'مزاد';
+    }
+    return 'عنصر';
+  };
+
+  // الحصول على نوع العنصر لاستخدامه في handleViewItem
+  const getItemTypeForNavigation = (favorite) => {
+    if (favorite.favoritable_type === 'App\\Models\\Property') {
+      return 'land';
+    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
+      return 'auction';
+    }
+    return null;
+  };
 
   if (loading) {
     return (
-      <div className="favorites-container">
-        <div className="loading">جاري تحميل المفضلة...</div>
+      <div className="interests-container">
+        <div className="interests-loading">
+          <div className="loading-spinner"></div>
+          <p>جاري تحميل المفضلة...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="interests-container">
+        <div className="interests-error">
+          <FiX className="error-icon" />
+          <p>{error}</p>
+          <button className="retry-btn" onClick={fetchFavorites}>
+            إعادة المحاولة
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="favorites-container">
-      <div className="page-header">
-        <div className="header-content">
-          <h1>المفضلة</h1>
-          <p>الأراضي والمزادات التي قمت بإضافتها إلى المفضلة</p>
-        </div>
-        {currentFavorites.length > 0 && (
-          <button 
-            className="btn btn-danger"
-            onClick={clearAllFavorites}
-          >
-            حذف الكل
-          </button>
-        )}
-      </div>
+    <div className="interests-container">
+      {/* عنوان الصفحة */}
+      {/* <div className="interests-header">
+        <h1 className="page-title">
+          <FiHeart className="title-icon" />
+          المفضلة
+        </h1>
+        <p className="page-subtitle">
+          العناصر التي قمت بإضافتها إلى المفضلة
+          {favorites.length > 0 && ` (${favorites.length} عنصر)`}
+        </p>
+      </div> */}
 
-      <div className="favorites-tabs">
-        <div className="tabs">
-          <button 
-            className={`tab ${activeTab === 'lands' ? 'active' : ''}`}
-            onClick={() => setActiveTab('lands')}
-          >
-            <span className="tab-icon">🏠</span>
-            الأراضي
-            <span className="tab-count">({favorites.lands?.length || 0})</span>
-          </button>
-          <button 
-            className={`tab ${activeTab === 'auctions' ? 'active' : ''}`}
-            onClick={() => setActiveTab('auctions')}
-          >
-            <span className="tab-icon">🔨</span>
-            المزادات
-            <span className="tab-count">({favorites.auctions?.length || 0})</span>
-          </button>
-        </div>
-      </div>
-
-      <div className="favorites-content">
-        {currentFavorites.length === 0 ? (
+      {/* قائمة المفضلة */}
+      <div className="interests-list">
+        {favorites.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">♥</div>
+            <FiHeart className="empty-icon" />
             <h3>لا توجد عناصر في المفضلة</h3>
-            <p>
-              {activeTab === 'lands' 
-                ? 'قم بإضافة الأراضي التي تعجبك إلى المفضلة لتسهيل الوصول إليها لاحقاً'
-                : 'قم بإضافة المزادات التي تهمك إلى المفضلة لمتابعتها'
-              }
-            </p>
-            <button className="btn btn-primary">
-              {activeTab === 'lands' ? 'تصفح الأراضي' : 'تصفح المزادات'}
-            </button>
+            <p>لم تقم بإضافة أي عناصر إلى المفضلة حتى الآن</p>
+            <Link to="/properties" className="browse-btn">
+              تصفح الاراضي
+            </Link>
           </div>
         ) : (
-          <div className="favorites-grid">
-            {activeTab === 'lands' 
-              ? favorites.lands?.map(renderLandCard)
-              : favorites.auctions?.map(renderAuctionCard)
-            }
-          </div>
-        )}
-      </div>
+          favorites.map((favorite) => (
+            <div 
+              key={favorite.id} 
+              className="interest-card"
+              onClick={() => handleViewItem(favorite.favoritable_id, getItemTypeForNavigation(favorite))}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="interest-header">
+                <div className="interest-title-section">
+                  <div className="item-type-badge">
+                    {getItemIcon(favorite)}
+                    {getItemType(favorite)}
+                  </div>
+                  <h3 className="interest-title">
+                    {getItemTitle(favorite)}
+                  </h3>
+                  <span className={`status-badge ${favorite.favoritable.status === 'مفتوح' ? 'status-approved' : 'status-pending'}`}>
+                    <FiHeart />
+                    {favorite.favoritable.status}
+                  </span>
+                </div>
+                <div className="interest-reference">
+                  <FiCalendar className="reference-icon" />
+                  <span>أضيف في: {formatDate(favorite.created_at)}</span>
+                </div>
+              </div>
 
-      {currentFavorites.length > 0 && (
-        <div className="favorites-summary">
-          <div className="summary-card">
-            <h4>ملخص المفضلة</h4>
-            <div className="summary-stats">
-              <div className="summary-stat">
-                <span className="stat-label">إجمالي الأراضي:</span>
-                <span className="stat-value">{favorites.lands?.length || 0}</span>
+              <div className="interest-details">
+                {/* تفاصيل الأرض */}
+                {favorite.favoritable_type === 'App\\Models\\Property' && (
+                  <>
+                    <div className="detail-item">
+                      <FiMapPin className="detail-icon" />
+                      <span className="detail-label">الموقع:</span>
+                      <span className="detail-value">
+                        {favorite.favoritable.region} - {favorite.favoritable.city}
+                      </span>
+                    </div>
+                    
+                    <div className="detail-item">
+                      <FiX className="detail-icon" />
+                      <span className="detail-label">المساحة:</span>
+                      <span className="detail-value">
+                        {formatPrice(favorite.favoritable.total_area)} م²
+                      </span>
+                    </div>
+
+                    {favorite.favoritable.price_per_sqm && (
+                      <div className="detail-item">
+                        <FiDollarSign className="detail-icon" />
+                        <span className="detail-label">سعر المتر:</span>
+                        <span className="detail-value">
+                          {formatPrice(favorite.favoritable.price_per_sqm)} ر.س
+                        </span>
+                      </div>
+                    )}
+
+                    {favorite.favoritable.total_area && favorite.favoritable.price_per_sqm && (
+                      <div className="detail-item">
+                        <FiHome className="detail-icon" />
+                        <span className="detail-label">السعر الإجمالي:</span>
+                        <span className="detail-value elegantTotal_price">
+                          {formatPrice(calculateTotalPrice(favorite.favoritable))} ر.س
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="detail-item">
+                      <span className="detail-label">نوع الأرض:</span>
+                      <span className="detail-value">{favorite.favoritable.land_type}</span>
+                    </div>
+
+                    {favorite.favoritable.deed_number && (
+                      <div className="detail-item">
+                        <span className="detail-label">رقم الصك:</span>
+                        <span className="detail-value">{favorite.favoritable.deed_number}</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* تفاصيل المزاد */}
+                {favorite.favoritable_type === 'App\\Models\\Auction' && (
+                  <>
+                    <div className="detail-item">
+                      <FiMapPin className="detail-icon" />
+                      <span className="detail-label">العنوان:</span>
+                      <span className="detail-value">
+                        {favorite.favoritable.address}
+                      </span>
+                    </div>
+                    
+                    <div className="detail-item">
+                      <FiCalendar className="detail-icon" />
+                      <span className="detail-label">تاريخ المزاد:</span>
+                      <span className="detail-value">
+                        {formatDate(favorite.favoritable.auction_date)}
+                      </span>
+                    </div>
+
+                    <div className="detail-item">
+                      <FiClock className="detail-icon" />
+                      <span className="detail-label">وقت البدء:</span>
+                      <span className="detail-value">
+                        {formatTime(favorite.favoritable.start_time)}
+                      </span>
+                    </div>
+
+                    <div className="detail-item">
+                      <span className="detail-label">الوصف:</span>
+                      <span className="detail-value description-text">
+                        {favorite.favoritable.description}
+                      </span>
+                    </div>
+
+                    {favorite.favoritable.intro_link && (
+                      <div className="detail-item">
+                        <span className="detail-label">رابط التعريف:</span>
+                        <a 
+                          href={favorite.favoritable.intro_link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="detail-value link"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          اضغط هنا للمشاهدة
+                        </a>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-              <div className="summary-stat">
-                <span className="stat-label">إجمالي المزادات:</span>
-                <span className="stat-value">{favorites.auctions?.length || 0}</span>
-              </div>
-              <div className="summary-stat">
-                <span className="stat-label">المجموع الكلي:</span>
-                <span className="stat-value total">
-                  {(favorites.lands?.length || 0) + (favorites.auctions?.length || 0)}
-                </span>
+
+              <div className="interest-actions">
+                <button 
+                  className="view-property-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewItem(favorite.favoritable_id, getItemTypeForNavigation(favorite));
+                  }}
+                >
+                  <FiEye />
+                  <span>
+                    {favorite.favoritable_type === 'App\\Models\\Property' 
+                      ? 'عرض تفاصيل الأرض' 
+                      : 'عرض تفاصيل المزاد'
+                    }
+                  </span>
+                </button>
+                
+                <button 
+                  className="remove-favorite-btn"
+                  onClick={(e) => removeFavorite(favorite, e)}
+                  disabled={removingId === favorite.id}
+                >
+                  {removingId === favorite.id ? (
+                    <div className="loading-spinner-small"></div>
+                  ) : (
+                    <FiTrash2 />
+                  )}
+                  <span>
+                    {removingId === favorite.id ? 'جاري الإزالة...' : 'إزالة من المفضلة'}
+                  </span>
+                </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }

@@ -118,35 +118,10 @@ const PropertiesPage = () => {
     }
   }, [location.state, activeTab]);
 
-  // Load favorites from localStorage
+  // تحميل بيانات المفضلة من الخادم عند تحميل الصفحة
   useEffect(() => {
-    const savedPropertyFavorites = localStorage.getItem('propertyFavorites');
-    const savedAuctionFavorites = localStorage.getItem('auctionFavorites');
-
-    if (savedPropertyFavorites) {
-      setFavorites(prev => ({
-        ...prev,
-        properties: JSON.parse(savedPropertyFavorites)
-      }));
-    }
-
-    if (savedAuctionFavorites) {
-      setFavorites(prev => ({
-        ...prev,
-        auctions: JSON.parse(savedAuctionFavorites)
-      }));
-    }
+    fetchFavorites();
   }, []);
-
-  // Save favorites to localStorage when updated
-  useEffect(() => {
-    if (favorites.properties) {
-      localStorage.setItem('propertyFavorites', JSON.stringify(favorites.properties));
-    }
-    if (favorites.auctions) {
-      localStorage.setItem('auctionFavorites', JSON.stringify(favorites.auctions));
-    }
-  }, [favorites]);
 
   // Fetch data when filters, tab, or page changes
   useEffect(() => {
@@ -184,6 +159,32 @@ const PropertiesPage = () => {
       window.history.replaceState({}, document.title);
     }
   }, [location.state, activeTab]);
+
+  // جلب المفضلات من الخادم
+  const fetchFavorites = async () => {
+    try {
+      // هنا يمكن إضافة طلب لجلب المفضلات من الخادم إذا كان هناك API لذلك
+      // حاليًا نستخدم الخزن المحلي مؤقتًا
+      const savedPropertyFavorites = localStorage.getItem('propertyFavorites');
+      const savedAuctionFavorites = localStorage.getItem('auctionFavorites');
+
+      if (savedPropertyFavorites) {
+        setFavorites(prev => ({
+          ...prev,
+          properties: JSON.parse(savedPropertyFavorites)
+        }));
+      }
+
+      if (savedAuctionFavorites) {
+        setFavorites(prev => ({
+          ...prev,
+          auctions: JSON.parse(savedAuctionFavorites)
+        }));
+      }
+    } catch (error) {
+      console.error("فشل في جلب المفضلات:", error);
+    }
+  };
 
   const fetchProperties = async () => {
     try {
@@ -315,39 +316,141 @@ const PropertiesPage = () => {
     setCurrentPage(1);
   };
 
-  // Toggle favorite status for properties
-  const togglePropertyFavorite = (propertyId, e) => {
+  // Toggle favorite status for properties using API
+  const togglePropertyFavorite = async (propertyId, e) => {
     e?.stopPropagation();
-    const propertyFavorites = favorites.properties || [];
+    const token = localStorage.getItem('token');
+    try {
+      const url = `https://shahin-tqay.onrender.com/api/favorites/property/${propertyId}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // إضافة أي توكن للتوثيق إذا كان مطلوبًا
+          'Authorization': `Bearer ${token}`
+        },
+      });
 
-    if (propertyFavorites.includes(propertyId)) {
-      setFavorites({
-        ...favorites,
-        properties: propertyFavorites.filter(id => id !== propertyId)
-      });
-    } else {
-      setFavorites({
-        ...favorites,
-        properties: [...propertyFavorites, propertyId]
-      });
+      if (!response.ok) {
+        throw new Error('فشل في تحديث المفضلة');
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        // تحديث حالة المفضلة استنادًا إلى الاستجابة
+        if (data.action === 'added') {
+          // إضافة إلى المفضلة
+          setFavorites(prev => ({
+            ...prev,
+            properties: [...prev.properties, propertyId]
+          }));
+          
+          // تحديث localStorage
+          const savedFavorites = JSON.parse(localStorage.getItem('propertyFavorites') || '[]');
+          savedFavorites.push(propertyId);
+          localStorage.setItem('propertyFavorites', JSON.stringify(savedFavorites));
+        } else if (data.action === 'removed') {
+          // إزالة من المفضلة
+          setFavorites(prev => ({
+            ...prev,
+            properties: prev.properties.filter(id => id !== propertyId)
+          }));
+          
+          // تحديث localStorage
+          const savedFavorites = JSON.parse(localStorage.getItem('propertyFavorites') || '[]');
+          const updatedFavorites = savedFavorites.filter(id => id !== propertyId);
+          localStorage.setItem('propertyFavorites', JSON.stringify(updatedFavorites));
+        }
+      }
+    } catch (error) {
+      console.error('خطأ في تحديث المفضلة:', error);
+      
+      // استخدم الوظيفة المحلية في حالة فشل API
+      const propertyFavorites = favorites.properties || [];
+
+      if (propertyFavorites.includes(propertyId)) {
+        setFavorites({
+          ...favorites,
+          properties: propertyFavorites.filter(id => id !== propertyId)
+        });
+        localStorage.setItem('propertyFavorites', JSON.stringify(propertyFavorites.filter(id => id !== propertyId)));
+      } else {
+        setFavorites({
+          ...favorites,
+          properties: [...propertyFavorites, propertyId]
+        });
+        localStorage.setItem('propertyFavorites', JSON.stringify([...propertyFavorites, propertyId]));
+      }
     }
   };
 
-  // Toggle favorite status for auctions
-  const toggleAuctionFavorite = (auctionId, e) => {
+  // Toggle favorite status for auctions using API
+  const toggleAuctionFavorite = async (auctionId, e) => {
     e?.stopPropagation();
-    const auctionFavorites = favorites.auctions || [];
+      const token = localStorage.getItem('token');
+    try {
+      const url = `https://shahin-tqay.onrender.com/api/favorites/auction/${auctionId}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // إضافة أي توكن للتوثيق إذا كان مطلوبًا
+          'Authorization': `Bearer ${token}`
+        },
+      });
 
-    if (auctionFavorites.includes(auctionId)) {
-      setFavorites({
-        ...favorites,
-        auctions: auctionFavorites.filter(id => id !== auctionId)
-      });
-    } else {
-      setFavorites({
-        ...favorites,
-        auctions: [...auctionFavorites, auctionId]
-      });
+      if (!response.ok) {
+        throw new Error('فشل في تحديث المفضلة');
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        // تحديث حالة المفضلة استنادًا إلى الاستجابة
+        if (data.action === 'added') {
+          // إضافة إلى المفضلة
+          setFavorites(prev => ({
+            ...prev,
+            auctions: [...prev.auctions, auctionId]
+          }));
+          
+          // تحديث localStorage
+          const savedFavorites = JSON.parse(localStorage.getItem('auctionFavorites') || '[]');
+          savedFavorites.push(auctionId);
+          localStorage.setItem('auctionFavorites', JSON.stringify(savedFavorites));
+        } else if (data.action === 'removed') {
+          // إزالة من المفضلة
+          setFavorites(prev => ({
+            ...prev,
+            auctions: prev.auctions.filter(id => id !== auctionId)
+          }));
+          
+          // تحديث localStorage
+          const savedFavorites = JSON.parse(localStorage.getItem('auctionFavorites') || '[]');
+          const updatedFavorites = savedFavorites.filter(id => id !== auctionId);
+          localStorage.setItem('auctionFavorites', JSON.stringify(updatedFavorites));
+        }
+      }
+    } catch (error) {
+      console.error('خطأ في تحديث المفضلة:', error);
+      
+      // استخدم الوظيفة المحلية في حالة فشل API
+      const auctionFavorites = favorites.auctions || [];
+
+      if (auctionFavorites.includes(auctionId)) {
+        setFavorites({
+          ...favorites,
+          auctions: auctionFavorites.filter(id => id !== auctionId)
+        });
+        localStorage.setItem('auctionFavorites', JSON.stringify(auctionFavorites.filter(id => id !== auctionId)));
+      } else {
+        setFavorites({
+          ...favorites,
+          auctions: [...auctionFavorites, auctionId]
+        });
+        localStorage.setItem('auctionFavorites', JSON.stringify([...auctionFavorites, auctionId]));
+      }
     }
   };
 
@@ -632,6 +735,7 @@ const PropertiesPage = () => {
   // Auction Filters Component
   const AuctionFiltersContent = () => (
     <div className="shahinFilters_content">
+      
       <div className="shahinFilters_row">
         <div className="shahinFilter_group">
           <label>البحث في المزادات</label>
@@ -644,7 +748,7 @@ const PropertiesPage = () => {
           />
         </div>
 
-        <div className="shahinFilter_group">
+        {/* <div className="shahinFilter_group">
           <label>حالة المزاد</label>
           <select name="status" value={auctionFilters.status} onChange={handleAuctionFilterChange}>
             <option value="">جميع الحالات</option>
@@ -652,7 +756,7 @@ const PropertiesPage = () => {
               <option key={status} value={status}>{status}</option>
             ))}
           </select>
-        </div>
+        </div> */}
 
         <div className="shahinFilter_group">
           <label>اسم الشركة</label>

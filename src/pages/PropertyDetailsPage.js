@@ -302,15 +302,26 @@ const handleShowInterestForm = () => {
     }));
   };
   
- const handleSubmitInterest = async (e) => {
+function handleSubmit(e) {
+  e.preventDefault();
+
+  if (formData.message.trim().length < 10) {
+    alert("الرسالة يجب أن تكون أكثر من 10 أحرف");
+    return;
+  }
+
+  // تابع الإرسال هنا
+  console.log("تم الإرسال:", formData);
+}
+
+const handleSubmitInterest = async (e) => {
   e.preventDefault();
   setSubmitting(true);
   setSubmitResult(null);
   
   try {
     const requestData = {
-      ...formData,
-      property_id: parseInt(id),
+      message: formData.message
     };
     
     const headers = {
@@ -326,7 +337,8 @@ const handleShowInterestForm = () => {
     console.log('إرسال البيانات:', requestData);
     console.log('الـ Token المستخدم:', token ? 'موجود' : 'غير موجود');
 
-    const response = await fetch('https://shahin-tqay.onrender.com/api/user/interested', {
+    // استخدام الرابط الجديد
+    const response = await fetch(`https://shahin-tqay.onrender.com/api/properties/${id}/interest`, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(requestData),
@@ -367,6 +379,7 @@ const handleShowInterestForm = () => {
     setSubmitting(false);
   }
 };
+
 
   if (loading) {
     return (
@@ -651,8 +664,11 @@ const handleShowInterestForm = () => {
     )}
   </div>
 ) : (
-              <form onSubmit={handleSubmitInterest}>
-                <div className="elegantForm_group">
+<form onSubmit={(e) => {
+  handleSubmitInterest(e);
+  handleSubmit(e);
+}}>
+                {/* <div className="elegantForm_group">
                   <label>
                     <FaUser />
                     <span>الاسم الكامل</span>
@@ -695,21 +711,21 @@ const handleShowInterestForm = () => {
                     placeholder="أدخل البريد الإلكتروني"
                     required
                   />
-                </div>
+                </div> */}
                 
-                <div className="elegantForm_group">
-                  <label>
-                    <span>رسالة</span>
-                  </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    placeholder="أدخل رسالتك أو استفسارك هنا"
-                    rows={4}
-                    required
-                  />
-                </div>
+                  <div className="elegantForm_group">
+    <label>
+      <span>رسالة</span>
+    </label>
+    <textarea
+      name="message"
+      value={formData.message}
+      onChange={handleInputChange}
+      placeholder="أدخل رسالتك أو استفسارك هنايجب ان يكون اكبر من 10 احرف"
+      rows={4}
+      required
+    />
+  </div>
                 
                 <button 
                   type="submit" 

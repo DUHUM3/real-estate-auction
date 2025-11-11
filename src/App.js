@@ -20,11 +20,11 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import CreateProperty from './pages/CreateProperty';
 import Profile from './pages/Profile';
 import MyAds from './pages/MyAds';
-import AuctionRoom from './pages/AuctionRoom';
-import Dashboard from './pages/Dashboard';
+// import AuctionRoom from './pages/AuctionRoom';
+// import Dashboard from './pages/Dashboard';
 import Notifications from './pages/Notifications';
-import About from './pages/About';
-import Contact from './pages/Contact';
+// import About from './pages/About';
+// import Contact from './pages/Contact';
 import './styles/App.css';
 
 // إنشاء مثيل جديد لـ QueryClient
@@ -87,8 +87,8 @@ function App() {
               <main>
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/contact" element={<Contact />} />
+                  {/* <Route path="/about" element={<About />} /> */}
+                  {/* <Route path="/contact" element={<Contact />} /> */}
                   <Route path="/properties" element={<Properties />} />
                   <Route path="/property/:id/:type" element={<PropertyDetailsPage />} />
                   <Route path="/profile" element={<Profile />} />
@@ -102,8 +102,8 @@ function App() {
                   <Route path="/create-property" element={<CreateProperty />} />
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                  <Route path="/auction/:id" element={<AuctionRoom />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  {/* <Route path="/auction/:id" element={<AuctionRoom />} /> */}
+                  {/* <Route path="/dashboard" element={<Dashboard />} /> */}
                   <Route path="/notifications" element={<Notifications />} />
                 </Routes>
               </main>

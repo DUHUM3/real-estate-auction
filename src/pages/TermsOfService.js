@@ -311,7 +311,12 @@ const TermsOfService = () => {
   };
 
   return (
-    <div className="privacy-policy-container">
+       <div className="privacy-policy-container">
+      {/* العنوان الرئيسي المضاف */}
+      <div className="privacy-header">
+        <h1>شروط الاستخدام</h1>
+        <p>شاهين بلس - حماية بياناتك وخصوصيتك أولوية لدينا</p>
+      </div>
       
       <div className="content-wrapper">
         <div className="sections-sidebar">

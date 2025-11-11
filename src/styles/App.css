@@ -2842,27 +2842,7 @@ body {
 }
 
 /* ترويسة الصفحة */
-.interests-header {
-  text-align: center;
-  margin-bottom: 3rem;
-  padding: 2rem 0;
-}
 
-.page-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--text-color);
-  margin-bottom: 0.5rem;
-}
-
-.title-icon {
-  color: var(--primary-color);
-  font-size: 2rem;
-}
 
 .page-subtitle {
   font-size: 1.1rem;
@@ -2901,6 +2881,7 @@ body {
   font-size: 3rem;
   color: #e74c3c;
   margin-bottom: 1.5rem;
+  
 }
 
 .retry-btn {
@@ -2929,6 +2910,8 @@ body {
   justify-content: center;
   padding: 4rem 2rem;
   text-align: center;
+    margin-top: 130px;
+
   background-color: var(--background-white);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
@@ -2978,12 +2961,148 @@ body {
   gap: 1.5rem;
 }
 
+
+.view-property-btn {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.3s ease;
+}
+
+.view-property-btn:hover {
+  background: #2980b9;
+}
+.property-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #7f8c8d;
+  font-size: 14px;
+}
+/* إضافة إلى styles/Interests.css */
+
+/* زر إزالة من المفضلة */
+.remove-favorite-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.remove-favorite-btn:hover:not(:disabled) {
+  background: #c0392b;
+}
+
+.remove-favorite-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* السعر الإجمالي */
+.elegantTotal_price {
+  color: #27ae60;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* spinner صغير للتحميل */
+.loading-spinner-small {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+}
+
+/* تحسين الأيقونات في التفاصيل */
+.detail-icon {
+  color: #3498db;
+  min-width: 16px;
+}
+
+/* تحسين التخطيط للأزرار */
+.interest-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid #ecf0f1;
+}
+
+@media (max-width: 768px) {
+  .interest-actions {
+    flex-direction: column;
+  }
+  
+  .view-property-btn,
+  .remove-favorite-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* تحسين مظهر البطاقة */
+.interest-card {
+  position: relative;
+}
+
+.interest-card:hover {
+  border-color: #e74c3c;
+}
+
+/* تحسين العنوان */
+.interest-title {
+  color: #2c3e50;
+  margin-bottom: 5px;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+/* تحسين شارة الحالة */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-approved {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
 /* بطاقة الاهتمام */
 .interest-card {
   background-color: var(--background-white);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
   padding: 1.5rem;
+      margin-top: 70px;
+
   transition: all var(--transition-speed);
   border: 1px solid var(--border-color);
 }

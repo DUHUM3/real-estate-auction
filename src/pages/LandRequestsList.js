@@ -6,7 +6,6 @@ import {
   FaSearch,
   FaShare,
   FaFilter,
-  FaHeart,
   FaMapMarkerAlt,
   FaRulerCombined,
   FaMoneyBillWave,
@@ -22,7 +21,7 @@ import {
   FaPlus
 } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
-import { FaBullhorn } from 'react-icons/fa'; // أضف هذا الاستيراد
+import { FaBullhorn } from 'react-icons/fa';
 
 function LandRequestsList() {
   const [requests, setRequests] = useState([]);
@@ -30,6 +29,8 @@ function LandRequestsList() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [perPage, setPerPage] = useState(12);
   const [showFilters, setShowFilters] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -112,23 +113,61 @@ function LandRequestsList() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
+      
+      // بناء الـ query parameters
+      const params = {
+        page: currentPage,
+        ...filters
+      };
+
+      // إزالة الحقول الفارغة
+      Object.keys(params).forEach(key => {
+        if (params[key] === '' || params[key] === null) {
+          delete params[key];
+        }
+      });
+
+      console.log('Fetching requests with params:', params);
+
       const response = await axios.get('https://shahin-tqay.onrender.com/api/land-requests', {
-        headers: { 'Authorization': `Bearer ${token}` },
-        params: { ...filters, page: currentPage }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        params: params
       });
       
-      if (response.data.data) {
+      console.log('API Response:', response.data);
+
+      if (response.data && response.data.data) {
         setRequests(response.data.data);
-        setTotalPages(response.data.pagination?.last_page || 1);
+        
+        // تحديث معلومات الـ pagination من الـ API
+        if (response.data.pagination) {
+          setCurrentPage(response.data.pagination.current_page || 1);
+          setTotalPages(response.data.pagination.last_page || 1);
+          setPerPage(response.data.pagination.per_page || 12);
+          setTotalItems(response.data.pagination.total || 0);
+        } else {
+          // Fallback في حالة عدم وجود pagination
+          setTotalPages(1);
+          setTotalItems(response.data.data.length);
+        }
       } else {
         setRequests([]);
         setTotalPages(1);
+        setTotalItems(0);
       }
       setLoading(false);
     } catch (err) {
+      console.error('Error fetching requests:', err);
       setError('حدث خطأ أثناء تحميل البيانات');
       setLoading(false);
-      console.error(err);
+      
+      // Reset data on error
+      setRequests([]);
+      setTotalPages(1);
+      setTotalItems(0);
     }
   };
 
@@ -137,13 +176,14 @@ function LandRequestsList() {
     setFilters(prev => ({
       ...prev,
       [name]: value,
-      ...(name === 'region' && { city: '' })
+      ...(name === 'region' && { city: '' }) // Reset city when region changes
     }));
   };
 
   const applyFilters = () => {
     setShowMobileFilters(false);
-    setCurrentPage(1);
+    setCurrentPage(1); // العودة للصفحة الأولى عند تطبيق الفلتر
+    fetchRequests();
   };
 
   const resetFilters = () => {
@@ -180,18 +220,9 @@ function LandRequestsList() {
         url: window.location.href,
       }).catch((error) => console.log('Error sharing', error));
     } else {
-      const textArea = document.createElement("textarea");
-      textArea.value = shareText + " " + window.location.href;
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        alert("تم نسخ الرابط للمشاركة!");
-      } catch (err) {
-        console.error('فشل نسخ النص: ', err);
-      }
-      document.body.removeChild(textArea);
+      navigator.clipboard.writeText(shareText + " " + window.location.href)
+        .then(() => alert("تم نسخ الرابط للمشاركة!"))
+        .catch(err => console.error('فشل نسخ النص: ', err));
     }
   };
 
@@ -210,18 +241,49 @@ function LandRequestsList() {
     return status === 'open' ? 'shahinStatus_open' : 'shahinStatus_closed';
   };
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  const nextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
-  const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    // سيتم تفعيل fetchRequests تلقائياً عبر useEffect
+  };
+
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   const formatPrice = (price) => {
     if (!price) return '0';
     return parseFloat(price).toLocaleString('ar-SA');
   };
 
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(date);
+    } catch (e) {
+      return dateString;
+    }
+  };
+
   // Filters Component
   const FiltersContent = () => (
     <div className="shahinFilters_content">
+      <div className="shahinFilters_header">
+        <h4>فلاتر البحث</h4>
+        <button className="shahinReset_btn" onClick={resetFilters}>إعادة تعيين</button>
+      </div>
+      
       <div className="shahinFilters_row">
         <div className="shahinFilter_group">
           <label>المنطقة</label>
@@ -248,134 +310,145 @@ function LandRequestsList() {
           <select name="purpose" value={filters.purpose} onChange={handleFilterChange}>
             <option value="">الكل</option>
             <option value="sale">بيع</option>
-            <option value="rent">إيجار</option>
+            <option value="investment">استثمار</option>
           </select>
         </div>
 
-        {window.innerWidth >= 768 && (
-          <>
-            <div className="shahinFilter_group">
-              <label>النوع</label>
-              <select name="type" value={filters.type} onChange={handleFilterChange}>
-                <option value="">الكل</option>
-                <option value="residential">سكني</option>
-                <option value="commercial">تجاري</option>
-                <option value="agricultural">زراعي</option>
-              </select>
-            </div>
-
-            <div className="shahinFilter_group">
-              <label>المساحة من (م²)</label>
-              <input
-                type="number"
-                name="area_min"
-                placeholder="الحد الأدنى"
-                value={filters.area_min}
-                onChange={handleFilterChange}
-              />
-            </div>
-
-            <div className="shahinFilter_group">
-              <label>المساحة إلى (م²)</label>
-              <input
-                type="number"
-                name="area_max"
-                placeholder="الحد الأقصى"
-                value={filters.area_max}
-                onChange={handleFilterChange}
-              />
-            </div>
-          </>
-        )}
+        <div className="shahinFilter_group">
+          <label>النوع</label>
+          <select name="type" value={filters.type} onChange={handleFilterChange}>
+            <option value="">الكل</option>
+            <option value="residential">سكني</option>
+            <option value="commercial">تجاري</option>
+            <option value="agricultural">زراعي</option>
+          </select>
+        </div>
       </div>
 
-      {window.innerWidth < 768 && (
-        <div className="shahinFilters_row">
-          <div className="shahinFilter_group">
-            <label>النوع</label>
-            <select name="type" value={filters.type} onChange={handleFilterChange}>
-              <option value="">الكل</option>
-              <option value="residential">سكني</option>
-              <option value="commercial">تجاري</option>
-              <option value="agricultural">زراعي</option>
-            </select>
-          </div>
-
-          <div className="shahinFilter_group">
-            <label>المساحة من (م²)</label>
-            <input
-              type="number"
-              name="area_min"
-              placeholder="الحد الأدنى"
-              value={filters.area_min}
-              onChange={handleFilterChange}
-            />
-          </div>
-
-          <div className="shahinFilter_group">
-            <label>المساحة إلى (م²)</label>
-            <input
-              type="number"
-              name="area_max"
-              placeholder="الحد الأقصى"
-              value={filters.area_max}
-              onChange={handleFilterChange}
-            />
-          </div>
+      <div className="shahinFilters_row">
+        <div className="shahinFilter_group">
+          <label>المساحة من (م²)</label>
+          <input
+            type="number"
+            name="area_min"
+            placeholder="الحد الأدنى"
+            value={filters.area_min}
+            onChange={handleFilterChange}
+            min="0"
+          />
         </div>
-      )}
+
+        <div className="shahinFilter_group">
+          <label>المساحة إلى (م²)</label>
+          <input
+            type="number"
+            name="area_max"
+            placeholder="الحد الأقصى"
+            value={filters.area_max}
+            onChange={handleFilterChange}
+            min="0"
+          />
+        </div>
+
+        <div className="shahinFilter_group shahinSearch_group">
+          <label>بحث</label>
+          <input
+            type="text"
+            name="search"
+            placeholder="ابحث في الطلبات..."
+            value={filters.search}
+            onChange={handleFilterChange}
+          />
+        </div>
+      </div>
 
       <div className="shahinFilter_actions">
-        <button className="shahinReset_btn" onClick={resetFilters}>إعادة تعيين</button>
-        <button className="shahinApply_btn" onClick={applyFilters}>تطبيق الفلتر</button>
+        <button className="shahinApply_btn" onClick={applyFilters}>
+          تطبيق الفلتر
+        </button>
       </div>
     </div>
   );
 
-  // Render pagination
+  // Render pagination with improved UI
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
-    return (
-      <div className="shahinPagination">
-        <button onClick={prevPage} disabled={currentPage === 1} className="shahinPage_arrow">
-          <FaArrowRight />
-        </button>
+    const pages = [];
+    const maxVisiblePages = 5;
 
-        {Array.from({ length: totalPages }, (_, i) => {
-          const pageNum = i + 1;
-          if (
-            pageNum === 1 ||
-            pageNum === totalPages ||
-            pageNum === currentPage ||
-            pageNum === currentPage - 1 ||
-            pageNum === currentPage + 1
-          ) {
-            return (
-              <button
-                key={pageNum}
-                onClick={() => paginate(pageNum)}
-                className={currentPage === pageNum ? 'shahinActive' : ''}
-              >
-                {pageNum}
-              </button>
-            );
-          } else if (
-            pageNum === currentPage - 2 ||
-            pageNum === currentPage + 2
-          ) {
-            return <span key={pageNum} className="shahinEllipsis">...</span>;
-          }
-          return null;
-        })}
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
         <button
-          onClick={nextPage}
-          disabled={currentPage === totalPages}
-          className="shahinPage_arrow"
+          key={i}
+          onClick={() => paginate(i)}
+          className={`shahinPage_btn ${currentPage === i ? 'shahinActive' : ''}`}
         >
-          <FaArrowLeft />
+          {i}
         </button>
+      );
+    }
+
+    return (
+      <div className="shahinPagination_container">
+        <div className="shahinPagination_info">
+          <span>
+          </span>
+          <span>
+            {/* الصفحة {currentPage} من {totalPages} */}.
+          </span>
+        </div>
+        
+        <div className="shahinPagination">
+          <button 
+            onClick={prevPage} 
+            disabled={currentPage === 1} 
+            className="shahinPage_arrow"
+          >
+            <FaArrowRight />
+          </button>
+
+          {startPage > 1 && (
+            <>
+              <button
+                onClick={() => paginate(1)}
+                className="shahinPage_btn"
+              >
+                1
+              </button>
+              {startPage > 2 && <span className="shahinEllipsis">...</span>}
+            </>
+          )}
+
+          {pages}
+
+          {endPage < totalPages && (
+            <>
+              {endPage < totalPages - 1 && <span className="shahinEllipsis">...</span>}
+              <button
+                onClick={() => paginate(totalPages)}
+                className="shahinPage_btn"
+              >
+                {totalPages}
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={nextPage}
+            disabled={currentPage === totalPages}
+            className="shahinPage_arrow"
+          >
+            <FaArrowLeft />
+          </button>
+        </div>
       </div>
     );
   };
@@ -393,6 +466,7 @@ function LandRequestsList() {
               name="search"
               value={filters.search}
               onChange={handleFilterChange}
+              onKeyPress={(e) => e.key === 'Enter' && applyFilters()}
             />
           </div>
           <button
@@ -404,19 +478,17 @@ function LandRequestsList() {
           </button>
         </div>
 
-       <div className="shahinPage_header">
-<div class="form-buttons">
-    <Link to="/create-request" className="shahinMarketing_btn">
-      <FaPlus /> إنشاء طلب جديد
-    </Link>
-    <Link to="/marketing-request" className="shahinMarketing_btn">
-      <FaBullhorn /> طلب تسويق
-    </Link>
-  </div>
-</div>
+        <div className="shahinPage_header">
+          <div className="form-buttons">
+            <Link to="/create-request" className="shahinMarketing_btn">
+              <FaPlus /> إنشاء طلب جديد
+            </Link>
+            <Link to="/marketing-request" className="shahinMarketing_btn">
+              <FaBullhorn /> طلب تسويق
+            </Link>
+          </div>
+        </div>
       </div>
-      
-      
 
       {/* Desktop Filters */}
       {showFilters && window.innerWidth >= 768 && (
@@ -449,108 +521,100 @@ function LandRequestsList() {
         ) : error ? (
           <div className="shahinError_container">
             <p>حدث خطأ: {error}</p>
-            <button onClick={() => window.location.reload()}>إعادة المحاولة</button>
+            <button onClick={fetchRequests}>إعادة المحاولة</button>
           </div>
         ) : requests.length === 0 ? (
           <div className="shahinEmpty_state">
+            <div className="shahinEmpty_icon">
+              <FaBuilding />
+            </div>
+            <h3>لا توجد طلبات</h3>
             <p>لم يتم العثور على أي طلبات تطابق معايير البحث</p>
-            <button onClick={resetFilters}>إعادة تعيين الفلتر</button>
+            <div className="shahinEmpty_actions">
+              <button onClick={resetFilters}>إعادة تعيين الفلتر</button>
+            </div>
           </div>
         ) : (
-          <div className="shahinProperties_grid">
-            {requests.map((request) => (
-              <div
-                key={request.id}
-                className="shahinProperty_card"
-              >
-                <div className="shahinProperty_image">
-                  <div className="shahinPlaceholder_image shahinRequest_placeholder">
-                    <FaBuilding />
-                  </div>
-                  <div className={`shahinStatus_badge ${getStatusBadgeClass(request.status)}`}>
-                    {getStatusLabel(request.status)}
-                  </div>
-                  <button
-                    className={`shahinFavorite_btn ${favorites.includes(request.id) ? 'shahinActive' : ''}`}
-                    onClick={(e) => toggleFavorite(request.id, e)}
-                  >
-                    <FaHeart />
-                  </button>
-                </div>
+          <>
+            <div className="shahinResults_info">
+              <p>عرض {requests.length} من أصل {totalItems} طلب</p>
+            </div>
 
-                <div className="shahinProperty_details">
-                  <div className="shahinRequest_header">
-                    <h3>طلب رقم: {request.id}</h3>
-                  </div>
-
-                  <div className="shahinProperty_location">
-                    <FaMapMarkerAlt />
-                    <span>{request.region} - {request.city}</span>
-                  </div>
-
-                  <div className="shahinProperty_specs">
-                    <div className="shahinSpec">
-                      <FaRulerCombined />
-                      <span>{formatPrice(request.area)} م²</span>
+            <div className="shahinProperties_grid">
+              {requests.map((request) => (
+                <div
+                  key={request.id}
+                  className="shahinProperty_card"
+                >
+                  {/* تم إزالة قسم الصورة والأيقونة بالكامل */}
+                  
+                  <div className="shahinProperty_details">
+                    <div className="shahinRequest_header">
+                      <h3>طلب أرض #{request.id}</h3>
+                      <span className="shahinRequest_id">#{request.id}</span>
                     </div>
-                    <div className="shahinSpec">
-                      <FaHandshake />
-                      <span>{getPurposeLabel(request.purpose)}</span>
+
+                    <div className="shahinProperty_location">
+                      <FaMapMarkerAlt />
+                      <span>{request.region} - {request.city}</span>
                     </div>
-                    <div className="shahinSpec">
-                      <FaBuilding />
-                      <span>{getTypeLabel(request.type)}</span>
+
+                    <div className="shahinProperty_specs">
+                      <div className="shahinSpec">
+                        <FaRulerCombined />
+                        <span>{formatPrice(request.area)} م²</span>
+                      </div>
+                      <div className="shahinSpec">
+                        <FaHandshake />
+                        <span>{getPurposeLabel(request.purpose)}</span>
+                      </div>
+                      <div className="shahinSpec">
+                        <FaBuilding />
+                        <span>{getTypeLabel(request.type)}</span>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="shahinProperty_type">
-                    <span className={`shahinTag ${request.type}`}>
-                      {getTypeLabel(request.type)}
-                    </span>
-                    <span className={`shahinTag shahinPurpose ${request.purpose}`}>
-                      {getPurposeLabel(request.purpose)}
-                    </span>
-                  </div>
+                    <div className="shahinProperty_type">
+                      <span className={`shahinTag ${request.type}`}>
+                        {getTypeLabel(request.type)}
+                      </span>
+                      <span className={`shahinTag shahinPurpose ${request.purpose}`}>
+                        {getPurposeLabel(request.purpose)}
+                      </span>
+                    </div>
 
-                  <div className="shahinRequest_description">
-                    <p>{request.description}</p>
-                  </div>
+                    <div className="shahinRequest_description">
+                      <p>{request.description || 'لا يوجد وصف'}</p>
+                    </div>
 
-                  <div className="shahinRequest_date">
-                    <FaCalendarAlt />
-                    <span>تاريخ الإنشاء: {request.created_at}</span>
-                  </div>
+                    <div className="shahinRequest_date">
+                      <FaCalendarAlt />
+                      <span>أنشئ في: {formatDate(request.created_at)}</span>
+                    </div>
 
-                  <div className="shahinProperty_actions">
-                    <Link 
-                      to={`/requests/${request.id}`} 
-                      className="shahinAction_btn shahinDetails_btn"
-                    >
-                      <FaEye /> تفاصيل
-                    </Link>
-                    {/* {request.status === 'open' && (
+                    <div className="shahinProperty_actions">
                       <Link 
-                        to={`/requests/${request.id}#offer`} 
-                        className="shahinAction_btn shahinOffer_btn"
+                        to={`/requests/${request.id}`} 
+                        className="shahinAction_btn shahinDetails_btn"
                       >
-                        <FaPaperPlane /> تقديم عرض
+                        <FaEye /> تفاصيل
                       </Link>
-                    )} */}
-                    <button
-                      className="shahinAction_btn shahinShare_btn"
-                      onClick={(e) => shareRequest(request, e)}
-                    >
-                      <FaShare /> مشاركة
-                    </button>
+                      <button
+                        className="shahinAction_btn shahinShare_btn"
+                        onClick={(e) => shareRequest(request, e)}
+                      >
+                        <FaShare /> مشاركة
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
 
-        {/* Pagination */}
-        {renderPagination()}
+            {/* Pagination */}
+            {renderPagination()}
+          </>
+        )}
       </div>
     </div>
   );

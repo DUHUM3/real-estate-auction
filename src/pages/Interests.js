@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   FiHeart, 
   FiClock, 
   FiCheckCircle, 
   FiXCircle,
   FiEye,
-  FiFileText
+  FiFileText,
+  FiMapPin,
+  FiCalendar
 } from 'react-icons/fi';
 // import '../styles/Interests.css';
 
@@ -14,6 +16,7 @@ function Interests() {
   const [interests, setInterests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // جلب بيانات الاهتمامات
   useEffect(() => {
@@ -30,6 +33,7 @@ function Interests() {
 
         if (response.ok) {
           const data = await response.json();
+          console.log('بيانات الاهتمامات:', data); // للتصحيح
           setInterests(data.data || []);
         } else {
           throw new Error('فشل في جلب البيانات');
@@ -73,6 +77,25 @@ function Interests() {
     }
   };
 
+  // دالة للانتقال إلى صفحة تفاصيل الأرض
+  const handleViewProperty = (propertyId) => {
+    navigate(`/property/${propertyId}/land`);
+  };
+
+  // تنسيق التاريخ
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(date);
+    } catch (e) {
+      return dateString;
+    }
+  };
+
   if (loading) {
     return (
       <div className="interests-container">
@@ -101,13 +124,13 @@ function Interests() {
   return (
     <div className="interests-container">
       {/* عنوان الصفحة */}
-      <div className="interests-header">
+      {/* <div className="interests-header">
         <h1 className="page-title">
           <FiHeart className="title-icon" />
           اهتماماتي
         </h1>
         <p className="page-subtitle">عقارات قمت بالتعبير عن اهتمامك بها</p>
-      </div>
+      </div> */}
 
       {/* قائمة الاهتمامات */}
       <div className="interests-list">
@@ -122,10 +145,17 @@ function Interests() {
           </div>
         ) : (
           interests.map((interest) => (
-            <div key={interest.id} className="interest-card">
+            <div 
+              key={interest.id} 
+              className="interest-card"
+              onClick={() => handleViewProperty(interest.property_id)}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="interest-header">
                 <div className="interest-title-section">
-                  <h3 className="interest-title">{interest.property_title}</h3>
+                  <h3 className="interest-title">
+                    الأرض رقم #{interest.property_id}
+                  </h3>
                   <span className={`status-badge ${getStatusColor(interest.status)}`}>
                     {getStatusIcon(interest.status)}
                     {interest.status}
@@ -133,31 +163,50 @@ function Interests() {
                 </div>
                 <div className="interest-reference">
                   <FiFileText className="reference-icon" />
-                  <span>{interest.reference_number}</span>
+                  <span>رقم الطلب: {interest.id}</span>
                 </div>
               </div>
 
               <div className="interest-details">
                 <div className="detail-item">
+                  <FiCalendar className="detail-icon" />
                   <span className="detail-label">تاريخ التقديم:</span>
-                  <span className="detail-value">{interest.submitted_at}</span>
+                  <span className="detail-value">{formatDate(interest.created_at)}</span>
                 </div>
+                
                 <div className="detail-item">
-                  <span className="detail-label">رقم المرجع:</span>
-                  <span className="detail-value">{interest.reference_number}</span>
+                  <FiHeart className="detail-icon" />
+                  <span className="detail-label">الرسالة:</span>
+                  <span className="detail-value message-preview">
+                    {interest.message || 'لا توجد رسالة'}
+                  </span>
+                </div>
+
+                <div className="detail-item">
+                  <span className="detail-label">المعلومات الشخصية:</span>
+                  <span className="detail-value">
+                    {interest.full_name} - {interest.phone} - {interest.email}
+                  </span>
                 </div>
               </div>
 
-              {/* <div className="interest-actions">
-                <button className="view-details-btn">
+              <div className="interest-actions">
+                <button 
+                  className="view-property-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewProperty(interest.property_id);
+                  }}
+                >
                   <FiEye />
-                  <span>عرض التفاصيل</span>
+                  <span>عرض تفاصيل الأرض</span>
                 </button>
-                <button className="track-status-btn">
-                  <FiClock />
-                  <span>متابعة الحالة</span>
-                </button>
-              </div> */}
+                
+                <div className="property-indicator">
+                  <FiMapPin />
+                  <span>انقر على البطاقة لعرض الأرض</span>
+                </div>
+              </div>
             </div>
           ))
         )}
