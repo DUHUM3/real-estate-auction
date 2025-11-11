@@ -2,21 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// import {
-//   ,
-//   ,
-//   ,
-//   ,
-//   ,
-//   ,
-//   ,
-//   ,
-//   ,
-//   ,
-//   ,
-//   ,
-//   
-// } from 'react-icons/fa';
 
 function MarketingRequest() {
   const navigate = useNavigate();
@@ -193,22 +178,18 @@ function MarketingRequest() {
 
   return (
     <div className="elegantCreate_container">
-      {/* الهيدر */}
       <header className="elegantCreate_header">
         <button onClick={() => navigate(-1)} className="elegantBack_btn">
         العودة
         </button>
         
         <div className="elegantHeader_title">
-          {/* <span>📢</span> */}
           <span>طلب تسويق أرض</span>
         </div>
       </header>
 
-      {/* المحتوى الرئيسي */}
       <main className="elegantCreate_content">
         <div className="elegantCreate_card">
-          {/* عنوان البطاقة */}
           <div className="elegantCard_title">
             <span className="elegantCard_icon"></span>
             <h2>إنشاء طلب تسويق جديد</h2>
@@ -282,7 +263,6 @@ function MarketingRequest() {
           ) : (
             <form onSubmit={handleSubmit} className="elegantCreate_form">
               <div className="elegantForm_rows">
-                {/* الصف الأول: المنطقة والمدينة ورقم الوثيقة */}
                 <div className="elegantForm_row">
                   <div className="elegantForm_group">
                     <label htmlFor="region" className="elegantForm_label">
@@ -343,7 +323,6 @@ function MarketingRequest() {
                   </div>
                 </div>
 
-                {/* الصف الثاني: الوصف */}
                 <div className="elegantForm_row">
                   <div className="elegantForm_group elegantForm_fullRow">
                     <label htmlFor="description" className="elegantForm_label">
@@ -363,7 +342,6 @@ function MarketingRequest() {
                   </div>
                 </div>
 
-                {/* الصف الثالث: رفع الصور */}
                 <div className="elegantForm_row">
                   <div className="elegantForm_group elegantForm_fullRow">
                     <label className="elegantForm_label">
@@ -387,52 +365,30 @@ function MarketingRequest() {
                       <span className="elegantUpload_hint">(يمكن رفع حتى 5 صور، الحجم الأقصى 5MB لكل صورة)</span>
                     </div>
 
-                    {/* معاينة الصور */}
                     {images.length > 0 && (
-                      <div className="elegantImages_preview">
+                      <div className="elegantFiles_list">
                         <h4>الصور المرفوعة ({images.length}/5):</h4>
-                        <div className="elegantPreview_grid">
-                          {images.map((image, index) => (
-                            <div key={index} className="elegantPreview_item">
-                              <img 
-                                src={URL.createObjectURL(image)} 
-                                alt={`Preview ${index + 1}`}
-                                className="elegantPreview_image"
-                              />
-                              <button
-                                type="button"
-                                className="elegantRemove_image"
-                                onClick={() => removeImage(index)}
-                              >
-                                
-                              </button>
+                        {images.map((image, index) => (
+                          <div key={index} className="elegantFile_item">
+                            <div className="elegantFile_info">
+                              <span className="elegantFile_icon">🖼️</span>
+                              <span className="elegantFile_name">{image.name}</span>
                             </div>
-                          ))}
-                        </div>
+                            <button
+                              type="button"
+                              className="elegantRemove_file"
+                              onClick={() => removeImage(index)}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
                 </div>
-
-                {/* الموافقة على الشروط */}
-                {/* <div className="elegantForm_row">
-                  <div className="elegantForm_group elegantForm_fullRow">
-                    <label className="elegantCheckbox_label">
-                      <input
-                        type="checkbox"
-                        name="terms_accepted"
-                        checked={formData.terms_accepted}
-                        onChange={handleChange}
-                        className="elegantCheckbox"
-                      />
-                      <span className="elegantCheckbox_custom"></span>
-                      أوافق على الشروط والأحكام وسياسة الخصوصية
-                    </label>
-                  </div>
-                </div> */}
               </div>
 
-              {/* رسالة الخطأ */}
               {error && (
                 <div className="elegantError_message">
                   <span className="elegantError_icon">⚠️</span>
@@ -440,7 +396,6 @@ function MarketingRequest() {
                 </div>
               )}
 
-              {/* أزرار النموذج */}
               <div className="elegantForm_actions">
                 <button 
                   type="submit" 
@@ -460,33 +415,6 @@ function MarketingRequest() {
             </form>
           )}
         </div>
-
-        {/* معلومات مساعدة */}
-        {/* {!success && (
-          <div className="elegantHelp_section">
-            <div className="elegantHelp_card">
-              <h3>💡 معلومات مهمة عن طلبات التسويق</h3>
-              <div className="elegantHelp_list">
-                <div className="elegantHelp_item">
-                  <strong>شروط القبول:</strong>
-                  <p>يجب أن تكون الأرض مسجلة رسمياً وتملك وثيقة صحيحة</p>
-                </div>
-                <div className="elegantHelp_item">
-                  <strong>مدة المعالجة:</strong>
-                  <p>سيتم مراجعة طلبك خلال ٢٤-٤٨ ساعة عمل</p>
-                </div>
-                <div className="elegantHelp_item">
-                  <strong>المستندات المطلوبة:</strong>
-                  <p>صور واضحة للأرض + رقم الوثيقة الرسمي</p>
-                </div>
-                <div className="elegantHelp_item">
-                  <strong>الاتصال:</strong>
-                  <p>للاستفسارات: 920000000 - support@example.com</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )} */}
       </main>
     </div>
   );

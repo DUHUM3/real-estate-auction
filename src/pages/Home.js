@@ -26,7 +26,7 @@ import {
   FaFilter,
   FaChevronRight,
   FaChevronLeft,
-  FaLandmark
+  FaLandmark,
 } from 'react-icons/fa';
 import Login from './Login.js'; // تأكد من المسار الصحيح
 
@@ -41,6 +41,7 @@ const Notification = ({ message, type = 'success', onClose }) => (
 );
 
 // مكون بطاقة الأرض مع المفضلة
+// مكون بطاقة الأرض مع المفضلة - الإصدار المحسن
 const LandCard = ({
   id,
   img,
@@ -59,7 +60,11 @@ const LandCard = ({
   const [favorite, setFavorite] = useState(isFavorite);
   const [isLoading, setIsLoading] = useState(false);
 
-  // دالة واحدة فقط - الإصدار المصحح
+  // تحديث الحالة عند تغيير الـ props
+  useEffect(() => {
+    setFavorite(isFavorite);
+  }, [isFavorite]);
+
   const handleFavoriteClick = async (e) => {
     e.stopPropagation();
     if (isLoading) return;
@@ -67,7 +72,6 @@ const LandCard = ({
     setIsLoading(true);
     try {
       const result = await onToggleFavorite(id, !favorite, 'property');
-      // تحديث الحالة بناءً على الاستجابة من السيرفر
       if (result && result.success) {
         setFavorite(result.is_favorite);
       }
@@ -118,23 +122,22 @@ const LandCard = ({
         <div className="land-price">
           <FaMoneyBillWave className="price-icon" /> {price} ريال
         </div>
-       // في مكون LandCard، قم بتعديل الزر
-<button 
-  className="view-btn"
-  onClick={(e) => {
-    e.stopPropagation(); // منع تنفيذ النقر على البطاقة
-    onClick && onClick(id, 'land');
-  }}
->
-  {auctionTitle ? 'المشاركة في المزاد' : 'عرض التفاصيل'}
-</button>
+        <button 
+          className="view-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick && onClick(id, 'land');
+          }}
+        >
+          {auctionTitle ? 'المشاركة في المزاد' : 'عرض التفاصيل'}
+        </button>
       </div>
     </div>
   );
 };
-
 // بطاقة المزاد مع المفضلة
 // بطاقة المزاد مع المفضلة - الإصدار المصحح
+// بطاقة المزاد مع المفضلة - الإصدار المحسن
 const AuctionCard = ({
   id,
   img,
@@ -154,6 +157,11 @@ const AuctionCard = ({
   const [favorite, setFavorite] = useState(isFavorite);
   const [isLoading, setIsLoading] = useState(false);
 
+  // تحديث الحالة عند تغيير الـ props
+  useEffect(() => {
+    setFavorite(isFavorite);
+  }, [isFavorite]);
+
   const handleFavoriteClick = async (e) => {
     e.stopPropagation();
     if (isLoading) return;
@@ -161,13 +169,11 @@ const AuctionCard = ({
     setIsLoading(true);
     try {
       const result = await onToggleFavorite(id, !favorite, 'auction');
-      // تحديث الحالة بناءً على الاستجابة من السيرفر
       if (result && result.success) {
         setFavorite(result.is_favorite);
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      // في حالة الخطأ، نعيد الحالة إلى ما كانت عليه
       setFavorite(favorite);
     } finally {
       setIsLoading(false);
@@ -208,20 +214,20 @@ const AuctionCard = ({
           <span><FaUsers className="details-icon" /> {bidders} مزايد</span>
         </div>
         <div className="auction-actions">
-<button 
-  className="details-btn"
-  onClick={(e) => {
-    e.stopPropagation(); // منع تنفيذ النقر على البطاقة
-    onClick && onClick(id, 'auction');
-  }}
->
-  تفاصيل المزاد
-</button>        </div>
+          <button 
+            className="details-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick && onClick(id, 'auction');
+            }}
+          >
+            تفاصيل المزاد
+          </button>
+        </div>
       </div>
     </div>
   );
 };
-
 // مكون شريط العملاء المتحرك المعدل
 const ClientsSlider = ({ clients, onClientClick }) => {
   const [activeIndex, setActiveIndex] = useState(1);
@@ -356,10 +362,11 @@ function Home({ onLoginClick }) {
 // دالة إضافة/إزالة من المفضلة
 // دالة إضافة/إزالة من المفضلة - الإصدار المصحح
 // دالة إضافة/إزالة من المفضلة - الإصدار النهائي
+// دالة إضافة/إزالة من المفضلة - الإصدار المحسن
 const handleToggleFavorite = async (id, isFavorite, type) => {
   if (!currentUser) {
     setShowLoginModal(true);
-    return;
+    return { success: false };
   }
 
   try {
@@ -397,7 +404,7 @@ const handleToggleFavorite = async (id, isFavorite, type) => {
     if (result.success) {
       showNotification(result.message, 'success');
       
-      // تحديث الحالة مباشرة
+      // تحديث الحالة مباشرة في state
       if (type === 'property') {
         setLands(prevLands => 
           prevLands.map(land => 
@@ -416,7 +423,6 @@ const handleToggleFavorite = async (id, isFavorite, type) => {
         );
       }
       
-      // إرجاع النتيجة للمكون الفرعي
       return result;
     } else {
       throw new Error(result.message || 'حدث خطأ ما');
@@ -424,44 +430,44 @@ const handleToggleFavorite = async (id, isFavorite, type) => {
   } catch (error) {
     console.error('❌ Error updating favorite:', error);
     showNotification(error.message || 'فشل في تحديث المفضلة', 'error');
-    throw error;
+    return { success: false, error: error.message };
   }
 };
   // دوال جلب البيانات من الـ APIs
   const fetchLands = async () => {
-    setIsLoading(prev => ({ ...prev, lands: true }));
-    try {
-      const response = await fetch('https://shahin-tqay.onrender.com/api/properties/properties/latest');
-      const data = await response.json();
-      
-      if (data.status && data.data) {
-        const formattedLands = data.data.data.map(land => ({
-          id: land.id,
-          img: land.cover_image && land.cover_image !== 'default_cover.jpg' 
-            ? `https://shahin-tqay.onrender.com/storage/${land.cover_image}` 
-            : null,
-          title: land.title,
-          location: `${land.region}، ${land.city}`,
-          price: land.price_per_sqm 
-            ? `${parseFloat(land.price_per_sqm).toLocaleString('ar-SA')}` 
-            : land.estimated_investment_value 
-            ? `${parseFloat(land.estimated_investment_value).toLocaleString('ar-SA')}` 
-            : 'غير محدد',
-          area: parseFloat(land.total_area).toLocaleString('ar-SA'),
-          landType: land.land_type,
-          purpose: land.purpose,
-          status: land.status,
-          isFavorite: land.is_favorite || false
-        }));
-        setLands(formattedLands);
-        setFiltersApplied(data.filters_applied || []);
-      }
-    } catch (error) {
-      console.error('Error fetching lands:', error);
-    } finally {
-      setIsLoading(prev => ({ ...prev, lands: false }));
+  setIsLoading(prev => ({ ...prev, lands: true }));
+  try {
+    const response = await fetch('https://shahin-tqay.onrender.com/api/properties/properties/latest');
+    const data = await response.json();
+    
+    if (data.status && data.data) {
+      const formattedLands = data.data.data.map(land => ({
+        id: land.id,
+        img: land.cover_image && land.cover_image !== 'default_cover.jpg' 
+          ? `https://shahin-tqay.onrender.com/storage/${land.cover_image}` 
+          : null,
+        title: land.title,
+        location: `${land.region}، ${land.city}`,
+        price: land.price_per_sqm 
+          ? `${parseFloat(land.price_per_sqm).toLocaleString('ar-SA')}` 
+          : land.estimated_investment_value 
+          ? `${parseFloat(land.estimated_investment_value).toLocaleString('ar-SA')}` 
+          : 'غير محدد',
+        area: parseFloat(land.total_area).toLocaleString('ar-SA'),
+        landType: land.land_type,
+        purpose: land.purpose,
+        status: land.status,
+        is_favorite: land.is_favorite || false // تأكد من هذا الحقل
+      }));
+      setLands(formattedLands);
+      setFiltersApplied(data.filters_applied || []);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching lands:', error);
+  } finally {
+    setIsLoading(prev => ({ ...prev, lands: false }));
+  }
+};
 
   const fetchAuctions = async () => {
     setIsLoading(prev => ({ ...prev, auctions: true }));

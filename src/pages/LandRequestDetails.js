@@ -1,36 +1,52 @@
 // src/pages/LandRequestDetails.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { ModalContext } from '../App';
 import {
-  FaArrowRight,
-  FaShareAlt,
-  FaStar,
-  FaCalendarAlt,
   FaMapMarkerAlt,
-  FaCity,
-  FaHandshake,
+  FaRulerCombined,
+  FaMoneyBillWave,
+  FaHeart,
+  FaShare,
+  FaArrowLeft,
+  FaCalendarAlt,
   FaBuilding,
-  FaRuler,
-  FaStickyNote,
-  FaEdit,
+  FaClock,
+  FaExpand,
+  FaArrowRight,
+  FaArrowLeft as FaLeft,
+  FaPhone,
+  FaEnvelope,
+  FaUser,
+  FaTimes,
+  FaFileAlt,
   FaPaperPlane,
+  FaEdit,
   FaExclamationCircle,
   FaCheckCircle,
-  FaFileAlt,
-  FaSearch
+  FaSearch,
+  FaHandshake,
+  FaCity,
+  FaStickyNote
 } from 'react-icons/fa';
+import '../styles/PropertyDetailsModal.css';
 
-function LandRequestDetails() {
+const LandRequestDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { openLogin } = useContext(ModalContext);
+
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [showImageModal, setShowImageModal] = useState(false);
   const [offerMessage, setOfferMessage] = useState('');
   const [offerLoading, setOfferLoading] = useState(false);
   const [offerSuccess, setOfferSuccess] = useState(false);
   const [offerError, setOfferError] = useState(null);
+  const [showOfferForm, setShowOfferForm] = useState(false);
 
   useEffect(() => {
     fetchRequestDetails();
@@ -55,7 +71,7 @@ function LandRequestDetails() {
         return;
       }
 
-      const response = await axios.get(
+      const response = await fetch(
         `https://shahin-tqay.onrender.com/api/land-requests/${id}`,
         {
           headers: { 
@@ -65,7 +81,12 @@ function LandRequestDetails() {
         }
       );
       
-      setRequest(response.data.data);
+      if (!response.ok) {
+        throw new Error('فشل في جلب البيانات');
+      }
+
+      const result = await response.json();
+      setRequest(result.data);
       setLoading(false);
     } catch (err) {
       console.error('❌ خطأ في تحميل التفاصيل:', err);
@@ -80,6 +101,115 @@ function LandRequestDetails() {
         setError('حدث خطأ أثناء تحميل تفاصيل الطلب');
       }
       setLoading(false);
+    }
+  };
+
+  const checkFavoriteStatus = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        const favorites = JSON.parse(localStorage.getItem('requestFavorites') || '[]');
+        setIsFavorite(favorites.includes(parseInt(id)));
+        return;
+      }
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+
+      const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/request/${id}`, {
+        method: 'GET',
+        headers: headers
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setIsFavorite(result.isFavorite || false);
+      } else {
+        const favorites = JSON.parse(localStorage.getItem('requestFavorites') || '[]');
+        setIsFavorite(favorites.includes(parseInt(id)));
+      }
+    } catch (error) {
+      console.error('خطأ في التحقق من المفضلة:', error);
+      const favorites = JSON.parse(localStorage.getItem('requestFavorites') || '[]');
+      setIsFavorite(favorites.includes(parseInt(id)));
+    }
+  };
+
+  const toggleFavorite = async () => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      const favorites = JSON.parse(localStorage.getItem('requestFavorites') || '[]');
+      let newFavorites;
+
+      if (isFavorite) {
+        newFavorites = favorites.filter(favId => favId !== parseInt(id));
+      } else {
+        newFavorites = [...favorites, parseInt(id)];
+      }
+
+      localStorage.setItem('requestFavorites', JSON.stringify(newFavorites));
+      setIsFavorite(!isFavorite);
+      return;
+    }
+
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+
+      const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/request/${id}`, {
+        method: isFavorite ? 'DELETE' : 'POST',
+        headers: headers
+      });
+
+      if (response.ok) {
+        setIsFavorite(!isFavorite);
+        
+        const favorites = JSON.parse(localStorage.getItem('requestFavorites') || '[]');
+        let newFavorites;
+
+        if (isFavorite) {
+          newFavorites = favorites.filter(favId => favId !== parseInt(id));
+        } else {
+          newFavorites = [...favorites, parseInt(id)];
+        }
+
+        localStorage.setItem('requestFavorites', JSON.stringify(newFavorites));
+      } else {
+        throw new Error('فشل في تحديث المفضلة');
+      }
+    } catch (error) {
+      console.error('خطأ في تحديث المفضلة:', error);
+      const favorites = JSON.parse(localStorage.getItem('requestFavorites') || '[]');
+      let newFavorites;
+
+      if (isFavorite) {
+        newFavorites = favorites.filter(favId => favId !== parseInt(id));
+      } else {
+        newFavorites = [...favorites, parseInt(id)];
+      }
+
+      localStorage.setItem('requestFavorites', JSON.stringify(newFavorites));
+      setIsFavorite(!isFavorite);
+    }
+  };
+
+  const shareItem = () => {
+    const shareData = {
+      title: `طلب أرض - ${request.region} - ${request.city}`,
+      text: `طلب أرض ${getTypeLabel(request.type)} في ${request.region} - ${request.city}`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('تم نسخ الرابط للمشاركة!');
     }
   };
 
@@ -104,23 +234,29 @@ function LandRequestDetails() {
         return;
       }
 
-      const response = await axios.post(
+      const response = await fetch(
         `https://shahin-tqay.onrender.com/api/land-requests/${id}/offers`,
-        { 
-          message: offerMessage.trim()
-        },
-        { 
+        {
+          method: 'POST',
           headers: { 
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          } 
+          },
+          body: JSON.stringify({ 
+            message: offerMessage.trim()
+          })
         }
       );
 
-      console.log('✅ تم تقديم العرض بنجاح:', response.data);
-      setOfferSuccess(true);
-      setOfferMessage('');
-      setOfferLoading(false);
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setOfferSuccess(true);
+        setOfferMessage('');
+        setOfferLoading(false);
+      } else {
+        throw new Error(result.message || 'حدث خطأ في تقديم العرض');
+      }
       
     } catch (err) {
       console.error('❌ خطأ في تقديم العرض:', err);
@@ -141,9 +277,28 @@ function LandRequestDetails() {
       } else if (err.request) {
         setOfferError('تعذر الاتصال بالخادم، يرجى التحقق من الاتصال بالإنترنت');
       } else {
-        setOfferError('حدث خطأ غير متوقع');
+        setOfferError(err.message || 'حدث خطأ غير متوقع');
       }
     }
+  };
+
+  const handleShowOfferForm = () => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      openLogin(() => {
+        setShowOfferForm(true);
+      });
+      return;
+    }
+    
+    setShowOfferForm(true);
+  };
+
+  const handleCloseOfferForm = () => {
+    setShowOfferForm(false);
+    setOfferError(null);
+    setOfferMessage('');
   };
 
   const getPurposeLabel = (purpose) => purpose === 'sale' ? 'بيع' : 'إيجار';
@@ -168,201 +323,255 @@ function LandRequestDetails() {
 
   const getStatusClass = (status) => {
     switch (status) {
-      case 'open': return 'status-open';
-      case 'closed': return 'status-closed';
-      case 'completed': return 'status-completed';
-      default: return 'status-default';
+      case 'open': return 'open';
+      case 'closed': return 'closed';
+      case 'completed': return 'completed';
+      default: return 'default';
     }
   };
 
-  if (loading) return (
-    <div className="elegantLoading_container">
-      <div className="elegantLoader"></div>
-      <p className="elegantLoading_text">جاري تحميل تفاصيل الطلب...</p>
-    </div>
-  );
-  
-  if (error) return (
-    <div className="elegantError_container">
-      <div className="elegantError_icon">⚠️</div>
-      <p className="elegantError_text">{error}</p>
-      <div className="elegantError_actions">
-        <button onClick={fetchRequestDetails} className="elegantRetry_btn">
-          إعادة المحاولة
-        </button>
-        <button onClick={() => navigate(-1)} className="elegantBack_btn">
-          العودة
-        </button>
+  const formatPrice = (price) => {
+    if (!price) return '0';
+    return parseFloat(price).toLocaleString('ar-SA');
+  };
+
+  const getAllImages = () => {
+    if (!request || !request.images) return [];
+    return request.images.map(img => img.image_path);
+  };
+
+  if (loading) {
+    return (
+      <div className="elegantLoading_container">
+        <div className="elegantLoader"></div>
+        <p>جاري تحميل تفاصيل الطلب...</p>
       </div>
-    </div>
-  );
-  
-  if (!request) return (
-    <div className="elegantNotFound_container">
-      <div className="elegantNotFound_icon">
-        <FaSearch />
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="elegantError_container">
+        <p>{error}</p>
+        <button onClick={() => navigate(-1)}>العودة</button>
       </div>
-      <p className="elegantNotFound_text">لم يتم العثور على الطلب</p>
-      <button onClick={() => navigate('/land-requests')} className="elegantBack_btn">
-        العودة للقائمة
-      </button>
-    </div>
-  );
+    );
+  }
+
+  if (!request) {
+    return (
+      <div className="elegantError_container">
+        <p>البيانات غير متوفرة</p>
+        <button onClick={() => navigate(-1)}>العودة</button>
+      </div>
+    );
+  }
+
+  const images = getAllImages();
 
   return (
     <div className="elegantDetails_container">
-      {/* الهيدر */}
-      <header className="elegantDetails_header">
+      {/* Header */}
+      <div className="elegantDetails_header">
         <button onClick={() => navigate(-1)} className="elegantBack_btn">
-          <FaArrowRight /> العودة
+          <FaArrowLeft />
+          العودة
         </button>
-        
-        <div className="elegantHeader_title">
-          <span className="elegantHeader_icon">
-            <FaFileAlt />
-          </span>
-          <span>تفاصيل الطلب</span>
-        </div>
-        
         <div className="elegantHeader_actions">
-          <button className="elegantShare_btn" title="مشاركة">
-            <FaShareAlt />
+          <button 
+            className={`elegantFavorite_btn ${isFavorite ? 'elegantActive' : ''}`}
+            onClick={toggleFavorite}
+          >
+            <FaHeart />
           </button>
-          <button className="elegantFavorite_btn" title="إضافة للمفضلة">
-            <FaStar />
+          <button className="elegantShare_btn" onClick={shareItem}>
+            <FaShare />
           </button>
         </div>
-      </header>
+      </div>
 
-      {/* المحتوى الرئيسي */}
-      <main className="elegantDetails_content">
-        {/* بطاقة تفاصيل الطلب */}
-        <div className="elegantRequest_card">
-          <div className="elegantCard_header">
-            <div className="elegantRequest_info">
-              <h1 className="elegantRequest_title">
-                طلب أرض رقم #{request.id}
-              </h1>
-              <div className="elegantDate_info">
-                <FaCalendarAlt className="elegantDate_icon" />
-                <span>تاريخ الإنشاء: {request.created_at}</span>
-              </div>
-            </div>
-            
-            <div className="elegantStatus_section">
-              <span className={`elegantStatus_badge ${getStatusClass(request.status)}`}>
-                {getStatusLabel(request.status)}
-              </span>
-            </div>
+      {/* Image Gallery */}
+      {images.length > 0 && (
+        <div className="elegantImage_gallery">
+          <div className="elegantMain_image">
+            <img 
+              src={`https://shahin-tqay.onrender.com/storage/${images[selectedImage]}`} 
+              alt="Main" 
+              onClick={() => setShowImageModal(true)}
+            />
+            <button 
+              className="elegantExpand_btn"
+              onClick={() => setShowImageModal(true)}
+            >
+              <FaExpand />
+            </button>
+
+            {images.length > 1 && (
+              <>
+                <button 
+                  className="elegantGallery_nav elegantPrev"
+                  onClick={() => setSelectedImage(prev => prev === 0 ? images.length - 1 : prev - 1)}
+                >
+                  <FaArrowRight />
+                </button>
+                <button 
+                  className="elegantGallery_nav elegantNext"
+                  onClick={() => setSelectedImage(prev => (prev + 1) % images.length)}
+                >
+                  <FaLeft />
+                </button>
+                
+                <div className="elegantGallery_count">
+                  {selectedImage + 1} / {images.length}
+                </div>
+              </>
+            )}
           </div>
+          
+          {images.length > 1 && (
+            <div className="elegantThumbnails">
+              {images.map((image, index) => (
+                <div
+                  key={index}
+                  className={`elegantThumbnail ${selectedImage === index ? 'elegantActive' : ''}`}
+                  onClick={() => setSelectedImage(index)}
+                >
+                  <img src={`https://shahin-tqay.onrender.com/storage/${image}`} alt={`Thumbnail ${index + 1}`} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
-          {/* شبكة التفاصيل */}
-          <div className="elegantDetails_grid">
-            <div className="elegantDetail_item">
-              <div className="elegantDetail_header">
-                <span className="elegantDetail_icon">
-                  <FaMapMarkerAlt />
-                </span>
-                <span className="elegantDetail_label">المنطقة</span>
-              </div>
-              <div className="elegantDetail_value">{request.region}</div>
-            </div>
-            
-            <div className="elegantDetail_item">
-              <div className="elegantDetail_header">
-                <span className="elegantDetail_icon">
-                  <FaCity />
-                </span>
-                <span className="elegantDetail_label">المدينة</span>
-              </div>
-              <div className="elegantDetail_value">{request.city}</div>
-            </div>
-            
-            <div className="elegantDetail_item">
-              <div className="elegantDetail_header">
-                <span className="elegantDetail_icon">
-                  <FaHandshake />
-                </span>
-                <span className="elegantDetail_label">الغرض</span>
-              </div>
-              <div className="elegantDetail_value">{getPurposeLabel(request.purpose)}</div>
-            </div>
-            
-            <div className="elegantDetail_item">
-              <div className="elegantDetail_header">
-                <span className="elegantDetail_icon">
-                  <FaBuilding />
-                </span>
-                <span className="elegantDetail_label">النوع</span>
-              </div>
-              <div className="elegantDetail_value">{getTypeLabel(request.type)}</div>
-            </div>
-            
-            <div className="elegantDetail_item">
-              <div className="elegantDetail_header">
-                <span className="elegantDetail_icon">
-                  <FaRuler />
-                </span>
-                <span className="elegantDetail_label">المساحة</span>
-              </div>
-              <div className="elegantDetail_value">{request.area.toLocaleString()} م²</div>
-            </div>
+      {/* Main Content */}
+      <div className="elegantDetails_content">
+        {/* Title and Basic Info */}
+        <div className="elegantTitle_section">
+          <h1>طلب أرض #{request.id}</h1>
+          <div className={`elegantStatus_badge ${getStatusClass(request.status)}`}>
+            {getStatusLabel(request.status)}
           </div>
         </div>
 
-        {/* قسم الوصف */}
+        {/* Creation Date */}
+        <div className="elegantDate_section">
+          <FaCalendarAlt className="elegantSection_icon" />
+          <span>تاريخ الإنشاء: {request.created_at}</span>
+        </div>
+
+        {/* Location */}
+        <div className="elegantLocation_section">
+          <FaMapMarkerAlt className="elegantSection_icon" />
+          <div className="elegantLocation_info">
+            <h3>الموقع</h3>
+            <p>{request.region} - {request.city}</p>
+          </div>
+        </div>
+
+        {/* Specifications */}
+        <div className="elegantSpecs_section">
+          <h3>تفاصيل الطلب</h3>
+          <div className="elegantSpecs_grid">
+            <div className="elegantSpec_item">
+              <FaHandshake />
+              <div>
+                <span className="elegantSpec_label">الغرض</span>
+                <span className="elegantSpec_value">{getPurposeLabel(request.purpose)}</span>
+              </div>
+            </div>
+            <div className="elegantSpec_item">
+              <FaBuilding />
+              <div>
+                <span className="elegantSpec_label">النوع</span>
+                <span className="elegantSpec_value">{getTypeLabel(request.type)}</span>
+              </div>
+            </div>
+            <div className="elegantSpec_item">
+              <FaRulerCombined />
+              <div>
+                <span className="elegantSpec_label">المساحة المطلوبة</span>
+                <span className="elegantSpec_value">{formatPrice(request.area)} م²</span>
+              </div>
+            </div>
+            <div className="elegantSpec_item">
+              <FaCity />
+              <div>
+                <span className="elegantSpec_label">المدينة</span>
+                <span className="elegantSpec_value">{request.city}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Description */}
         <div className="elegantDescription_section">
-          <div className="elegantSection_header">
-            <span className="elegantSection_icon">
-              <FaStickyNote />
-            </span>
-            <h3 className="elegantSection_title">الوصف</h3>
-          </div>
-          <div className="elegantDescription_content">
-            <p className="elegantDescription_text">{request.description}</p>
-          </div>
+          <h3>الوصف</h3>
+          <p>{request.description}</p>
         </div>
 
-        {/* قسم تقديم العرض */}
+        {/* Offer Button */}
         {request.status === 'open' && (
-          <div className="elegantOffer_section" id="offer">
-            <div className="elegantSection_header">
-              <span className="elegantSection_icon">
-                <FaPaperPlane />
-              </span>
-              <h3 className="elegantSection_title">تقديم عرض</h3>
-            </div>
+          <div className="elegantInterest_section" id="offer">
+            <button 
+              className="elegantInterest_btn" 
+              onClick={handleShowOfferForm}
+            >
+              تقديم عرض
+            </button>
+          </div>
+        )}
+
+        {/* Closed Message */}
+        {request.status !== 'open' && (
+          <div className="elegantClosed_message">
+            <div className="elegantClosed_icon">🔒</div>
+            <p className="elegantClosed_text">
+              هذا الطلب {request.status === 'closed' ? 'مغلق' : 'مكتمل'} ولا يمكن تقديم عروض جديدة
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Offer Form Modal */}
+      {showOfferForm && (
+        <div className="elegantForm_modal">
+          <div className="elegantForm_content">
+            <button 
+              className="elegantModal_close" 
+              onClick={handleCloseOfferForm}
+            >
+              <FaTimes />
+            </button>
+            <h3>تقديم عرض على الطلب</h3>
             
             {offerSuccess ? (
-              <div className="elegantSuccess_message">
+              <div className="elegantSubmit_result success">
                 <div className="elegantSuccess_icon">
                   <FaCheckCircle />
                 </div>
-                <div className="elegantSuccess_content">
-                  <p className="elegantSuccess_text">تم تقديم العرض بنجاح!</p>
-                  <p className="elegantSuccess_subtext">سيتم مراجعة عرضك من قبل صاحب الطلب</p>
-                </div>
+                <p>تم تقديم العرض بنجاح!</p>
+                <p className="elegantSuccess_subtext">سيتم مراجعة عرضك من قبل صاحب الطلب</p>
                 <button 
-                  onClick={() => setOfferSuccess(false)} 
-                  className="elegantNewOffer_btn"
+                  onClick={handleCloseOfferForm} 
+                  className="elegantCloseResult_btn"
                 >
-                  تقديم عرض آخر
+                  إغلاق
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleOfferSubmit} className="elegantOffer_form">
+              <form onSubmit={handleOfferSubmit}>
                 <div className="elegantForm_group">
-                  <label htmlFor="offerMessage" className="elegantForm_label">
-                    <FaEdit className="elegantForm_label_icon" />
-                    تفاصيل العرض:
+                  <label>
+                    <FaEdit />
+                    <span>تفاصيل العرض</span>
                   </label>
                   <textarea
-                    id="offerMessage"
+                    name="offerMessage"
                     value={offerMessage}
                     onChange={(e) => setOfferMessage(e.target.value)}
                     placeholder="أدخل تفاصيل العرض هنا... مثلاً: لدي أرض تناسب متطلباتك في الموقع المطلوب مع توفر جميع الخدمات..."
-                    rows="5"
-                    className="elegantForm_textarea"
+                    rows={5}
                     required
                   />
                   <div className="elegantForm_hint">
@@ -377,33 +586,39 @@ function LandRequestDetails() {
                   </div>
                 )}
                 
-                <div className="elegantForm_actions">
-                  <button 
-                    type="submit" 
-                    className="elegantSubmit_btn"
-                    disabled={offerLoading}
-                  >
-                    <FaPaperPlane className="elegantSubmit_icon" />
-                    {offerLoading ? 'جاري الإرسال...' : 'إرسال العرض'}
-                  </button>
-                </div>
+                <button 
+                  type="submit" 
+                  className="elegantSubmit_btn"
+                  disabled={offerLoading}
+                >
+                  <FaPaperPlane className="elegantSubmit_icon" />
+                  {offerLoading ? 'جاري الإرسال...' : 'إرسال العرض'}
+                </button>
               </form>
             )}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* رسالة إذا كان الطلب مغلقاً */}
-        {request.status !== 'open' && (
-          <div className="elegantClosed_message">
-            <div className="elegantClosed_icon">🔒</div>
-            <p className="elegantClosed_text">
-              هذا الطلب {request.status === 'closed' ? 'مغلق' : 'مكتمل'} ولا يمكن تقديم عروض جديدة
-            </p>
+      {/* Image Modal */}
+      {showImageModal && images.length > 0 && (
+        <div className="elegantImage_modal">
+          <div className="elegantModal_content">
+            <button 
+              className="elegantModal_close" 
+              onClick={() => setShowImageModal(false)}
+            >
+              <FaTimes />
+            </button>
+            <img 
+              src={`https://shahin-tqay.onrender.com/storage/${images[selectedImage]}`} 
+              alt="Enlarged view" 
+            />
           </div>
-        )}
-      </main>
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default LandRequestDetails;
