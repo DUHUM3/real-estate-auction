@@ -349,9 +349,9 @@ function Register({ onClose, onSwitchToLogin }) {
               <option value={5}>وسيط عقاري</option>
               <option value={6}>شركة مزادات عقارية</option>
             </select>
-            <div className="user-type-info">
+            {/* <div className="user-type-info">
               <span>نوع الحساب المحدد: {getUserTypeLabel(userTypeId)}</span>
-            </div>
+            </div> */}
           </div>
 
           {/* رسائل الخطأ والنجاح */}

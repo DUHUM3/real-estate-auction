@@ -145,20 +145,20 @@ body {
   z-index: -1;
 }
 
-/* ===== الصور ===== */
-/* .slide-2 {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.20)),
-    url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
-} */
-
+/* ===== الصور المحلية ===== */
 .slide-0 {
   background-image: linear-gradient(rgba(0, 0, 0, 0.20), rgba(0, 0, 0, 0.20)),
-    url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
+    url('../../public/images/slide1.jpg');
 }
 
 .slide-1 {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0.10)),
-    url('https://images.unsplash.com/photo-1460317442991-0ec209397118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)),
+    url('../../public/images/slide5.jpg');
+}
+
+.slide-2 {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)),
+    url('../../public/images/slide3.jpg');
 }
 
 /* ===== المحتوى ===== */
@@ -194,8 +194,20 @@ body {
 }
 
 .land-word {
+  position: relative;
   color: var(--primary-color);
+
 }
+
+.land-word::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4); /* شفاف */
+  z-index: -1; /* خلف النص */
+  border-radius: 10px;
+}
+
 
 .hero-content p {
   font-family: var(--font-lt);
@@ -1117,7 +1129,60 @@ body {
     margin: 0 auto;
   }
 }
+/* أنماط إضافية للفلاتر */
+.price-inputs {
+  grid-column: span 2;
+}
 
+.price-inputs label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.price-inputs-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price-inputs-row input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.price-separator {
+  color: #666;
+  font-weight: bold;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+/* تحسينات للعرض على الجوال */
+@media (max-width: 768px) {
+  .price-inputs {
+    grid-column: span 1;
+  }
+  
+  .price-inputs-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .price-separator {
+    display: none;
+  }
+}
 /* تعديلات قسم الخدمات - إضافة أزرار التنقل */
 .service-actions {
   display: flex;

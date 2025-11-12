@@ -180,6 +180,13 @@ function Navbar({ onLoginClick, onRegisterClick }) {
               <FaPlus className="link-icon" />
               طلب شراء / تسويق
             </button>
+             <button 
+                className="nav-link"
+                onClick={handleCreateRequest}
+              >
+                <FaPlus className="link-icon" />
+طلب تسويق منتج عقاري عبر شركات المزادات
+              </button>
           </div>
         </div>
 
@@ -408,6 +415,13 @@ function Navbar({ onLoginClick, onRegisterClick }) {
               >
                 <FaPlus className="link-icon" />
                 طلب شراء / تسويق
+              </button>
+               <button 
+                className="mobile-nav-link"
+                onClick={handleCreateRequest}
+              >
+                <FaPlus className="link-icon" />
+طلب تسويق منتج عقاري عبر شركات المزادات
               </button>
             </div>
 
