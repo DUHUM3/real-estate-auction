@@ -1,6 +1,6 @@
 import React, { useState, useEffect ,useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ModalContext } from '../App'; // تأكد من المسار الصحيح
+import { ModalContext } from '../../App'; 
 
 import {
   FaMapMarkerAlt,
@@ -20,12 +20,12 @@ import {
   FaUser,
   FaTimes
 } from 'react-icons/fa';
-import '../styles/PropertyDetailsModal.css';
+import '../../styles/PropertyDetailsModal.css';
 
 const PropertyDetailsPage = () => {
   const { id, type } = useParams();
   const navigate = useNavigate();
-  const { openLogin } = useContext(ModalContext); // استخدام Context
+  const { openLogin } = useContext(ModalContext); 
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -414,10 +414,10 @@ const handleSubmitInterest = async (e) => {
     <div className="elegantDetails_container">
       {/* Header */}
       <div className="elegantDetails_header">
-        <button onClick={() => navigate(-1)} className="elegantBack_btn">
+        {/* <button onClick={() => navigate(-1)} className="elegantBack_btn">
           <FaArrowLeft />
           العودة
-        </button>
+        </button> */}
         <div className="elegantHeader_actions">
           <button 
             className={`elegantFavorite_btn ${isFavorite ? 'elegantActive' : ''}`}

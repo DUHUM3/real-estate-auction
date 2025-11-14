@@ -78,7 +78,7 @@ export function AuthProvider({ children }) {
     return new Date() < new Date(expiresAt);
   };
 
-  // دالة للحصول على التوكن للمستخدم في الطلبات المستقبلية
+  // دالة للحصول على التوكن للمستخدم
   const getAuthHeader = () => {
     const token = localStorage.getItem('token');
     const tokenType = localStorage.getItem('token_type') || 'Bearer';

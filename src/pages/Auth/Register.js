@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import '../styles/AuthModal.css';
-import axios from 'axios';
-import { FiMail, FiLock, FiEye, FiEyeOff, FiX } from 'react-icons/fi';
-
+import { useAuth } from '../../context/AuthContext';
+import { authApi } from '../../api/authApi';
+import '../../styles/AuthModal.css';
+import { FiX } from 'react-icons/fi';
 
 function Register({ onClose, onSwitchToLogin }) {
   const [userTypeId, setUserTypeId] = useState(1);
@@ -105,35 +104,13 @@ function Register({ onClose, onSwitchToLogin }) {
       userData.entity_name = formData.entity_name;
       userData.commercial_register = formData.commercial_register;
       userData.license_number = formData.license_number;
+      userData.commercial_register_file = formData.commercial_register_file;
+      userData.license_file = formData.license_file;
     }
 
     try {
-      // Create FormData for file uploads if needed
-      let apiData = userData;
-      if (userTypeId === 6) {
-        const formDataObj = new FormData();
-        Object.keys(userData).forEach(key => {
-          formDataObj.append(key, userData[key]);
-        });
-        if (formData.commercial_register_file) {
-          formDataObj.append('commercial_register_file', formData.commercial_register_file);
-        }
-        if (formData.license_file) {
-          formDataObj.append('license_file', formData.license_file);
-        }
-        apiData = formDataObj;
-      }
-
-      // Send API request
-      const response = await axios.post(
-        'https://shahin-tqay.onrender.com/api/register',
-        apiData,
-        {
-          headers: {
-            'Content-Type': userTypeId === 6 ? 'multipart/form-data' : 'application/json'
-          }
-        }
-      );
+      // استخدام الـ API المنفصل
+      const response = await authApi.register(userData, userTypeId);
 
       setSuccess('تم إنشاء الحساب بنجاح!');
       login(response.data); // Store user data in context
@@ -141,7 +118,7 @@ function Register({ onClose, onSwitchToLogin }) {
       if (onClose) onClose();
     } catch (err) {
       console.error('Registration error:', err);
-      setError(err.response?.data?.message || 'حدث خطأ أثناء التسجيل، يرجى المحاولة مرة أخرى');
+      setError(err.message || 'حدث خطأ أثناء التسجيل، يرجى المحاولة مرة أخرى');
     } finally {
       setLoading(false);
     }
@@ -303,7 +280,8 @@ function Register({ onClose, onSwitchToLogin }) {
     <div className="auth-modal-overlay" onClick={handleOverlayClick}>
       <div className="auth-modal register-modal">
         <div className="auth-modal-header">
-          <button className="close-btn" onClick={onClose}>            <FiX size={22} />
+          <button className="close-btn" onClick={onClose}>
+            <FiX size={22} />
           </button>
         </div>
         
@@ -349,9 +327,6 @@ function Register({ onClose, onSwitchToLogin }) {
               <option value={5}>وسيط عقاري</option>
               <option value={6}>شركة مزادات عقارية</option>
             </select>
-            {/* <div className="user-type-info">
-              <span>نوع الحساب المحدد: {getUserTypeLabel(userTypeId)}</span>
-            </div> */}
           </div>
 
           {/* رسائل الخطأ والنجاح */}

@@ -199,14 +199,14 @@ body {
 
 }
 
-.land-word::before {
+/* .land-word::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4); /* شفاف */
-  z-index: -1; /* خلف النص */
+  background: rgba(0, 0, 0, 0.4);
+  z-index: -1; 
   border-radius: 10px;
-}
+} */
 
 
 .hero-content p {
@@ -3451,8 +3451,8 @@ body {
 .shahinMarketing_btn {
   flex: 1; /* يجعل كل زر بنفس الحجم */
   background: white;
-  color: #3b82f6;
-  border: 2px solid #3b82f6;
+  color: #53a1dd;
+  border: 2px solid #53a1dd;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   text-decoration: none;
@@ -3467,7 +3467,7 @@ body {
 }
 
 .shahinMarketing_btn:hover {
-  background: #3b82f6;
+  background: #53a1dd;
   color: white;
   transform: translateY(-2px);
 }

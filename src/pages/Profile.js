@@ -80,7 +80,7 @@ function Profile() {
       try {
         setStatsLoading(true);
         const token = localStorage.getItem('token');
-        const response = await fetch('https://shahin-tqay.onrender.com/api/user/properties/stats', {
+        const response = await fetch('https://shahin-tqay.onrender.com/api/user/properties /stats', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

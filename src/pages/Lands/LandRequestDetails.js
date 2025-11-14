@@ -1,7 +1,7 @@
 // src/pages/LandRequestDetails.js
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ModalContext } from '../App';
+import { ModalContext } from '../../App';
 import {
   FaMapMarkerAlt,
   FaRulerCombined,
@@ -29,7 +29,7 @@ import {
   FaCity,
   FaStickyNote
 } from 'react-icons/fa';
-import '../styles/PropertyDetailsModal.css';
+import '../../styles/PropertyDetailsModal.css';
 
 const LandRequestDetails = () => {
   const { id } = useParams();

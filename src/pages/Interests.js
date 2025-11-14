@@ -139,7 +139,7 @@ function Interests() {
             <FiHeart className="empty-icon" />
             <h3>لا توجد اهتمامات</h3>
             <p>لم تقم بالتعبير عن اهتمامك بأي عقار حتى الآن</p>
-            <Link to="/properties" className="browse-btn">
+            <Link to="/lands-and-auctions-list" className="browse-btn">
               تصفح الاراضي
             </Link>
           </div>

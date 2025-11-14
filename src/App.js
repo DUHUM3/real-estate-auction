@@ -2,46 +2,54 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// استيراد المكونات
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
+
+// الصفحات الرئيسية والعامة
 import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Properties from './pages/PropertyList';
-import PropertyDetailsPage from './pages/PropertyDetailsPage';
-import Favorites from './pages/Favorites';
-import LandRequestsList from './pages/LandRequestsList';
-import Interests from './pages/Interests';
-import LandRequestDetails from './pages/LandRequestDetails';
-import CreateLandRequest from './pages/CreateLandRequest';
-import MarketingRequest from './pages/AuctionRequest';
-import TermsOfService from './pages/TermsOfService';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import CreateProperty from './pages/CreateProperty';
+import LandsAndAuctionsList from './pages/LandsAndAuctionsList';
+import LandRequestsList from './pages/Lands/LandRequestsList';
+
+// صفحات الملف الشخصي والإدارة
 import Profile from './pages/Profile';
 import MyAds from './pages/MyAds';
-// import AuctionRoom from './pages/AuctionRoom';
-// import Dashboard from './pages/Dashboard';
+import Favorites from './pages/Favorites';
+import Interests from './pages/Interests';
 import Notifications from './pages/Notifications';
-// import About from './pages/About';
-// import Contact from './pages/Contact';
+
+import Createland from './pages/Lands/CreateLand';
+import LandRequestDetails from './pages/Lands/LandRequestDetails';
+import CreateLandRequest from './pages/Lands/CreateLandRequest';
+import CreateAuctionRequest from './pages/Auction/CreateAuctionRequest';
+import LandDetails from './pages/Lands/LandDetails';
+
+// صفحات المصادقة
+import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
+
+import TermsOfService from './pages/Privacy/TermsOfService';
+import PrivacyPolicy from './pages/Privacy/PrivacyPolicy';
+
 import './styles/App.css';
 
-// إنشاء مثيل جديد لـ QueryClient
+// تكوين React Query Client لإدارة حالة الخادم
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-      staleTime: 30000,
+      refetchOnWindowFocus: false, 
+      retry: 1, 
+      staleTime: 30000, 
     },
   },
 });
 
-// إنشاء Context لإدارة نافذة تسجيل الدخول
+// إنشاء Context لإدارة نوافذ تسجيل الدخول والتسجيل
 export const ModalContext = React.createContext();
 
 function App() {
+  // حالة التحكم في عرض نوافذ التسجيل والدخول
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [afterLoginCallback, setAfterLoginCallback] = useState(null);
@@ -63,7 +71,6 @@ function App() {
     setAfterLoginCallback(null);
   };
 
-  // دالة يتم استدعاؤها بعد تسجيل الدخول بنجاح
   const handleLoginSuccess = () => {
     if (afterLoginCallback) {
       afterLoginCallback();
@@ -71,6 +78,7 @@ function App() {
     closeModals();
   };
 
+  // قيمة Context التي ستتشارك بين المكونات
   const modalContextValue = {
     openLogin,
     openRegister,
@@ -83,33 +91,41 @@ function App() {
         <ModalContext.Provider value={modalContextValue}>
           <Router>
             <div className="App">
+              {/* شريط التنقل الرئيسي */}
               <Navbar onLoginClick={openLogin} onRegisterClick={openRegister} />
+              
               <main>
                 <Routes>
                   <Route path="/" element={<Home />} />
-                  {/* <Route path="/about" element={<About />} /> */}
-                  {/* <Route path="/contact" element={<Contact />} /> */}
-                  <Route path="/properties" element={<Properties />} />
-                  <Route path="/property/:id/:type" element={<PropertyDetailsPage />} />
-                  <Route path="/profile" element={<Profile />} />
+                  
+                  {/* صفحات العقارات والأراضي */}
+                  <Route path="/lands-and-auctions-list" element={<LandsAndAuctionsList />} />
+                  <Route path="/lands/:id/:type" element={<LandDetails />} />
+                  <Route path="/create-lands" element={<Createland />} />
+                  
+                  {/* صفحات طلبات الأراضي */}
                   <Route path="/land-requests" element={<LandRequestsList />} />
                   <Route path="/requests/:id" element={<LandRequestDetails />} />
                   <Route path="/create-request" element={<CreateLandRequest />} />
-                  <Route path="/marketing-request" element={<MarketingRequest />} />
-                  <Route path="/interests" element={<Interests />} />
+                  
+                  {/* صفحات المستخدم */}
+                  <Route path="/profile" element={<Profile />} />
                   <Route path="/my-ads" element={<MyAds />} />
                   <Route path="/my-lands" element={<Favorites />} />
-                  <Route path="/create-property" element={<CreateProperty />} />
+                  <Route path="/interests" element={<Interests />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  
+                  {/* صفحات أخرى */}
+                  <Route path="/create-auction-request" element={<CreateAuctionRequest />} />
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                  {/* <Route path="/auction/:id" element={<AuctionRoom />} /> */}
-                  {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-                  <Route path="/notifications" element={<Notifications />} />
                 </Routes>
               </main>
+              
+              {/* تذييل الصفحة */}
               <Footer />
 
-              {/* مودال تسجيل الدخول */}
+              {/* نافذة تسجيل الدخول */}
               {showLogin && (
                 <Login 
                   onClose={closeModals} 
@@ -118,7 +134,7 @@ function App() {
                 />
               )}
 
-              {/* مودال إنشاء الحساب */}
+              {/* نافذة إنشاء حساب جديد */}
               {showRegister && (
                 <Register onClose={closeModals} onSwitchToLogin={openLogin} />
               )}

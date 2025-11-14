@@ -6,9 +6,9 @@ import {
   FaTrash, 
   FaFilter, 
   FaSearch, 
-  FaTag,           // ✅ أيقونة للمزادات
-  FaClipboardList, // ✅ أيقونة للإعلانات
-  FaExclamationTriangle, // ✅ أيقونة للخطأ
+  FaTag,          
+  FaClipboardList, 
+  FaExclamationTriangle, 
   FaArrowLeft,
   FaArrowRight,
   FaTimes,
@@ -62,11 +62,11 @@ function MyAds() {
       };
     } else {
       return {
-        base: 'https://shahin-tqay.onrender.com/api/user/properties',  // تم تغيير الرابط للإنشاء
-        create: 'https://shahin-tqay.onrender.com/api/user/properties',
-        list: 'https://shahin-tqay.onrender.com/api/user/properties/my',
-        status: (status) => `https://shahin-tqay.onrender.com/api/user/properties/status/${status}`,
-        single: (id) => `https://shahin-tqay.onrender.com/api/user/properties/${id}`
+        base: 'https://shahin-tqay.onrender.com/api/user/properties ',  // تم تغيير الرابط للإنشاء
+        create: 'https://shahin-tqay.onrender.com/api/user/properties ',
+        list: 'https://shahin-tqay.onrender.com/api/user/properties /my',
+        status: (status) => `https://shahin-tqay.onrender.com/api/user/properties /status/${status}`,
+        single: (id) => `https://shahin-tqay.onrender.com/api/user/properties /${id}`
       };
     }
   };

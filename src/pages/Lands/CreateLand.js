@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 function CreateProperty() {
   const [formData, setFormData] = useState({
@@ -29,7 +29,7 @@ function CreateProperty() {
     // هنا سيتم إضافة منطق إرسال البيانات للخادم
     console.log('Property data:', formData);
     alert('تم إضافة العقار بنجاح وسيتم مراجعته');
-    navigate('/properties');
+    navigate('/lands-and-auctions-list');
   };
 
   if (!currentUser) {

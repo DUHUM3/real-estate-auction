@@ -1,64 +1,13 @@
 import React, { useState } from 'react';
-import { FaTimes, FaHeart, FaShare, FaMapMarkerAlt, FaCalendarAlt, FaClock, FaBuilding, FaGlobe, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import '../styles/PropertyDetailsModal.css';
+import Icons from '../../icons';
+import { imageUtils, textUtils } from '../../api/auctionApi';
 
 const AuctionDetailsModal = ({ auction, onClose, isFavorite, onToggleFavorite, onShare }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const images = imageUtils.getGalleryImages(auction);
 
-  // Clean up quotes from JSON strings
-  const cleanText = (text) => {
-    if (typeof text === 'string') {
-      return text.replace(/"/g, '');
-    }
-    return text || '';
-  };
-
-  // Format date
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return new Intl.DateTimeFormat('ar-SA', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }).format(date);
-    } catch (e) {
-      return dateString;
-    }
-  };
-
-  // Get cover image URL
-  const getCoverImageUrl = () => {
-    if (auction.cover_image) {
-      return `https://shahin-tqay.onrender.com/storage/${auction.cover_image}`;
-    }
-    return null;
-  };
-
-  // Get gallery images
-  const getGalleryImages = () => {
-    const images = [];
-    
-    // Add cover image if exists
-    if (auction.cover_image) {
-      images.push(`https://shahin-tqay.onrender.com/storage/${auction.cover_image}`);
-    }
-    
-    // Add additional images if exist
-    if (auction.images && auction.images.length > 0) {
-      auction.images.forEach(img => {
-        if (img.image_path) {
-          images.push(`https://shahin-tqay.onrender.com/storage/${img.image_path}`);
-        }
-      });
-    }
-    
-    return images;
-  };
-
-  const images = getGalleryImages();
-
-  // Navigate through images
+  // دوال التنقل بين الصور
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
@@ -67,31 +16,57 @@ const AuctionDetailsModal = ({ auction, onClose, isFavorite, onToggleFavorite, o
     setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
   };
 
+  // التعامل مع إضافة/إزالة من المفضلة مع تكامل API
+  const handleToggleFavorite = async (e) => {
+    e.stopPropagation();
+    try {
+      await onToggleFavorite(auction.id, e);
+      // اختياري: إضافة استدعاء API هنا إذا لزم الأمر
+      // await auctionApi.toggleFavorite(auction.id);
+    } catch (error) {
+      console.error('خطأ عند التبديل إلى المفضلة:', error);
+    }
+  };
+
+  // التعامل مع المشاركة مع تكامل API
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    try {
+      await onShare(auction, e);
+      // اختياري: إضافة استدعاء API هنا إذا لزم الأمر
+      // await auctionApi.shareAuction(auction.id);
+    } catch (error) {
+      console.error('خطأ عند مشاركة المزاد:', error);
+    }
+  };
+
   return (
     <div className="elegantModal_overlay" onClick={onClose}>
       <div className="elegantModal_content elegantAuction_modal" onClick={(e) => e.stopPropagation()}>
         <button className="elegantModal_close" onClick={onClose}>
-          <FaTimes />
+          <Icons.FaTimes />
         </button>
 
+        {/* قسم الرأس */}
         <div className="elegantModal_header">
-          <h2>{cleanText(auction.title)}</h2>
+          <h2>{textUtils.cleanText(auction.title)}</h2>
           
           <div className="elegantModal_actions">
             <button 
               className={`elegantFavorite_action ${isFavorite ? 'elegantActive' : ''}`}
-              onClick={(e) => onToggleFavorite(auction.id, e)}
+              onClick={handleToggleFavorite}
             >
-              <FaHeart />
+              <Icons.FaHeart />
               <span>{isFavorite ? 'مضاف للمفضلة' : 'أضف للمفضلة'}</span>
             </button>
-            <button className="elegantShare_action" onClick={(e) => onShare(auction, e)}>
-              <FaShare />
+            <button className="elegantShare_action" onClick={handleShare}>
+              <Icons.FaShare />
               <span>مشاركة</span>
             </button>
           </div>
         </div>
 
+        {/* قسم المعرض */}
         {images.length > 0 ? (
           <div className="elegantModal_gallery">
             <div className="elegantGallery_main">
@@ -100,10 +75,10 @@ const AuctionDetailsModal = ({ auction, onClose, isFavorite, onToggleFavorite, o
               {images.length > 1 && (
                 <>
                   <button className="elegantGallery_nav elegantPrev" onClick={prevImage}>
-                    <FaArrowRight />
+                    <Icons.FaArrowRight />
                   </button>
                   <button className="elegantGallery_nav elegantNext" onClick={nextImage}>
-                    <FaArrowLeft />
+                    <Icons.FaArrowLeft />
                   </button>
                 </>
               )}
@@ -129,20 +104,22 @@ const AuctionDetailsModal = ({ auction, onClose, isFavorite, onToggleFavorite, o
           </div>
         ) : (
           <div className="elegantModal_noImage">
-            <FaBuilding />
+            <Icons.FaBuilding />
             <p>لا توجد صور متاحة</p>
           </div>
         )}
 
+        {/* قسم المحتوى */}
         <div className="elegantModal_body">
           <div className="elegantAuction_detailsGrid">
+            {/* معلومات المزاد */}
             <div className="elegantDetail_section">
               <h3>معلومات المزاد</h3>
               
               {auction.company && (
                 <div className="elegantDetail_item">
                   <div className="elegantDetail_label">
-                    <FaBuilding />
+                    <Icons.FaBuilding />
                     <span>الشركة المنظمة</span>
                   </div>
                   <div className="elegantDetail_value">{auction.company.auction_name}</div>
@@ -151,23 +128,23 @@ const AuctionDetailsModal = ({ auction, onClose, isFavorite, onToggleFavorite, o
               
               <div className="elegantDetail_item">
                 <div className="elegantDetail_label">
-                  <FaMapMarkerAlt />
+                  <Icons.FaMapMarkerAlt />
                   <span>العنوان</span>
                 </div>
-                <div className="elegantDetail_value">{cleanText(auction.address)}</div>
+                <div className="elegantDetail_value">{textUtils.cleanText(auction.address)}</div>
               </div>
               
               <div className="elegantDetail_item">
                 <div className="elegantDetail_label">
-                  <FaCalendarAlt />
+                  <Icons.FaCalendarAlt />
                   <span>تاريخ المزاد</span>
                 </div>
-                <div className="elegantDetail_value">{formatDate(auction.auction_date)}</div>
+                <div className="elegantDetail_value">{textUtils.formatDate(auction.auction_date)}</div>
               </div>
               
               <div className="elegantDetail_item">
                 <div className="elegantDetail_label">
-                  <FaClock />
+                  <Icons.FaClock />
                   <span>وقت البدء</span>
                 </div>
                 <div className="elegantDetail_value">{auction.start_time}</div>
@@ -176,7 +153,7 @@ const AuctionDetailsModal = ({ auction, onClose, isFavorite, onToggleFavorite, o
               {auction.intro_link && (
                 <div className="elegantDetail_item">
                   <div className="elegantDetail_label">
-                    <FaGlobe />
+                    <Icons.FaGlobe />
                     <span>رابط تعريفي</span>
                   </div>
                   <div className="elegantDetail_value">
@@ -188,12 +165,14 @@ const AuctionDetailsModal = ({ auction, onClose, isFavorite, onToggleFavorite, o
               )}
             </div>
 
+            {/* وصف المزاد */}
             <div className="elegantDetail_section">
               <h3>وصف المزاد</h3>
-              <p className="elegantDescription">{cleanText(auction.description)}</p>
+              <p className="elegantDescription">{textUtils.cleanText(auction.description)}</p>
             </div>
           </div>
 
+          {/* قسم الخريطة */}
           {auction.latitude && auction.longitude && (
             <div className="elegantMap_section">
               <h3>الموقع على الخريطة</h3>
@@ -211,6 +190,7 @@ const AuctionDetailsModal = ({ auction, onClose, isFavorite, onToggleFavorite, o
           )}
         </div>
 
+        {/* قسم الفوتر */}
         <div className="elegantModal_footer">
           <button className="elegantClose_modal" onClick={onClose}>إغلاق</button>
         </div>

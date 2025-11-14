@@ -1,7 +1,7 @@
   import React, { useEffect, useState } from 'react';
   import { useLocation } from 'react-router-dom';
   import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-  import { fetchAllNotifications, markNotificationAsRead } from '../services/notificationService';
+  import { fetchAllNotifications, markNotificationAsRead } from '../utils/notificationService';
   import { FaBell, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
   import '../styles/NotificationsPage.css';
 

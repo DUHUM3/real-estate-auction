@@ -1,0 +1,535 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Icons from '../icons/index';
+import { MdClose } from 'react-icons/md';
+import { propertiesApi, propertiesUtils } from '../api/propertiesApi';
+import { auctionsApi, auctionsUtils } from '../api/auctionApi';
+import FiltersComponent from '../utils/FiltersComponent';
+import '../styles/PropertyList.css';
+
+const PropertiesPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const filterBarRef = useRef(null);
+  const lastScrollTop = useRef(0);
+
+  // States
+  const [state, setState] = useState({
+    properties: [],
+    auctions: [],
+    loading: true,
+    error: null,
+    currentPage: 1,
+    totalPages: 1,
+    activeTab: 'lands',
+    showFilters: false,
+    showMobileFilters: false,
+    hideFilterBar: false,
+    favorites: { properties: [], auctions: [] }
+  });
+
+  const [landFilters, setLandFilters] = useState({
+    search: '', region: '', city: '', land_type: '', purpose: '',
+    min_area: '', max_area: '', min_price: '', max_price: '',
+    min_investment: '', max_investment: ''
+  });
+
+  const [auctionFilters, setAuctionFilters] = useState({
+    search: '', status: '', date_from: '', date_to: '', company: '', address: ''
+  });
+
+  // Constants
+  const regions = [];
+  const landTypes = ['سكني', 'تجاري', 'صناعي', 'زراعي'];
+  const purposes = ['بيع', 'استثمار'];
+  const auctionStatuses = ['مفتوح', 'مغلق', 'معلق'];
+
+  // Effects
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setState(prev => ({ ...prev, hideFilterBar: scrollTop > lastScrollTop.current && scrollTop > 100 }));
+      lastScrollTop.current = scrollTop;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.searchFromHome && location.state?.searchQuery) {
+      const searchQuery = location.state.searchQuery;
+      const updateFilter = state.activeTab === 'lands' ? setLandFilters : setAuctionFilters;
+      updateFilter(prev => ({ ...prev, search: searchQuery }));
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, state.activeTab]);
+
+  useEffect(() => { fetchFavorites(); }, []);
+
+  useEffect(() => {
+    state.activeTab === 'lands' ? fetchProperties() : fetchAuctions();
+  }, [state.activeTab, state.currentPage, landFilters, auctionFilters]);
+
+  useEffect(() => {
+    if (location.state?.activeTab) {
+      setState(prev => ({ ...prev, activeTab: location.state.activeTab }));
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  // Helper Functions
+  const updateState = (updates) => setState(prev => ({ ...prev, ...updates }));
+
+  const getCurrentFilters = () => state.activeTab === 'lands' ? landFilters : auctionFilters;
+  const getCurrentFilterHandler = () => state.activeTab === 'lands' ? handleLandFilterChange : handleAuctionFilterChange;
+  const getFilterOptions = () => state.activeTab === 'lands' ? { regions, landTypes, purposes } : { auctionStatuses };
+
+  // API Functions
+  const fetchFavorites = async () => {
+    try {
+      const savedPropertyFavorites = localStorage.getItem('propertyFavorites');
+      const savedAuctionFavorites = localStorage.getItem('auctionFavorites');
+      updateState({
+        favorites: {
+          properties: savedPropertyFavorites ? JSON.parse(savedPropertyFavorites) : [],
+          auctions: savedAuctionFavorites ? JSON.parse(savedAuctionFavorites) : []
+        }
+      });
+    } catch (error) {
+      console.error("فشل في جلب المفضلات:", error);
+    }
+  };
+
+  const fetchProperties = async () => {
+    try {
+      updateState({ loading: true });
+      const data = await propertiesApi.getProperties(landFilters, state.currentPage);
+      
+      if (data.status && data.data) {
+        updateState({ 
+          properties: data.data.data || [],
+          totalPages: data.data.pagination?.last_page || 1,
+          loading: false 
+        });
+      } else {
+        updateState({ properties: [], totalPages: 1, loading: false });
+      }
+    } catch (error) {
+      updateState({ error: error.message, loading: false });
+    }
+  };
+
+  const fetchAuctions = async () => {
+    try {
+      updateState({ loading: true });
+      const data = await auctionsApi.getAuctions(auctionFilters, state.currentPage);
+      
+      if (data.success && data.data) {
+        updateState({ 
+          auctions: data.data.data || [],
+          totalPages: data.data.last_page || 1,
+          loading: false 
+        });
+      } else {
+        updateState({ auctions: [], totalPages: 1, loading: false });
+      }
+    } catch (error) {
+      updateState({ error: error.message, loading: false });
+    }
+  };
+
+  // Filter Handlers
+  const handleLandFilterChange = (e) => {
+    const { name, value } = e.target;
+    setLandFilters(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAuctionFilterChange = (e) => {
+    const { name, value } = e.target;
+    setAuctionFilters(prev => ({ ...prev, [name]: value }));
+  };
+
+  const resetFilters = () => {
+    if (state.activeTab === 'lands') {
+      setLandFilters({
+        search: '', region: '', city: '', land_type: '', purpose: '',
+        min_area: '', max_area: '', min_price: '', max_price: '',
+        min_investment: '', max_investment: ''
+      });
+    } else {
+      setAuctionFilters({
+        search: '', status: '', date_from: '', date_to: '', company: '', address: ''
+      });
+    }
+    updateState({ currentPage: 1 });
+  };
+
+  const applyFilters = () => {
+    updateState({ showMobileFilters: false, currentPage: 1 });
+  };
+
+  // Favorite Handlers
+  const toggleFavorite = async (type, id, e) => {
+    e?.stopPropagation();
+    const token = localStorage.getItem('token');
+    const api = type === 'properties' ? propertiesApi : auctionsApi;
+    const storageKey = type === 'properties' ? 'propertyFavorites' : 'auctionFavorites';
+    
+    try {
+      const data = await api.toggleFavorite(id, token);
+      
+      if (data.success) {
+        const action = data.action;
+        const currentFavorites = state.favorites[type] || [];
+        let newFavorites;
+
+        if (action === 'added') {
+          newFavorites = [...currentFavorites, id];
+        } else {
+          newFavorites = currentFavorites.filter(favId => favId !== id);
+        }
+
+        updateState({ favorites: { ...state.favorites, [type]: newFavorites } });
+        localStorage.setItem(storageKey, JSON.stringify(newFavorites));
+      }
+    } catch (error) {
+      console.error('خطأ في تحديث المفضلة:', error);
+      handleLocalFavorite(type, id);
+    }
+  };
+
+  const handleLocalFavorite = (type, id) => {
+    const storageKey = type === 'properties' ? 'propertyFavorites' : 'auctionFavorites';
+    const currentFavorites = state.favorites[type] || [];
+    const isFavorite = currentFavorites.includes(id);
+    
+    const newFavorites = isFavorite 
+      ? currentFavorites.filter(favId => favId !== id)
+      : [...currentFavorites, id];
+
+    updateState({ favorites: { ...state.favorites, [type]: newFavorites } });
+    localStorage.setItem(storageKey, JSON.stringify(newFavorites));
+  };
+
+  // Share Handlers
+  const shareItem = async (item, type, e) => {
+    e?.stopPropagation();
+    const api = type === 'properties' ? propertiesApi : auctionsApi;
+    const utils = type === 'properties' ? propertiesUtils : auctionsUtils;
+    
+    try {
+      await api.shareItem(item.id);
+      
+      if (navigator.share) {
+        const shareData = {
+          title: type === 'properties' ? item.title : utils.cleanText(item.title),
+          text: type === 'properties' 
+            ? `أرض ${item.land_type} في ${item.region} - ${item.city}`
+            : `مزاد: ${utils.cleanText(item.title)} - ${utils.cleanText(item.description)}`,
+          url: window.location.href,
+        };
+        await navigator.share(shareData);
+      } else {
+        copyToClipboard(item, type, utils);
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  const copyToClipboard = (item, type, utils) => {
+    const shareText = type === 'properties' 
+      ? `${item.title} - أرض ${item.land_type} في ${item.region} - ${item.city}`
+      : `${utils.cleanText(item.title)} - ${utils.cleanText(item.description)}`;
+    
+    navigator.clipboard.writeText(`${shareText} ${window.location.href}`)
+      .then(() => alert("تم نسخ الرابط للمشاركة!"))
+      .catch(err => console.error('فشل نسخ النص: ', err));
+  };
+
+  // Navigation Handlers
+  const openDetails = (item, type) => {
+    navigate(`/lands/${item.id}/${type}`);
+  };
+
+  // Pagination Handlers
+  const paginate = (pageNumber) => updateState({ currentPage: pageNumber });
+  const nextPage = () => state.currentPage < state.totalPages && updateState({ currentPage: state.currentPage + 1 });
+  const prevPage = () => state.currentPage > 1 && updateState({ currentPage: state.currentPage - 1 });
+
+  // Render Functions
+  const renderPagination = () => {
+    if (state.totalPages <= 1) return null;
+
+    return (
+      <div className="shahinPagination">
+        <button onClick={prevPage} disabled={state.currentPage === 1} className="shahinPage_arrow">
+          <Icons.FaArrowRight />
+        </button>
+
+        {Array.from({ length: state.totalPages }, (_, i) => {
+          const pageNum = i + 1;
+          if (pageNum === 1 || pageNum === state.totalPages || 
+              [state.currentPage - 1, state.currentPage, state.currentPage + 1].includes(pageNum)) {
+            return (
+              <button
+                key={pageNum}
+                onClick={() => paginate(pageNum)}
+                className={state.currentPage === pageNum ? 'shahinActive' : ''}
+              >
+                {pageNum}
+              </button>
+            );
+          } else if ([state.currentPage - 2, state.currentPage + 2].includes(pageNum)) {
+            return <span key={pageNum} className="shahinEllipsis">...</span>;
+          }
+          return null;
+        })}
+
+        <button onClick={nextPage} disabled={state.currentPage === state.totalPages} className="shahinPage_arrow">
+          <Icons.FaArrowLeft />
+        </button>
+      </div>
+    );
+  };
+
+  const renderPropertyCard = (property) => (
+    <div key={property.id} className="shahinProperty_card" onClick={() => openDetails(property, 'land')}>
+      <div className="shahinProperty_image">
+        {propertiesUtils.getPropertyImageUrl(property) ? (
+          <img src={propertiesUtils.getPropertyImageUrl(property)} alt={property.title} />
+        ) : (
+          <div className="shahinPlaceholder_image"><Icons.FaHome /></div>
+        )}
+        <div className={`shahinStatus_badge ${propertiesUtils.getStatusBadgeClass(property.status)}`}>
+          {property.status}
+        </div>
+        <button
+          className={`shahinFavorite_btn ${state.favorites.properties?.includes(property.id) ? 'shahinActive' : ''}`}
+          onClick={(e) => toggleFavorite('properties', property.id, e)}
+        >
+          <Icons.FaHeart />
+        </button>
+      </div>
+
+      <div className="shahinProperty_details">
+        <h3>{property.title}</h3>
+        <div className="shahinProperty_location">
+          <Icons.FaMapMarkerAlt />
+          <span>{property.region} - {property.city}</span>
+          {property.geo_location_text && <span className="shahinLocation_detail">({property.geo_location_text})</span>}
+        </div>
+
+        <div className="shahinProperty_specs">
+          <div className="shahinSpec"><Icons.FaRulerCombined /><span>{propertiesUtils.formatPrice(property.total_area)} م²</span></div>
+          <div className="shahinSpec">
+            <Icons.FaMoneyBillWave />
+            <span>
+              {property.purpose === 'بيع'
+                ? `${propertiesUtils.formatPrice(property.price_per_sqm)} ر.س/م²`
+                : `${propertiesUtils.formatPrice(property.estimated_investment_value)} ر.س`}
+            </span>
+          </div>
+        </div>
+
+        {property.purpose === 'بيع' && property.price_per_sqm && property.total_area && (
+          <div className="shahinTotal_price">
+            <strong>السعر الإجمالي: {propertiesUtils.formatPrice(propertiesUtils.calculateTotalPrice(property))} ر.س</strong>
+          </div>
+        )}
+
+        <div className="shahinProperty_type">
+          <span className={`shahinTag ${property.land_type?.toLowerCase()}`}>{property.land_type}</span>
+          <span className={`shahinTag shahinPurpose ${property.purpose?.toLowerCase()}`}>{property.purpose}</span>
+        </div>
+
+        <div className="shahinProperty_actions">
+          <button className="shahinAction_btn shahinDetails_btn">تفاصيل</button>
+          <button className="shahinAction_btn shahinShare_btn" onClick={(e) => shareItem(property, 'properties', e)}>
+            <Icons.FaShare /> مشاركة
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderAuctionCard = (auction) => (
+    <div key={auction.id} className="shahinAuction_card" onClick={() => openDetails(auction, 'auction')}>
+      <div className="shahinAuction_image">
+        {auctionsUtils.getAuctionImageUrl(auction) ? (
+          <img src={auctionsUtils.getAuctionImageUrl(auction)} alt={auctionsUtils.cleanText(auction.title)} />
+        ) : (
+          <div className="shahinPlaceholder_image"><Icons.FaImage /></div>
+        )}
+        <div className={`shahinStatus_badge ${auctionsUtils.getStatusBadgeClass(auction.status)}`}>
+          {auction.status}
+        </div>
+        <button
+          className={`shahinFavorite_btn ${state.favorites.auctions?.includes(auction.id) ? 'shahinActive' : ''}`}
+          onClick={(e) => toggleFavorite('auctions', auction.id, e)}
+        >
+          <Icons.FaHeart />
+        </button>
+      </div>
+
+      <div className="shahinAuction_details">
+        <h3>{auctionsUtils.cleanText(auction.title)}</h3>
+        {auction.company && (
+          <div className="shahinAuction_company">
+            <Icons.FaBuilding />
+            <span>{auction.company.auction_name}</span>
+          </div>
+        )}
+
+        <div className="shahinAuction_location">
+          <Icons.FaMapMarkerAlt />
+          <span>{auctionsUtils.cleanText(auction.address)}</span>
+        </div>
+
+        <div className="shahinAuction_schedule">
+          <div className="shahinSchedule_item">
+            <Icons.FaCalendarDay />
+            <span>{auctionsUtils.formatDate(auction.auction_date)}</span>
+          </div>
+          <div className="shahinSchedule_item">
+            <Icons.FaClock />
+            <span>{auctionsUtils.formatTime(auction.start_time)}</span>
+          </div>
+        </div>
+
+        <p className="shahinAuction_description">{auctionsUtils.cleanText(auction.description)}</p>
+
+        <div className="shahinAuction_actions">
+          <button className="shahinAction_btn shahinDetails_btn">تفاصيل</button>
+          <button className="shahinAction_btn shahinShare_btn" onClick={(e) => shareItem(auction, 'auctions', e)}>
+            <Icons.FaShare /> مشاركة
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderContent = () => {
+    if (state.loading) {
+      return (
+        <div className="shahinLoading_container">
+          <div className="shahinLoader"></div>
+          <p>جاري تحميل {state.activeTab === 'lands' ? 'الأراضي' : 'المزادات'}...</p>
+        </div>
+      );
+    }
+
+    if (state.error) {
+      return (
+        <div className="shahinError_container">
+          <p>حدث خطأ: {state.error}</p>
+          <button onClick={() => window.location.reload()}>إعادة المحاولة</button>
+        </div>
+      );
+    }
+
+    const items = state.activeTab === 'lands' ? state.properties : state.auctions;
+    if (items.length === 0) {
+      return (
+        <div className="shahinEmpty_state">
+          <p>لم يتم العثور على أي {state.activeTab === 'lands' ? 'أراضٍ' : 'مزادات'} تطابق معايير البحث</p>
+          <button onClick={resetFilters}>إعادة تعيين الفلتر</button>
+        </div>
+      );
+    }
+
+    return (
+      <div className={`shahin${state.activeTab === 'lands' ? 'Properties' : 'Auctions'}_grid`}>
+        {state.activeTab === 'lands' ? state.properties.map(renderPropertyCard) : state.auctions.map(renderAuctionCard)}
+      </div>
+    );
+  };
+
+  return (
+    <div className="shahinProperties_container">
+      {/* Search and Filter Bar */}
+      <div className={`shahinSearch_filter ${state.hideFilterBar ? 'shahinHideFilter' : ''}`} ref={filterBarRef}>
+        <div className="shahinSearch_bar">
+          <div className="shahinSearch_input">
+            <Icons.FaSearch className="shahinSearch_icon" />
+            <input
+              type="text"
+              placeholder={state.activeTab === 'lands' ? "البحث عن أراضي..." : "البحث عن مزادات..."}
+              name="search"
+              value={getCurrentFilters().search}
+              onChange={getCurrentFilterHandler()}
+            />
+          </div>
+          <button
+            className="shahinFilter_toggle"
+            onClick={() => window.innerWidth < 768 ? 
+              updateState({ showMobileFilters: true }) : 
+              updateState({ showFilters: !state.showFilters })
+            }
+          >
+            {state.showFilters ? <MdClose /> : <Icons.FaFilter />}
+            <span>{state.showFilters ? 'إغلاق' : 'فلترة'}</span>
+          </button>
+        </div>
+
+        <div className="shahinTabs">
+          <button
+            className={state.activeTab === 'lands' ? 'shahinActive' : ''}
+            onClick={() => updateState({ activeTab: 'lands', currentPage: 1 })}
+          >
+            الأراضي
+          </button>
+          <button
+            className={state.activeTab === 'auctions' ? 'shahinActive' : ''}
+            onClick={() => updateState({ activeTab: 'auctions', currentPage: 1 })}
+          >
+            المزادات
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop Filters */}
+      {state.showFilters && window.innerWidth >= 768 && (
+        <div className="shahinFilters_container shahinDesktop">
+          <FiltersComponent
+            activeTab={state.activeTab}
+            filters={getCurrentFilters()}
+            onFilterChange={getCurrentFilterHandler()}
+            onResetFilters={resetFilters}
+            onApplyFilters={applyFilters}
+            {...getFilterOptions()}
+          />
+        </div>
+      )}
+
+      {/* Mobile Filter Sidebar */}
+      <div className={`shahinOverlay ${state.showMobileFilters ? 'shahinActive' : ''}`} 
+           onClick={() => updateState({ showMobileFilters: false })}></div>
+      <div className={`shahinMobileFilter_sidebar ${state.showMobileFilters ? 'shahinActive' : ''}`}>
+        <div className="shahinSidebar_header">
+          <h3>🔍 فلاتر البحث</h3>
+          <button className="shahinClose_sidebar" onClick={() => updateState({ showMobileFilters: false })}>
+            <Icons.FaTimes />
+          </button>
+        </div>
+        <FiltersComponent
+          activeTab={state.activeTab}
+          filters={getCurrentFilters()}
+          onFilterChange={getCurrentFilterHandler()}
+          onResetFilters={resetFilters}
+          onApplyFilters={applyFilters}
+          {...getFilterOptions()}
+        />
+      </div>
+
+      {/* Main Content */}
+      <div className="shahinContent_area">
+        {renderContent()}
+        {renderPagination()}
+      </div>
+    </div>
+  );
+};
+
+export default PropertiesPage;

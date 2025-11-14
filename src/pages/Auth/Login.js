@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import '../styles/AuthModal.css';
+import { useAuth } from '../../context/AuthContext';
+import { authApi } from '../../api/authApi';
+import '../../styles/AuthModal.css';
 
 // ✅ استيراد الأيقونات الاحترافية
 import { FiMail, FiLock, FiEye, FiEyeOff, FiX } from 'react-icons/fi';
@@ -37,41 +38,26 @@ function Login({ onClose, onSwitchToRegister }) {
     setError('');
 
     try {
-      const response = await fetch('https://shahin-tqay.onrender.com/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
-      });
+      // استخدام الـ API المنفصل
+      const data = await authApi.login(formData.email, formData.password);
 
-      const data = await response.json();
+      const userData = {
+        id: data.user.id,
+        full_name: data.user.full_name,
+        email: data.user.email,
+        phone: data.user.phone,
+        user_type: data.user.user_type,
+        status: data.user.status,
+        access_token: data.access_token,
+        token_type: data.token_type,
+        expires_at: data.expires_at
+      };
 
-      if (response.ok) {
-        const userData = {
-          id: data.user.id,
-          full_name: data.user.full_name,
-          email: data.user.email,
-          phone: data.user.phone,
-          user_type: data.user.user_type,
-          status: data.user.status,
-          access_token: data.access_token,
-          token_type: data.token_type,
-          expires_at: data.expires_at
-        };
-
-        login(userData);
-        navigate('/');
-        if (onClose) onClose();
-      } else {
-        setError(data.message || 'حدث خطأ أثناء تسجيل الدخول');
-      }
+      login(userData);
+      if (onClose) onClose();
+      
     } catch (error) {
-      setError('حدث خطأ في الاتصال بالخادم');
+      setError(error.message || 'حدث خطأ في الاتصال بالخادم');
       console.error('Login error:', error);
     } finally {
       setLoading(false);
@@ -132,7 +118,6 @@ function Login({ onClose, onSwitchToRegister }) {
             <div className="form-group">
               <label className="form-label">البريد الإلكتروني</label>
               <div className="input-with-icon">
-                {/* <FiMail className="input-icon" /> */}
                 <input
                   type="email"
                   name="email"
@@ -149,7 +134,6 @@ function Login({ onClose, onSwitchToRegister }) {
             <div className="form-group password-group">
               <label className="form-label">كلمة المرور</label>
               <div className="password-input-container">
-                {/* <FiLock className="input-icon" /> */}
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"

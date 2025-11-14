@@ -238,7 +238,7 @@ function Favorites() {
             <FiHeart className="empty-icon" />
             <h3>لا توجد عناصر في المفضلة</h3>
             <p>لم تقم بإضافة أي عناصر إلى المفضلة حتى الآن</p>
-            <Link to="/properties" className="browse-btn">
+            <Link to="/lands-and-auctions-list" className="browse-btn">
               تصفح الاراضي
             </Link>
           </div>

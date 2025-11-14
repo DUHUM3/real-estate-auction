@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './PrivacyPolicy.css'; // استخدام نفس ملف الستايل
+import '../../styles/PrivacyPolicy.css';
 
 const TermsOfService = () => {
   const [activeSection, setActiveSection] = useState(1);
