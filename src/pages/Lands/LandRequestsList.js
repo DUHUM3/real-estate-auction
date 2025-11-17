@@ -335,9 +335,9 @@ function LandRequestsList() {
             <Link to="/create-request" className="shahinMarketing_btn">
               <Icons.FaPlus /> إنشاء طلب جديد
             </Link>
-            <Link to="/create-auction-request" className="shahinMarketing_btn">
+            {/* <Link to="/create-auction-request" className="shahinMarketing_btn">
               <Icons.FaBullhorn /> طلب تسويق
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

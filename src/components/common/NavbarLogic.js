@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchLatestNotifications, markNotificationAsRead } from '../../utils/notificationService';
+import { fetchLatestNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../../utils/notificationService';
 
 /**
  * Custom hook للتعامل مع حالة الشريط التنقل والتفاعلات
@@ -18,23 +18,31 @@ export const useNavbarLogic = (onLoginClick, onRegisterClick) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationPage, setNotificationPage] = useState(1);
   
   // مراجع DOM
   const mobileMenuRef = useRef(null);
   const userMenuRef = useRef(null);
   const notificationsRef = useRef(null);
+  const notificationSoundRef = useRef(null);
 
-  // جلب الإشعارات باستخدام React Query v5
+  // تهيئة صوت الإشعار
+  useEffect(() => {
+    notificationSoundRef.current = new Audio('/sounds/notification.mp3');
+    notificationSoundRef.current.volume = 0.3; // ضبط مستوى الصوت
+  }, []);
+
+  // جلب الإشعارات باستخدام React Query v5 مع الباجينيشين
   const {
     data: notificationsData,
     isLoading: notificationsLoading,
     isError: notificationsError,
     refetch: refetchNotifications
   } = useQuery({
-    queryKey: ['latestNotifications'],
-    queryFn: fetchLatestNotifications,
+    queryKey: ['latestNotifications', notificationPage],
+    queryFn: () => fetchLatestNotifications(notificationPage),
     enabled: !!currentUser,
-    refetchInterval: 60000, // إعادة الجلب كل دقيقة
+    refetchInterval: 30000, // إعادة الجلب كل 30 ثانية
   });
 
   // Mutation لتحديد الإشعار كمقروء
@@ -45,6 +53,31 @@ export const useNavbarLogic = (onLoginClick, onRegisterClick) => {
       queryClient.invalidateQueries({ queryKey: ['allNotifications'] });
     },
   });
+
+  // Mutation لتحديد جميع الإشعارات كمقروءة
+  const markAllAsReadMutation = useMutation({
+    mutationFn: markAllNotificationsAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['latestNotifications'] });
+      queryClient.invalidateQueries({ queryKey: ['allNotifications'] });
+    },
+  });
+
+  // تشغيل صوت الإشعار عند وصول إشعار جديد
+  useEffect(() => {
+    if (notificationsData?.data && notificationsData.data.length > 0) {
+      const hasNewNotification = notificationsData.data.some(notif => 
+        !notif.read_at && 
+        new Date(notif.created_at) > new Date(Date.now() - 30000) // إشعارات في آخر 30 ثانية
+      );
+      
+      if (hasNewNotification && notificationSoundRef.current) {
+        notificationSoundRef.current.play().catch(error => {
+          console.log('تعذر تشغيل صوت الإشعار:', error);
+        });
+      }
+    }
+  }, [notificationsData]);
 
   /**
    * معالجة النقر على الإشعار
@@ -58,24 +91,47 @@ export const useNavbarLogic = (onLoginClick, onRegisterClick) => {
     setShowNotifications(false);
   };
 
- /**
- * تسجيل خروج المستخدم والتوجيه إلى الصفحة الرئيسية
- */
-const handleLogout = async () => {
-  try {
-    await logout();
-    setIsMobileMenuOpen(false);
-    setShowUserMenu(false);
-    setShowNotifications(false);
-    
-    // التوجيه إلى الصفحة الرئيسية بعد تسجيل الخروج
-    navigate('/');
-  } catch (error) {
-    console.error('Error during logout:', error);
-    // حتى في حالة الخطأ، نوجه إلى الصفحة الرئيسية
-    navigate('/');
-  }
-};
+  /**
+   * تحديد جميع الإشعارات كمقروءة
+   */
+  const handleMarkAllAsRead = () => {
+    markAllAsReadMutation.mutate();
+  };
+
+  /**
+   * تحميل المزيد من الإشعارات
+   */
+  const handleLoadMoreNotifications = () => {
+    if (notificationsData?.next_page_url) {
+      setNotificationPage(prev => prev + 1);
+    }
+  };
+
+  /**
+   * تحديث الإشعارات
+   */
+  const handleRefreshNotifications = () => {
+    refetchNotifications();
+  };
+
+  /**
+   * تسجيل خروج المستخدم والتوجيه إلى الصفحة الرئيسية
+   */
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setIsMobileMenuOpen(false);
+      setShowUserMenu(false);
+      setShowNotifications(false);
+      
+      // التوجيه إلى الصفحة الرئيسية بعد تسجيل الخروج
+      navigate('/');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // حتى في حالة الخطأ، نوجه إلى الصفحة الرئيسية
+      navigate('/');
+    }
+  };
 
   /**
    * التحقق من المسار النشط
@@ -176,6 +232,7 @@ const handleLogout = async () => {
     notificationsLoading,
     notificationsError,
     unreadNotifications,
+    notificationPage,
     
     // المراجع
     mobileMenuRef,
@@ -184,6 +241,9 @@ const handleLogout = async () => {
     
     // الدوال
     handleNotificationClick,
+    handleMarkAllAsRead,
+    handleLoadMoreNotifications,
+    handleRefreshNotifications,
     handleLogout,
     isActive,
     ...userTypeCheckers,
@@ -192,6 +252,7 @@ const handleLogout = async () => {
     handleCreateRequest,
     setShowNotifications,
     setShowUserMenu,
+    setNotificationPage,
     
     // الدوال المورودة
     onLoginClick,
@@ -199,5 +260,4 @@ const handleLogout = async () => {
   };
 };
 
-// تصدير افتراضي للتوافق
 export default useNavbarLogic;

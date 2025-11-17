@@ -88,11 +88,11 @@ const ClientsSection = () => {
   const fetchClients = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('https://shahin-tqay.onrender.com/api/clients/Featured');
+      const response = await fetch('https://shahin-tqay.onrender.com/api/clients/featured');
       const data = await response.json();
 
-      if (Array.isArray(data)) {
-        const formattedClients = data.map(client => ({
+      if (data.success && Array.isArray(data.data)) {
+        const formattedClients = data.data.map(client => ({
           id: client.id,
           name: client.name,
           logo: client.logo,

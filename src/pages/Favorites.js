@@ -112,9 +112,9 @@ function Favorites() {
     console.log('التنقل إلى التفاصيل:', { id, type: itemType });
     
     if (itemType === 'lands' || itemType === 'land') {
-      navigate(`/property/${id}/land`);
+      navigate(`/lands/${id}/land`);
     } else {
-      navigate(`/property/${id}/auction`);
+      navigate(`/lands/${id}/auction`);
     }
   };
 

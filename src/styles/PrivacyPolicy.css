@@ -21,17 +21,17 @@
   padding: 40px 30px;
   border-radius: 15px;
   margin-bottom: 30px;
+  margin-top: 75px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  font-family: var(--font-ar);
+  font-family: var(--font-ar); /* ← استخدام نفس الخط */
 }
 
 .privacy-header h1 {
-  margin: 0 0 15px 0;
-   font-family: var(--font-lt);
-
+  /* margin: 0 0 15px 0; */
+  font-family: var(--font-ar) !important; /* ← تغيير إلى الخط العربي */
   font-size: 2rem;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-weight: 500;
+  /* text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); */
 }
 
 .privacy-header p {
@@ -39,14 +39,15 @@
   font-size: 1.2rem;
   opacity: 0.9;
   font-weight: 300;
+  font-family: var(--font-ar); /* ← استخدام نفس الخط */
 }
 
 /* المحتوى العام */
 .content-wrapper {
   display: flex;
   gap: 30px;
-  /* margin-top: 75px; */
   margin-bottom: 40px;
+  font-family: var(--font-ar); /* ← إضافة الخط */
 }
 
 /* الشريط الجانبي */
@@ -60,7 +61,7 @@
   position: sticky;
   top: 30px;
   border: 1px solid #f1f5f9;
-  font-family: var(--font-ar);
+  font-family: var(--font-ar); /* ← استخدام نفس الخط */
 }
 
 .sections-sidebar h3 {
@@ -69,7 +70,7 @@
   border-bottom: 2px solid #e2e8f0;
   padding-bottom: 15px;
   font-size: 1.3rem;
-  font-family: var(--font-lt);
+  font-family: var(--font-ar); /* ← تغيير إلى الخط العربي */
   font-weight: 600;
 }
 
@@ -77,6 +78,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  font-family: var(--font-ar); /* ← إضافة الخط */
 }
 
 .sections-sidebar li {
@@ -88,6 +90,7 @@
   display: flex;
   align-items: center;
   border: 1px solid transparent;
+  font-family: var(--font-ar); /* ← استخدام نفس الخط */
 }
 
 .sections-sidebar li:hover {
@@ -115,7 +118,7 @@
   font-size: 0.85rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  font-family: var(--font-lt); /* ← للأرقام أو النصوص الإنجليزية */
+  font-family: var(--font-ar); /* ← تغيير إلى الخط العربي للأرقام */
 }
 
 .sections-sidebar li.active span {
@@ -131,13 +134,14 @@
   padding: 35px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   border: 1px solid #f1f5f9;
-  font-family: var(--font-ar);
+  font-family: var(--font-ar); /* ← استخدام نفس الخط */
 }
 
 .section-header {
   border-bottom: 2px solid #f1f5f9;
   padding-bottom: 20px;
   margin-bottom: 30px;
+  font-family: var(--font-ar); /* ← إضافة الخط */
 }
 
 .section-header h2 {
@@ -147,6 +151,7 @@
   align-items: center;
   font-size: 1.5rem;
   font-weight: 600;
+  font-family: var(--font-ar); /* ← استخدام نفس الخط */
 }
 
 .section-number {
@@ -162,7 +167,7 @@
   font-size: 1.1rem;
   font-weight: 600;
   border: 2px solid #e2e8f0;
-  font-family: var(--font-lt);
+  font-family: var(--font-ar); /* ← تغيير إلى الخط العربي */
 }
 
 /* نصوص الفقرات */
@@ -171,7 +176,7 @@
   text-align: justify;
   color: #475569;
   font-size: 1.05rem;
-  font-family: var(--font-lt);
+  font-family: var(--font-ar); /* ← تغيير إلى الخط العربي */
   position: relative;
   padding-right: 10px;
 }
@@ -183,6 +188,7 @@
   margin-top: 40px;
   padding-top: 25px;
   border-top: 1px solid #f1f5f9;
+  font-family: var(--font-ar); /* ← إضافة الخط */
 }
 
 .nav-button {
@@ -195,7 +201,7 @@
   font-size: 1rem;
   font-weight: 500;
   transition: all 0.3s ease;
-  font-family: var(--font-ar);
+  font-family: var(--font-ar); /* ← استخدام نفس الخط */
 }
 
 .nav-button:hover {
@@ -225,18 +231,20 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   color: #64748b;
   border: 1px solid #f1f5f9;
-  font-family: var(--font-ar);
+  font-family: var(--font-ar); /* ← استخدام نفس الخط */
 }
 
 .privacy-footer p {
   margin: 8px 0;
   font-size: 0.95rem;
+  font-family: var(--font-ar); /* ← استخدام نفس الخط */
 }
 
 /* تصميم متجاوب */
 @media (max-width: 768px) {
   .privacy-policy-container {
     padding: 15px;
+    font-family: var(--font-ar); /* ← التأكد من استمرار الخط */
   }
   
   .content-wrapper {
@@ -315,4 +323,17 @@
 
 .sections-sidebar::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* تطبيق الخط على جميع العناصر الإضافية */
+.sections-sidebar a, 
+.section-content a, 
+.nav-button, 
+.privacy-footer a {
+  font-family: var(--font-ar) !important;
+}
+
+/* للتأكد من تطبيق الخط على جميع النصوص */
+* {
+  font-family: var(--font-ar) !important;
 }

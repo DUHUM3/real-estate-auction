@@ -215,42 +215,62 @@ const PropertiesPage = () => {
   // Share Handlers
   const shareItem = async (item, type, e) => {
     e?.stopPropagation();
-    const api = type === 'properties' ? propertiesApi : auctionsApi;
-    const utils = type === 'properties' ? propertiesUtils : auctionsUtils;
     
     try {
-      await api.shareItem(item.id);
-      
-      if (navigator.share) {
-        const shareData = {
-          title: type === 'properties' ? item.title : utils.cleanText(item.title),
-          text: type === 'properties' 
-            ? `أرض ${item.land_type} في ${item.region} - ${item.city}`
-            : `مزاد: ${utils.cleanText(item.title)} - ${utils.cleanText(item.description)}`,
-          url: window.location.href,
-        };
-        await navigator.share(shareData);
+      // إنشاء نص المشاركة بناءً على النوع
+      let shareText = '';
+      if (type === 'properties') {
+        shareText = `أرض ${item.land_type} - ${item.region} - ${item.city}`;
       } else {
-        copyToClipboard(item, type, utils);
+        shareText = `مزاد: ${auctionsUtils.cleanText(item.title)} - ${auctionsUtils.cleanText(item.description)}`;
+      }
+      
+      // إنشاء رابط المشاركة الصحيح
+      const shareUrl = type === 'properties' 
+        ? `${window.location.origin}/lands/${item.id}/land`
+        : `${window.location.origin}/lands/${item.id}/auction`;
+      
+      // استخدام Web Share API إذا متاح
+      if (navigator.share) {
+        await navigator.share({
+          title: type === 'properties' ? `أرض رقم ${item.id}` : `مزاد رقم ${item.id}`,
+          text: shareText,
+          url: shareUrl,
+        });
+      } else {
+        // Fallback إلى نسخ النص
+        navigator.clipboard.writeText(shareText + " " + shareUrl)
+          .then(() => alert("تم نسخ الرابط للمشاركة!"))
+          .catch(err => console.error('فشل نسخ النص: ', err));
       }
     } catch (error) {
       console.error('Error sharing:', error);
+      // Fallback في حالة فشل المشاركة
+      let shareText = '';
+      if (type === 'properties') {
+        shareText = `أرض ${item.land_type} - ${item.region} - ${item.city}`;
+      } else {
+        shareText = `مزاد: ${auctionsUtils.cleanText(item.title)} - ${auctionsUtils.cleanText(item.description)}`;
+      }
+      
+      const shareUrl = type === 'properties' 
+        ? `${window.location.origin}/lands/${item.id}/land`
+        : `${window.location.origin}/lands/${item.id}/auction`;
+      
+      navigator.clipboard.writeText(shareText + " " + shareUrl)
+        .then(() => alert("تم نسخ الرابط للمشاركة!"))
+        .catch(err => console.error('فشل نسخ النص: ', err));
     }
   };
 
-  const copyToClipboard = (item, type, utils) => {
-    const shareText = type === 'properties' 
-      ? `${item.title} - أرض ${item.land_type} في ${item.region} - ${item.city}`
-      : `${utils.cleanText(item.title)} - ${utils.cleanText(item.description)}`;
-    
-    navigator.clipboard.writeText(`${shareText} ${window.location.href}`)
-      .then(() => alert("تم نسخ الرابط للمشاركة!"))
-      .catch(err => console.error('فشل نسخ النص: ', err));
-  };
-
-  // Navigation Handlers
-  const openDetails = (item, type) => {
-    navigate(`/lands/${item.id}/${type}`);
+  // Navigation Handlers - تم التعديل هنا فقط
+  const openDetails = (item, itemType) => {
+    // استخدام الروابط الجديدة
+    if (itemType === 'land') {
+      navigate(`/lands/${item.id}/land`);
+    } else if (itemType === 'auction') {
+      navigate(`/lands/${item.id}/auction`);
+    }
   };
 
   // Pagination Handlers

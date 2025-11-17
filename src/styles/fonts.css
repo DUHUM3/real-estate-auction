@@ -3,37 +3,55 @@
 /* Tajawal (Arabic) */
 @font-face {
   font-family: 'Tajawal';
-  src: url('../assets/fonts/Tajawal-Regular.ttf') format('woff2');
-  font-weight: 200;
+  src: url('../assets/fonts/Tajawal-Regular.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Tajawal';
-  src: url('../assets/fonts/Tajawal-Bold.ttf') format('woff2');
+  src: url('../assets/fonts/Tajawal-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Tajawal';
+  src: url('../assets/fonts/Tajawal-Light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
-/* Cairo (Latin) */
 @font-face {
-  font-family: 'Cairo';
-  src: url('../assets/fonts/Cairo-Bold.ttf') format('woff2');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Cairo';
-  src: url('../assets/fonts/Cairo-Regular.ttf') format('woff2');
-  font-weight: 200;
+  font-family: 'Tajawal';
+  src: url('../assets/fonts/Tajawal-Medium.ttf') format('truetype');
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
-/* متغيرات عامة للسهول */
-:root{
+/* Cairo (Latin) - اختياري إذا كنت تحتاجه */
+@font-face {
+  font-family: 'Cairo';
+  src: url('../assets/fonts/Cairo-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('../assets/fonts/Cairo-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* متغيرات عامة للسهولة */
+:root {
   --font-ar: 'Tajawal', sans-serif;
   --font-lt: 'Cairo', sans-serif;
 }

@@ -55,7 +55,7 @@ const AuctionCard = ({
         <div className="auction-timer">
           <Icons.FaCalendarAlt className="timer-icon" /> {daysLeft} يوم متبقي
         </div>
-        <div className="card-actions">
+        {/* <div className="card-actions">
           <button
             className={`action-btn favorite-btn ${favorite ? 'active' : ''} ${isLoading ? 'loading' : ''}`}
             onClick={handleFavoriteClick}
@@ -63,7 +63,7 @@ const AuctionCard = ({
           >
             <Icons.FaBookmark />
           </button>
-        </div>
+        </div> */}
       </div>
       <div className="auction-content">
         <h3>{title}</h3>

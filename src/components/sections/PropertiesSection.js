@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Icons from '../../icons/index';
 import LandCard from '../LandCard';
 import AuctionCard from '../AuctionCard';
+import FiltersComponent from '../../utils/FiltersComponent'; // استيراد مكون الفلاتر
 
 const PropertiesSection = ({ onToggleFavorite, onPropertyClick }) => {
   const navigate = useNavigate();
@@ -18,29 +19,50 @@ const PropertiesSection = ({ onToggleFavorite, onPropertyClick }) => {
   const [filterType, setFilterType] = useState('lands');
   const [filtersApplied, setFiltersApplied] = useState([]);
 
-  const [landFilter, setLandFilter] = useState({
+  // حالة موحدة للفلاتر
+  const [filters, setFilters] = useState({
+    // فلتر الأراضي
     propertyType: '',
     city: '',
     region: '',
     purpose: '',
     minPrice: '',
     maxPrice: '',
-    area: ''
-  });
-
-  const [auctionFilter, setAuctionFilter] = useState({
-    city: '',
-    region: '',
+    area: '',
+    land_type: '',
+    min_area: '',
+    max_area: '',
+    
+    // فلتر المزادات
     startDate: '',
     endDate: '',
-    maxDaysLeft: ''
+    maxDaysLeft: '',
+    search: '',
+    company: '',
+    address: '',
+    date_from: '',
+    date_to: ''
   });
 
   // دوال جلب البيانات
-  const fetchLands = async () => {
+  const fetchLands = async (filterParams = {}) => {
     setIsLoading(prev => ({ ...prev, lands: true }));
     try {
-      const response = await fetch('https://shahin-tqay.onrender.com/api/properties/properties/latest');
+      // بناء query parameters بناءً على الفلاتر
+      const queryParams = new URLSearchParams();
+      
+      if (filterParams.region) queryParams.append('region', filterParams.region);
+      if (filterParams.city) queryParams.append('city', filterParams.city);
+      if (filterParams.land_type) queryParams.append('land_type', filterParams.land_type);
+      if (filterParams.purpose) queryParams.append('purpose', filterParams.purpose);
+      if (filterParams.min_area) queryParams.append('min_area', filterParams.min_area);
+      if (filterParams.max_area) queryParams.append('max_area', filterParams.max_area);
+      if (filterParams.minPrice) queryParams.append('min_price', filterParams.minPrice);
+      if (filterParams.maxPrice) queryParams.append('max_price', filterParams.maxPrice);
+      
+      const url = `https://shahin-tqay.onrender.com/api/properties/properties/latest${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      
+      const response = await fetch(url);
       const data = await response.json();
 
       if (data.status && data.data) {
@@ -72,10 +94,23 @@ const PropertiesSection = ({ onToggleFavorite, onPropertyClick }) => {
     }
   };
 
-  const fetchAuctions = async () => {
+  const fetchAuctions = async (filterParams = {}) => {
     setIsLoading(prev => ({ ...prev, auctions: true }));
     try {
-      const response = await fetch('https://shahin-tqay.onrender.com/api/properties/auctions/latest');
+      // بناء query parameters بناءً على الفلاتر
+      const queryParams = new URLSearchParams();
+      
+      if (filterParams.region) queryParams.append('region', filterParams.region);
+      if (filterParams.city) queryParams.append('city', filterParams.city);
+      if (filterParams.search) queryParams.append('search', filterParams.search);
+      if (filterParams.company) queryParams.append('company', filterParams.company);
+      if (filterParams.address) queryParams.append('address', filterParams.address);
+      if (filterParams.date_from) queryParams.append('date_from', filterParams.date_from);
+      if (filterParams.date_to) queryParams.append('date_to', filterParams.date_to);
+      
+      const url = `https://shahin-tqay.onrender.com/api/properties/auctions/latest${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      
+      const response = await fetch(url);
       const data = await response.json();
 
       if (data.success && data.data) {
@@ -114,33 +149,64 @@ const PropertiesSection = ({ onToggleFavorite, onPropertyClick }) => {
     fetchAuctions();
   }, []);
 
-  const handleLandFilterChange = (field, value) => {
-    setLandFilter(prev => ({
+  // معالج تغيير الفلاتر
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
       ...prev,
-      [field]: value
+      [name]: value
     }));
   };
 
-  const handleAuctionFilterChange = (field, value) => {
-    setAuctionFilter(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
+  // تطبيق الفلاتر
   const applyFilters = () => {
+    if (filterType === 'lands') {
+      fetchLands(filters);
+    } else {
+      fetchAuctions(filters);
+    }
+    setShowFilter(false);
+  };
+
+  // إعادة تعيين الفلاتر
+  const resetFilters = () => {
+    setFilters({
+      propertyType: '',
+      city: '',
+      region: '',
+      purpose: '',
+      minPrice: '',
+      maxPrice: '',
+      area: '',
+      land_type: '',
+      min_area: '',
+      max_area: '',
+      startDate: '',
+      endDate: '',
+      maxDaysLeft: '',
+      search: '',
+      company: '',
+      address: '',
+      date_from: '',
+      date_to: ''
+    });
+    
+    // إعادة تحميل البيانات بدون فلاتر
     if (filterType === 'lands') {
       fetchLands();
     } else {
       fetchAuctions();
     }
-    setShowFilter(false);
   };
 
   const displayedItems = filterType === 'lands' ? lands : auctions;
   const startIndex = currentPage * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = displayedItems.slice(startIndex, endIndex);
+
+  // بيانات للفلاتر
+  const landTypes = ['سكني', 'تجاري', 'زراعي', 'صناعي', 'مختلط'];
+  const purposes = ['بيع', 'استثمار'];
 
   return (
     <section className="properties-section" id="properties">
@@ -187,50 +253,17 @@ const PropertiesSection = ({ onToggleFavorite, onPropertyClick }) => {
         </div>
 
         <div className={`advanced-filter ${showFilter ? 'show' : ''}`}>
-          {/* محتوى الفلاتر - يمكن تقسيمه لمزيد من التنظيم */}
-          <div className="filter-content">
-            {filterType === 'lands' ? (
-              <LandFilter 
-                filter={landFilter}
-                onChange={handleLandFilterChange}
-              />
-            ) : (
-              <AuctionFilter 
-                filter={auctionFilter}
-                onChange={handleAuctionFilterChange}
-              />
-            )}
-            
-            <div className="filter-actions">
-              <button className="filter-btn" onClick={applyFilters}>تطبيق الفلتر</button>
-              <button
-                className="reset-btn"
-                onClick={() => {
-                  if (filterType === 'lands') {
-                    setLandFilter({
-                      propertyType: '',
-                      city: '',
-                      region: '',
-                      purpose: '',
-                      minPrice: '',
-                      maxPrice: '',
-                      area: ''
-                    });
-                  } else {
-                    setAuctionFilter({
-                      city: '',
-                      region: '',
-                      startDate: '',
-                      endDate: '',
-                      maxDaysLeft: ''
-                    });
-                  }
-                }}
-              >
-                إعادة تعيين
-              </button>
-            </div>
-          </div>
+          {/* استخدام مكون الفلاتر الموحد */}
+          <FiltersComponent
+            activeTab={filterType === 'lands' ? 'lands' : 'auctions'}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onResetFilters={resetFilters}
+            onApplyFilters={applyFilters}
+            landTypes={landTypes}
+            purposes={purposes}
+            showSearch={true}
+          />
         </div>
 
         <div className="properties-container">
@@ -294,192 +327,5 @@ const PropertiesSection = ({ onToggleFavorite, onPropertyClick }) => {
     </section>
   );
 };
-
-// مكونات الفلاتر المساعدة
-const LandFilter = ({ filter, onChange }) => (
-  <div className="filter-section">
-    <div className="filter-row">
-      <div className="filter-group">
-        <select
-          value={filter.propertyType}
-          onChange={(e) => onChange('propertyType', e.target.value)}
-        >
-          <option value="">نوع العقار</option>
-          <option value="سكني">سكني</option>
-          <option value="تجاري">تجاري</option>
-          <option value="زراعي">زراعي</option>
-          <option value="صناعي">صناعي</option>
-          <option value="مختلط">مختلط</option>
-        </select>
-      </div>
-
-      <div className="filter-group">
-        <select
-          value={filter.city}
-          onChange={(e) => onChange('city', e.target.value)}
-        >
-          <option value="">المدينة</option>
-          <option value="الرياض">الرياض</option>
-          <option value="جدة">جدة</option>
-          <option value="الدمام">الدمام</option>
-          <option value="مكة">مكة المكرمة</option>
-          <option value="المدينة">المدينة المنورة</option>
-        </select>
-      </div>
-
-      <div className="filter-group">
-        <select
-          value={filter.region}
-          onChange={(e) => onChange('region', e.target.value)}
-        >
-          <option value="">المنطقة</option>
-          <option value="الرياض">منطقة الرياض</option>
-          <option value="مكة">منطقة مكة المكرمة</option>
-          <option value="الشرقية">المنطقة الشرقية</option>
-          <option value="عسير">منطقة عسير</option>
-          <option value="الجوف">منطقة الجوف</option>
-        </select>
-      </div>
-
-      <div className="filter-group">
-        <select
-          value={filter.purpose}
-          onChange={(e) => onChange('purpose', e.target.value)}
-        >
-          <option value="">الغرض من العقار</option>
-          <option value="بيع">بيع</option>
-          <option value="استثمار">استثمار</option>
-        </select>
-      </div>
-
-      <div className="filter-group price-inputs">
-        <label>نطاق السعر (ريال)</label>
-        <div className="price-inputs-row">
-          <input
-            type="number"
-            value={filter.minPrice}
-            onChange={(e) => onChange('minPrice', e.target.value)}
-            placeholder="الحد الأدنى"
-            min="0"
-          />
-          <span className="price-separator">-</span>
-          <input
-            type="number"
-            value={filter.maxPrice}
-            onChange={(e) => onChange('maxPrice', e.target.value)}
-            placeholder="الحد الأقصى"
-            min="0"
-          />
-        </div>
-      </div>
-
-      <div className="filter-group">
-        <select
-          value={filter.area}
-          onChange={(e) => onChange('area', e.target.value)}
-        >
-          <option value="">المساحة</option>
-          <option value="0-500">حتى 5000 م²</option>
-          <option value="500-1000">5000 - 10,000 م²</option>
-          <option value="1000-5000">10,000 - 50,000 م²</option>
-          <option value="5000+">أكثر من 50,000 م²</option>
-        </select>
-      </div>
-    </div>
-  </div>
-);
-
-const AuctionFilter = ({ filter, onChange }) => (
-  <div className="filter-section">
-    <div className="filter-header">
-      <h4>فلتر المزادات</h4>
-    </div>
-    <div className="filter-row">
-      <div className="filter-group">
-        <label className="filter-label">المدينة</label>
-        <select
-          value={filter.city}
-          onChange={(e) => onChange('city', e.target.value)}
-        >
-          <option value="">اختر المدينة</option>
-          <option value="الرياض">الرياض</option>
-          <option value="جدة">جدة</option>
-          <option value="الدمام">الدمام</option>
-          <option value="مكة">مكة المكرمة</option>
-          <option value="المدينة">المدينة المنورة</option>
-          <option value="الخبر">الخبر</option>
-          <option value="الطائف">الطائف</option>
-        </select>
-      </div>
-
-      <div className="filter-group">
-        <label className="filter-label">المنطقة</label>
-        <select
-          value={filter.region}
-          onChange={(e) => onChange('region', e.target.value)}
-        >
-          <option value="">اختر المنطقة</option>
-          <option value="الرياض">منطقة الرياض</option>
-          <option value="مكة">منطقة مكة المكرمة</option>
-          <option value="الشرقية">المنطقة الشرقية</option>
-          <option value="المدينة">منطقة المدينة المنورة</option>
-          <option value="القصيم">منطقة القصيم</option>
-          <option value="عسير">منطقة عسير</option>
-          <option value="تبوك">منطقة تبوك</option>
-          <option value="حائل">منطقة حائل</option>
-          <option value="الحدود الشمالية">الحدود الشمالية</option>
-          <option value="جازان">منطقة جازان</option>
-          <option value="نجران">منطقة نجران</option>
-          <option value="الباحة">منطقة الباحة</option>
-          <option value="الجوف">منطقة الجوف</option>
-        </select>
-      </div>
-
-      <div className="filter-group">
-        <label className="filter-label">
-          <Icons.FaCalendarAlt className="label-icon" />
-          تاريخ بداية المزاد
-        </label>
-        <input
-          type="date"
-          value={filter.startDate}
-          onChange={(e) => onChange('startDate', e.target.value)}
-          className="date-input"
-        />
-      </div>
-
-      <div className="filter-group">
-        <label className="filter-label">
-          <Icons.FaCalendarAlt className="label-icon" />
-          تاريخ نهاية المزاد
-        </label>
-        <input
-          type="date"
-          value={filter.endDate}
-          onChange={(e) => onChange('endDate', e.target.value)}
-          className="date-input"
-        />
-      </div>
-
-      <div className="filter-group">
-        <label className="filter-label">
-          <Icons.FaClock className="label-icon" />
-          المدة المتبقية
-        </label>
-        <select
-          value={filter.maxDaysLeft}
-          onChange={(e) => onChange('maxDaysLeft', e.target.value)}
-        >
-          <option value="">جميع المدد</option>
-          <option value="1">ينتهي خلال 24 ساعة</option>
-          <option value="3">ينتهي خلال 3 أيام</option>
-          <option value="7">ينتهي خلال أسبوع</option>
-          <option value="15">ينتهي خلال أسبوعين</option>
-          <option value="30">ينتهي خلال شهر</option>
-        </select>
-      </div>
-    </div>
-  </div>
-);
 
 export default PropertiesSection;

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BsHouseFill } from 'react-icons/bs';
 import Icons from '../../icons';
 import '../../styles/Navbar.css';
+import MarketingRequestModal from '../../pages/Auction/CreateAuctionRequest'; 
 
 /**
  * مكون الشريط التنقل - الجزء المرئي فقط
@@ -43,55 +44,76 @@ const NavbarUI = ({
   onRegisterClick
 }) => {
   
+  const [showMarketingModal, setShowMarketingModal] = useState(false);
+
+  // دالة التحقق من تسجيل الدخول وعرض نافذة التسويق
+  const handleMarketingRequest = () => {
+    if (!currentUser) {
+      // إذا لم يكن المستخدم مسجل الدخول، افتح نافذة تسجيل الدخول
+      onLoginClick();
+      return;
+    }
+    
+    // إذا كان مسجل الدخول، اعرض نافذة طلب التسويق
+    setShowMarketingModal(true);
+    handleCloseMenu(); // إغلاق القائمة الجانبية إذا كانت مفتوحة
+  };
+
+  // دالة معالجة نجاح طلب التسويق
+  const handleMarketingSuccess = (response) => {
+    console.log('طلب التسويق تم بنجاح:', response);
+    // يمكنك إضافة أي إجراء إضافي هنا مثل إظهار رسالة نجاح
+  };
+
   /**
-   * مكون الإشعارات
-   */
-  const renderNotifications = () => (
-    <div className="notifications-dropdown">
-      <div className="notifications-header">
-        <h3>الإشعارات</h3>
-        <span className="notifications-count">{unreadNotifications} غير مقروء</span>
-      </div>
-      <div className="notifications-list hide-scrollbar">
-        {notificationsLoading ? (
-          <div className="loading-notifications">جاري التحميل...</div>
-        ) : notificationsError ? (
-          <div className="error-notifications">حدث خطأ في تحميل الإشعارات</div>
-        ) : notifications.length === 0 ? (
-          <div className="empty-notifications">لا توجد إشعارات</div>
-        ) : (
-          notifications.map(notification => (
-            <div 
-              key={notification.id} 
-              className={`notification-item ${notification.read_at ? 'read' : 'unread'}`}
-              onClick={() => handleNotificationClick(notification)}
-            >
-              <div className="notification-content">
-                <h4>{notification.data.title}</h4>
-                <p>{notification.data.body}</p>
-                <span className="notification-time">
-                  {new Date(notification.data.created_at).toLocaleString('ar-SA', {
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric'
-                  })}
-                </span>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-      <Link 
-        to="/notifications" 
-        className="view-all-notifications"
-        onClick={() => setShowNotifications(false)}
-      >
-        عرض جميع الإشعارات
-      </Link>
+ * مكون الإشعارات
+ */
+const renderNotifications = () => (
+  <div className="notifications-dropdown">
+    <div className="notifications-header">
+      <h3>الإشعارات</h3>
+      <span className="notifications-count">{unreadNotifications} غير مقروء</span>
     </div>
-  );
+    <div className="notifications-list custom-scrollbar">
+      {notificationsLoading ? (
+        <div className="loading-notifications">جاري التحميل...</div>
+      ) : notificationsError ? (
+        <div className="error-notifications">حدث خطأ في تحميل الإشعارات</div>
+      ) : notifications.length === 0 ? (
+        <div className="empty-notifications">لا توجد إشعارات</div>
+      ) : (
+        notifications.map(notification => (
+          <div 
+            key={notification.id} 
+            className={`notification-item ${notification.read_at ? 'read' : 'unread'}`}
+            onClick={() => handleNotificationClick(notification)}
+          >
+            <div className="notification-content">
+              <h4>{notification.data.title}</h4>
+              <p>{notification.data.body}</p>
+              <span className="notification-time">
+                {new Date(notification.data.created_at).toLocaleString('ar-SA', {
+                  year: 'numeric',
+                  month: 'numeric',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric'
+                })}
+              </span>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+    <Link 
+      to="/notifications" 
+      className="view-all-notifications"
+      onClick={() => setShowNotifications(false)}
+    >
+      عرض جميع الإشعارات
+    </Link>
+  </div>
+);
 
   /**
    * قائمة المستخدم المنسدلة
@@ -134,7 +156,7 @@ const NavbarUI = ({
           onClick={() => setShowUserMenu(false)}
         >
           <Icons.FaHandshake className="dropdown-icon" />
-          عروضي
+          اهتماماتي بالاراضي
         </Link>
       )}
       
@@ -187,14 +209,14 @@ const NavbarUI = ({
         onClick={handleCreateRequest}
       >
         <Icons.FaUser className="link-icon" />
-        طلب شراء / تسويق
+        طلبات الشراء
       </button>
       
       <button 
         className="nav-link"
-        onClick={handleCreateRequest}
+        onClick={handleMarketingRequest}
       >
-        <Icons.FaUser className="link-icon" />
+        <Icons.FaBullhorn className="link-icon" />
         طلب تسويق منتج عقاري عبر شركات المزادات
       </button>
     </div>
@@ -211,8 +233,11 @@ const NavbarUI = ({
           onClick={() => setShowNotifications(!showNotifications)}
         >
           <Icons.FaBell className="notification-icon" />
+
           {unreadNotifications > 0 && (
-            <span className="notification-badge">{unreadNotifications}</span>
+            <span className="notification-badge">
+              {unreadNotifications > 4 ? "4+" : unreadNotifications}
+            </span>
           )}
         </button>
         
@@ -286,7 +311,7 @@ const NavbarUI = ({
       {(isLandOwner() || isInvestor() || isPropertyOwner()) && (
         <Link to="/interests" className="mobile-nav-link" onClick={handleCloseMenu}>
           <Icons.FaHandshake className="link-icon" />
-          عروضي
+          اهتماماتي بالاراضي
         </Link>
       )}
 
@@ -383,14 +408,14 @@ const NavbarUI = ({
             onClick={handleCreateRequest}
           >
             <Icons.FaUser className="link-icon" />
-            طلب شراء / تسويق
+            طلبات الشراء
           </button>
           
           <button 
             className="mobile-nav-link"
-            onClick={handleCreateRequest}
+            onClick={handleMarketingRequest}
           >
-            <Icons.FaUser className="link-icon" />
+            <Icons.FaBullhorn className="link-icon" />
             طلب تسويق منتج عقاري عبر شركات المزادات
           </button>
         </div>
@@ -402,47 +427,56 @@ const NavbarUI = ({
   );
 
   return (
-    <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
-      <div className="nav-container">
-        {/* الشعار */}
-        <div className="logo-section">
-          <Link to="/" className="nav-logo" onClick={handleCloseMenu}>
-            <img src="images/logo3.png" alt="Logo" className="logo-image" />
-            <img src="images/text.png" alt="Logo" className="logo-image" />
-          </Link>
+    <>
+      <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+        <div className="nav-container">
+          {/* الشعار */}
+          <div className="logo-section">
+            <Link to="/" className="nav-logo" onClick={handleCloseMenu}>
+              <img src="images/logo3.png" alt="Logo" className="logo-image" />
+              <img src="images/text.png" alt="Logo" className="logo-image" />
+            </Link>
+          </div>
+
+          {/* القوائم الرئيسية - للكمبيوتر */}
+          <div className="nav-menu-section">
+            {renderNavLinks()}
+          </div>
+
+          {/* الأقسام الجانبية - للكمبيوتر */}
+          <div className="nav-controls-section">
+            {currentUser ? renderUserControls() : renderAuthButtons()}
+
+            {/* أيقونة القائمة الجانبية - للهاتف */}
+            <button 
+              className="mobile-menu-btn" 
+              onClick={handleMobileMenuToggle}
+              aria-label="فتح القائمة"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+
+          {/* القائمة الجانبية للهاتف */}
+          {renderMobileSidebar()}
+
+          {/* طبقة التعتيم للهاتف */}
+          {isMobileMenuOpen && (
+            <div className="mobile-overlay" onClick={handleCloseMenu}></div>
+          )}
         </div>
+      </nav>
 
-        {/* القوائم الرئيسية - للكمبيوتر */}
-        <div className="nav-menu-section">
-          {renderNavLinks()}
-        </div>
-
-        {/* الأقسام الجانبية - للكمبيوتر */}
-        <div className="nav-controls-section">
-          {currentUser ? renderUserControls() : renderAuthButtons()}
-
-          {/* أيقونة القائمة الجانبية - للهاتف */}
-          <button 
-            className="mobile-menu-btn" 
-            onClick={handleMobileMenuToggle}
-            aria-label="فتح القائمة"
-            aria-expanded={isMobileMenuOpen}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </div>
-
-        {/* القائمة الجانبية للهاتف */}
-        {renderMobileSidebar()}
-
-        {/* طبقة التعتيم للهاتف */}
-        {isMobileMenuOpen && (
-          <div className="mobile-overlay" onClick={handleCloseMenu}></div>
-        )}
-      </div>
-    </nav>
+      {/* نافذة طلب التسويق */}
+      <MarketingRequestModal 
+        isOpen={showMarketingModal}
+        onClose={() => setShowMarketingModal(false)}
+        onSuccess={handleMarketingSuccess}
+      />
+    </>
   );
 };
 

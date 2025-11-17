@@ -20,7 +20,7 @@ const FiltersComponent = ({
   const availableRegions = locationService.getRegions();
   const availableCities = locationService.getCitiesByRegion();
 
-  // 🔹 مكوّن اختيار المنطقة + المدينة (يستخدم في كل الفلاتر)
+  // 🔹 مكوّن اختيار المنطقة + المدينة (يستخدم فقط في الأراضي والطلبات)
   const RegionCity = () => (
     <>
       <div className="shahinFilter_group">
@@ -201,8 +201,7 @@ const FiltersComponent = ({
   const AuctionFiltersContent = () => (
     <div className="shahinFilters_content">
       <div className="shahinFilters_row">
-
-        <RegionCity />
+        {/* تم إزالة RegionCity من هنا */}
 
         <div className="shahinFilter_group">
           <label>البحث في المزادات</label>
@@ -265,6 +264,28 @@ const FiltersComponent = ({
             <label>إلى تاريخ</label>
             <input type="date" name="date_to" value={filters.date_to} onChange={onFilterChange} />
           </div>
+
+          {/* إضافة فلاتر إضافية للمزادات بدلاً من المنطقة والمدينة */}
+          {/* <div className="shahinFilter_group">
+            <label>حالة المزاد</label>
+            <select name="auction_status" value={filters.auction_status} onChange={onFilterChange}>
+              <option value="">جميع الحالات</option>
+              <option value="active">مزادات نشطة</option>
+              <option value="upcoming">مزادات قادمة</option>
+              <option value="ended">مزادات منتهية</option>
+            </select>
+          </div> */}
+
+          {/* <div className="shahinFilter_group">
+            <label>ترتيب حسب</label>
+            <select name="sort_by" value={filters.sort_by} onChange={onFilterChange}>
+              <option value="">الافتراضي</option>
+              <option value="date_asc">الأقدم أولاً</option>
+              <option value="date_desc">الأحدث أولاً</option>
+              <option value="title_asc">بالاسم (أ-ي)</option>
+              <option value="title_desc">بالاسم (ي-أ)</option>
+            </select>
+          </div> */}
         </div>
       )}
 

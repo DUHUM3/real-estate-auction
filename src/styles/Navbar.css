@@ -443,6 +443,64 @@
 .notifications-list {
   max-height: 300px;
   overflow-y: auto;
+  padding-right: 4px; /* مساحة لشريط التمرير */
+}
+.custom-scrollbar {
+  /* للمتصفحات التي تدعم WebKit (Chrome, Safari, Edge) */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: rgba(83, 161, 221, 0.3);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(83, 161, 221, 0.5);
+}
+
+/* للمتصفحات التي تدعم Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.custom-scrollbar:hover {
+  scrollbar-color: rgba(83, 161, 221, 0.3) transparent;
+}
+
+/* تحسينات إضافية للتمرير السلس */
+.notifications-list {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* تأكد من أن القائمة تأخذ المساحة الكافية */
+.notifications-dropdown {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.notifications-list {
+  flex: 1;
+  min-height: 150px;
 }
 
 .hide-scrollbar {

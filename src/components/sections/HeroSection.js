@@ -5,7 +5,57 @@ import Icons from '../../icons/index';
 const HeroSection = ({ onSellLandClick, onBrowseInvestments }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [firstImageLoaded, setFirstImageLoaded] = useState(false);
   const navigate = useNavigate();
+
+  // تحميل الصورة الأولى فوراً ثم باقي الصور
+  useEffect(() => {
+    const imageUrls = [
+      '/images/slide1.jpg',
+      '/images/slide5.jpg', 
+      '/images/slide3.jpg'
+    ];
+
+    // تحميل الصورة الأولى بشكل منفصل وفوري
+    const loadFirstImage = () => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = imageUrls[0];
+        img.onload = () => {
+          setFirstImageLoaded(true);
+          resolve();
+        };
+        img.onerror = () => {
+          setFirstImageLoaded(true); // استمر حتى لو فشلت الصورة
+          resolve();
+        };
+      });
+    };
+
+    // تحميل باقي الصور في الخلفية
+    const loadRemainingImages = () => {
+      const promises = imageUrls.slice(1).map(url => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.src = url;
+          img.onload = resolve;
+          img.onerror = resolve; // تجاهل الأخطاء للصور الأخرى
+        });
+      });
+
+      Promise.all(promises)
+        .then(() => {
+          setImagesLoaded(true);
+        })
+        .catch(() => {
+          setImagesLoaded(true);
+        });
+    };
+
+    // بدء تحميل الصورة الأولى ثم الباقي
+    loadFirstImage().then(loadRemainingImages);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -47,7 +97,15 @@ const HeroSection = ({ onSellLandClick, onBrowseInvestments }) => {
         </div>
       </div>
 
-      <div className={`hero-background slide-${currentSlide}`}></div>
+      {/* عرض الخلفية فور تحميل الصورة الأولى */}
+      {firstImageLoaded && (
+        <div className={`hero-background slide-${currentSlide}`}></div>
+      )}
+
+      {/* خلفية بديلة أثناء التحميل */}
+      {!firstImageLoaded && (
+        <div className="hero-background loading-background"></div>
+      )}
 
       <div className="hero-content container">
         <div className="hero-title-container">

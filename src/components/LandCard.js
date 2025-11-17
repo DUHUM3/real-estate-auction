@@ -51,7 +51,7 @@ const LandCard = ({
         <div className="land-tag">{landType}</div>
         {status === "تم البيع" && <div className="sold-badge">تم البيع</div>}
         {auctionTitle && <div className="auction-badge">مزاد</div>}
-        <div className="card-actions">
+        {/* <div className="card-actions">
           <button
             className={`action-btn favorite-btn ${favorite ? 'active' : ''} ${isLoading ? 'loading' : ''}`}
             onClick={handleFavoriteClick}
@@ -59,7 +59,7 @@ const LandCard = ({
           >
             <Icons.FaBookmark />
           </button>
-        </div>
+        </div> */}
       </div>
       <div className="land-content">
         <h3>{title}</h3>

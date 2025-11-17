@@ -57,16 +57,16 @@ function MyAds() {
     if (currentUser?.user_type === 'شركة مزادات') {
       return {
         base: 'https://shahin-tqay.onrender.com/api/user/auctions',
-        status: 'https://shahin-tqay.onrender.com/api/user/auctions',
+        myAuctions: 'https://shahin-tqay.onrender.com/api/user/auctions',
         single: (id) => `https://shahin-tqay.onrender.com/api/user/auctions/${id}`
       };
     } else {
       return {
-        base: 'https://shahin-tqay.onrender.com/api/user/properties ',  // تم تغيير الرابط للإنشاء
-        create: 'https://shahin-tqay.onrender.com/api/user/properties ',
-        list: 'https://shahin-tqay.onrender.com/api/user/properties /my',
-        status: (status) => `https://shahin-tqay.onrender.com/api/user/properties /status/${status}`,
-        single: (id) => `https://shahin-tqay.onrender.com/api/user/properties /${id}`
+        base: 'https://shahin-tqay.onrender.com/api/user/properties',
+        create: 'https://shahin-tqay.onrender.com/api/user/properties',
+        list: 'https://shahin-tqay.onrender.com/api/user/properties/my',
+        status: (status) => `https://shahin-tqay.onrender.com/api/user/properties/status/${status}`,
+        single: (id) => `https://shahin-tqay.onrender.com/api/user/properties/${id}`
       };
     }
   };
@@ -78,7 +78,7 @@ function MyAds() {
       const token = localStorage.getItem('token');
       const urls = getApiUrls();
       
-      let url = currentUser?.user_type === 'شركة مزادات' ? urls.base : urls.list;
+      let url = currentUser?.user_type === 'شركة مزادات' ? urls.myAuctions : urls.list;
       
       // إذا كان هناك تصفية بالحالة ولم يكن المستخدم شركة مزادات
       if (status !== 'الكل' && currentUser?.user_type !== 'شركة مزادات') {
@@ -95,8 +95,13 @@ function MyAds() {
 
       const result = await response.json();
       
-      if (result.status || result.success) {
-        setAds(result.data || []);
+      if (result.status) {
+        // تعديل هنا للتعامل مع هيكل البيانات الجديد
+        if (currentUser?.user_type === 'شركة مزادات') {
+          setAds(result.data?.data || []);
+        } else {
+          setAds(result.data?.data || []);
+        }
       } else {
         setError('فشل في جلب الإعلانات');
       }
@@ -132,7 +137,7 @@ function MyAds() {
 
       const result = await response.json();
       
-      if (result.status || result.success) {
+      if (result.status) {
         setAds(ads.filter(ad => ad.id !== adId));
         alert('تم حذف الإعلان بنجاح');
       } else {
@@ -298,7 +303,7 @@ function MyAds() {
 
       const result = await response.json();
       
-      if (result.status || result.success) {
+      if (result.status) {
         alert('تم إضافة الإعلان بنجاح');
         resetForm();
         setShowAdForm(false);
@@ -420,26 +425,6 @@ function MyAds() {
     const config = statusConfig[status] || { text: status, class: 'myads-status-pending' };
     return <span className={`myads-status-badge ${config.class}`}>{config.text}</span>;
   };
-
-  // تحديد عنوان الخطوة الحالية
-  // const getCurrentStepTitle = () => {
-  //   if (currentUser?.user_type === 'شركة مزادات') {
-  //     const auctionTitles = [
-  //       "المعلومات الأساسية للمزاد",
-  //       "معلومات الموقع والتاريخ",
-  //       "الصور والملفات"
-  //     ];
-  //     return auctionTitles[currentStep - 1];
-  //   } else {
-  //     const propertyTitles = [
-  //       "المعلومات الأساسية للأرض",
-  //       "معلومات المساحة والموقع",
-  //       "التفاصيل المالية",
-  //       "الصور والإقرارات"
-  //     ];
-  //     return propertyTitles[currentStep - 1];
-  //   }
-  // };
 
   // عرض النموذج المناسب حسب نوع المستخدم والخطوة الحالية
   const renderAdForm = () => {
@@ -1109,6 +1094,20 @@ function MyAds() {
     );
   };
 
+  // تصحيح مسار الصورة
+  const getImageUrl = (item) => {
+    if (!item || !item.cover_image) return 'https://via.placeholder.com/300x150?text=لا+توجد+صورة';
+    
+    // للمزادات
+    if (currentUser?.user_type === 'شركة مزادات') {
+      return `https://shahin-tqay.onrender.com/storage/${item.cover_image}`;
+    } 
+    // للأراضي
+    else {
+      return `https://shahin-tqay.onrender.com/storage/${item.cover_image}`;
+    }
+  };
+
   return (
     <div className="my-ads-page">
       <div className="myads-page-container">
@@ -1179,10 +1178,10 @@ function MyAds() {
               }
             </p>
           </div>
-      ) : error ? (
+        ) : error ? (
           <div className="myads-error-state">
             <div className="myads-error-icon">
-              <FaExclamationTriangle /> {/* ✅ أيقونة للخطأ */}
+              <FaExclamationTriangle />
             </div>
             <p>{error}</p>
             <button className="myads-btn myads-btn-primary" onClick={() => fetchAds(activeStatus)}>
@@ -1195,10 +1194,7 @@ function MyAds() {
               <div key={ad.id} className="myads-card">
                 <div className="myads-img">
                   <img 
-                    src={
-                      ad.cover_image_url || 
-                      (ad.cover_image ? `https://shahin-tqay.onrender.com/storage/${ad.cover_image}` : 'https://via.placeholder.com/300x150?text=لا+توجد+صورة')
-                    } 
+                    src={getImageUrl(ad)}
                     alt={ad.title} 
                   />
                   {getStatusBadge(ad.status)}
@@ -1208,52 +1204,34 @@ function MyAds() {
                   <div className="myads-info">
                     {currentUser?.user_type === 'شركة مزادات' ? (
                       <>
+                        {/* عرض معلومات المزاد */}
                         <div className="myads-info-item">
-                          <span className="myads-info-label">العنوان:</span>
-                          <span className="myads-info-value">{ad.address}</span>
+                          <span className="myads-info-label">الحالة:</span>
+                          <span className="myads-info-value">{ad.status}</span>
                         </div>
                         <div className="myads-info-item">
-                          <span className="myads-info-label">التاريخ:</span>
+                          <span className="myads-info-label">تاريخ الإضافة:</span>
                           <span className="myads-info-value">
-                            {new Date(ad.auction_date).toLocaleDateString('ar-SA')}
+                            {new Date(ad.created_at).toLocaleDateString('ar-SA')}
                           </span>
-                        </div>
-                        <div className="myads-info-item">
-                          <span className="myads-info-label">الوقت:</span>
-                          <span className="myads-info-value">{ad.start_time}</span>
                         </div>
                       </>
                     ) : (
                       <>
+                        {/* عرض معلومات الأرض */}
                         <div className="myads-info-item">
-                          <span className="myads-info-label">المدينة:</span>
-                          <span className="myads-info-value">{ad.city}</span>
+                          <span className="myads-info-label">الحالة:</span>
+                          <span className="myads-info-value">{ad.status}</span>
                         </div>
                         <div className="myads-info-item">
-                          <span className="myads-info-label">المساحة:</span>
-                          <span className="myads-info-value">{ad.total_area} م²</span>
+                          <span className="myads-info-label">سعر المتر:</span>
+                          <span className="myads-info-value">
+                            {ad.price_per_sqm ? `${ad.price_per_sqm} ريال` : 'غير محدد'}
+                          </span>
                         </div>
-                        {ad.purpose === 'بيع' ? (
-                          <div className="myads-info-item">
-                            <span className="myads-info-label">السعر:</span>
-                            <span className="myads-info-value">
-                              {ad.price_per_sqm * ad.total_area} ريال
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="myads-info-item">
-                            <span className="myads-info-label">قيمة الاستثمار:</span>
-                            <span className="myads-info-value">
-                              {ad.estimated_investment_value} ريال
-                            </span>
-                          </div>
-                        )}
                       </>
                     )}
                   </div>
-                  <p className="myads-desc">
-                    {ad.description?.substring(0, 100)}...
-                  </p>
                   <div className="myads-footer">
                     <span className="myads-date">
                       {new Date(ad.created_at).toLocaleDateString('ar-SA')}
@@ -1275,12 +1253,12 @@ function MyAds() {
             ))}
           </div>
         ) : (
-           <div className="myads-empty-state">
+          <div className="myads-empty-state">
             <div className="myads-empty-icon">
               {currentUser?.user_type === 'شركة مزادات' ? (
-                <FaTag size={48} /> // ✅ أيقونة للمزادات
+                <FaTag size={48} />
               ) : (
-                <FaClipboardList size={48} /> // ✅ أيقونة للإعلانات
+                <FaClipboardList size={48} />
               )}
             </div>
             <h3>

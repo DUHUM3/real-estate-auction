@@ -94,7 +94,7 @@
 .elegantMain_image {
   position: relative;
   width: 100%;
-  height: 250px;
+  height: 300px;
   overflow: hidden;
   background: #f8f9fa;
 }
@@ -226,6 +226,8 @@
 .elegantDetails_content {
   padding: 20px 16px;
   background: var(--background-white);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .elegantTitle_section {
@@ -733,6 +735,54 @@
   background: #3a8bc8;
 }
 
+/* ===== تحسينات للشاشات الكبيرة ===== */
+@media (min-width: 768px) {
+  .elegantDetails_content {
+    padding: 30px 40px;
+  }
+  
+  .elegantMain_image {
+    height: 400px;
+  }
+  
+  .elegantTitle_section h1 {
+    font-size: 1.6rem;
+  }
+  
+  .elegantSpecs_grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+  }
+  
+  .elegantTotal_price {
+    grid-column: span 3;
+  }
+  
+  .elegantAdditional_grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+  }
+  
+  .elegantThumbnail {
+    flex: 0 0 80px;
+    height: 80px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .elegantDetails_content {
+    padding: 40px 60px;
+  }
+  
+  .elegantMain_image {
+    height: 500px;
+  }
+  
+  .elegantTitle_section h1 {
+    font-size: 1.8rem;
+  }
+}
+
 /* ===== تحسينات للشاشات الصغيرة ===== */
 @media (max-width: 360px) {
   .elegantSpecs_grid,
@@ -756,14 +806,6 @@
 @media (min-width: 480px) {
   .elegantMain_image {
     height: 300px;
-  }
-  
-  .elegantSpecs_grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .elegantTotal_price {
-    grid-column: span 3;
   }
   
   .elegantThumbnail {

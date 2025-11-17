@@ -79,7 +79,7 @@ function Interests() {
 
   // دالة للانتقال إلى صفحة تفاصيل الأرض
   const handleViewProperty = (propertyId) => {
-    navigate(`/property/${propertyId}/land`);
+    navigate(`/lands/${propertyId}/land`);
   };
 
   // تنسيق التاريخ

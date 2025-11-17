@@ -309,9 +309,20 @@ const TermsOfService = () => {
 
     20: `تشكل هذه الشروط وسياسة الخصوصية وأي سياسات أو قواعد تشغيل ملوقع وتطبيق "شاهين بلس" كل بنود الاتفاق الكامل بينك وبين موقع وتطبيق "شاهين بلس" الصادر عن مؤسسة شاهين بلس ، مع الأخذ بعين الاعتبار املواضيع املتعلقة بذلك، وتحل محل أي إصدارات سابقة من هذه الشروط.`
   };
+  
+  const scrollToSection = (sectionId) => {
+    setActiveSection(sectionId);
+    // في الهواتف، التمرير إلى أعلى المحتوى بعد تغيير القسم
+    if (window.innerWidth <= 768) {
+      const contentElement = document.querySelector('.section-content');
+      if (contentElement) {
+        contentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
 
-  return (
-       <div className="privacy-policy-container">
+   return (
+    <div className="privacy-policy-container">
       {/* العنوان الرئيسي المضاف */}
       <div className="privacy-header">
         <h1>شروط الاستخدام</h1>
@@ -326,7 +337,7 @@ const TermsOfService = () => {
               <li 
                 key={section.id}
                 className={activeSection === section.id ? 'active' : ''}
-                onClick={() => setActiveSection(section.id)}
+                onClick={() => scrollToSection(section.id)}
               >
                 <span>{section.id}</span> {section.title}
               </li>
@@ -351,7 +362,7 @@ const TermsOfService = () => {
             {activeSection > 1 && (
               <button 
                 className="nav-button prev"
-                onClick={() => setActiveSection(activeSection - 1)}
+                onClick={() => scrollToSection(activeSection - 1)}
               >
                 ← القسم السابق
               </button>
@@ -360,7 +371,7 @@ const TermsOfService = () => {
             {activeSection < sections.length && (
               <button 
                 className="nav-button next"
-                onClick={() => setActiveSection(activeSection + 1)}
+                onClick={() => scrollToSection(activeSection + 1)}
               >
                 القسم التالي →
               </button>

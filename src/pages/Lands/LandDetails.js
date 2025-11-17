@@ -1,5 +1,5 @@
-import React, { useState, useEffect ,useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ModalContext } from '../../App'; 
 
 import {
@@ -25,6 +25,7 @@ import '../../styles/PropertyDetailsModal.css';
 const PropertyDetailsPage = () => {
   const { id, type } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { openLogin } = useContext(ModalContext); 
 
   const [data, setData] = useState(null);
@@ -198,20 +199,36 @@ const toggleFavorite = async () => {
   }
 };
 
+  // Share Function - تم التعديل هنا
   const shareItem = () => {
+    const currentUrl = window.location.href;
     const shareData = {
       title: type === 'land' ? data.title : cleanText(data.title),
       text: type === 'land' 
         ? `أرض ${data.land_type} في ${data.region} - ${data.city}`
         : `مزاد: ${cleanText(data.title)}`,
-      url: window.location.href,
+      url: currentUrl,
     };
 
     if (navigator.share) {
       navigator.share(shareData).catch(console.error);
     } else {
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(currentUrl);
       alert('تم نسخ الرابط للمشاركة!');
+    }
+  };
+
+  // Back Function - تم التعديل هنا
+  const handleBack = () => {
+    // التحقق مما إذا كان هناك تبويب سابق محفوظ
+    const lastActiveTab = localStorage.getItem('lastActiveTab') || location.state?.fromTab;
+    
+    if (lastActiveTab) {
+      // العودة إلى قائمة التبويب المحدد
+      navigate('/lands', { state: { activeTab: lastActiveTab } });
+    } else {
+      // العودة إلى الصفحة السابقة أو الصفحة الرئيسية
+      navigate(-1);
     }
   };
 
@@ -394,7 +411,7 @@ const handleSubmitInterest = async (e) => {
     return (
       <div className="elegantError_container">
         <p>{error}</p>
-        <button onClick={() => navigate(-1)}>العودة</button>
+        <button onClick={handleBack}>العودة</button>
       </div>
     );
   }
@@ -403,7 +420,7 @@ const handleSubmitInterest = async (e) => {
     return (
       <div className="elegantError_container">
         <p>البيانات غير متوفرة</p>
-        <button onClick={() => navigate(-1)}>العودة</button>
+        <button onClick={handleBack}>العودة</button>
       </div>
     );
   }
@@ -412,12 +429,12 @@ const handleSubmitInterest = async (e) => {
 
   return (
     <div className="elegantDetails_container">
-      {/* Header */}
+      {/* Header - تم التعديل هنا */}
       <div className="elegantDetails_header">
-        {/* <button onClick={() => navigate(-1)} className="elegantBack_btn">
+        <button className="elegantBack_btn" onClick={handleBack}>
           <FaArrowLeft />
-          العودة
-        </button> */}
+          <span>رجوع</span>
+        </button>
         <div className="elegantHeader_actions">
           <button 
             className={`elegantFavorite_btn ${isFavorite ? 'elegantActive' : ''}`}
@@ -493,7 +510,7 @@ const handleSubmitInterest = async (e) => {
       </div>
 
       {/* Main Content */}
-          <div className="elegantDetails_content">
+      <div className="elegantDetails_content">
         {/* Title and Basic Info */}
         <div className="elegantTitle_section">
           <h1>{type === 'land' ? data.title : cleanText(data.title)}</h1>
@@ -501,6 +518,7 @@ const handleSubmitInterest = async (e) => {
             {data.status}
           </div>
         </div>
+
         {/* Location */}
         <div className="elegantLocation_section">
           <FaMapMarkerAlt className="elegantSection_icon" />
@@ -623,7 +641,7 @@ const handleSubmitInterest = async (e) => {
         )}
         
         {/* Interest Button */}
-      {type === 'land' && (
+        {type === 'land' && (
           <div className="elegantInterest_section">
             <button 
               className="elegantInterest_btn" 
@@ -634,6 +652,33 @@ const handleSubmitInterest = async (e) => {
           </div>
         )}
       </div>
+
+      {/* Image Modal */}
+      {showImageModal && (
+        <div className="elegantImage_modal" onClick={() => setShowImageModal(false)}>
+          <div className="elegantModal_content" onClick={(e) => e.stopPropagation()}>
+            <img src={getImageUrl(images[selectedImage])} alt="Modal" />
+            <button 
+              className="elegantModal_nav elegantModal_prev"
+              onClick={() => setSelectedImage(prev => prev === 0 ? images.length - 1 : prev - 1)}
+            >
+              <FaArrowRight />
+            </button>
+            <button 
+              className="elegantModal_nav elegantModal_next"
+              onClick={() => setSelectedImage(prev => (prev + 1) % images.length)}
+            >
+              <FaLeft />
+            </button>
+            <button 
+              className="elegantModal_close"
+              onClick={() => setShowImageModal(false)}
+            >
+              <FaTimes />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Interest Form Modal */}
       {showInterestForm && (
@@ -647,85 +692,39 @@ const handleSubmitInterest = async (e) => {
             </button>
             <h3>تقديم اهتمام بالعقار</h3>
             
-        {submitResult ? (
-  <div className={`elegantSubmit_result ${submitResult.success ? 'success' : 'error'}`}>
-    <p>{submitResult.message}</p>
-    {submitResult.success ? (
-      <button onClick={handleCloseInterestForm} className="elegantCloseResult_btn">
-        إغلاق
-      </button>
-    ) : (
-      <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-        <button onClick={() => setSubmitResult(null)} className="elegantTryAgain_btn">
-          حاول مرة أخرى
-        </button>
-       
-      </div>
-    )}
-  </div>
-) : (
-<form onSubmit={(e) => {
-  handleSubmitInterest(e);
-  handleSubmit(e);
-}}>
-                {/* <div className="elegantForm_group">
+            {submitResult ? (
+              <div className={`elegantSubmit_result ${submitResult.success ? 'success' : 'error'}`}>
+                <p>{submitResult.message}</p>
+                {submitResult.success ? (
+                  <button onClick={handleCloseInterestForm} className="elegantCloseResult_btn">
+                    إغلاق
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                    <button onClick={() => setSubmitResult(null)} className="elegantTryAgain_btn">
+                      حاول مرة أخرى
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <form onSubmit={(e) => {
+                handleSubmitInterest(e);
+                handleSubmit(e);
+              }}>
+                <div className="elegantForm_group">
                   <label>
-                    <FaUser />
-                    <span>الاسم الكامل</span>
+                    <span>رسالة</span>
                   </label>
-                  <input
-                    type="text"
-                    name="full_name"
-                    value={formData.full_name}
+                  <textarea
+                    name="message"
+                    value={formData.message}
                     onChange={handleInputChange}
-                    placeholder="أدخل الاسم الكامل"
+                    placeholder="أدخل رسالتك أو استفسارك هنا (يجب أن يكون أكثر من 10 أحرف)"
+                    rows={4}
                     required
                   />
                 </div>
-                
-                <div className="elegantForm_group">
-                  <label>
-                    <FaPhone />
-                    <span>رقم الهاتف</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="أدخل رقم الهاتف"
-                    required
-                  />
-                </div>
-                
-                <div className="elegantForm_group">
-                  <label>
-                    <FaEnvelope />
-                    <span>البريد الإلكتروني</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="أدخل البريد الإلكتروني"
-                    required
-                  />
-                </div> */}
-                
-                  <div className="elegantForm_group">
-    <label>
-      <span>رسالة</span>
-    </label>
-    <textarea
-      name="message"
-      value={formData.message}
-      onChange={handleInputChange}
-      placeholder="أدخل رسالتك أو استفسارك هنايجب ان يكون اكبر من 10 احرف"
-      rows={4}
-      required
-    />
-  </div>
                 
                 <button 
                   type="submit" 

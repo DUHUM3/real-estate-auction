@@ -1,11 +1,18 @@
+// components/MarketingRequestModal.js
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { marketingApi, validationService } from '../../api/auctionRequestApi';
 import { formHelpers, successHandler } from '../../utils/formHelpers';
-import {locationService} from '../../utils/LocationForFiltters'
-function MarketingRequest() {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState(formHelpers.initialFormData);
+import { locationService } from '../../utils/LocationForFiltters';
+import './MarketingRequestModal.css';
+
+function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
+  const [formData, setFormData] = useState({
+    region: '',
+    city: '',
+    description: '',
+    document_number: '',
+    terms_accepted: false
+  });
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -15,6 +22,7 @@ function MarketingRequest() {
   const [regions, setRegions] = useState([]);
   const [cities, setCities] = useState({});
   const [availableCities, setAvailableCities] = useState([]);
+  const modalRef = useRef(null);
 
   // Initialize regions and cities
   useEffect(() => {
@@ -31,15 +39,103 @@ function MarketingRequest() {
     }
   }, [formData.region, cities]);
 
+  // Close modal when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        handleClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
+
+  const handleClose = () => {
+    if (!loading) {
+      onClose();
+    }
+  };
+
+  const resetForm = () => {
+    setSuccess(false);
+    setFormData({
+      region: '',
+      city: '',
+      description: '',
+      document_number: '',
+      terms_accepted: false
+    });
+    setImages([]);
+    setError(null);
+    setResponseData(null);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const totalImages = images.length + files.length;
+    
+    if (totalImages > 5) {
+      setError('يمكن رفع حتى 5 صور فقط');
+      return;
+    }
+
+    const validFiles = files.filter(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('حجم الصورة يجب أن لا يتجاوز 5MB');
+        return false;
+      }
+      return true;
+    });
+
+    setImages(prev => [...prev, ...validFiles]);
+    setError(null);
+  };
+
+  const removeImage = (index) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     // Validate form
-    const formErrors = validationService.validateForm(formData, images);
-    if (formErrors.length > 0) {
-      setError(formErrors[0]);
+    if (!formData.region || !formData.city || !formData.document_number || !formData.description) {
+      setError('جميع الحقول مطلوبة');
+      return;
+    }
+
+    if (images.length === 0) {
+      setError('يجب رفع صورة واحدة على الأقل');
+      return;
+    }
+
+    if (!formData.terms_accepted) {
+      setError('يجب الموافقة على الشروط والأحكام');
       return;
     }
 
@@ -47,7 +143,6 @@ function MarketingRequest() {
     const token = localStorage.getItem('token');
     if (!token) {
       setError('يجب تسجيل الدخول أولاً');
-      navigate('/login');
       return;
     }
 
@@ -73,6 +168,10 @@ function MarketingRequest() {
       setResponseData(response);
       setSuccess(true);
       
+      if (onSuccess) {
+        onSuccess(response);
+      }
+      
     } catch (err) {
       console.error('❌ خطأ في إنشاء طلب التسويق:', err);
       handleApiError(err);
@@ -87,7 +186,6 @@ function MarketingRequest() {
       if (err.response.status === 401) {
         setError('انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى');
         localStorage.removeItem('token');
-        navigate('/login');
       } else if (err.response.status === 422) {
         setError('بيانات غير صالحة: ' + (err.response.data.message || 'يرجى التحقق من البيانات المدخلة'));
       } else {
@@ -100,323 +198,240 @@ function MarketingRequest() {
     }
   };
 
-  // Reset form for new submission
-  const resetForm = () => {
-    setSuccess(false);
-    setFormData(formHelpers.initialFormData);
-    setImages([]);
-    setError(null);
-  };
-
-  // Loading component
-  if (loading) {
-    return (
-      <div className="elegantLoading_container">
-        <div className="elegantLoader"></div>
-        <p className="elegantLoading_text">جاري إنشاء طلب التسويق...</p>
-      </div>
-    );
-  }
-
-  // Success content
-  const successContent = successHandler.getSuccessContent(responseData);
+  if (!isOpen) return null;
 
   return (
-    <div className="elegantCreate_container">
-      <header className="elegantCreate_header">
-        <button onClick={() => navigate(-1)} className="elegantBack_btn">
-          العودة
-        </button>
-        
-        <div className="elegantHeader_title">
-          <span>طلب تسويق أرض</span>
+    <div className="myads-form-overlay">
+      <div className="myads-form-modal myads-form-stepper" ref={modalRef}>
+        <div className="myads-form-header">
+          <h3>طلب تسويق منتج عقاري</h3>
+          <button 
+            className="myads-close-btn" 
+            onClick={handleClose}
+            disabled={loading}
+          >
+            ✕
+          </button>
         </div>
-      </header>
 
-      <main className="elegantCreate_content">
-        <div className="elegantCreate_card">
-          <div className="elegantCard_title">
-            <span className="elegantCard_icon"></span>
-            <h2>إنشاء طلب تسويق جديد</h2>
+        <div className="form-progress-container">
+          <div className="form-progress-steps">
+            <div className="form-progress-step active">
+              <div className="step-number">1</div>
+              <div className="step-text">بيانات الطلب</div>
+            </div>
+            <div className="form-progress-step">
+              <div className="step-number">2</div>
+              <div className="step-text">المراجعة</div>
+            </div>
+            <div className="form-progress-step">
+              <div className="step-number">3</div>
+              <div className="step-text">الإكمال</div>
+            </div>
           </div>
+        </div>
 
-          {success ? (
-            <SuccessView 
-              successContent={successContent} 
-              onNavigateHome={() => navigate('/land-requests')}
-              onCreateNew={resetForm}
-            />
+        <div className="myads-form-step">
+          {loading ? (
+            <div className="elegantLoading_container">
+              <div className="elegantLoader"></div>
+              <p>جاري إنشاء طلب التسويق...</p>
+            </div>
+          ) : success ? (
+            <div className="form-completion">
+              <div className="form-completion-icon">✓</div>
+              <h3>تم إنشاء الطلب بنجاح</h3>
+              <p>سيتم مراجعة طلبك من قبل الإدارة وسيتم إشعارك بنتيجة المراجعة</p>
+              {responseData && (
+                <div className="request-summary">
+                  <h4>تفاصيل الطلب:</h4>
+                  <div className="summary-grid">
+                    <div className="summary-item">
+                      <strong>رقم الطلب:</strong>
+                      <span>#{responseData.id || '--'}</span>
+                    </div>
+                    <div className="summary-item">
+                      <strong>المنطقة:</strong>
+                      <span>{formData.region}</span>
+                    </div>
+                    <div className="summary-item">
+                      <strong>المدينة:</strong>
+                      <span>{formData.city}</span>
+                    </div>
+                    <div className="summary-item">
+                      <strong>رقم الوثيقة:</strong>
+                      <span>{formData.document_number}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div className="myads-form-actions">
+                <button 
+                  onClick={resetForm} 
+                  className="myads-btn-primary"
+                >
+                  إنشاء طلب جديد
+                </button>
+                <button 
+                  onClick={handleClose} 
+                  className="myads-btn-outline"
+                >
+                  إغلاق
+                </button>
+              </div>
+            </div>
           ) : (
-            <FormView
-              formData={formData}
-              images={images}
-              error={error}
-              regions={regions}
-              availableCities={availableCities}
-              fileInputRef={fileInputRef}
-              onChange={formHelpers.handleInputChange(formData, setFormData)}
-              onImageUpload={formHelpers.handleImageUpload(images, setImages, setError)}
-              onRemoveImage={formHelpers.removeImage(images, setImages)}
-              onSubmit={handleSubmit}
-              onCancel={() => navigate('/land-requests')}
-              loading={loading}
-            />
+            <form onSubmit={handleSubmit} className="myads-form myads-compact-form">
+              <div className="myads-form-grid myads-mobile-grid">
+                {/* المنطقة */}
+                <div className="myads-form-group">
+                  <label htmlFor="region">المنطقة *</label>
+                  <select 
+                    id="region"
+                    name="region"
+                    value={formData.region}
+                    onChange={handleInputChange}
+                    className="myads-form-control"
+                    required
+                  >
+                    <option value="">اختر المنطقة</option>
+                    {regions.map(region => (
+                      <option key={region} value={region}>{region}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* المدينة */}
+                <div className="myads-form-group">
+                  <label htmlFor="city">المدينة *</label>
+                  <select 
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    className="myads-form-control"
+                    disabled={!formData.region}
+                    required
+                  >
+                    <option value="">اختر المدينة</option>
+                    {availableCities.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* رقم الوثيقة */}
+                <div className="myads-form-group">
+                  <label htmlFor="document_number">رقم الوثيقة *</label>
+                  <input
+                    type="text"
+                    id="document_number"
+                    name="document_number"
+                    value={formData.document_number}
+                    onChange={handleInputChange}
+                    className="myads-form-control"
+                    placeholder="أدخل رقم وثيقة الأرض"
+                    required
+                  />
+                </div>
+
+                {/* الوصف */}
+                <div className="myads-form-group full-width">
+                  <label htmlFor="description">الوصف *</label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    className="myads-form-control"
+                    placeholder="أدخل وصف مفصل للأرض... (الموقع، المساحة، الخدمات المتاحة، إلخ)"
+                    rows="4"
+                    required
+                  />
+                </div>
+
+                {/* رفع الصور */}
+                <div className="myads-form-group full-width">
+                  <label>الصور *</label>
+                  <div className="myads-file-input-wrapper">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageUpload}
+                      multiple
+                      accept="image/*"
+                      className="myads-form-control"
+                    />
+                    <small>يمكن رفع حتى 5 صور، الحجم الأقصى 5MB لكل صورة</small>
+                  </div>
+
+                  {images.length > 0 && (
+                    <div className="files-list">
+                      <h4>الصور المرفوعة ({images.length}/5):</h4>
+                      {images.map((image, index) => (
+                        <div key={index} className="file-item">
+                          <div className="file-info">
+                            <span className="file-icon">🖼️</span>
+                            <span className="file-name">{image.name}</span>
+                          </div>
+                          <button
+                            type="button"
+                            className="remove-file"
+                            onClick={() => removeImage(index)}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* الشروط والأحكام */}
+                <div className="myads-form-group full-width">
+                  <label className="myads-checkbox-container">
+                    أوافق على الشروط والأحكام
+                    <input
+                      type="checkbox"
+                      name="terms_accepted"
+                      checked={formData.terms_accepted}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <span className="myads-checkmark"></span>
+                  </label>
+                </div>
+              </div>
+
+              {error && (
+                <div className="error-message">
+                  <span className="error-icon">⚠️</span>
+                  {error}
+                </div>
+              )}
+
+              <div className="myads-form-actions">
+                <button 
+                  type="submit" 
+                  className="myads-btn-primary" 
+                  disabled={loading}
+                >
+                  {loading ? 'جاري الإرسال...' : 'إنشاء طلب التسويق'}
+                </button>
+                <button 
+                  type="button" 
+                  className="myads-btn-outline" 
+                  onClick={handleClose}
+                >
+                  إلغاء
+                </button>
+              </div>
+            </form>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
 
-// Success View Component
-const SuccessView = ({ successContent, onNavigateHome, onCreateNew }) => (
-  <div className="elegantSuccess_message">
-    <div className="elegantSuccess_icon"></div>
-    <div className="elegantSuccess_content">
-      <h3 className="elegantSuccess_title">{successContent?.title}</h3>
-      <p className="elegantSuccess_text">{successContent?.message}</p>
-      
-      {successContent?.summary && (
-        <div className="elegantRequest_summary">
-          <h4>تفاصيل الطلب:</h4>
-          <div className="elegantSummary_grid">
-            <div className="elegantSummary_item">
-              <strong>رقم الطلب:</strong>
-              <span>#{successContent.summary.id}</span>
-            </div>
-            <div className="elegantSummary_item">
-              <strong>المنطقة:</strong>
-              <span>{successContent.summary.region}</span>
-            </div>
-            <div className="elegantSummary_item">
-              <strong>المدينة:</strong>
-              <span>{successContent.summary.city}</span>
-            </div>
-            <div className="elegantSummary_item">
-              <strong>رقم الوثيقة:</strong>
-              <span>{successContent.summary.document_number}</span>
-            </div>
-            <div className="elegantSummary_item">
-              <strong>الحالة:</strong>
-              <span className={`elegantStatus_badge ${successContent.summary.status === 'under_review' ? 'elegantStatus_review' : ''}`}>
-                {successContent.summary.status_ar}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-    <div className="elegantSuccess_actions">
-      <button onClick={onNavigateHome} className="elegantCancel_btn">
-        العودة للقائمة الرئيسية
-      </button>
-      <button onClick={onCreateNew} className="elegantSubmit_btn">
-        إنشاء طلب جديد
-      </button>
-    </div>
-  </div>
-);
-
-// Form View Component
-const FormView = ({
-  formData,
-  images,
-  error,
-  regions,
-  availableCities,
-  fileInputRef,
-  onChange,
-  onImageUpload,
-  onRemoveImage,
-  onSubmit,
-  onCancel,
-  loading
-}) => (
-  <form onSubmit={onSubmit} className="elegantCreate_form">
-    <div className="elegantForm_rows">
-      <div className="elegantForm_row">
-        <FormSelect
-          id="region"
-          name="region"
-          label="المنطقة:"
-          value={formData.region}
-          onChange={onChange}
-          options={regions}
-          placeholder="اختر المنطقة"
-          required
-        />
-        
-        <FormSelect
-          id="city"
-          name="city"
-          label="المدينة:"
-          value={formData.city}
-          onChange={onChange}
-          options={availableCities}
-          placeholder="اختر المدينة"
-          disabled={!formData.region}
-          required
-        />
-
-        <FormInput
-          id="document_number"
-          name="document_number"
-          type="text"
-          label="رقم الوثيقة:"
-          value={formData.document_number}
-          onChange={onChange}
-          placeholder="أدخل رقم وثيقة الأرض"
-          required
-        />
-      </div>
-
-      <div className="elegantForm_row">
-        <FormTextarea
-          id="description"
-          name="description"
-          label="الوصف:"
-          value={formData.description}
-          onChange={onChange}
-          placeholder="أدخل وصف مفصل للأرض... (الموقع، المساحة، الخدمات المتاحة، إلخ)"
-          rows="5"
-          required
-        />
-      </div>
-
-      <div className="elegantForm_row">
-        <ImageUploadSection
-          images={images}
-          fileInputRef={fileInputRef}
-          onImageUpload={onImageUpload}
-          onRemoveImage={onRemoveImage}
-        />
-      </div>
-    </div>
-
-    {error && (
-      <div className="elegantError_message">
-        <span className="elegantError_icon">⚠️</span>
-        {error}
-      </div>
-    )}
-
-    <div className="elegantForm_actions">
-      <button type="submit" className="elegantSubmit_btn" disabled={loading}>
-        {loading ? 'جاري الإرسال...' : 'إنشاء طلب التسويق'}
-      </button>
-      <button type="button" className="elegantCancel_btn" onClick={onCancel}>
-        إلغاء
-      </button>
-    </div>
-  </form>
-);
-
-// Reusable Form Components
-const FormSelect = ({ id, name, label, value, onChange, options, placeholder, disabled, required }) => (
-  <div className="elegantForm_group">
-    <label htmlFor={id} className="elegantForm_label">
-      <span className="elegantForm_label_icon"></span>
-      {label}
-    </label>
-    <select 
-      id={id}
-      name={name}
-      value={value}
-      onChange={onChange}
-      className="elegantForm_select"
-      disabled={disabled}
-      required={required}
-    >
-      <option value="">{placeholder}</option>
-      {options.map(option => (
-        <option key={option} value={option}>{option}</option>
-      ))}
-    </select>
-  </div>
-);
-
-const FormInput = ({ id, name, type, label, value, onChange, placeholder, required }) => (
-  <div className="elegantForm_group">
-    <label htmlFor={id} className="elegantForm_label">
-      <span className="elegantForm_label_icon"></span>
-      {label}
-    </label>
-    <input
-      type={type}
-      id={id}
-      name={name}
-      value={value}
-      onChange={onChange}
-      className="elegantForm_input"
-      placeholder={placeholder}
-      required={required}
-    />
-  </div>
-);
-
-const FormTextarea = ({ id, name, label, value, onChange, placeholder, rows, required }) => (
-  <div className="elegantForm_group elegantForm_fullRow">
-    <label htmlFor={id} className="elegantForm_label">
-      <span className="elegantForm_label_icon"></span>
-      {label}
-    </label>
-    <textarea
-      id={id}
-      name={name}
-      value={value}
-      onChange={onChange}
-      className="elegantForm_textarea"
-      placeholder={placeholder}
-      rows={rows}
-      required={required}
-    />
-  </div>
-);
-
-const ImageUploadSection = ({ images, fileInputRef, onImageUpload, onRemoveImage }) => (
-  <div className="elegantForm_group elegantForm_fullRow">
-    <label className="elegantForm_label">
-      <span className="elegantForm_label_icon"></span>
-      الصور:
-    </label>
-    
-    <div className="elegantUpload_section">
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={onImageUpload}
-        multiple
-        accept="image/*"
-        className="elegantFile_input"
-        id="imageUpload"
-      />
-      <label htmlFor="imageUpload" className="elegantUpload_btn">
-        <span>اختر الصور</span>
-      </label>
-      <span className="elegantUpload_hint">(يمكن رفع حتى 5 صور، الحجم الأقصى 5MB لكل صورة)</span>
-    </div>
-
-    {images.length > 0 && (
-      <div className="elegantFiles_list">
-        <h4>الصور المرفوعة ({images.length}/5):</h4>
-        {images.map((image, index) => (
-          <div key={index} className="elegantFile_item">
-            <div className="elegantFile_info">
-              <span className="elegantFile_icon">🖼️</span>
-              <span className="elegantFile_name">{image.name}</span>
-            </div>
-            <button
-              type="button"
-              className="elegantRemove_file"
-              onClick={() => onRemoveImage(index)}
-            >
-              ✕
-            </button>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
-
-export default MarketingRequest;
+export default MarketingRequestModal;
