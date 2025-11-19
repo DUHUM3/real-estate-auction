@@ -5,29 +5,21 @@ import { ModalContext } from '../../App';
 import {
   FaMapMarkerAlt,
   FaRulerCombined,
-  FaMoneyBillWave,
   FaHeart,
   FaShare,
   FaArrowLeft,
   FaCalendarAlt,
   FaBuilding,
-  FaClock,
   FaExpand,
   FaArrowRight,
   FaArrowLeft as FaLeft,
-  FaPhone,
-  FaEnvelope,
-  FaUser,
   FaTimes,
-  FaFileAlt,
   FaPaperPlane,
   FaEdit,
   FaExclamationCircle,
   FaCheckCircle,
-  FaSearch,
   FaHandshake,
-  FaCity,
-  FaStickyNote
+  FaCity
 } from 'react-icons/fa';
 import '../../styles/PropertyDetailsModal.css';
 
@@ -373,10 +365,10 @@ const LandRequestDetails = () => {
     <div className="elegantDetails_container">
       {/* Header */}
       <div className="elegantDetails_header">
-        <button onClick={() => navigate(-1)} className="elegantBack_btn">
+        {/* <button onClick={() => navigate(-1)} className="elegantBack_btn">
           <FaArrowLeft />
           العودة
-        </button>
+        </button> */}
         <div className="elegantHeader_actions">
           <button 
             className={`elegantFavorite_btn ${isFavorite ? 'elegantActive' : ''}`}
@@ -445,93 +437,94 @@ const LandRequestDetails = () => {
       )}
 
       {/* Main Content */}
-      <div className="elegantDetails_content">
-        {/* Title and Basic Info */}
-        <div className="elegantTitle_section">
-          <h1>طلب أرض #{request.id}</h1>
-          <div className={`elegantStatus_badge ${getStatusClass(request.status)}`}>
-            {getStatusLabel(request.status)}
-          </div>
+   {/* Main Content */}
+<div className="elegantDetails_content">
+  {/* العنوان أولاً */}
+  <div className="elegantTitle_section">
+    <h1>طلب أرض #{request.id}</h1>
+    <div className={`elegantStatus_badge ${getStatusClass(request.status)}`}>
+      {getStatusLabel(request.status)}
+    </div>
+  </div>
+
+  {/* الوصف مباشرة تحت العنوان بدون عنوان */}
+  <div className="elegantDescription_section">
+    <p>{request.description}</p>
+  </div>
+
+  {/* التاريخ */}
+  <div className="elegantDate_section">
+    {/* <FaCalendarAlt className="elegantSection_icon" /> */}
+    <span>تاريخ الإنشاء: {request.created_at}</span>
+  </div>
+
+  {/* الموقع */}
+  <div className="elegantLocation_section">
+    <FaMapMarkerAlt className="elegantSection_icon" />
+    <div className="elegantLocation_info">
+      <h3>الموقع</h3>
+      <p>{request.region} - {request.city}</p>
+    </div>
+  </div>
+
+  {/* تفاصيل الطلب */}
+  <div className="elegantSpecs_section">
+    <h3>تفاصيل الطلب</h3>
+    <div className="elegantSpecs_grid">
+      <div className="elegantSpec_item">
+        <FaHandshake />
+        <div>
+          <span className="elegantSpec_label">الغرض</span>
+          <span className="elegantSpec_value">{getPurposeLabel(request.purpose)}</span>
         </div>
-
-        {/* Creation Date */}
-        <div className="elegantDate_section">
-          <FaCalendarAlt className="elegantSection_icon" />
-          <span>تاريخ الإنشاء: {request.created_at}</span>
-        </div>
-
-        {/* Location */}
-        <div className="elegantLocation_section">
-          <FaMapMarkerAlt className="elegantSection_icon" />
-          <div className="elegantLocation_info">
-            <h3>الموقع</h3>
-            <p>{request.region} - {request.city}</p>
-          </div>
-        </div>
-
-        {/* Specifications */}
-        <div className="elegantSpecs_section">
-          <h3>تفاصيل الطلب</h3>
-          <div className="elegantSpecs_grid">
-            <div className="elegantSpec_item">
-              <FaHandshake />
-              <div>
-                <span className="elegantSpec_label">الغرض</span>
-                <span className="elegantSpec_value">{getPurposeLabel(request.purpose)}</span>
-              </div>
-            </div>
-            <div className="elegantSpec_item">
-              <FaBuilding />
-              <div>
-                <span className="elegantSpec_label">النوع</span>
-                <span className="elegantSpec_value">{getTypeLabel(request.type)}</span>
-              </div>
-            </div>
-            <div className="elegantSpec_item">
-              <FaRulerCombined />
-              <div>
-                <span className="elegantSpec_label">المساحة المطلوبة</span>
-                <span className="elegantSpec_value">{formatPrice(request.area)} م²</span>
-              </div>
-            </div>
-            <div className="elegantSpec_item">
-              <FaCity />
-              <div>
-                <span className="elegantSpec_label">المدينة</span>
-                <span className="elegantSpec_value">{request.city}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Description */}
-        <div className="elegantDescription_section">
-          <h3>الوصف</h3>
-          <p>{request.description}</p>
-        </div>
-
-        {/* Offer Button */}
-        {request.status === 'open' && (
-          <div className="elegantInterest_section" id="offer">
-            <button 
-              className="elegantInterest_btn" 
-              onClick={handleShowOfferForm}
-            >
-              تقديم عرض
-            </button>
-          </div>
-        )}
-
-        {/* Closed Message */}
-        {request.status !== 'open' && (
-          <div className="elegantClosed_message">
-            <div className="elegantClosed_icon">🔒</div>
-            <p className="elegantClosed_text">
-              هذا الطلب {request.status === 'closed' ? 'مغلق' : 'مكتمل'} ولا يمكن تقديم عروض جديدة
-            </p>
-          </div>
-        )}
       </div>
+      <div className="elegantSpec_item">
+        <FaBuilding />
+        <div>
+          <span className="elegantSpec_label">النوع</span>
+          <span className="elegantSpec_value">{getTypeLabel(request.type)}</span>
+        </div>
+      </div>
+      <div className="elegantSpec_item">
+        <FaRulerCombined />
+        <div>
+          <span className="elegantSpec_label">المساحة المطلوبة</span>
+          <span className="elegantSpec_value">{formatPrice(request.area)} م²</span>
+        </div>
+      </div>
+      <div className="elegantSpec_item">
+        <FaCity />
+        <div>
+          <span className="elegantSpec_label">المدينة</span>
+          <span className="elegantSpec_value">{request.city}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* باقي الأقسام تبقى كما هي */}
+  {/* Offer Button */}
+  {request.status === 'open' && (
+    <div className="elegantInterest_section" id="offer">
+      <button 
+        className="elegantInterest_btn" 
+        onClick={handleShowOfferForm}
+      >
+        تقديم عرض
+      </button>
+    </div>
+  )}
+
+  {/* Closed Message */}
+  {request.status !== 'open' && (
+    <div className="elegantClosed_message">
+      <div className="elegantClosed_icon">🔒</div>
+      <p className="elegantClosed_text">
+        هذا الطلب {request.status === 'closed' ? 'مغلق' : 'مكتمل'} ولا يمكن تقديم عروض جديدة
+      </p>
+    </div>
+  )}
+</div>
 
       {/* Offer Form Modal */}
       {showOfferForm && (

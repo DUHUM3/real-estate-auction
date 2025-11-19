@@ -1,7 +1,6 @@
 import { 
   FaHome, 
   FaFacebookF, 
-  FaTwitter, 
   FaInstagram, 
   FaLinkedinIn,
   FaPhone,
@@ -47,13 +46,16 @@ import {
   FaImage,
   FaEye,
   FaPaperPlane,
+  FaTwitter,
+  FaYoutube,
+  FaTiktok,
+  FaSnapchatGhost
 } from 'react-icons/fa';
 
 // اصدر كل الأيقونات في object واحد
 const Icons = {
   FaHome, 
   FaFacebookF, 
-  FaTwitter, 
   FaInstagram, 
   FaLinkedinIn,
   FaPhone,
@@ -102,6 +104,10 @@ const Icons = {
   FaTimes,
   FaEye,
   FaPaperPlane,
+  FaTwitter,
+  FaYoutube,
+  FaTiktok,
+  FaSnapchatGhost
 };
 
 export default Icons;

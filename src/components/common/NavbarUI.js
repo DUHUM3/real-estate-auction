@@ -204,13 +204,14 @@ const renderNotifications = () => (
         الاراضي والمزادات
       </Link>
 
-      <button 
-        className="nav-link"
-        onClick={handleCreateRequest}
-      >
-        <Icons.FaUser className="link-icon" />
-        طلبات الشراء
-      </button>
+     <Link 
+  to="/purchase-requests"
+  className={`nav-link ${isActive('/purchase-requests') ? 'active' : ''}`}
+  onClick={handleCreateRequest}
+>
+  <Icons.FaUser className="link-icon" />
+  طلبات الشراء و الاستثمار
+</Link>
       
       <button 
         className="nav-link"
@@ -403,13 +404,15 @@ const renderNotifications = () => (
             الاراضي والمزادات
           </Link>
 
-          <button 
-            className="mobile-nav-link"
-            onClick={handleCreateRequest}
-          >
-            <Icons.FaUser className="link-icon" />
-            طلبات الشراء
-          </button>
+         <Link 
+  to="/purchase-requests"
+  className={`mobile-nav-link ${isActive('/purchase-requests') ? 'active' : ''}`}
+  onClick={handleCreateRequest}
+>
+  <Icons.FaUser className="link-icon" />
+  طلبات الشراء و الاستثمار
+</Link>
+
           
           <button 
             className="mobile-nav-link"
@@ -433,8 +436,8 @@ const renderNotifications = () => (
           {/* الشعار */}
           <div className="logo-section">
             <Link to="/" className="nav-logo" onClick={handleCloseMenu}>
-              <img src="images/logo3.png" alt="Logo" className="logo-image" />
-              <img src="images/text.png" alt="Logo" className="logo-image" />
+              <img src="/images/logo3.webp" alt="Logo" className="logo-image" />
+              <img src="/images/text.webp" alt="Logo" className="logo-image" />
             </Link>
           </div>
 

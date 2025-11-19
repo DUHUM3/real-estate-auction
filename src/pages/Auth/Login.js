@@ -4,41 +4,80 @@ import { useAuth } from '../../context/AuthContext';
 import { authApi } from '../../api/authApi';
 import '../../styles/AuthModal.css';
 
-// ✅ استيراد الأيقونات الاحترافية
+import toast from 'react-hot-toast';
+
 import { FiMail, FiLock, FiEye, FiEyeOff, FiX } from 'react-icons/fi';
-import { AiOutlineLogin } from 'react-icons/ai';
 
 function Login({ onClose, onSwitchToRegister }) {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+
+  const [fieldErrors, setFieldErrors] = useState({
+    email: '',
+    password: ''
+  });
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
-    setError('');
+
+    setFieldErrors({
+      ...fieldErrors,
+      [name]: ''
+    });
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
+  // دالة التحقق من الإيميل
+  const isValidEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const validateFields = () => {
+    let errors = {};
+
+    // فحص الإيميل
+    if (!formData.email.trim()) {
+      errors.email = "الرجاء إدخال البريد الإلكتروني";
+    } else if (!isValidEmail(formData.email.trim())) {
+      errors.email = "صيغة البريد الإلكتروني غير صحيحة يجب ان يكون @gmail.com";
+    }
+
+    // فحص كلمة المرور
+    if (!formData.password.trim()) {
+      errors.password = "الرجاء إدخال كلمة المرور";
+    } else if (formData.password.length < 6) {
+      errors.password = "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateFields()) return;
+
     setLoading(true);
-    setError('');
 
     try {
-      // استخدام الـ API المنفصل
       const data = await authApi.login(formData.email, formData.password);
 
       const userData = {
@@ -55,10 +94,21 @@ function Login({ onClose, onSwitchToRegister }) {
 
       login(userData);
       if (onClose) onClose();
-      
+
     } catch (error) {
-      setError(error.message || 'حدث خطأ في الاتصال بالخادم');
-      console.error('Login error:', error);
+      if (
+        error.message?.includes("incorrect") ||
+        error.message?.includes("invalid") ||
+        error.message?.includes("password") ||
+        error.message?.includes("email")
+      ) {
+        setFieldErrors({
+          email: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+          password: "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+        });
+      } else {
+        toast.error(error.message || "حدث خطأ في الاتصال بالخادم");
+      }
     } finally {
       setLoading(false);
     }
@@ -80,11 +130,11 @@ function Login({ onClose, onSwitchToRegister }) {
         </div>
 
         <div className="auth-content">
-          {/* قسم الشعار */}
+
           <div className="auth-hero-section">
             <div className="logo-container">
               <img
-                src="/images/logo2.png"
+                src="/images/logo2.webp"
                 alt="منصة الاراضي السعودية"
                 className="auth-logo"
               />
@@ -93,46 +143,40 @@ function Login({ onClose, onSwitchToRegister }) {
             <div className="auth-divider"></div>
           </div>
 
-          {/* خيارات التسجيل */}
           <div className="auth-options">
-            <button className="auth-option-btn active">
-              تسجيل الدخول
-            </button>
-            <button
-              className="auth-option-btn"
-              onClick={onSwitchToRegister}
-            >
+            <button className="auth-option-btn active">تسجيل الدخول</button>
+            <button className="auth-option-btn" onClick={onSwitchToRegister}>
               حساب جديد
             </button>
           </div>
 
-          {/* عرض رسالة الخطأ */}
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
           {/* نموذج تسجيل الدخول */}
           <form onSubmit={handleSubmit} className="auth-form">
+
+            {/* البريد الإلكتروني */}
             <div className="form-group">
               <label className="form-label">البريد الإلكتروني</label>
               <div className="input-with-icon">
                 <input
-                  type="email"
+                  type="text"
                   name="email"
                   placeholder="example@email.com"
                   value={formData.email}
                   onChange={handleChange}
-                  required
-                  className="form-input"
+                  className={`form-input ${fieldErrors.email ? "input-error" : ""}`}
                   disabled={loading}
                 />
               </div>
+
+              {fieldErrors.email && (
+                <p className="field-error-text">{fieldErrors.email}</p>
+              )}
             </div>
 
+            {/* كلمة المرور */}
             <div className="form-group password-group">
               <label className="form-label">كلمة المرور</label>
+
               <div className="password-input-container">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -140,10 +184,10 @@ function Login({ onClose, onSwitchToRegister }) {
                   placeholder="........."
                   value={formData.password}
                   onChange={handleChange}
-                  required
-                  className="form-input password-input"
+                  className={`form-input password-input ${fieldErrors.password ? "input-error" : ""}`}
                   disabled={loading}
                 />
+
                 <button
                   type="button"
                   className="password-toggle-btn"
@@ -153,6 +197,10 @@ function Login({ onClose, onSwitchToRegister }) {
                   {showPassword ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
+
+              {fieldErrors.password && (
+                <p className="field-error-text">{fieldErrors.password}</p>
+              )}
             </div>
 
             <button
@@ -160,7 +208,7 @@ function Login({ onClose, onSwitchToRegister }) {
               className="btn-login-submit"
               disabled={loading}
             >
-              {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
+              {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
             </button>
           </form>
         </div>

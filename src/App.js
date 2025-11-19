@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast'; // ✅ تم إضافة Toaster
 
 // استيراد المكونات
 import Navbar from './components/common/Navbar';
@@ -86,11 +87,15 @@ function App() {
   };
 
   return (
+    // ✅ تم نقل Toaster إلى المكان الصحيح داخل return
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ModalContext.Provider value={modalContextValue}>
           <Router>
             <div className="App">
+              {/* ✅ إضافة Toaster هنا */}
+              <Toaster position="top-center" />
+              
               {/* شريط التنقل الرئيسي */}
               <Navbar onLoginClick={openLogin} onRegisterClick={openRegister} />
               
@@ -104,7 +109,7 @@ function App() {
                   <Route path="/create-lands" element={<Createland />} />
                   
                   {/* صفحات طلبات الأراضي */}
-                  <Route path="/land-requests" element={<LandRequestsList />} />
+                  <Route path="/purchase-requests" element={<LandRequestsList />} />
                   <Route path="/requests/:id" element={<LandRequestDetails />} />
                   <Route path="/create-request" element={<CreateLandRequest />} />
                   

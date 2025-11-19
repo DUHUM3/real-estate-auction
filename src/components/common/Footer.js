@@ -1,6 +1,7 @@
 import React from 'react';
 import '../../styles/Footer.css';
 import Icons from '../../icons';
+import { FaXTwitter } from "react-icons/fa6"; // 🟢 أيقونة X الرسمية
 
 function Footer() {
   return (
@@ -12,20 +13,21 @@ function Footer() {
             <div className="logo-icon">
               <Icons.FaHome />
             </div>
-            <span className="logo-text">شاهين بلاس</span>
+            <span className="logo-text">شاهين بلس</span>
           </div>
+
           <div className="social-links">
-            <a href="#" className="social-link" aria-label="Facebook">
-              <Icons.FaFacebookF />
+            <a href="#" className="social-link" aria-label="X">
+              <FaXTwitter />
             </a>
-            <a href="#" className="social-link" aria-label="Twitter">
-              <Icons.FaTwitter />
+            <a href="#" className="social-link" aria-label="YouTube">
+              <Icons.FaYoutube />
             </a>
-            <a href="#" className="social-link" aria-label="Instagram">
-              <Icons.FaInstagram />
+            <a href="#" className="social-link" aria-label="TikTok">
+              <Icons.FaTiktok />
             </a>
-            <a href="#" className="social-link" aria-label="LinkedIn">
-              <Icons.FaLinkedinIn />
+            <a href="#" className="social-link" aria-label="Snapchat">
+              <Icons.FaSnapchatGhost />
             </a>
           </div>
         </div>
@@ -33,7 +35,7 @@ function Footer() {
         {/* المحتوى الرئيسي */}
         <div className="footer-content">
           <p className="footer-description">
-            منصة مزادات الاراضي الرائدة في المملكة العربية السعودية.
+            اول منصة متخصصة في عرض واستثمار الارضي وعرض المزادات .
           </p>
 
           {/* معلومات الاتصال مضغوطة */}

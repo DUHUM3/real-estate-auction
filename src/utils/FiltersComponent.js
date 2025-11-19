@@ -203,6 +203,8 @@ const FiltersComponent = ({
       <div className="shahinFilters_row">
         {/* تم إزالة RegionCity من هنا */}
 
+<RegionCity />
+
         <div className="shahinFilter_group">
           <label>البحث في المزادات</label>
           <input

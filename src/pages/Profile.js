@@ -260,7 +260,7 @@ function Profile() {
           </div>
         </div>
 
-        <div className="profile-actions">
+        {/* <div className="profile-actions">
           {!isEditing ? (
             <button className="edit-btn" onClick={() => setIsEditing(true)}>
               <FiEdit2 />
@@ -278,7 +278,7 @@ function Profile() {
               </button>
             </div>
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* بطاقة الإحصائيات */}

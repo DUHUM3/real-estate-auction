@@ -228,6 +228,7 @@
   background: var(--background-white);
   max-width: 1200px;
   margin: 0 auto;
+  margin-top: 50px;
 }
 
 .elegantTitle_section {
@@ -291,14 +292,14 @@
 }
 
 .elegantLocation_info h3 {
-  font-size: 1rem;
+  font-size: 1.3rem;
   margin-bottom: 4px;
   color: var(--primary-color);
   font-weight: 600;
 }
 
 .elegantLocation_info p {
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   margin-bottom: 4px;
   color: var(--text-color);
 }
@@ -319,9 +320,10 @@
 .elegantAdditional_section h3 {
   font-size: 1.1rem;
   margin-bottom: 12px;
-  color: var(--primary-color);
+  color: var(--primary-color); /* اللون الأزرق */
   font-weight: 600;
 }
+
 
 .elegantSpecs_grid {
   display: grid;
@@ -352,17 +354,26 @@
 
 .elegantSpec_label {
   display: block;
-  font-size: 0.7rem;
-  color: var(--text-light);
+  font-size: 1rem;
+  color: var(--primary-color); /* اللون الأسود */
   margin-bottom: 2px;
+  font-weight: 700;
 }
+
 
 .elegantSpec_value {
   display: block;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--primary-color);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-color); /* اللون الأزرق */
 }
+
+.elegantDetail_value {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--primary-color); /* اللون الأزرق */
+}
+
 
 .elegantTotal_price {
   grid-column: span 2;
@@ -412,8 +423,9 @@
 .elegantDetail_label {
   display: block;
   font-size: 0.7rem;
-  color: var(--text-light);
+  color: var(--text-color); /* اللون الأسود */
   margin-bottom: 4px;
+  font-weight: 500; /* يمكن جعله عريض قليلاً */
 }
 
 .elegantDetail_value {
@@ -557,7 +569,7 @@
 }
 
 .elegantSubmit_btn:hover:not(:disabled) {
-  background: #3a8bc8;
+  background: #53a1dd;
 }
 
 .elegantSubmit_btn:disabled {
@@ -811,5 +823,120 @@
   .elegantThumbnail {
     flex: 0 0 70px;
     height: 70px;
+  }
+}
+/* ===== حاوية الحالة ===== */
+.elegantStatus_container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* الشارة الأساسية */
+.elegantStatus_badge {
+  padding: 8px 14px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: #ffffff; /* أبيض أساسي */
+  border: 1px solid #e5e7eb; /* رمادي خفيف جدًا */
+  color: #4b5563; /* رمادي ناعم */
+}
+
+/* حالة متاحة */
+.elegantStatus_badge.active,
+.elegantStatus_badge.available,
+.elegantStatus_badge.مفتوح {
+  background: #f9fef9; /* أخضر باهت جدًا */
+  border-color: #d7f5df;
+  color: #4d7c57; /* أخضر ناعم */
+}
+
+/* حالة معلقة */
+.elegantStatus_badge.pending,
+.elegantStatus_badge.reserved,
+.elegantStatus_badge.معلق {
+  background: #fffaf3; /* أصفر باهت جدًا */
+  border-color: #f5e7c8;
+  color: #9c7a3c; /* أصفر ناعم */
+}
+
+/* حالة مغلقة */
+.elegantStatus_badge.closed,
+.elegantStatus_badge.sold,
+.elegantStatus_badge.مغلق {
+  background: #fff6f6; /* أحمر فاتح جدًا */
+  border-color: #f3d3d3;
+  color: #9b4242; /* أحمر غامق ناعم */
+}
+
+/* ===== شارة التوثيق ===== */
+.elegantVerification_indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff; /* أبيض أساسي */
+  color: #4b5563;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* ظل هادئ جدًا */
+}
+
+/* أيقونة التوثيق */
+.elegantVerification_indicator svg {
+  font-size: 1.1rem;
+  color: #10b981;     /* أخضر واضح للأيقونة */
+  flex-shrink: 0;
+}
+
+/* تحسين النص */
+.elegantVerification_indicator span {
+  font-weight: 700;
+}
+
+/* ===== استجابة الهواتف ===== */
+@media (max-width: 480px) {
+  .elegantStatus_badge {
+    font-size: 0.85rem;
+    padding: 7px 12px;
+  }
+  .elegantVerification_indicator {
+    font-size: 0.8rem;
+    padding: 7px 12px;
+  }
+
+  /* 🔥 تصغير الأيقونات فقط على الهاتف */
+  .elegantStatus_badge svg,
+  .elegantVerification_indicator svg {
+    font-size: 0.9rem !important;  /* أصغر من الحجم العادي */
+  }
+}
+
+/* ===== الشاشات المتوسطة ===== */
+@media (min-width: 768px) {
+  .elegantStatus_badge {
+    font-size: 1rem;
+    padding: 10px 18px;
+  }
+  .elegantVerification_indicator {
+    font-size: 0.9rem;
+    padding: 9px 16px;
+  }
+}
+
+/* ===== الشاشات الكبيرة ===== */
+@media (min-width: 1024px) {
+  .elegantStatus_badge {
+    font-size: 1.05rem;
+    padding: 12px 22px;
+  }
+  .elegantVerification_indicator {
+    font-size: 1rem;
+    padding: 10px 18px;
   }
 }

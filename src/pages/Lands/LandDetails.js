@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ModalContext } from '../../App'; 
+import { toast, Toaster } from 'react-hot-toast';
 
 import {
   FaMapMarkerAlt,
@@ -18,7 +19,9 @@ import {
   FaPhone,
   FaEnvelope,
   FaUser,
-  FaTimes
+  FaTimes,
+  FaCheckCircle, // إضافة هذه الأيقونة
+  FaFileContract // إضافة هذه الأيقونة
 } from 'react-icons/fa';
 import '../../styles/PropertyDetailsModal.css';
 
@@ -57,6 +60,26 @@ const PropertyDetailsPage = () => {
     }
   }, [id, type]);
 
+  // دالة لعرض رسائل الخطأ من API
+  const showApiError = (errorObj) => {
+    if (typeof errorObj === 'string') {
+      toast.error(errorObj);
+    } else if (errorObj.message) {
+      toast.error(errorObj.message);
+    } else if (errorObj.details) {
+      toast.error(errorObj.details);
+    } else if (errorObj.error) {
+      toast.error(errorObj.error);
+    } else {
+      toast.error('حدث خطأ غير متوقع');
+    }
+  };
+
+  // دالة لعرض رسائل النجاح
+  const showApiSuccess = (message) => {
+    toast.success(message);
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -79,7 +102,8 @@ const PropertyDetailsPage = () => {
       });
       
       if (!response.ok) {
-        throw new Error('فشل في جلب البيانات');
+        const errorData = await response.json();
+        throw errorData;
       }
 
       const result = await response.json();
@@ -92,83 +116,110 @@ const PropertyDetailsPage = () => {
       
       setLoading(false);
     } catch (error) {
-      setError(error.message);
+      setError(error.message || 'فشل في جلب البيانات');
+      showApiError(error);
       setLoading(false);
     }
   };
 
   const checkFavoriteStatus = async () => {
-  try {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // إذا لم يكن هناك token، استخدم localStorage فقط
+        const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
+        setIsFavorite(favorites.includes(parseInt(id)));
+        return;
+      }
+
+      // إذا كان هناك token، تحقق من السيرفر
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+
+      const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/${type}/${id}`, {
+        method: 'GET',
+        headers: headers
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setIsFavorite(result.isFavorite || false);
+      } else {
+        // Fallback إلى localStorage إذا فشل الطلب
+        const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
+        setIsFavorite(favorites.includes(parseInt(id)));
+      }
+    } catch (error) {
+      console.error('خطأ في التحقق من المفضلة:', error);
+      // Fallback إلى localStorage
+      const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
+      setIsFavorite(favorites.includes(parseInt(id)));
+    }
+  };
+
+  const toggleFavorite = async () => {
     const token = localStorage.getItem('token');
+    
     if (!token) {
       // إذا لم يكن هناك token، استخدم localStorage فقط
       const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-      setIsFavorite(favorites.includes(parseInt(id)));
+      let newFavorites;
+
+      if (isFavorite) {
+        newFavorites = favorites.filter(favId => favId !== parseInt(id));
+        showApiSuccess('تم إزالة العقار من المفضلة');
+      } else {
+        newFavorites = [...favorites, parseInt(id)];
+        showApiSuccess('تم إضافة العقار إلى المفضلة');
+      }
+
+      localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
+      setIsFavorite(!isFavorite);
       return;
     }
 
-    // إذا كان هناك token، تحقق من السيرفر
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
+    try {
+      // إذا كان هناك token، استخدم الـ API
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
 
-    const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/${type}/${id}`, {
-      method: 'GET',
-      headers: headers
-    });
+      const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/${type}/${id}`, {
+        method: isFavorite ? 'DELETE' : 'POST',
+        headers: headers
+      });
 
-    if (response.ok) {
-      const result = await response.json();
-      setIsFavorite(result.isFavorite || false);
-    } else {
-      // Fallback إلى localStorage إذا فشل الطلب
-      const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-      setIsFavorite(favorites.includes(parseInt(id)));
-    }
-  } catch (error) {
-    console.error('خطأ في التحقق من المفضلة:', error);
-    // Fallback إلى localStorage
-    const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-    setIsFavorite(favorites.includes(parseInt(id)));
-  }
-};
+      if (response.ok) {
+        setIsFavorite(!isFavorite);
+        
+        if (isFavorite) {
+          showApiSuccess('تم إزالة العقار من المفضلة');
+        } else {
+          showApiSuccess('تم إضافة العقار إلى المفضلة');
+        }
+        
+        // تحديث localStorage أيضاً للحفاظ على التزامن
+        const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
+        let newFavorites;
 
-const toggleFavorite = async () => {
-  const token = localStorage.getItem('token');
-  
-  if (!token) {
-    // إذا لم يكن هناك token، استخدم localStorage فقط
-    const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-    let newFavorites;
+        if (isFavorite) {
+          newFavorites = favorites.filter(favId => favId !== parseInt(id));
+        } else {
+          newFavorites = [...favorites, parseInt(id)];
+        }
 
-    if (isFavorite) {
-      newFavorites = favorites.filter(favId => favId !== parseInt(id));
-    } else {
-      newFavorites = [...favorites, parseInt(id)];
-    }
-
-    localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
-    setIsFavorite(!isFavorite);
-    return;
-  }
-
-  try {
-    // إذا كان هناك token، استخدم الـ API
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-
-    const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/${type}/${id}`, {
-      method: isFavorite ? 'DELETE' : 'POST',
-      headers: headers
-    });
-
-    if (response.ok) {
-      setIsFavorite(!isFavorite);
-      
-      // تحديث localStorage أيضاً للحفاظ على التزامن
+        localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
+      } else {
+        const errorData = await response.json();
+        throw errorData;
+      }
+    } catch (error) {
+      console.error('خطأ في تحديث المفضلة:', error);
+      showApiError(error);
+      // Fallback إلى localStorage
       const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
       let newFavorites;
 
@@ -179,25 +230,9 @@ const toggleFavorite = async () => {
       }
 
       localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
-    } else {
-      throw new Error('فشل في تحديث المفضلة');
+      setIsFavorite(!isFavorite);
     }
-  } catch (error) {
-    console.error('خطأ في تحديث المفضلة:', error);
-    // Fallback إلى localStorage
-    const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-    let newFavorites;
-
-    if (isFavorite) {
-      newFavorites = favorites.filter(favId => favId !== parseInt(id));
-    } else {
-      newFavorites = [...favorites, parseInt(id)];
-    }
-
-    localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
-    setIsFavorite(!isFavorite);
-  }
-};
+  };
 
   // Share Function - تم التعديل هنا
   const shareItem = () => {
@@ -214,7 +249,7 @@ const toggleFavorite = async () => {
       navigator.share(shareData).catch(console.error);
     } else {
       navigator.clipboard.writeText(currentUrl);
-      alert('تم نسخ الرابط للمشاركة!');
+      showApiSuccess('تم نسخ الرابط للمشاركة!');
     }
   };
 
@@ -278,9 +313,8 @@ const toggleFavorite = async () => {
     }
     return images;
   };
-  
 
-const handleShowInterestForm = () => {
+  const handleShowInterestForm = () => {
     const token = localStorage.getItem('token');
     console.log('التحقق من token في handleShowInterestForm:', token);
     
@@ -319,84 +353,92 @@ const handleShowInterestForm = () => {
     }));
   };
   
-function handleSubmit(e) {
-  e.preventDefault();
+  const validateForm = () => {
+    if (formData.message.trim().length < 10) {
+      showApiError("الرسالة يجب أن تكون أكثر من 10 أحرف");
+      return false;
+    }
+    return true;
+  };
 
-  if (formData.message.trim().length < 10) {
-    alert("الرسالة يجب أن تكون أكثر من 10 أحرف");
-    return;
-  }
-
-  // تابع الإرسال هنا
-  console.log("تم الإرسال:", formData);
-}
-
-const handleSubmitInterest = async (e) => {
-  e.preventDefault();
-  setSubmitting(true);
-  setSubmitResult(null);
-  
-  try {
-    const requestData = {
-      message: formData.message
-    };
+  const handleSubmitInterest = async (e) => {
+    e.preventDefault();
     
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-
-    // الحصول على الـ token وإضافته في كل عملية
-    const token = localStorage.getItem('token');
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    // التحقق من صحة النموذج
+    if (!validateForm()) {
+      return;
     }
 
-    console.log('إرسال البيانات:', requestData);
-    console.log('الـ Token المستخدم:', token ? 'موجود' : 'غير موجود');
+    setSubmitting(true);
+    setSubmitResult(null);
+    
+    try {
+      const requestData = {
+        message: formData.message
+      };
+      
+      const headers = {
+        'Content-Type': 'application/json',
+      };
 
-    // استخدام الرابط الجديد
-    const response = await fetch(`https://shahin-tqay.onrender.com/api/properties/${id}/interest`, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(requestData),
-    });
-    
-    const result = await response.json();
-    console.log('استجابة السيرفر:', result);
-    
-    if (response.ok && result.success) {
-      setSubmitResult({
-        success: true,
-        message: result.message || 'تم إرسال طلب الاهتمام بنجاح'
-      });
-      setFormData({
-        full_name: '',
-        phone: '',
-        email: '',
-        message: ''
+      // الحصول على الـ token وإضافته في كل عملية
+      const token = localStorage.getItem('token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      console.log('إرسال البيانات:', requestData);
+      console.log('الـ Token المستخدم:', token ? 'موجود' : 'غير موجود');
+
+      // استخدام الرابط الجديد
+      const response = await fetch(`https://shahin-tqay.onrender.com/api/properties/${id}/interest`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(requestData),
       });
       
-      setTimeout(() => {
-        setShowInterestForm(false);
-      }, 3000);
-    } else {
-      // عرض رسالة الخطأ من الـ backend بشكل مباشر
+      const result = await response.json();
+      console.log('استجابة السيرفر:', result);
+      
+      if (response.ok && result.success) {
+        const successMessage = result.message || 'تم إرسال طلب الاهتمام بنجاح';
+        setSubmitResult({
+          success: true,
+          message: successMessage
+        });
+        showApiSuccess(successMessage);
+        
+        setFormData({
+          full_name: '',
+          phone: '',
+          email: '',
+          message: ''
+        });
+        
+        setTimeout(() => {
+          setShowInterestForm(false);
+        }, 3000);
+      } else {
+        // عرض رسالة الخطأ من الـ backend بشكل مباشر
+        const errorMessage = result.message || result.error || 'حدث خطأ أثناء إرسال الطلب';
+        setSubmitResult({
+          success: false,
+          message: errorMessage
+        });
+        showApiError(result);
+      }
+    } catch (error) {
+      console.error('خطأ في الاتصال:', error);
+      const errorMessage = 'حدث خطأ في الاتصال بالخادم';
       setSubmitResult({
         success: false,
-        message: result.message || result.error || 'حدث خطأ أثناء إرسال الطلب'
+        message: errorMessage
       });
+      showApiError(errorMessage);
+    } finally {
+      setSubmitting(false);
     }
-  } catch (error) {
-    console.error('خطأ في الاتصال:', error);
-    setSubmitResult({
-      success: false,
-      message: 'حدث خطأ في الاتصال بالخادم'
-    });
-  } finally {
-    setSubmitting(false);
-  }
-};
-
+  };
 
   if (loading) {
     return (
@@ -429,6 +471,37 @@ const handleSubmitInterest = async (e) => {
 
   return (
     <div className="elegantDetails_container">
+      {/* إضافة Toaster هنا */}
+    <Toaster
+  position="top-center"
+  reverseOrder={false}
+  toastOptions={{
+    duration: 4000,
+    style: {
+      background: '#fff', // تغيير الخلفية إلى الأبيض
+      color: '#000', // تغيير لون النص إلى الأسود
+      direction: 'rtl',
+      fontFamily: 'Arial, sans-serif',
+      border: '1px solid #e0e0e0', // إضافة حدود فاتحة
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', // إضافة ظل
+    },
+    success: {
+      duration: 3000,
+      iconTheme: {
+        primary: '#22c55e', // لون أيقونة النجاح
+        secondary: '#fff', // لون أيقونة النجاح
+      },
+    },
+    error: {
+      duration: 5000,
+      iconTheme: {
+        primary: '#ef4444', // لون أيقونة الخطأ
+        secondary: '#fff', // لون أيقونة الخطأ
+      },
+    },
+  }}
+/>
+
       {/* Header - تم التعديل هنا */}
       <div className="elegantDetails_header">
         <button className="elegantBack_btn" onClick={handleBack}>
@@ -510,16 +583,39 @@ const handleSubmitInterest = async (e) => {
       </div>
 
       {/* Main Content */}
-      <div className="elegantDetails_content">
-        {/* Title and Basic Info */}
-        <div className="elegantTitle_section">
-          <h1>{type === 'land' ? data.title : cleanText(data.title)}</h1>
-          <div className={`elegantStatus_badge ${data.status?.toLowerCase()}`}>
-            {data.status}
-          </div>
+   <div className="elegantDetails_content">
+  {/* العنوان أولاً */}
+  <div className="elegantTitle_section">
+    <h1>{type === 'land' ? data.title : cleanText(data.title)}</h1>
+    <div className="elegantStatus_container">
+      <div className={`elegantStatus_badge ${data.status?.toLowerCase()}`}>
+        {data.status}
+      </div>
+      {/* إشارة التوثيق - تظهر فقط إذا كان هناك deed_number */}
+      {type === 'land' && data.deed_number && (
+        <div className="elegantVerification_indicator" title="موثق برقم صك">
+          <FaCheckCircle />
+          <span>موثق</span>
+        </div>
+      )}
+    </div>
+  </div>
+
+        {/* الوصف مباشرة تحت العنوان بدون عنوان */}
+        <div className="elegantDescription_section">
+          <p>{type === 'land' ? data.description : cleanText(data.description)}</p>
         </div>
 
-        {/* Location */}
+        {/* التاريخ */}
+        <div className="elegantDate_section">
+          <span>
+            {type === 'land' 
+              ? `تاريخ الإنشاء: ${formatDate(data.created_at)}`
+              : `تاريخ المزاد: ${formatDate(data.auction_date)}`}
+          </span>
+        </div>
+
+        {/* الموقع */}
         <div className="elegantLocation_section">
           <FaMapMarkerAlt className="elegantSection_icon" />
           <div className="elegantLocation_info">
@@ -529,15 +625,15 @@ const handleSubmitInterest = async (e) => {
                 ? `${data.region} - ${data.city}`
                 : cleanText(data.address)}
             </p>
-            {type === 'land' && data.geo_location_text && (
+            {/* {type === 'land' && data.geo_location_text && (
               <span className="elegantLocation_detail">{data.geo_location_text}</span>
-            )}
+            )} */}
           </div>
         </div>
 
-        {/* Specifications */}
+        {/* المواصفات */}
         <div className="elegantSpecs_section">
-          <h3>المواصفات</h3>
+          <h3>{type === 'land' ? 'تفاصيل العقار' : 'تفاصيل المزاد'}</h3>
           <div className="elegantSpecs_grid">
             {type === 'land' ? (
               <>
@@ -591,13 +687,6 @@ const handleSubmitInterest = async (e) => {
                   </div>
                 </div>
                 <div className="elegantSpec_item">
-                  <FaCalendarAlt />
-                  <div>
-                    <span className="elegantSpec_label">تاريخ المزاد</span>
-                    <span className="elegantSpec_value">{formatDate(data.auction_date)}</span>
-                  </div>
-                </div>
-                <div className="elegantSpec_item">
                   <FaClock />
                   <div>
                     <span className="elegantSpec_label">وقت البدء</span>
@@ -609,38 +698,20 @@ const handleSubmitInterest = async (e) => {
           </div>
         </div>
 
-        {/* Description */}
-        <div className="elegantDescription_section">
-          <h3>الوصف</h3>
-          <p>{type === 'land' ? data.description : cleanText(data.description)}</p>
-        </div>
-
-        {/* Additional Details */}
+        {/* تفاصيل إضافية للأراضي فقط */}
         {type === 'land' && (
           <div className="elegantAdditional_section">
             <h3>تفاصيل إضافية</h3>
             <div className="elegantAdditional_grid">
               <div className="elegantDetail_item">
-                <span className="elegantDetail_label">رقم الصك</span>
-                <span className="elegantDetail_value">{data.deed_number}</span>
-              </div>
-              <div className="elegantDetail_item">
                 <span className="elegantDetail_label">رقم الإعلان</span>
                 <span className="elegantDetail_value">{data.announcement_number}</span>
-              </div>
-              <div className="elegantDetail_item">
-                <span className="elegantDetail_label">رقم الوكالة</span>
-                <span className="elegantDetail_value">{data.agency_number}</span>
-              </div>
-              <div className="elegantDetail_item">
-                <span className="elegantDetail_label">الإقرار القانوني</span>
-                <span className="elegantDetail_value">{data.legal_declaration}</span>
               </div>
             </div>
           </div>
         )}
         
-        {/* Interest Button */}
+        {/* زر تقديم الاهتمام للأراضي فقط */}
         {type === 'land' && (
           <div className="elegantInterest_section">
             <button 
@@ -708,10 +779,7 @@ const handleSubmitInterest = async (e) => {
                 )}
               </div>
             ) : (
-              <form onSubmit={(e) => {
-                handleSubmitInterest(e);
-                handleSubmit(e);
-              }}>
+              <form onSubmit={handleSubmitInterest}>
                 <div className="elegantForm_group">
                   <label>
                     <span>رسالة</span>
