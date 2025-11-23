@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Icons from '../icons/index';
 import { MdClose } from 'react-icons/md';
 import { propertiesApi, propertiesUtils } from '../api/propertiesApi';
 import { auctionsApi, auctionsUtils } from '../api/auctionApi';
 import FiltersComponent from '../utils/FiltersComponent';
+import { ModalContext } from '../App';
+import { toast, Toaster } from 'react-hot-toast'; // إضافة Toaster
 import '../styles/PropertyList.css';
 
 const PropertiesPage = () => {
@@ -12,6 +14,7 @@ const PropertiesPage = () => {
   const navigate = useNavigate();
   const filterBarRef = useRef(null);
   const lastScrollTop = useRef(0);
+  const { openLogin } = useContext(ModalContext);
 
   // States
   const [state, setState] = useState({
@@ -84,6 +87,161 @@ const PropertiesPage = () => {
   const getCurrentFilters = () => state.activeTab === 'lands' ? landFilters : auctionFilters;
   const getCurrentFilterHandler = () => state.activeTab === 'lands' ? handleLandFilterChange : handleAuctionFilterChange;
   const getFilterOptions = () => state.activeTab === 'lands' ? { regions, landTypes, purposes } : { auctionStatuses };
+
+  /**
+   * دالة الحصول على نص زر الإنشاء
+   */
+  const getCreateButtonText = () => {
+    const userType = localStorage.getItem('user_type');
+    switch(userType) {
+      case 'مالك أرض':
+        return 'إنشاء أرض';
+      case 'وكيل عقارات':
+        return 'إنشاء أرض';
+      case 'شركة مزادات':
+        return 'إنشاء مزاد';
+      default:
+        return 'إنشاء جديد ';
+    }
+  };
+
+  /**
+   * دالة التحقق من صلاحية المستخدم للإنشاء
+   */
+  const canUserCreate = () => {
+    const userType = localStorage.getItem('user_type');
+    const allowedTypes = ['مالك أرض', 'وكيل عقارات', 'شركة مزادات'];
+    return allowedTypes.includes(userType);
+  };
+
+  /**
+   * دالة الحصول على رسالة الخطأ للصلاحيات
+   */
+  const getPermissionErrorMessage = () => {
+    const userType = localStorage.getItem('user_type');
+    switch(userType) {
+      case 'مستخدم عام':
+        return 'عذراً، المستخدم العام لا يمكنه إنشاء عقارات أو مزادات. يمكنك إنشاء طلب شراء بدلاً من ذلك.';
+      default:
+        return 'عذراً، ليس لديك صلاحية إنشاء عقارات أو مزادات.';
+    }
+  };
+
+  /**
+   * دالة إنشاء جديد حسب نوع المستخدم مع التحقق من الصلاحيات
+   */
+  const handleCreateNew = () => {
+    const token = localStorage.getItem('token');
+    const userType = localStorage.getItem('user_type');
+    
+    console.log('التحقق من صلاحيات المستخدم:', { token, userType });
+
+    // إذا لم يكن مسجل دخول
+    if (!token) {
+      console.log('المستخدم غير مسجل الدخول - فتح نافذة تسجيل الدخول');
+      openLogin(() => {
+        // بعد تسجيل الدخول، التحقق من الصلاحيات مرة أخرى
+        const newUserType = localStorage.getItem('user_type');
+        if (canUserCreate()) {
+          proceedWithCreation(newUserType);
+        } else {
+          showPermissionError();
+        }
+      });
+      return;
+    }
+
+    // إذا كان مسجل دخول ولكن ليس لديه صلاحية
+    if (!canUserCreate()) {
+      showPermissionError();
+      return;
+    }
+
+    // إذا كان مسجل دخول وله صلاحية
+    proceedWithCreation(userType);
+  };
+
+  /**
+   * المتابعة في عملية الإنشاء بعد التحقق من الصلاحيات
+   */
+  const proceedWithCreation = (userType) => {
+    console.log('المستخدم له صلاحية - المتابعة في الإنشاء:', userType);
+    
+    switch(userType) {
+      case 'مالك أرض':
+        navigate('/create-property');
+        break;
+      case 'وكيل عقارات':
+        navigate('/create-property');
+        break;
+      case 'شركة مزادات':
+        navigate('/create-auction');
+        break;
+      default:
+        // هذا الحالة يجب ألا تحدث لأننا تحققنا من الصلاحيات مسبقاً
+        showPermissionError();
+        break;
+    }
+  };
+
+  /**
+   * عرض رسالة خطأ الصلاحيات باستخدام Toaster
+   */
+  const showPermissionError = () => {
+    const errorMessage = getPermissionErrorMessage();
+    
+    // استخدام toast.error لعرض رسالة الخطأ
+    toast.error(errorMessage, {
+      duration: 5000,
+      position: 'top-center',
+    });
+    
+    // للمستخدم العام، نقترح عليه إنشاء طلب شراء بعد 3 ثواني
+    const userType = localStorage.getItem('user_type');
+    if (userType === 'مستخدم عام') {
+      setTimeout(() => {
+        toast((t) => (
+          <div style={{ textAlign: 'right', direction: 'rtl' }}>
+            <p style={{ margin: '0 0 10px 0' }}>هل تريد إنشاء طلب شراء بدلاً من ذلك؟</p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button 
+                onClick={() => {
+                  navigate('/create-ad');
+                  toast.dismiss(t.id);
+                }}
+                style={{
+                  padding: '5px 15px',
+                  backgroundColor: '#22c55e',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                نعم
+              </button>
+              <button 
+                onClick={() => toast.dismiss(t.id)}
+                style={{
+                  padding: '5px 15px',
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                لا
+              </button>
+            </div>
+          </div>
+        ), {
+          duration: 8000,
+          position: 'top-center',
+        });
+      }, 2000);
+    }
+  };
 
   // API Functions
   const fetchFavorites = async () => {
@@ -240,7 +398,7 @@ const PropertiesPage = () => {
       } else {
         // Fallback إلى نسخ النص
         navigator.clipboard.writeText(shareText + " " + shareUrl)
-          .then(() => alert("تم نسخ الرابط للمشاركة!"))
+          .then(() => toast.success("تم نسخ الرابط للمشاركة!"))
           .catch(err => console.error('فشل نسخ النص: ', err));
       }
     } catch (error) {
@@ -258,12 +416,12 @@ const PropertiesPage = () => {
         : `${window.location.origin}/lands/${item.id}/auction`;
       
       navigator.clipboard.writeText(shareText + " " + shareUrl)
-        .then(() => alert("تم نسخ الرابط للمشاركة!"))
+        .then(() => toast.success("تم نسخ الرابط للمشاركة!"))
         .catch(err => console.error('فشل نسخ النص: ', err));
     }
   };
 
-  // Navigation Handlers - تم التعديل هنا فقط
+  // Navigation Handlers
   const openDetails = (item, itemType) => {
     // استخدام الروابط الجديدة
     if (itemType === 'land') {
@@ -468,6 +626,39 @@ const PropertiesPage = () => {
 
   return (
     <div className="shahinProperties_container">
+      {/* إضافة Toaster للإشعارات */}
+   <Toaster
+  position="top-center"
+  reverseOrder={false}
+  toastOptions={{
+    duration: 4000,
+    style: {
+      background: '#fff',
+      color: '#000',
+      direction: 'rtl',
+      fontFamily: 'Arial, sans-serif',
+      border: '1px solid #e0e0e0',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+      zIndex: 999999,   // ← أهم سطر لكي يظهر فوق كل شيء
+    },
+    success: {
+      duration: 3000,
+      iconTheme: {
+        primary: '#22c55e',
+        secondary: '#fff',
+      },
+    },
+    error: {
+      duration: 5000,
+      iconTheme: {
+        primary: '#ef4444',
+        secondary: '#fff',
+      },
+    },
+  }}
+/>
+
+
       {/* Search and Filter Bar */}
       <div className={`shahinSearch_filter ${state.hideFilterBar ? 'shahinHideFilter' : ''}`} ref={filterBarRef}>
         <div className="shahinSearch_bar">
@@ -481,6 +672,17 @@ const PropertiesPage = () => {
               onChange={getCurrentFilterHandler()}
             />
           </div>
+          
+          {/* زر الإنشاء الجديد */}
+          <button
+            className="shahinFilter_toggle"
+            onClick={handleCreateNew}
+            title={getCreateButtonText()}
+          >
+            <Icons.FaPlus className="shahinCreate_icon" />
+            <span>{getCreateButtonText()}</span>
+          </button>
+
           <button
             className="shahinFilter_toggle"
             onClick={() => window.innerWidth < 768 ? 

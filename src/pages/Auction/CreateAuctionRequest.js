@@ -1,11 +1,25 @@
-// components/MarketingRequestModal.js
+// CreateAuctionRequest.js
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  FaArrowRight, 
+  FaCheck, 
+  FaExclamationTriangle, 
+  FaUpload, 
+  FaTimes,
+  FaMapMarkerAlt,
+  FaFileAlt,
+  FaImage,
+  FaPlus,
+  FaHome
+} from 'react-icons/fa';
 import { marketingApi, validationService } from '../../api/auctionRequestApi';
 import { formHelpers, successHandler } from '../../utils/formHelpers';
 import { locationService } from '../../utils/LocationForFiltters';
 import './MarketingRequestModal.css';
 
-function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
+function CreateAuctionRequest() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     region: '',
     city: '',
@@ -22,7 +36,9 @@ function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
   const [regions, setRegions] = useState([]);
   const [cities, setCities] = useState({});
   const [availableCities, setAvailableCities] = useState([]);
-  const modalRef = useRef(null);
+  const [imagesPreviews, setImagesPreviews] = useState([]);
+  const [formTouched, setFormTouched] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   // Initialize regions and cities
   useEffect(() => {
@@ -34,42 +50,44 @@ function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
   useEffect(() => {
     if (formData.region && cities[formData.region]) {
       setAvailableCities(cities[formData.region]);
+      
+      // اختيار أول مدينة افتراضيا إذا تم اختيار منطقة جديدة
+      if (!formData.city && cities[formData.region].length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          city: cities[formData.region][0]
+        }));
+      }
     } else {
       setAvailableCities([]);
+      setFormData(prev => ({
+        ...prev,
+        city: ''
+      }));
     }
   }, [formData.region, cities]);
 
-  // Close modal when clicking outside
+  // إنشاء معاينات للصور المختارة
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        handleClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.body.style.overflow = 'hidden';
+    const previews = [];
+    images.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previews.push({
+          file: file,
+          preview: e.target.result
+        });
+        if (previews.length === images.length) {
+          setImagesPreviews([...previews]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    
+    if (images.length === 0) {
+      setImagesPreviews([]);
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
-  // Reset form when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      resetForm();
-    }
-  }, [isOpen]);
-
-  const handleClose = () => {
-    if (!loading) {
-      onClose();
-    }
-  };
+  }, [images]);
 
   const resetForm = () => {
     setSuccess(false);
@@ -81,8 +99,10 @@ function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
       terms_accepted: false
     });
     setImages([]);
+    setImagesPreviews([]);
     setError(null);
     setResponseData(null);
+    setFormTouched(false);
   };
 
   const handleInputChange = (e) => {
@@ -91,10 +111,15 @@ function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    setFormTouched(true);
   };
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
+    processSelectedImages(files);
+  };
+
+  const processSelectedImages = (files) => {
     const totalImages = images.length + files.length;
     
     if (totalImages > 5) {
@@ -103,6 +128,12 @@ function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
     }
 
     const validFiles = files.filter(file => {
+      const isValidType = /^image\/(jpeg|jpg|png|gif|webp)$/i.test(file.type);
+      if (!isValidType) {
+        setError('يجب أن تكون الملفات صوراً من نوع JPEG، PNG، أو WebP فقط');
+        return false;
+      }
+      
       if (file.size > 5 * 1024 * 1024) {
         setError('حجم الصورة يجب أن لا يتجاوز 5MB');
         return false;
@@ -110,12 +141,37 @@ function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
       return true;
     });
 
-    setImages(prev => [...prev, ...validFiles]);
-    setError(null);
+    if (validFiles.length > 0) {
+      setImages(prev => [...prev, ...validFiles]);
+      setError(null);
+      setFormTouched(true);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      processSelectedImages(files);
+    }
   };
 
   const removeImage = (index) => {
     setImages(prev => prev.filter((_, i) => i !== index));
+    setImagesPreviews(prev => prev.filter((_, i) => i !== index));
+    setFormTouched(true);
   };
 
   // Form submission handler
@@ -167,10 +223,7 @@ function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
       console.log('✅ تم إنشاء طلب التسويق:', response);
       setResponseData(response);
       setSuccess(true);
-      
-      if (onSuccess) {
-        onSuccess(response);
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       
     } catch (err) {
       console.error('❌ خطأ في إنشاء طلب التسويق:', err);
@@ -186,6 +239,7 @@ function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
       if (err.response.status === 401) {
         setError('انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى');
         localStorage.removeItem('token');
+        navigate('/login');
       } else if (err.response.status === 422) {
         setError('بيانات غير صالحة: ' + (err.response.data.message || 'يرجى التحقق من البيانات المدخلة'));
       } else {
@@ -198,53 +252,91 @@ function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
     }
   };
 
-  if (!isOpen) return null;
+  const handleBack = () => {
+    if (formTouched && !success) {
+      if (window.confirm('هل أنت متأكد من إلغاء الطلب؟ سيتم فقدان جميع البيانات المدخلة.')) {
+        navigate(-1);
+      }
+    } else {
+      navigate(-1);
+    }
+  };
 
+  const handleCreateNew = () => {
+    resetForm();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  // تحديد حالة الزر بناء على البيانات المدخلة
+  const isFormValid = formData.region && formData.city && formData.document_number && 
+                      formData.description && images.length > 0 && formData.terms_accepted;
+  
   return (
-    <div className="myads-form-overlay">
-      <div className="myads-form-modal myads-form-stepper" ref={modalRef}>
-        <div className="myads-form-header">
-          <h3>طلب تسويق منتج عقاري</h3>
-          <button 
-            className="myads-close-btn" 
-            onClick={handleClose}
-            disabled={loading}
-          >
-            ✕
-          </button>
+    <div className="auction-request-container">
+      {/* Header */}
+      <header className="request-header">
+        <div className="request-header-content">
+          <div className="header-left">
+            <button 
+              className="back-button"
+              onClick={handleBack}
+              disabled={loading}
+              aria-label="رجوع"
+            >
+              <FaArrowRight className="back-icon" />
+              <span className="back-text">رجوع</span>
+            </button>
+          </div>
+          
+          <h1 className="header-title">طلب تسويق منتج عقاري</h1>
+          
+          <div className="header-right">
+            <button 
+              className="header-btn outline"
+              onClick={handleBack}
+              disabled={loading}
+            >
+              إلغاء
+            </button>
+          </div>
         </div>
+      </header>
 
-        <div className="form-progress-container">
-          <div className="form-progress-steps">
-            <div className="form-progress-step active">
+      {/* Progress Steps */}
+      <div className="request-progress-container">
+        <div className="request-progress-wrapper">
+          <div className="request-progress-steps">
+            <div className={`progress-step ${!success ? 'active' : 'completed'}`}>
               <div className="step-number">1</div>
               <div className="step-text">بيانات الطلب</div>
             </div>
-            <div className="form-progress-step">
+            <div className={`progress-step ${success ? 'active' : ''}`}>
               <div className="step-number">2</div>
-              <div className="step-text">المراجعة</div>
-            </div>
-            <div className="form-progress-step">
-              <div className="step-number">3</div>
               <div className="step-text">الإكمال</div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="myads-form-step">
+      {/* Main Content */}
+      <main className="request-main-content">
+        <div className="request-container">
           {loading ? (
-            <div className="elegantLoading_container">
-              <div className="elegantLoader"></div>
-              <p>جاري إنشاء طلب التسويق...</p>
+            <div className="request-loading">
+              <div className="loading-spinner"></div>
+              <p className="loading-text">جاري إنشاء طلب التسويق...</p>
             </div>
           ) : success ? (
-            <div className="form-completion">
-              <div className="form-completion-icon">✓</div>
-              <h3>تم إنشاء الطلب بنجاح</h3>
-              <p>سيتم مراجعة طلبك من قبل الإدارة وسيتم إشعارك بنتيجة المراجعة</p>
+            <div className="request-success">
+              <div className="success-icon">
+                <FaCheck />
+              </div>
+              <h2 className="success-title">تم إنشاء الطلب بنجاح</h2>
+              <p className="success-description">سيتم مراجعة طلبك من قبل فريق العمل المختص وسيتم إشعارك بنتيجة المراجعة قريباً</p>
+              
               {responseData && (
-                <div className="request-summary">
-                  <h4>تفاصيل الطلب:</h4>
+                <div className="request-summary-card">
+                  <h3 className="summary-title">تفاصيل الطلب:</h3>
                   <div className="summary-grid">
                     <div className="summary-item">
                       <strong>رقم الطلب:</strong>
@@ -260,178 +352,244 @@ function MarketingRequestModal({ isOpen, onClose, onSuccess }) {
                     </div>
                     <div className="summary-item">
                       <strong>رقم الوثيقة:</strong>
-                      <span>{formData.document_number}</span>
+                      <span dir="ltr">{formData.document_number}</span>
+                    </div>
+                    <div className="summary-item full-width">
+                      <strong>الوصف:</strong>
+                      <span>{formData.description}</span>
+                    </div>
+                    <div className="summary-item full-width">
+                      <strong>المرفقات:</strong>
+                      <span>{images.length} صورة</span>
                     </div>
                   </div>
                 </div>
               )}
-              <div className="myads-form-actions">
+              
+              <div className="success-actions">
                 <button 
-                  onClick={resetForm} 
-                  className="myads-btn-primary"
+                  onClick={handleCreateNew} 
+                  className="btn primary"
                 >
+                  <FaPlus className="btn-icon" />
                   إنشاء طلب جديد
                 </button>
-                <button 
-                  onClick={handleClose} 
-                  className="myads-btn-outline"
+                {/* <button 
+                  onClick={() => navigate('/')} 
+                  className="btn outline"
                 >
-                  إغلاق
-                </button>
+                  <FaHome className="btn-icon" />
+                  العودة للرئيسية
+                </button> */}
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="myads-form myads-compact-form">
-              <div className="myads-form-grid myads-mobile-grid">
-                {/* المنطقة */}
-                <div className="myads-form-group">
-                  <label htmlFor="region">المنطقة *</label>
-                  <select 
-                    id="region"
-                    name="region"
-                    value={formData.region}
-                    onChange={handleInputChange}
-                    className="myads-form-control"
-                    required
-                  >
-                    <option value="">اختر المنطقة</option>
-                    {regions.map(region => (
-                      <option key={region} value={region}>{region}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* المدينة */}
-                <div className="myads-form-group">
-                  <label htmlFor="city">المدينة *</label>
-                  <select 
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className="myads-form-control"
-                    disabled={!formData.region}
-                    required
-                  >
-                    <option value="">اختر المدينة</option>
-                    {availableCities.map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* رقم الوثيقة */}
-                <div className="myads-form-group">
-                  <label htmlFor="document_number">رقم الوثيقة *</label>
-                  <input
-                    type="text"
-                    id="document_number"
-                    name="document_number"
-                    value={formData.document_number}
-                    onChange={handleInputChange}
-                    className="myads-form-control"
-                    placeholder="أدخل رقم وثيقة الأرض"
-                    required
-                  />
-                </div>
-
-                {/* الوصف */}
-                <div className="myads-form-group full-width">
-                  <label htmlFor="description">الوصف *</label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    className="myads-form-control"
-                    placeholder="أدخل وصف مفصل للأرض... (الموقع، المساحة، الخدمات المتاحة، إلخ)"
-                    rows="4"
-                    required
-                  />
-                </div>
-
-                {/* رفع الصور */}
-                <div className="myads-form-group full-width">
-                  <label>الصور *</label>
-                  <div className="myads-file-input-wrapper">
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleImageUpload}
-                      multiple
-                      accept="image/*"
-                      className="myads-form-control"
-                    />
-                    <small>يمكن رفع حتى 5 صور، الحجم الأقصى 5MB لكل صورة</small>
-                  </div>
-
-                  {images.length > 0 && (
-                    <div className="files-list">
-                      <h4>الصور المرفوعة ({images.length}/5):</h4>
-                      {images.map((image, index) => (
-                        <div key={index} className="file-item">
-                          <div className="file-info">
-                            <span className="file-icon">🖼️</span>
-                            <span className="file-name">{image.name}</span>
-                          </div>
-                          <button
-                            type="button"
-                            className="remove-file"
-                            onClick={() => removeImage(index)}
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
+            <form onSubmit={handleSubmit} className="request-form">
+              <div className="form-card">
+                <div className="form-section">
+                  <h3 className="section-title">
+                    {/* <FaMapMarkerAlt className="section-icon" /> */}
+                    المعلومات الأساسية
+                  </h3>
+                  <div className="form-grid">
+                    {/* المنطقة */}
+                    <div className="form-group">
+                      <label htmlFor="region">المنطقة <span className="required">*</span></label>
+                      <select 
+                        id="region"
+                        name="region"
+                        value={formData.region}
+                        onChange={handleInputChange}
+                        className="form-control"
+                        required
+                      >
+                        <option value="" disabled>اختر المنطقة</option>
+                        {regions.map(region => (
+                          <option key={region} value={region}>{region}</option>
+                        ))}
+                      </select>
                     </div>
-                  )}
+
+                    {/* المدينة */}
+                    <div className="form-group">
+                      <label htmlFor="city">المدينة <span className="required">*</span></label>
+                      <select 
+                        id="city"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        className="form-control"
+                        disabled={!formData.region}
+                        required
+                      >
+                        <option value="" disabled>اختر المدينة</option>
+                        {availableCities.map(city => (
+                          <option key={city} value={city}>{city}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* رقم الوثيقة */}
+                    <div className="form-group">
+                      <label htmlFor="document_number">رقم الوثيقة <span className="required">*</span></label>
+                      <input
+                        type="text"
+                        id="document_number"
+                        name="document_number"
+                        value={formData.document_number}
+                        onChange={handleInputChange}
+                        className="form-control"
+                        placeholder="أدخل رقم وثيقة العقار"
+                        required
+                        dir="ltr"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* الشروط والأحكام */}
-                <div className="myads-form-group full-width">
-                  <label className="myads-checkbox-container">
-                    أوافق على الشروط والأحكام
-                    <input
-                      type="checkbox"
-                      name="terms_accepted"
-                      checked={formData.terms_accepted}
+                <div className="form-section">
+                  <h3 className="section-title">
+                    {/* <FaFileAlt className="section-icon" /> */}
+                    تفاصيل الطلب
+                  </h3>
+                  <div className="form-group">
+                    <label htmlFor="description">الوصف <span className="required">*</span></label>
+                    <textarea
+                      id="description"
+                      name="description"
+                      value={formData.description}
                       onChange={handleInputChange}
+                      className="form-control"
+                      placeholder="أدخل وصف مفصل للعقار... (الموقع، المساحة، المميزات، الخدمات المتاحة، إلخ)"
+                      rows="5"
                       required
                     />
-                    <span className="myads-checkmark"></span>
-                  </label>
+                    <small className="input-hint">أدخل وصفاً تفصيلياً للعقار لزيادة فرص التسويق الناجح.</small>
+                  </div>
                 </div>
-              </div>
 
-              {error && (
-                <div className="error-message">
-                  <span className="error-icon">⚠️</span>
-                  {error}
+                <div className="form-section">
+                  <h3 className="section-title">
+                    {/* <FaImage className="section-icon" /> */}
+                    المرفقات
+                  </h3>
+                  <div className="form-group">
+                    <label>
+                      صور العقار <span className="required">*</span>
+                      <span className="count-badge">{images.length}/5</span>
+                    </label>
+                    
+                    {/* منطقة السحب والإفلات */}
+                    <div 
+                      className={`dropzone ${dragging ? 'dragging' : ''}`} 
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                    >
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                        multiple
+                        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                        className="file-input"
+                        aria-label="اختيار صور العقار"
+                      />
+                      
+                      <div className="dropzone-content">
+                        <div className="upload-icon">
+                          <FaUpload />
+                        </div>
+                        <div className="upload-text">
+                          <p>اسحب الصور وأفلتها هنا، أو انقر للاختيار</p>
+                          <small>الحد الأقصى: 5 صور، حجم كل صورة لا يتجاوز 5MB</small>
+                        </div>
+                      </div>
+                    </div>
+
+                    {imagesPreviews.length > 0 && (
+                      <div className="image-previews">
+                        {imagesPreviews.map((image, index) => (
+                          <div key={index} className="image-preview-item">
+                            <div className="preview-container">
+                              <img src={image.preview} alt={`صورة ${index + 1}`} className="preview-image" />
+                              <button
+                                type="button"
+                                className="remove-image"
+                                onClick={() => removeImage(index)}
+                                aria-label="حذف الصورة"
+                              >
+                                <FaTimes />
+                              </button>
+                              <div className="image-details">
+                                <span className="image-name">{image.file.name.length > 15 ? 
+                                  image.file.name.substring(0, 12) + '...' + image.file.name.substring(image.file.name.lastIndexOf('.')) : 
+                                  image.file.name
+                                }</span>
+                                <span className="image-size">{(image.file.size / (1024 * 1024)).toFixed(2)} MB</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
 
-              <div className="myads-form-actions">
-                <button 
-                  type="submit" 
-                  className="myads-btn-primary" 
-                  disabled={loading}
-                >
-                  {loading ? 'جاري الإرسال...' : 'إنشاء طلب التسويق'}
-                </button>
-                <button 
-                  type="button" 
-                  className="myads-btn-outline" 
-                  onClick={handleClose}
-                >
-                  إلغاء
-                </button>
+                <div className="form-section terms-section">
+                  <div className="form-group">
+                    <div className="checkbox-wrapper">
+                      <label className="checkbox-container">
+                        <input
+                          type="checkbox"
+                          name="terms_accepted"
+                          checked={formData.terms_accepted}
+                          onChange={handleInputChange}
+                          required
+                        />
+                        <span className="checkmark"></span>
+                        <span className="checkbox-text">
+                          أوافق على <a href="#" className="terms-link">الشروط والأحكام</a> الخاصة بتسويق المنتجات العقارية
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="error-message">
+                    <FaExclamationTriangle className="error-icon" />
+                    <span className="error-text">{error}</span>
+                  </div>
+                )}
+
+                <div className="form-actions">
+                  <button 
+                    type="submit" 
+                    className={`btn primary large ${!isFormValid ? 'disabled' : ''}`}
+                    disabled={loading || !isFormValid}
+                  >
+                    <span className="btn-text">
+                      {loading ? 'جاري الإرسال...' : 'إنشاء طلب التسويق'}
+                    </span>
+                  </button>
+                  {/* <button 
+                    type="button" 
+                    className="btn outline large" 
+                    onClick={handleBack}
+                    disabled={loading}
+                  >
+                    إلغاء
+                  </button> */}
+                </div>
               </div>
             </form>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
 
-export default MarketingRequestModal;
+export default CreateAuctionRequest;

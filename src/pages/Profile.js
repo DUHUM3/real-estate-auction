@@ -80,7 +80,7 @@ function Profile() {
       try {
         setStatsLoading(true);
         const token = localStorage.getItem('token');
-        const response = await fetch('https://shahin-tqay.onrender.com/api/user/properties /stats', {
+        const response = await fetch('https://shahin-tqay.onrender.com/api/user/properties/stats', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -100,6 +100,18 @@ function Profile() {
 
     fetchUserStats();
   }, []);
+
+  /**
+   * التحقق مما إذا كان يجب عرض الإحصائيات
+   * إخفاء الإحصائيات عن المستخدم العام وشركة المزادات
+   */
+  const shouldShowStats = () => {
+    if (!apiData) return false;
+    
+    const userType = apiData.user.user_type;
+    // إخفاء الإحصائيات عن المستخدم العام وشركة المزادات
+    return userType !== 'مستخدم عام' && userType !== 'شركة مزادات';
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -281,72 +293,74 @@ function Profile() {
         </div> */}
       </div>
 
-      {/* بطاقة الإحصائيات */}
-      <div className="stats-section">
-        <h3 className="section-title">
-          <FiHome className="title-icon" />
-          إحصائيات الاراضي
-        </h3>
-        {statsLoading ? (
-          <div className="stats-loading">
-            <div className="loading-spinner"></div>
-            <span>جاري التحميل...</span>
-          </div>
-        ) : stats ? (
-          <div className="stats-grid">
-            <div className="stat-item">
-              <div className="stat-icon total">
-                <FiHome />
+      {/* بطاقة الإحصائيات - تظهر فقط للمستخدمين المسموح لهم */}
+      {shouldShowStats() && (
+        <div className="stats-section">
+          <h3 className="section-title">
+            <FiHome className="title-icon" />
+            إحصائيات الاراضي
+          </h3>
+          {statsLoading ? (
+            <div className="stats-loading">
+              <div className="loading-spinner"></div>
+              <span>جاري التحميل...</span>
+            </div>
+          ) : stats ? (
+            <div className="stats-grid">
+              <div className="stat-item">
+                <div className="stat-icon total">
+                  <FiHome />
+                </div>
+                <div className="stat-content">
+                  <span className="stat-number">{stats.total}</span>
+                  <span className="stat-label">الإجمالي</span>
+                </div>
               </div>
-              <div className="stat-content">
-                <span className="stat-number">{stats.total}</span>
-                <span className="stat-label">الإجمالي</span>
+              <div className="stat-item">
+                <div className="stat-icon pending">
+                  <FiClock />
+                </div>
+                <div className="stat-content">
+                  <span className="stat-number">{stats.under_review}</span>
+                  <span className="stat-label">قيد المراجعة</span>
+                </div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-icon approved">
+                  <FiCheckCircle />
+                </div>
+                <div className="stat-content">
+                  <span className="stat-number">{stats.approved}</span>
+                  <span className="stat-label">معتمدة</span>
+                </div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-icon rejected">
+                  <FiXCircle />
+                </div>
+                <div className="stat-content">
+                  <span className="stat-number">{stats.rejected}</span>
+                  <span className="stat-label">مرفوضة</span>
+                </div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-icon sold">
+                  <FiDollarSign />
+                </div>
+                <div className="stat-content">
+                  <span className="stat-number">{stats.sold}</span>
+                  <span className="stat-label">تم بيعها</span>
+                </div>
               </div>
             </div>
-            <div className="stat-item">
-              <div className="stat-icon pending">
-                <FiClock />
-              </div>
-              <div className="stat-content">
-                <span className="stat-number">{stats.under_review}</span>
-                <span className="stat-label">قيد المراجعة</span>
-              </div>
+          ) : (
+            <div className="stats-error">
+              <FiXCircle />
+              <span>تعذر تحميل الإحصائيات</span>
             </div>
-            <div className="stat-item">
-              <div className="stat-icon approved">
-                <FiCheckCircle />
-              </div>
-              <div className="stat-content">
-                <span className="stat-number">{stats.approved}</span>
-                <span className="stat-label">معتمدة</span>
-              </div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-icon rejected">
-                <FiXCircle />
-              </div>
-              <div className="stat-content">
-                <span className="stat-number">{stats.rejected}</span>
-                <span className="stat-label">مرفوضة</span>
-              </div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-icon sold">
-                <FiDollarSign />
-              </div>
-              <div className="stat-content">
-                <span className="stat-number">{stats.sold}</span>
-                <span className="stat-label">تم بيعها</span>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="stats-error">
-            <FiXCircle />
-            <span>تعذر تحميل الإحصائيات</span>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* المعلومات الشخصية */}
       <div className="info-section">

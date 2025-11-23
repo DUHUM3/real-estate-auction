@@ -49,7 +49,8 @@ import {
   FaTwitter,
   FaYoutube,
   FaTiktok,
-  FaSnapchatGhost
+  FaSnapchatGhost,
+  FaList
 } from 'react-icons/fa';
 
 // اصدر كل الأيقونات في object واحد
@@ -107,7 +108,8 @@ const Icons = {
   FaTwitter,
   FaYoutube,
   FaTiktok,
-  FaSnapchatGhost
+  FaSnapchatGhost,
+  FaList
 };
 
 export default Icons;

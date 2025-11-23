@@ -19,13 +19,14 @@ import MyAds from './pages/MyAds';
 import Favorites from './pages/Favorites';
 import Interests from './pages/Interests';
 import Notifications from './pages/Notifications';
+import MyRequests from './pages/MyRequests';
 
 import Createland from './pages/Lands/CreateLand';
 import LandRequestDetails from './pages/Lands/LandRequestDetails';
 import CreateLandRequest from './pages/Lands/CreateLandRequest';
 import CreateAuctionRequest from './pages/Auction/CreateAuctionRequest';
 import LandDetails from './pages/Lands/LandDetails';
-
+import CreateAd from './pages/CreateAd';
 // صفحات المصادقة
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
@@ -119,9 +120,11 @@ function App() {
                   <Route path="/my-lands" element={<Favorites />} />
                   <Route path="/interests" element={<Interests />} />
                   <Route path="/notifications" element={<Notifications />} />
-                  
+                  <Route path="/my-requests" element={<MyRequests />} />  
+                  <Route path="/create-ad" element={<CreateAd />} />
+
                   {/* صفحات أخرى */}
-                  <Route path="/create-auction-request" element={<CreateAuctionRequest />} />
+                  <Route path="/create-marketing-request" element={<CreateAuctionRequest />} />
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 </Routes>

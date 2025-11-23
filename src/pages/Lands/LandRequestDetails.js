@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ModalContext } from '../../App';
+import { toast, Toaster } from 'react-hot-toast';
 import {
   FaMapMarkerAlt,
   FaRulerCombined,
@@ -36,9 +37,28 @@ const LandRequestDetails = () => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [offerMessage, setOfferMessage] = useState('');
   const [offerLoading, setOfferLoading] = useState(false);
-  const [offerSuccess, setOfferSuccess] = useState(false);
-  const [offerError, setOfferError] = useState(null);
   const [showOfferForm, setShowOfferForm] = useState(false);
+  const [submitResult, setSubmitResult] = useState(null);
+
+  // دالة لعرض رسائل الخطأ من API
+  const showApiError = (errorObj) => {
+    if (typeof errorObj === 'string') {
+      toast.error(errorObj);
+    } else if (errorObj.message) {
+      toast.error(errorObj.message);
+    } else if (errorObj.details) {
+      toast.error(errorObj.details);
+    } else if (errorObj.error) {
+      toast.error(errorObj.error);
+    } else {
+      toast.error('حدث خطأ غير متوقع');
+    }
+  };
+
+  // دالة لعرض رسائل النجاح
+  const showApiSuccess = (message) => {
+    toast.success(message);
+  };
 
   useEffect(() => {
     fetchRequestDetails();
@@ -56,13 +76,6 @@ const LandRequestDetails = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      if (!token) {
-        setError('يجب تسجيل الدخول أولاً');
-        setLoading(false);
-        navigate('/login');
-        return;
-      }
-
       const response = await fetch(
         `https://shahin-tqay.onrender.com/api/land-requests/${id}`,
         {
@@ -74,7 +87,8 @@ const LandRequestDetails = () => {
       );
       
       if (!response.ok) {
-        throw new Error('فشل في جلب البيانات');
+        const errorData = await response.json();
+        throw errorData;
       }
 
       const result = await response.json();
@@ -82,12 +96,9 @@ const LandRequestDetails = () => {
       setLoading(false);
     } catch (err) {
       console.error('❌ خطأ في تحميل التفاصيل:', err);
+      showApiError(err);
       
-      if (err.response?.status === 401) {
-        setError('انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى');
-        localStorage.removeItem('token');
-        navigate('/login');
-      } else if (err.response?.status === 404) {
+      if (err.response?.status === 404) {
         setError('لم يتم العثور على الطلب');
       } else {
         setError('حدث خطأ أثناء تحميل تفاصيل الطلب');
@@ -138,8 +149,10 @@ const LandRequestDetails = () => {
 
       if (isFavorite) {
         newFavorites = favorites.filter(favId => favId !== parseInt(id));
+        showApiSuccess('تم إزالة الطلب من المفضلة');
       } else {
         newFavorites = [...favorites, parseInt(id)];
+        showApiSuccess('تم إضافة الطلب إلى المفضلة');
       }
 
       localStorage.setItem('requestFavorites', JSON.stringify(newFavorites));
@@ -161,6 +174,12 @@ const LandRequestDetails = () => {
       if (response.ok) {
         setIsFavorite(!isFavorite);
         
+        if (isFavorite) {
+          showApiSuccess('تم إزالة الطلب من المفضلة');
+        } else {
+          showApiSuccess('تم إضافة الطلب إلى المفضلة');
+        }
+        
         const favorites = JSON.parse(localStorage.getItem('requestFavorites') || '[]');
         let newFavorites;
 
@@ -172,10 +191,13 @@ const LandRequestDetails = () => {
 
         localStorage.setItem('requestFavorites', JSON.stringify(newFavorites));
       } else {
-        throw new Error('فشل في تحديث المفضلة');
+        const errorData = await response.json();
+        throw errorData;
       }
     } catch (error) {
       console.error('خطأ في تحديث المفضلة:', error);
+      showApiError(error);
+      
       const favorites = JSON.parse(localStorage.getItem('requestFavorites') || '[]');
       let newFavorites;
 
@@ -201,26 +223,65 @@ const LandRequestDetails = () => {
       navigator.share(shareData).catch(console.error);
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('تم نسخ الرابط للمشاركة!');
+      showApiSuccess('تم نسخ الرابط للمشاركة!');
     }
+  };
+
+  const handleShowOfferForm = () => {
+    const token = localStorage.getItem('token');
+    console.log('التحقق من token في handleShowOfferForm:', token);
+    
+    if (!token) {
+      // إذا لم يكن المستخدم مسجل الدخول، افتح نافذة تسجيل الدخول
+      console.log('المستخدم غير مسجل الدخول - فتح نافذة تسجيل الدخول');
+      openLogin(() => {
+        // هذه الدالة ستنفذ بعد تسجيل الدخول بنجاح
+        console.log('تم تسجيل الدخول بنجاح - فتح فورم العرض');
+        setShowOfferForm(true);
+      });
+      return;
+    }
+    
+    // إذا كان مسجل الدخول، اعرض فورم العرض مباشرة
+    console.log('المستخدم مسجل الدخول - عرض فورم العرض مباشرة');
+    setShowOfferForm(true);
+  };
+
+  const handleCloseOfferForm = () => {
+    setShowOfferForm(false);
+    setOfferMessage('');
+    setSubmitResult(null);
+  };
+
+  const validateForm = () => {
+    if (offerMessage.trim().length < 10) {
+      showApiError("تفاصيل العرض يجب أن تكون أكثر من 10 أحرف");
+      return false;
+    }
+    return true;
   };
 
   const handleOfferSubmit = async (e) => {
     e.preventDefault();
     
     if (!offerMessage.trim()) {
-      setOfferError('يرجى إدخال تفاصيل العرض');
+      showApiError('يرجى إدخال تفاصيل العرض');
+      return;
+    }
+
+    // التحقق من صحة النموذج
+    if (!validateForm()) {
       return;
     }
 
     try {
       setOfferLoading(true);
-      setOfferError(null);
+      setSubmitResult(null);
       
       const token = localStorage.getItem('token');
       
       if (!token) {
-        setOfferError('يجب تسجيل الدخول أولاً');
+        showApiError('يجب تسجيل الدخول أولاً');
         setOfferLoading(false);
         navigate('/login');
         return;
@@ -243,9 +304,23 @@ const LandRequestDetails = () => {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        setOfferSuccess(true);
+        // نجاح - إغلاق الفورم فوراً وإظهار رسالة النجاح
         setOfferMessage('');
         setOfferLoading(false);
+        
+        const successMessage = result.message || 'تم تقديم العرض بنجاح!';
+        setSubmitResult({
+          success: true,
+          message: successMessage
+        });
+        showApiSuccess(successMessage);
+        
+        // إغلاق الفورم بعد نجاح الإرسال مباشرة
+        setTimeout(() => {
+          setShowOfferForm(false);
+          setSubmitResult(null);
+        }, 3000);
+        
       } else {
         throw new Error(result.message || 'حدث خطأ في تقديم العرض');
       }
@@ -253,44 +328,13 @@ const LandRequestDetails = () => {
     } catch (err) {
       console.error('❌ خطأ في تقديم العرض:', err);
       setOfferLoading(false);
-      
-      if (err.response) {
-        if (err.response.status === 401) {
-          setOfferError('انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى');
-          localStorage.removeItem('token');
-          navigate('/login');
-        } else if (err.response.status === 422) {
-          setOfferError('بيانات غير صالحة: ' + (err.response.data.message || 'يرجى التحقق من البيانات المدخلة'));
-        } else if (err.response.status === 404) {
-          setOfferError('لم يتم العثور على الطلب');
-        } else {
-          setOfferError(err.response.data.message || 'حدث خطأ في الخادم');
-        }
-      } else if (err.request) {
-        setOfferError('تعذر الاتصال بالخادم، يرجى التحقق من الاتصال بالإنترنت');
-      } else {
-        setOfferError(err.message || 'حدث خطأ غير متوقع');
-      }
-    }
-  };
-
-  const handleShowOfferForm = () => {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      openLogin(() => {
-        setShowOfferForm(true);
+      const errorMessage = err.message || 'حدث خطأ في تقديم العرض';
+      setSubmitResult({
+        success: false,
+        message: errorMessage
       });
-      return;
+      showApiError(err);
     }
-    
-    setShowOfferForm(true);
-  };
-
-  const handleCloseOfferForm = () => {
-    setShowOfferForm(false);
-    setOfferError(null);
-    setOfferMessage('');
   };
 
   const getPurposeLabel = (purpose) => purpose === 'sale' ? 'بيع' : 'إيجار';
@@ -363,12 +407,43 @@ const LandRequestDetails = () => {
 
   return (
     <div className="elegantDetails_container">
+      {/* Toaster للإشعارات */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#fff',
+            color: '#000',
+            direction: 'rtl',
+            fontFamily: 'Arial, sans-serif',
+            border: '1px solid #e0e0e0',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#22c55e',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+
       {/* Header */}
       <div className="elegantDetails_header">
-        {/* <button onClick={() => navigate(-1)} className="elegantBack_btn">
+        <button onClick={() => navigate(-1)} className="elegantBack_btn">
           <FaArrowLeft />
-          العودة
-        </button> */}
+          <span>العودة</span>
+        </button>
         <div className="elegantHeader_actions">
           <button 
             className={`elegantFavorite_btn ${isFavorite ? 'elegantActive' : ''}`}
@@ -437,94 +512,91 @@ const LandRequestDetails = () => {
       )}
 
       {/* Main Content */}
-   {/* Main Content */}
-<div className="elegantDetails_content">
-  {/* العنوان أولاً */}
-  <div className="elegantTitle_section">
-    <h1>طلب أرض #{request.id}</h1>
-    <div className={`elegantStatus_badge ${getStatusClass(request.status)}`}>
-      {getStatusLabel(request.status)}
-    </div>
-  </div>
-
-  {/* الوصف مباشرة تحت العنوان بدون عنوان */}
-  <div className="elegantDescription_section">
-    <p>{request.description}</p>
-  </div>
-
-  {/* التاريخ */}
-  <div className="elegantDate_section">
-    {/* <FaCalendarAlt className="elegantSection_icon" /> */}
-    <span>تاريخ الإنشاء: {request.created_at}</span>
-  </div>
-
-  {/* الموقع */}
-  <div className="elegantLocation_section">
-    <FaMapMarkerAlt className="elegantSection_icon" />
-    <div className="elegantLocation_info">
-      <h3>الموقع</h3>
-      <p>{request.region} - {request.city}</p>
-    </div>
-  </div>
-
-  {/* تفاصيل الطلب */}
-  <div className="elegantSpecs_section">
-    <h3>تفاصيل الطلب</h3>
-    <div className="elegantSpecs_grid">
-      <div className="elegantSpec_item">
-        <FaHandshake />
-        <div>
-          <span className="elegantSpec_label">الغرض</span>
-          <span className="elegantSpec_value">{getPurposeLabel(request.purpose)}</span>
+      <div className="elegantDetails_content">
+        {/* العنوان أولاً */}
+        <div className="elegantTitle_section">
+          <h1>طلب أرض #{request.id}</h1>
+          <div className={`elegantStatus_badge ${getStatusClass(request.status)}`}>
+            {getStatusLabel(request.status)}
+          </div>
         </div>
-      </div>
-      <div className="elegantSpec_item">
-        <FaBuilding />
-        <div>
-          <span className="elegantSpec_label">النوع</span>
-          <span className="elegantSpec_value">{getTypeLabel(request.type)}</span>
-        </div>
-      </div>
-      <div className="elegantSpec_item">
-        <FaRulerCombined />
-        <div>
-          <span className="elegantSpec_label">المساحة المطلوبة</span>
-          <span className="elegantSpec_value">{formatPrice(request.area)} م²</span>
-        </div>
-      </div>
-      <div className="elegantSpec_item">
-        <FaCity />
-        <div>
-          <span className="elegantSpec_label">المدينة</span>
-          <span className="elegantSpec_value">{request.city}</span>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  {/* باقي الأقسام تبقى كما هي */}
-  {/* Offer Button */}
-  {request.status === 'open' && (
-    <div className="elegantInterest_section" id="offer">
-      <button 
-        className="elegantInterest_btn" 
-        onClick={handleShowOfferForm}
-      >
-        تقديم عرض
-      </button>
-    </div>
-  )}
+        {/* الوصف مباشرة تحت العنوان بدون عنوان */}
+        <div className="elegantDescription_section">
+          <p>{request.description}</p>
+        </div>
 
-  {/* Closed Message */}
-  {request.status !== 'open' && (
-    <div className="elegantClosed_message">
-      <div className="elegantClosed_icon">🔒</div>
-      <p className="elegantClosed_text">
-        هذا الطلب {request.status === 'closed' ? 'مغلق' : 'مكتمل'} ولا يمكن تقديم عروض جديدة
-      </p>
-    </div>
-  )}
-</div>
+        {/* التاريخ */}
+        <div className="elegantDate_section">
+          <span>تاريخ الإنشاء: {request.created_at}</span>
+        </div>
+
+        {/* الموقع */}
+        <div className="elegantLocation_section">
+          <FaMapMarkerAlt className="elegantSection_icon" />
+          <div className="elegantLocation_info">
+            <h3>الموقع</h3>
+            <p>{request.region} - {request.city}</p>
+          </div>
+        </div>
+
+        {/* تفاصيل الطلب */}
+        <div className="elegantSpecs_section">
+          <h3>تفاصيل الطلب</h3>
+          <div className="elegantSpecs_grid">
+            <div className="elegantSpec_item">
+              <FaHandshake />
+              <div>
+                <span className="elegantSpec_label">الغرض</span>
+                <span className="elegantSpec_value">{getPurposeLabel(request.purpose)}</span>
+              </div>
+            </div>
+            <div className="elegantSpec_item">
+              <FaBuilding />
+              <div>
+                <span className="elegantSpec_label">النوع</span>
+                <span className="elegantSpec_value">{getTypeLabel(request.type)}</span>
+              </div>
+            </div>
+            <div className="elegantSpec_item">
+              <FaRulerCombined />
+              <div>
+                <span className="elegantSpec_label">المساحة المطلوبة</span>
+                <span className="elegantSpec_value">{formatPrice(request.area)} م²</span>
+              </div>
+            </div>
+            <div className="elegantSpec_item">
+              <FaCity />
+              <div>
+                <span className="elegantSpec_label">المدينة</span>
+                <span className="elegantSpec_value">{request.city}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Offer Button */}
+        {request.status === 'open' && (
+          <div className="elegantInterest_section" id="offer">
+            <button 
+              className="elegantInterest_btn" 
+              onClick={handleShowOfferForm}
+            >
+              تقديم عرض
+            </button>
+          </div>
+        )}
+
+        {/* Closed Message */}
+        {request.status !== 'open' && (
+          <div className="elegantClosed_message">
+            <div className="elegantClosed_icon">🔒</div>
+            <p className="elegantClosed_text">
+              هذا الطلب {request.status === 'closed' ? 'مغلق' : 'مكتمل'} ولا يمكن تقديم عروض جديدة
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* Offer Form Modal */}
       {showOfferForm && (
@@ -538,19 +610,23 @@ const LandRequestDetails = () => {
             </button>
             <h3>تقديم عرض على الطلب</h3>
             
-            {offerSuccess ? (
-              <div className="elegantSubmit_result success">
-                <div className="elegantSuccess_icon">
-                  <FaCheckCircle />
-                </div>
-                <p>تم تقديم العرض بنجاح!</p>
-                <p className="elegantSuccess_subtext">سيتم مراجعة عرضك من قبل صاحب الطلب</p>
-                <button 
-                  onClick={handleCloseOfferForm} 
-                  className="elegantCloseResult_btn"
-                >
-                  إغلاق
-                </button>
+            {submitResult ? (
+              <div className={`elegantSubmit_result ${submitResult.success ? 'success' : 'error'}`}>
+                <p>{submitResult.message}</p>
+                {submitResult.success ? (
+                  <button onClick={handleCloseOfferForm} className="elegantCloseResult_btn">
+                    إغلاق
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                    <button onClick={() => setSubmitResult(null)} className="elegantTryAgain_btn">
+                      حاول مرة أخرى
+                    </button>
+                    <button onClick={handleCloseOfferForm} className="elegantCloseResult_btn">
+                      إلغاء
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <form onSubmit={handleOfferSubmit}>
@@ -568,16 +644,9 @@ const LandRequestDetails = () => {
                     required
                   />
                   <div className="elegantForm_hint">
-                    اكتب وصفاً واضحاً ومفصلاً لعرضك
+                    اكتب وصفاً واضحاً ومفصلاً لعرضك (يجب أن يكون أكثر من 10 أحرف)
                   </div>
                 </div>
-                
-                {offerError && (
-                  <div className="elegantError_message">
-                    <FaExclamationCircle className="elegantError_icon" />
-                    <span className="elegantError_text">{offerError}</span>
-                  </div>
-                )}
                 
                 <button 
                   type="submit" 

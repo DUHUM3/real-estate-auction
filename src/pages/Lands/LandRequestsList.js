@@ -1,10 +1,11 @@
 // src/pages/LandRequestsList.js
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { MdClose } from 'react-icons/md';
 import Icons from '../../icons/index';
 import FiltersComponent from '../../utils/FiltersComponent';
 import { propertiesApi, propertiesUtils } from '../../api/propertiesApi';
+import { ModalContext } from '../../App'; // استيراد ModalContext
 
 function LandRequestsList() {
   const [requests, setRequests] = useState([]);
@@ -20,6 +21,10 @@ function LandRequestsList() {
   const [hideFilterBar, setHideFilterBar] = useState(false);
   const filterBarRef = useRef(null);
   const lastScrollTop = useRef(0);
+
+  // استخدام useContext للحصول على openLogin
+  const { openLogin } = useContext(ModalContext);
+  const navigate = useNavigate();
 
   const [filters, setFilters] = useState({
     search: '',
@@ -62,6 +67,27 @@ function LandRequestsList() {
   useEffect(() => {
     fetchRequests();
   }, [filters, currentPage]);
+
+  // دالة التحقق من التسجيل وإنشاء طلب جديد
+  const handleCreateRequest = () => {
+    const token = localStorage.getItem('token');
+    console.log('التحقق من token في handleCreateRequest:', token);
+    
+    if (!token) {
+      // إذا لم يكن المستخدم مسجل الدخول، افتح نافذة تسجيل الدخول
+      console.log('المستخدم غير مسجل الدخول - فتح نافذة تسجيل الدخول');
+      openLogin(() => {
+        // هذه الدالة ستنفذ بعد تسجيل الدخول بنجاح
+        console.log('تم تسجيل الدخول بنجاح - الانتقال لصفحة إنشاء الطلب');
+        navigate('/create-request');
+      });
+      return;
+    }
+    
+    // إذا كان مسجل الدخول، انتقل مباشرة لصفحة إنشاء الطلب
+    console.log('المستخدم مسجل الدخول - الانتقال لصفحة إنشاء الطلب مباشرة');
+    navigate('/create-request');
+  };
 
   const fetchRegionsAndCities = () => {
     const regionsData = [
@@ -332,9 +358,13 @@ function LandRequestsList() {
 
         <div className="shahinPage_header">
           <div className="form-buttons">
-            <Link to="/create-request" className="shahinMarketing_btn">
+            {/* تعديل زر إنشاء طلب جديد لاستخدام handleCreateRequest بدلاً من Link */}
+            <button 
+              onClick={handleCreateRequest} 
+              className="shahinMarketing_btn"
+            >
               <Icons.FaPlus /> إنشاء طلب جديد
-            </Link>
+            </button>
             {/* <Link to="/create-auction-request" className="shahinMarketing_btn">
               <Icons.FaBullhorn /> طلب تسويق
             </Link> */}
@@ -401,6 +431,13 @@ function LandRequestsList() {
             <p>لم يتم العثور على أي طلبات تطابق معايير البحث</p>
             <div className="shahinEmpty_actions">
               <button onClick={resetFilters}>إعادة تعيين الفلتر</button>
+              {/* إضافة زر إنشاء طلب جديد في حالة عدم وجود طلبات */}
+              <button 
+                onClick={handleCreateRequest} 
+                className="shahinCreate_first"
+              >
+                <Icons.FaPlus /> كن أول من ينشئ طلب
+              </button>
             </div>
           </div>
         ) : (
