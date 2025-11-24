@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ModalContext } from '../../App'; 
+import { useAuth } from '../../context/AuthContext'; // استيراد useAuth
 import { toast, Toaster } from 'react-hot-toast';
 
 import {
@@ -30,6 +31,7 @@ const PropertyDetailsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { openLogin } = useContext(ModalContext); 
+  const { currentUser } = useAuth(); // استخدام useAuth
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -78,6 +80,45 @@ const PropertyDetailsPage = () => {
   // دالة لعرض رسائل النجاح
   const showApiSuccess = (message) => {
     toast.success(message);
+  };
+
+  /**
+   * دالة الحصول على نوع المستخدم الحالي
+   */
+  const getCurrentUserType = () => {
+    // استخدام currentUser من AuthContext أولاً، ثم localStorage كبديل
+    return currentUser?.user_type || localStorage.getItem('user_type');
+  };
+
+  /**
+   * دالة التحقق من صلاحية المستخدم لتقديم الاهتمام
+   */
+  const isUserAllowedToShowInterest = () => {
+    const userType = getCurrentUserType();
+    console.log('نوع المستخدم الحالي:', userType);
+    
+    // الأنواع المسموح لها بتقديم الاهتمام (جميع الأنواع عدا شركة مزادات)
+    const allowedTypes = ['مالك أرض', 'وكيل عقارات', 'مستثمر', 'فرد', 'مالك ارض', 'وكيل عقاري'];
+    
+    // إذا لم يكن هناك نوع مستخدم (مستخدم غير مسجل)، نسمح له بتسجيل الدخول أولاً
+    if (!userType) {
+      return true;
+    }
+    
+    return allowedTypes.includes(userType);
+  };
+
+  /**
+   * دالة الحصول على رسالة الخطأ
+   */
+  const getInterestErrorMessage = () => {
+    const userType = getCurrentUserType();
+    
+    if (userType === 'شركة مزادات') {
+      return 'عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات';
+    }
+    
+    return 'عذراً، ليس لديك صلاحية لتقديم الاهتمام';
   };
 
   const fetchData = async () => {
@@ -317,20 +358,44 @@ const PropertyDetailsPage = () => {
   const handleShowInterestForm = () => {
     const token = localStorage.getItem('token');
     console.log('التحقق من token في handleShowInterestForm:', token);
+    console.log('بيانات المستخدم الحالي:', currentUser);
     
     if (!token) {
       // إذا لم يكن المستخدم مسجل الدخول، افتح نافذة تسجيل الدخول
       console.log('المستخدم غير مسجل الدخول - فتح نافذة تسجيل الدخول');
       openLogin(() => {
         // هذه الدالة ستنفذ بعد تسجيل الدخول بنجاح
-        console.log('تم تسجيل الدخول بنجاح - فتح فورم الاهتمام');
+        console.log('تم تسجيل الدخول بنجاح - التحقق من نوع المستخدم');
+        
+        // بعد تسجيل الدخول، currentUser سيكون محدثاً
+        const userType = getCurrentUserType();
+        console.log('نوع المستخدم بعد التسجيل:', userType);
+        
+        if (userType === 'شركة مزادات') {
+          console.log('شركة مزادات - غير مسموح بتقديم الاهتمام');
+          toast.error('عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات');
+          return;
+        }
+        
+        console.log('المستخدم مسجل الدخول ومسموح له - فتح فورم الاهتمام');
         setShowInterestForm(true);
       });
       return;
     }
     
-    // إذا كان مسجل الدخول، اعرض فورم الاهتمام مباشرة
-    console.log('المستخدم مسجل الدخول - عرض فورم الاهتمام مباشرة');
+    // التحقق من نوع المستخدم للمستخدمين المسجلين
+    const userType = getCurrentUserType();
+    console.log('نوع المستخدم الحالي للمستخدم المسجل:', userType);
+    
+    // إذا كان المستخدم شركة مزادات، منع تقديم الاهتمام
+    if (userType === 'شركة مزادات') {
+      console.log('شركة مزادات - غير مسموح بتقديم الاهتمام');
+      toast.error('عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات');
+      return;
+    }
+    
+    // إذا كان مسجل الدخول وليس شركة مزادات، اعرض فورم الاهتمام مباشرة
+    console.log('المستخدم مسجل الدخول ومسموح له - عرض فورم الاهتمام مباشرة');
     setShowInterestForm(true);
   };
   
@@ -366,6 +431,13 @@ const PropertyDetailsPage = () => {
     
     // التحقق من صحة النموذج
     if (!validateForm()) {
+      return;
+    }
+
+    // التحقق النهائي من صلاحية المستخدم قبل الإرسال
+    const userType = getCurrentUserType();
+    if (userType === 'شركة مزادات') {
+      showApiError('عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات');
       return;
     }
 

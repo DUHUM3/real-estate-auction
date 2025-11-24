@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ModalContext } from '../../App';
+import { useAuth } from '../../context/AuthContext'; // استيراد useAuth
 import { toast, Toaster } from 'react-hot-toast';
 import {
   FaMapMarkerAlt,
@@ -28,6 +29,7 @@ const LandRequestDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { openLogin } = useContext(ModalContext);
+  const { currentUser } = useAuth(); // استخدام useAuth
 
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -227,23 +229,86 @@ const LandRequestDetails = () => {
     }
   };
 
+  /**
+   * دالة الحصول على نوع المستخدم الحالي
+   */
+  const getCurrentUserType = () => {
+    // استخدام currentUser من AuthContext أولاً، ثم localStorage كبديل
+    return currentUser?.user_type || localStorage.getItem('user_type');
+  };
+
+  /**
+   * دالة التحقق من صلاحية المستخدم لتقديم العروض
+   */
+  const isUserAllowedToOffer = () => {
+    const userType = getCurrentUserType();
+    console.log('نوع المستخدم الحالي:', userType);
+    
+    // الأنواع المسموح لها بتقديم العروض (جميع الأنواع عدا شركة مزادات)
+    const allowedTypes = ['مالك أرض', 'وكيل عقارات', 'مستثمر', 'فرد', 'مالك ارض', 'وكيل عقاري'];
+    
+    // إذا لم يكن هناك نوع مستخدم (مستخدم غير مسجل)، نسمح له بتسجيل الدخول أولاً
+    if (!userType) {
+      return true;
+    }
+    
+    return allowedTypes.includes(userType);
+  };
+
+  /**
+   * دالة الحصول على رسالة الخطأ
+   */
+  const getOfferErrorMessage = () => {
+    const userType = getCurrentUserType();
+    
+    if (userType === 'شركة مزادات') {
+      return 'عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات';
+    }
+    
+    return 'عذراً، ليس لديك صلاحية لتقديم العروض';
+  };
+
   const handleShowOfferForm = () => {
     const token = localStorage.getItem('token');
     console.log('التحقق من token في handleShowOfferForm:', token);
+    console.log('بيانات المستخدم الحالي:', currentUser);
     
     if (!token) {
       // إذا لم يكن المستخدم مسجل الدخول، افتح نافذة تسجيل الدخول
       console.log('المستخدم غير مسجل الدخول - فتح نافذة تسجيل الدخول');
       openLogin(() => {
         // هذه الدالة ستنفذ بعد تسجيل الدخول بنجاح
-        console.log('تم تسجيل الدخول بنجاح - فتح فورم العرض');
+        console.log('تم تسجيل الدخول بنجاح - التحقق من نوع المستخدم');
+        
+        // بعد تسجيل الدخول، currentUser سيكون محدثاً
+        const userType = getCurrentUserType();
+        console.log('نوع المستخدم بعد التسجيل:', userType);
+        
+        if (userType === 'شركة مزادات') {
+          console.log('شركة مزادات - غير مسموح بتقديم العروض');
+          toast.error('عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات');
+          return;
+        }
+        
+        console.log('المستخدم مسجل الدخول ومسموح له - فتح فورم العرض');
         setShowOfferForm(true);
       });
       return;
     }
     
-    // إذا كان مسجل الدخول، اعرض فورم العرض مباشرة
-    console.log('المستخدم مسجل الدخول - عرض فورم العرض مباشرة');
+    // التحقق من نوع المستخدم للمستخدمين المسجلين
+    const userType = getCurrentUserType();
+    console.log('نوع المستخدم الحالي للمستخدم المسجل:', userType);
+    
+    // إذا كان المستخدم شركة مزادات، منع تقديم العرض
+    if (userType === 'شركة مزادات') {
+      console.log('شركة مزادات - غير مسموح بتقديم العروض');
+      toast.error('عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات');
+      return;
+    }
+    
+    // إذا كان مسجل الدخول وليس شركة مزادات، اعرض فورم العرض مباشرة
+    console.log('المستخدم مسجل الدخول ومسموح له - عرض فورم العرض مباشرة');
     setShowOfferForm(true);
   };
 
@@ -284,6 +349,14 @@ const LandRequestDetails = () => {
         showApiError('يجب تسجيل الدخول أولاً');
         setOfferLoading(false);
         navigate('/login');
+        return;
+      }
+
+      // التحقق النهائي من صلاحية المستخدم قبل الإرسال
+      const userType = getCurrentUserType();
+      if (userType === 'شركة مزادات') {
+        showApiError('عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات');
+        setOfferLoading(false);
         return;
       }
 

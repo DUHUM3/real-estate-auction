@@ -116,7 +116,7 @@ function Notifications() {
           <div className="header-top">
             <h1><FaBell /> الإشعارات</h1>
             <div className="header-actions">
-              <button 
+              {/* <button 
                 className="refresh-btn"
                 onClick={handleRefresh}
                 disabled={isLoading}
@@ -129,7 +129,7 @@ function Notifications() {
                 disabled={markAllAsReadMutation.isLoading}
               >
                 <FaCheckCircle /> تحديد الكل كمقروء
-              </button>
+              </button> */}
             </div>
           </div>
           

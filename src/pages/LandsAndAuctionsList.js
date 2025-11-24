@@ -6,7 +6,8 @@ import { propertiesApi, propertiesUtils } from '../api/propertiesApi';
 import { auctionsApi, auctionsUtils } from '../api/auctionApi';
 import FiltersComponent from '../utils/FiltersComponent';
 import { ModalContext } from '../App';
-import { toast, Toaster } from 'react-hot-toast'; // إضافة Toaster
+import { toast, Toaster } from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext'; // استيراد useAuth
 import '../styles/PropertyList.css';
 
 const PropertiesPage = () => {
@@ -15,6 +16,7 @@ const PropertiesPage = () => {
   const filterBarRef = useRef(null);
   const lastScrollTop = useRef(0);
   const { openLogin } = useContext(ModalContext);
+  const { currentUser } = useAuth(); // استخدام useAuth
 
   // States
   const [state, setState] = useState({
@@ -89,10 +91,26 @@ const PropertiesPage = () => {
   const getFilterOptions = () => state.activeTab === 'lands' ? { regions, landTypes, purposes } : { auctionStatuses };
 
   /**
+   * دالة الحصول على نوع المستخدم الحالي من AuthContext
+   */
+  const getCurrentUserType = () => {
+    return currentUser?.user_type || localStorage.getItem('user_type');
+  };
+
+  /**
+   * دالة التحقق من صلاحية المستخدم للإنشاء
+   */
+  const isUserAuthorized = (userType) => {
+    // الأنواع المسموح لها بالإنشاء
+    const authorizedTypes = ['مالك أرض', 'وكيل عقارات', 'شركة مزادات'];
+    return authorizedTypes.includes(userType);
+  };
+
+  /**
    * دالة الحصول على نص زر الإنشاء
    */
   const getCreateButtonText = () => {
-    const userType = localStorage.getItem('user_type');
+    const userType = getCurrentUserType();
     switch(userType) {
       case 'مالك أرض':
         return 'إنشاء أرض';
@@ -101,145 +119,67 @@ const PropertiesPage = () => {
       case 'شركة مزادات':
         return 'إنشاء مزاد';
       default:
-        return 'إنشاء جديد ';
+        return 'انظم الان';
     }
   };
 
   /**
-   * دالة التحقق من صلاحية المستخدم للإنشاء
+   * دالة التحقق إذا كان المستخدم مسجل دخول
    */
-  const canUserCreate = () => {
-    const userType = localStorage.getItem('user_type');
-    const allowedTypes = ['مالك أرض', 'وكيل عقارات', 'شركة مزادات'];
-    return allowedTypes.includes(userType);
+  const isUserLoggedIn = () => {
+    return !!currentUser || !!localStorage.getItem('token');
   };
 
   /**
-   * دالة الحصول على رسالة الخطأ للصلاحيات
-   */
-  const getPermissionErrorMessage = () => {
-    const userType = localStorage.getItem('user_type');
-    switch(userType) {
-      case 'مستخدم عام':
-        return 'عذراً، المستخدم العام لا يمكنه إنشاء عقارات أو مزادات. يمكنك إنشاء طلب شراء بدلاً من ذلك.';
-      default:
-        return 'عذراً، ليس لديك صلاحية إنشاء عقارات أو مزادات.';
-    }
-  };
-
-  /**
-   * دالة إنشاء جديد حسب نوع المستخدم مع التحقق من الصلاحيات
+   * دالة إنشاء جديد حسب نوع المستخدم
    */
   const handleCreateNew = () => {
-    const token = localStorage.getItem('token');
-    const userType = localStorage.getItem('user_type');
-    
-    console.log('التحقق من صلاحيات المستخدم:', { token, userType });
+    const userType = getCurrentUserType();
 
     // إذا لم يكن مسجل دخول
-    if (!token) {
-      console.log('المستخدم غير مسجل الدخول - فتح نافذة تسجيل الدخول');
+    if (!isUserLoggedIn()) {
       openLogin(() => {
-        // بعد تسجيل الدخول، التحقق من الصلاحيات مرة أخرى
-        const newUserType = localStorage.getItem('user_type');
-        if (canUserCreate()) {
-          proceedWithCreation(newUserType);
-        } else {
-          showPermissionError();
-        }
+        // بعد تسجيل الدخول، المتابعة في الإنشاء
+        const newUserType = getCurrentUserType();
+        proceedWithCreation(newUserType);
       });
       return;
     }
 
-    // إذا كان مسجل دخول ولكن ليس لديه صلاحية
-    if (!canUserCreate()) {
-      showPermissionError();
+    // التحقق من الصلاحية - إذا كان نوع المستخدم غير مصرح له
+    if (!isUserAuthorized(userType)) {
+      toast.error('عذراً، هذه الخدمة متاحة فقط لأصحاب الأراضي ووكلاء العقارات وشركات المزادات');
       return;
     }
 
-    // إذا كان مسجل دخول وله صلاحية
+    // إذا كان مسجل دخول وله صلاحية، المتابعة في الإنشاء مباشرة
     proceedWithCreation(userType);
   };
 
   /**
-   * المتابعة في عملية الإنشاء بعد التحقق من الصلاحيات
+   * المتابعة في عملية الإنشاء
    */
   const proceedWithCreation = (userType) => {
-    console.log('المستخدم له صلاحية - المتابعة في الإنشاء:', userType);
-    
+    // التحقق مرة أخرى من الصلاحية قبل المتابعة
+    if (!isUserAuthorized(userType)) {
+      toast.error('عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة');
+      return;
+    }
+
     switch(userType) {
       case 'مالك أرض':
-        navigate('/create-property');
+        navigate('/create-ad');
         break;
       case 'وكيل عقارات':
-        navigate('/create-property');
+        navigate('/create-ad');
         break;
       case 'شركة مزادات':
-        navigate('/create-auction');
+        navigate('/create-ad');
         break;
       default:
-        // هذا الحالة يجب ألا تحدث لأننا تحققنا من الصلاحيات مسبقاً
-        showPermissionError();
+        // للمستخدمين الآخرين، افترض إنشاء طلب شراء
+        navigate('/');
         break;
-    }
-  };
-
-  /**
-   * عرض رسالة خطأ الصلاحيات باستخدام Toaster
-   */
-  const showPermissionError = () => {
-    const errorMessage = getPermissionErrorMessage();
-    
-    // استخدام toast.error لعرض رسالة الخطأ
-    toast.error(errorMessage, {
-      duration: 5000,
-      position: 'top-center',
-    });
-    
-    // للمستخدم العام، نقترح عليه إنشاء طلب شراء بعد 3 ثواني
-    const userType = localStorage.getItem('user_type');
-    if (userType === 'مستخدم عام') {
-      setTimeout(() => {
-        toast((t) => (
-          <div style={{ textAlign: 'right', direction: 'rtl' }}>
-            <p style={{ margin: '0 0 10px 0' }}>هل تريد إنشاء طلب شراء بدلاً من ذلك؟</p>
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-              <button 
-                onClick={() => {
-                  navigate('/create-ad');
-                  toast.dismiss(t.id);
-                }}
-                style={{
-                  padding: '5px 15px',
-                  backgroundColor: '#22c55e',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer'
-                }}
-              >
-                نعم
-              </button>
-              <button 
-                onClick={() => toast.dismiss(t.id)}
-                style={{
-                  padding: '5px 15px',
-                  backgroundColor: '#ef4444',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer'
-                }}
-              >
-                لا
-              </button>
-            </div>
-          </div>
-        ), {
-          duration: 8000,
-          position: 'top-center',
-        });
-      }, 2000);
     }
   };
 
@@ -627,37 +567,36 @@ const PropertiesPage = () => {
   return (
     <div className="shahinProperties_container">
       {/* إضافة Toaster للإشعارات */}
-   <Toaster
-  position="top-center"
-  reverseOrder={false}
-  toastOptions={{
-    duration: 4000,
-    style: {
-      background: '#fff',
-      color: '#000',
-      direction: 'rtl',
-      fontFamily: 'Arial, sans-serif',
-      border: '1px solid #e0e0e0',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-      zIndex: 999999,   // ← أهم سطر لكي يظهر فوق كل شيء
-    },
-    success: {
-      duration: 3000,
-      iconTheme: {
-        primary: '#22c55e',
-        secondary: '#fff',
-      },
-    },
-    error: {
-      duration: 5000,
-      iconTheme: {
-        primary: '#ef4444',
-        secondary: '#fff',
-      },
-    },
-  }}
-/>
-
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#fff',
+            color: '#000',
+            direction: 'rtl',
+            fontFamily: 'Arial, sans-serif',
+            border: '1px solid #e0e0e0',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            zIndex: 999999,
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#22c55e',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
 
       {/* Search and Filter Bar */}
       <div className={`shahinSearch_filter ${state.hideFilterBar ? 'shahinHideFilter' : ''}`} ref={filterBarRef}>
@@ -673,7 +612,7 @@ const PropertiesPage = () => {
             />
           </div>
           
-          {/* زر الإنشاء الجديد */}
+          {/* زر الإنشاء الجديد - يظهر للجميع */}
           <button
             className="shahinFilter_toggle"
             onClick={handleCreateNew}

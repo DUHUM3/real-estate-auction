@@ -1342,3 +1342,25 @@
 }
 
 /* باقي CSS يبقى كما هو بدون تغيير */
+
+/* إزالة الخط السفلي من جميع الروابط */
+.nav-link {
+    text-decoration: none !important;
+}
+
+.nav-link:hover {
+    text-decoration: none !important;
+}
+
+.nav-link.active {
+    text-decoration: none !important;
+}
+
+/* إزالة الخط من الروابط في حالة التمرير */
+.navbar.scrolled .nav-link {
+    text-decoration: none !important;
+}
+
+.navbar.scrolled .nav-link:hover {
+    text-decoration: none !important;
+}

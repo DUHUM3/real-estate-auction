@@ -1,20 +1,16 @@
 // CreateLandRequest.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ModalContext } from '../../App'; // استيراد Context للنافذة المنبثقة
+import { toast, Toaster } from 'react-hot-toast'; // استيراد Toaster
 import { 
   FaArrowRight, 
   FaCheck, 
   FaExclamationTriangle, 
   FaUpload, 
   FaTimes,
-  FaMapMarkerAlt,
-  FaFileAlt,
-  FaImage,
   FaPlus,
-  FaHome,
-  FaMap,
-  FaRulerHorizontal,
-  FaBullseye
+  FaBan // أيقونة جديدة للتحذير
 } from 'react-icons/fa';
 import { landApi } from '../../api/landRequestApi';
 import { locationService } from '../../utils/LocationForFiltters';
@@ -22,6 +18,8 @@ import '../Auction/MarketingRequestModal.css';
 
 function CreateLandRequest() {
   const navigate = useNavigate();
+  const { openLogin } = useContext(ModalContext); // استخدام Context
+  
   const [formData, setFormData] = useState({
     region: '',
     city: '',
@@ -32,6 +30,7 @@ function CreateLandRequest() {
     document_number: '',
     terms_accepted: false
   });
+  
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -44,6 +43,73 @@ function CreateLandRequest() {
   const [imagesPreviews, setImagesPreviews] = useState([]);
   const [formTouched, setFormTouched] = useState(false);
   const [dragging, setDragging] = useState(false);
+  
+  // حالة جديدة للتحقق من نوع المستخدم
+  const [userType, setUserType] = useState(null);
+  const [checkingUserType, setCheckingUserType] = useState(true);
+
+  // دالة لعرض رسائل الخطأ من API
+  const showApiError = (errorObj) => {
+    if (typeof errorObj === 'string') {
+      toast.error(errorObj);
+    } else if (errorObj.message) {
+      toast.error(errorObj.message);
+    } else if (errorObj.details) {
+      toast.error(errorObj.details);
+    } else if (errorObj.error) {
+      toast.error(errorObj.error);
+    } else {
+      toast.error('حدث خطأ غير متوقع');
+    }
+  };
+
+  // دالة لعرض رسائل النجاح
+  const showApiSuccess = (message) => {
+    toast.success(message);
+  };
+
+  // التحقق من نوع المستخدم عند تحميل المكون
+  useEffect(() => {
+    checkUserType();
+  }, []);
+
+  // دالة للتحقق من نوع المستخدم
+  const checkUserType = () => {
+    try {
+      setCheckingUserType(true);
+      
+      // 1. التحقق من localStorage أولاً
+      const storedUserType = localStorage.getItem('user_type');
+      const token = localStorage.getItem('token');
+      
+      console.log('🔍 التحقق من نوع المستخدم:', {
+        storedUserType,
+        hasToken: !!token
+      });
+
+      if (!token) {
+        // إذا لم يكن هناك token، اعتبار المستخدم غير مسجل
+        setUserType(null);
+        setCheckingUserType(false);
+        return;
+      }
+
+      if (storedUserType === 'شركة مزادات') {
+        console.log('🚫 المستخدم هو شركة مزادات - غير مسموح بإنشاء طلبات');
+        setUserType('شركة مزادات');
+        showApiError('عذراً، شركات المزادات غير مسموح لها بإنشاء طلبات تسويق أراضي');
+      } else {
+        console.log('✅ المستخدم مسموح له بإنشاء طلبات - نوع المستخدم:', storedUserType);
+        setUserType(storedUserType);
+      }
+      
+      setCheckingUserType(false);
+    } catch (err) {
+      console.error('❌ خطأ في التحقق من نوع المستخدم:', err);
+      setCheckingUserType(false);
+      showApiError('حدث خطأ في التحقق من الصلاحيات');
+    }
+  };
 
   // Initialize regions and cities
   useEffect(() => {
@@ -56,7 +122,6 @@ function CreateLandRequest() {
     if (formData.region && cities[formData.region]) {
       setAvailableCities(cities[formData.region]);
       
-      // اختيار أول مدينة افتراضيا إذا تم اختيار منطقة جديدة
       if (!formData.city && cities[formData.region].length > 0) {
         setFormData(prev => ({
           ...prev,
@@ -131,19 +196,19 @@ function CreateLandRequest() {
     const totalImages = images.length + files.length;
     
     if (totalImages > 5) {
-      setError('يمكن رفع حتى 5 صور فقط');
+      showApiError('يمكن رفع حتى 5 صور فقط');
       return;
     }
 
     const validFiles = files.filter(file => {
       const isValidType = /^image\/(jpeg|jpg|png|gif|webp)$/i.test(file.type);
       if (!isValidType) {
-        setError('يجب أن تكون الملفات صوراً من نوع JPEG، PNG، أو WebP فقط');
+        showApiError('يجب أن تكون الملفات صوراً من نوع JPEG، PNG، أو WebP فقط');
         return false;
       }
       
       if (file.size > 5 * 1024 * 1024) {
-        setError('حجم الصورة يجب أن لا يتجاوز 5MB');
+        showApiError('حجم الصورة يجب أن لا يتجاوز 5MB');
         return false;
       }
       return true;
@@ -153,6 +218,7 @@ function CreateLandRequest() {
       setImages(prev => [...prev, ...validFiles]);
       setError(null);
       setFormTouched(true);
+      showApiSuccess(`تم إضافة ${validFiles.length} صورة بنجاح`);
     }
   };
 
@@ -180,6 +246,7 @@ function CreateLandRequest() {
     setImages(prev => prev.filter((_, i) => i !== index));
     setImagesPreviews(prev => prev.filter((_, i) => i !== index));
     setFormTouched(true);
+    showApiSuccess('تم حذف الصورة بنجاح');
   };
 
   // Form submission handler
@@ -187,31 +254,39 @@ function CreateLandRequest() {
     e.preventDefault();
     setError(null);
 
+    // التحقق النهائي من نوع المستخدم قبل الإرسال
+    if (userType === 'شركة مزادات') {
+      showApiError('عذراً، شركات المزادات غير مسموح لها بإنشاء طلبات تسويق أراضي');
+      return;
+    }
+
     // Validate form
     if (!formData.region || !formData.city || !formData.area || !formData.description || !formData.document_number) {
-      setError('جميع الحقول مطلوبة');
+      showApiError('جميع الحقول مطلوبة');
       return;
     }
 
     if (images.length === 0) {
-      setError('يجب رفع صورة واحدة على الأقل');
+      showApiError('يجب رفع صورة واحدة على الأقل');
       return;
     }
 
     if (!formData.terms_accepted) {
-      setError('يجب الموافقة على الشروط والأحكام');
+      showApiError('يجب الموافقة على الشروط والأحكام');
       return;
     }
 
     // Check authentication
     const token = localStorage.getItem('token');
     if (!token) {
-      setError('يجب تسجيل الدخول أولاً');
+      showApiError('يجب تسجيل الدخول أولاً');
+      openLogin(); // فتح نافذة تسجيل الدخول
       return;
     }
 
     try {
       setLoading(true);
+      showApiSuccess('جاري إنشاء طلب الأرض...');
 
       // Prepare form data for submission
       const submitData = new FormData();
@@ -234,6 +309,8 @@ function CreateLandRequest() {
       console.log('✅ تم إنشاء طلب الأرض:', response);
       setResponseData(response);
       setSuccess(true);
+      
+      showApiSuccess('تم إنشاء طلب الأرض بنجاح!');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       
     } catch (err) {
@@ -248,18 +325,33 @@ function CreateLandRequest() {
   const handleApiError = (err) => {
     if (err.response) {
       if (err.response.status === 401) {
-        setError('انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى');
+        const errorMsg = 'انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى';
+        showApiError(errorMsg);
+        setError(errorMsg);
         localStorage.removeItem('token');
-        navigate('/login');
+        localStorage.removeItem('user_type');
+        openLogin();
       } else if (err.response.status === 422) {
-        setError('بيانات غير صالحة: ' + (err.response.data.message || 'يرجى التحقق من البيانات المدخلة'));
+        const errorMsg = 'بيانات غير صالحة: ' + (err.response.data.message || 'يرجى التحقق من البيانات المدخلة');
+        showApiError(errorMsg);
+        setError(errorMsg);
+      } else if (err.response.status === 403) {
+        const errorMsg = 'عذراً، ليس لديك صلاحية لإنشاء طلبات تسويق أراضي';
+        showApiError(errorMsg);
+        setError(errorMsg);
       } else {
-        setError(err.response.data.message || 'حدث خطأ في الخادم');
+        const errorMsg = err.response.data.message || 'حدث خطأ في الخادم';
+        showApiError(errorMsg);
+        setError(errorMsg);
       }
     } else if (err.request) {
-      setError('تعذر الاتصال بالخادم، يرجى التحقق من الاتصال بالإنترنت');
+      const errorMsg = 'تعذر الاتصال بالخادم، يرجى التحقق من الاتصال بالإنترنت';
+      showApiError(errorMsg);
+      setError(errorMsg);
     } else {
-      setError('حدث خطأ غير متوقع');
+      const errorMsg = 'حدث خطأ غير متوقع';
+      showApiError(errorMsg);
+      setError(errorMsg);
     }
   };
 
@@ -275,16 +367,191 @@ function CreateLandRequest() {
 
   const handleCreateNew = () => {
     resetForm();
+    // showApiSuccess('تم إعادة تعيين النموذج لإنشاء طلب جديد');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // التحقق من صلاحية المستخدم لإنشاء الطلب
+  const isUserAllowed = () => {
+    return userType !== 'شركة مزادات';
+  };
   
-  // تحديد حالة الزر بناء على البيانات المدخلة
-  const isFormValid = formData.region && formData.city && formData.area && 
+  // تحديد حالة الزر بناء على البيانات المدخلة والصلاحية
+  const isFormValid = isUserAllowed() && formData.region && formData.city && formData.area && 
                       formData.description && formData.document_number && 
                       images.length > 0 && formData.terms_accepted;
+
+  // إذا كان المستخدم شركة مزادات، اعرض رسالة المنع
+  if (checkingUserType) {
+    return (
+      <div className="auction-request-container">
+        {/* Toaster للإشعارات */}
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#fff',
+              color: '#000',
+              direction: 'rtl',
+              fontFamily: 'Arial, sans-serif',
+              border: '1px solid #e0e0e0',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            },
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#22c55e',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              duration: 5000,
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
+        
+        <div className="request-loading">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">جاري التحقق من الصلاحيات...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isUserAllowed()) {
+    return (
+      <div className="auction-request-container">
+        {/* Toaster للإشعارات */}
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#fff',
+              color: '#000',
+              direction: 'rtl',
+              fontFamily: 'Arial, sans-serif',
+              border: '1px solid #e0e0e0',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            },
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#22c55e',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              duration: 5000,
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
+
+        {/* Header */}
+        <header className="request-header">
+          <div className="request-header-content">
+            <div className="header-left">
+              <button 
+                className="back-button"
+                onClick={() => navigate(-1)}
+                aria-label="رجوع"
+              >
+                <FaArrowRight className="back-icon" />
+                <span className="back-text">رجوع</span>
+              </button>
+            </div>
+            
+            <h1 className="header-title">طلب تسويق أرض</h1>
+            
+            <div className="header-right">
+              <button 
+                className="header-btn outline"
+                onClick={() => navigate(-1)}
+              >
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* محتوى رسالة المنع */}
+        <main className="request-main-content">
+          <div className="request-container">
+            <div className="access-denied-container">
+              <div className="access-denied-icon">
+                <FaBan />
+              </div>
+              <h2 className="access-denied-title">غير مسموح</h2>
+              <p className="access-denied-message">
+                عذراً، شركات المزادات غير مسموح لها بإنشاء طلبات تسويق أراضي.
+                <br />
+                يمكنك فقط تقديم عروض على الطلبات الموجودة.
+              </p>
+              <div className="access-denied-actions">
+                <button 
+                  onClick={() => navigate('/land-requests')}
+                  className="btn primary"
+                >
+                  تصفح الطلبات المتاحة
+                </button>
+                <button 
+                  onClick={() => navigate('/')}
+                  className="btn outline"
+                >
+                  العودة للرئيسية
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
   
   return (
     <div className="auction-request-container">
+      {/* Toaster للإشعارات */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#fff',
+            color: '#000',
+            direction: 'rtl',
+            fontFamily: 'Arial, sans-serif',
+            border: '1px solid #e0e0e0',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#22c55e',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+
       {/* Header */}
       <header className="request-header">
         <div className="request-header-content">
@@ -402,13 +669,6 @@ function CreateLandRequest() {
                   <FaPlus className="btn-icon" />
                   إنشاء طلب جديد
                 </button>
-                {/* <button 
-                  onClick={() => navigate('/')} 
-                  className="btn outline"
-                >
-                  <FaHome className="btn-icon" />
-                  العودة للرئيسية
-                </button> */}
               </div>
             </div>
           ) : (
@@ -416,7 +676,6 @@ function CreateLandRequest() {
               <div className="form-card">
                 <div className="form-section">
                   <h3 className="section-title">
-                    {/* <FaMapMarkerAlt className="section-icon" /> */}
                     الموقع والمنطقة
                   </h3>
                   <div className="form-grid">
@@ -461,7 +720,6 @@ function CreateLandRequest() {
 
                 <div className="form-section">
                   <h3 className="section-title">
-                    {/* <FaBullseye className="section-icon" /> */}
                     تفاصيل الأرض
                   </h3>
                   <div className="form-grid">
@@ -534,7 +792,6 @@ function CreateLandRequest() {
 
                 <div className="form-section">
                   <h3 className="section-title">
-                    {/* <FaFileAlt className="section-icon" /> */}
                     الوصف التفصيلي
                   </h3>
                   <div className="form-group">
@@ -555,7 +812,6 @@ function CreateLandRequest() {
 
                 <div className="form-section">
                   <h3 className="section-title">
-                    {/* <FaImage className="section-icon" /> */}
                     المرفقات
                   </h3>
                   <div className="form-group">
