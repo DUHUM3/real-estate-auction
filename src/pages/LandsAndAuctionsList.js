@@ -7,7 +7,7 @@ import { auctionsApi, auctionsUtils } from '../api/auctionApi';
 import FiltersComponent from '../utils/FiltersComponent';
 import { ModalContext } from '../App';
 import { toast, Toaster } from 'react-hot-toast';
-import { useAuth } from '../context/AuthContext'; // استيراد useAuth
+import { useAuth } from '../context/AuthContext';
 import '../styles/PropertyList.css';
 
 const PropertiesPage = () => {
@@ -16,7 +16,7 @@ const PropertiesPage = () => {
   const filterBarRef = useRef(null);
   const lastScrollTop = useRef(0);
   const { openLogin } = useContext(ModalContext);
-  const { currentUser } = useAuth(); // استخدام useAuth
+  const { currentUser } = useAuth();
 
   // States
   const [state, setState] = useState({
@@ -119,7 +119,7 @@ const PropertiesPage = () => {
       case 'شركة مزادات':
         return 'إنشاء مزاد';
       default:
-        return 'انظم الان';
+        return 'انضم الآن';
     }
   };
 
@@ -168,11 +168,7 @@ const PropertiesPage = () => {
 
     switch(userType) {
       case 'مالك أرض':
-        navigate('/create-ad');
-        break;
       case 'وكيل عقارات':
-        navigate('/create-ad');
-        break;
       case 'شركة مزادات':
         navigate('/create-ad');
         break;
@@ -363,7 +359,6 @@ const PropertiesPage = () => {
 
   // Navigation Handlers
   const openDetails = (item, itemType) => {
-    // استخدام الروابط الجديدة
     if (itemType === 'land') {
       navigate(`/lands/${item.id}/land`);
     } else if (itemType === 'auction') {
@@ -416,7 +411,7 @@ const PropertiesPage = () => {
     <div key={property.id} className="shahinProperty_card" onClick={() => openDetails(property, 'land')}>
       <div className="shahinProperty_image">
         {propertiesUtils.getPropertyImageUrl(property) ? (
-          <img src={propertiesUtils.getPropertyImageUrl(property)} alt={property.title} />
+          <img src={propertiesUtils.getPropertyImageUrl(property)} alt={property.title || "صورة العقار"} loading="lazy" />
         ) : (
           <div className="shahinPlaceholder_image"><Icons.FaHome /></div>
         )}
@@ -426,13 +421,14 @@ const PropertiesPage = () => {
         <button
           className={`shahinFavorite_btn ${state.favorites.properties?.includes(property.id) ? 'shahinActive' : ''}`}
           onClick={(e) => toggleFavorite('properties', property.id, e)}
+          aria-label="إضافة إلى المفضلة"
         >
           <Icons.FaHeart />
         </button>
       </div>
 
       <div className="shahinProperty_details">
-        <h3>{property.title}</h3>
+        <h3 className="shahinCard_title">{property.title}</h3>
         <div className="shahinProperty_location">
           <Icons.FaMapMarkerAlt />
           <span>{property.region} - {property.city}</span>
@@ -440,7 +436,10 @@ const PropertiesPage = () => {
         </div>
 
         <div className="shahinProperty_specs">
-          <div className="shahinSpec"><Icons.FaRulerCombined /><span>{propertiesUtils.formatPrice(property.total_area)} م²</span></div>
+          <div className="shahinSpec">
+            <Icons.FaRulerCombined />
+            <span>{propertiesUtils.formatPrice(property.total_area)} م²</span>
+          </div>
           <div className="shahinSpec">
             <Icons.FaMoneyBillWave />
             <span>
@@ -464,7 +463,11 @@ const PropertiesPage = () => {
 
         <div className="shahinProperty_actions">
           <button className="shahinAction_btn shahinDetails_btn">تفاصيل</button>
-          <button className="shahinAction_btn shahinShare_btn" onClick={(e) => shareItem(property, 'properties', e)}>
+          <button 
+            className="shahinAction_btn shahinShare_btn" 
+            onClick={(e) => shareItem(property, 'properties', e)}
+            aria-label="مشاركة"
+          >
             <Icons.FaShare /> مشاركة
           </button>
         </div>
@@ -476,7 +479,11 @@ const PropertiesPage = () => {
     <div key={auction.id} className="shahinAuction_card" onClick={() => openDetails(auction, 'auction')}>
       <div className="shahinAuction_image">
         {auctionsUtils.getAuctionImageUrl(auction) ? (
-          <img src={auctionsUtils.getAuctionImageUrl(auction)} alt={auctionsUtils.cleanText(auction.title)} />
+          <img 
+            src={auctionsUtils.getAuctionImageUrl(auction)} 
+            alt={auctionsUtils.cleanText(auction.title) || "صورة المزاد"}
+            loading="lazy"
+          />
         ) : (
           <div className="shahinPlaceholder_image"><Icons.FaImage /></div>
         )}
@@ -486,13 +493,14 @@ const PropertiesPage = () => {
         <button
           className={`shahinFavorite_btn ${state.favorites.auctions?.includes(auction.id) ? 'shahinActive' : ''}`}
           onClick={(e) => toggleFavorite('auctions', auction.id, e)}
+          aria-label="إضافة إلى المفضلة"
         >
           <Icons.FaHeart />
         </button>
       </div>
 
       <div className="shahinAuction_details">
-        <h3>{auctionsUtils.cleanText(auction.title)}</h3>
+        <h3 className="shahinCard_title">{auctionsUtils.cleanText(auction.title)}</h3>
         {auction.company && (
           <div className="shahinAuction_company">
             <Icons.FaBuilding />
@@ -520,12 +528,27 @@ const PropertiesPage = () => {
 
         <div className="shahinAuction_actions">
           <button className="shahinAction_btn shahinDetails_btn">تفاصيل</button>
-          <button className="shahinAction_btn shahinShare_btn" onClick={(e) => shareItem(auction, 'auctions', e)}>
+          <button 
+            className="shahinAction_btn shahinShare_btn" 
+            onClick={(e) => shareItem(auction, 'auctions', e)}
+            aria-label="مشاركة"
+          >
             <Icons.FaShare /> مشاركة
           </button>
         </div>
       </div>
     </div>
+  );
+
+  const renderFloatingCreateButton = () => (
+    <button 
+      className="shahinFloating_create" 
+      onClick={handleCreateNew} 
+      aria-label={getCreateButtonText()}
+    >
+      <Icons.FaPlus />
+      <span className="shahinCreateBtn_text">{getCreateButtonText()}</span>
+    </button>
   );
 
   const renderContent = () => {
@@ -542,7 +565,7 @@ const PropertiesPage = () => {
       return (
         <div className="shahinError_container">
           <p>حدث خطأ: {state.error}</p>
-          <button onClick={() => window.location.reload()}>إعادة المحاولة</button>
+          <button onClick={() => window.location.reload()} className="shahinRetry_btn">إعادة المحاولة</button>
         </div>
       );
     }
@@ -551,8 +574,11 @@ const PropertiesPage = () => {
     if (items.length === 0) {
       return (
         <div className="shahinEmpty_state">
+          <div className="shahinEmpty_icon">
+            {state.activeTab === 'lands' ? <Icons.FaHome size={36} /> : <Icons.FaGavel size={36} />}
+          </div>
           <p>لم يتم العثور على أي {state.activeTab === 'lands' ? 'أراضٍ' : 'مزادات'} تطابق معايير البحث</p>
-          <button onClick={resetFilters}>إعادة تعيين الفلتر</button>
+          <button onClick={resetFilters} className="shahinReset_filters_btn">إعادة تعيين الفلتر</button>
         </div>
       );
     }
@@ -576,7 +602,7 @@ const PropertiesPage = () => {
             background: '#fff',
             color: '#000',
             direction: 'rtl',
-            fontFamily: 'Arial, sans-serif',
+            fontFamily: 'Tajawal, Cairo, Arial, sans-serif',
             border: '1px solid #e0e0e0',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
             zIndex: 999999,
@@ -612,14 +638,13 @@ const PropertiesPage = () => {
             />
           </div>
           
-          {/* زر الإنشاء الجديد - يظهر للجميع */}
           <button
-            className="shahinFilter_toggle"
+            className="shahinFilter_toggle shahinCreate_btn"
             onClick={handleCreateNew}
             title={getCreateButtonText()}
           >
             <Icons.FaPlus className="shahinCreate_icon" />
-            <span>{getCreateButtonText()}</span>
+            <span className="shahinBtnText">{getCreateButtonText()}</span>
           </button>
 
           <button
@@ -628,24 +653,25 @@ const PropertiesPage = () => {
               updateState({ showMobileFilters: true }) : 
               updateState({ showFilters: !state.showFilters })
             }
+            aria-label="فلترة"
           >
             {state.showFilters ? <MdClose /> : <Icons.FaFilter />}
-            <span>{state.showFilters ? 'إغلاق' : 'فلترة'}</span>
+            <span className="shahinBtnText">{state.showFilters ? 'إغلاق' : 'فلترة'}</span>
           </button>
         </div>
 
         <div className="shahinTabs">
           <button
-            className={state.activeTab === 'lands' ? 'shahinActive' : ''}
+            className={`shahinTab_btn ${state.activeTab === 'lands' ? 'shahinActive' : ''}`}
             onClick={() => updateState({ activeTab: 'lands', currentPage: 1 })}
           >
-            الأراضي
+            <Icons.FaHome className="shahinTab_icon" /> الأراضي
           </button>
           <button
-            className={state.activeTab === 'auctions' ? 'shahinActive' : ''}
+            className={`shahinTab_btn ${state.activeTab === 'auctions' ? 'shahinActive' : ''}`}
             onClick={() => updateState({ activeTab: 'auctions', currentPage: 1 })}
           >
-            المزادات
+            <Icons.FaGavel className="shahinTab_icon" /> المزادات
           </button>
         </div>
       </div>
@@ -670,7 +696,11 @@ const PropertiesPage = () => {
       <div className={`shahinMobileFilter_sidebar ${state.showMobileFilters ? 'shahinActive' : ''}`}>
         <div className="shahinSidebar_header">
           <h3>🔍 فلاتر البحث</h3>
-          <button className="shahinClose_sidebar" onClick={() => updateState({ showMobileFilters: false })}>
+          <button 
+            className="shahinClose_sidebar" 
+            onClick={() => updateState({ showMobileFilters: false })}
+            aria-label="إغلاق"
+          >
             <Icons.FaTimes />
           </button>
         </div>
@@ -689,8 +719,11 @@ const PropertiesPage = () => {
         {renderContent()}
         {renderPagination()}
       </div>
+
+      {/* Floating Create Button - للهواتف فقط */}
+      {window.innerWidth < 768 && renderFloatingCreateButton()}
     </div>
   );
 };
 
-export default PropertiesPage;
+export default PropertiesPage;  

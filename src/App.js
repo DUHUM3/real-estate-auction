@@ -27,9 +27,12 @@ import CreateLandRequest from './pages/Lands/CreateLandRequest';
 import CreateAuctionRequest from './pages/Auction/CreateAuctionRequest';
 import LandDetails from './pages/Lands/LandDetails';
 import CreateAd from './pages/CreateAd';
+
 // صفحات المصادقة
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
 
 import TermsOfService from './pages/Privacy/TermsOfService';
 import PrivacyPolicy from './pages/Privacy/PrivacyPolicy';
@@ -127,6 +130,11 @@ function App() {
                   <Route path="/create-marketing-request" element={<CreateAuctionRequest />} />
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                                    {/* <Route path="/reset-password/:token" element={<ResetPassword />} /> */}
+
+                  <Route path="/reset-password" element={<ResetPassword />} />
                 </Routes>
               </main>
               

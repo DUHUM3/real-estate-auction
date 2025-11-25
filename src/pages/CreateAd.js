@@ -9,8 +9,8 @@ import {
   FaHome
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-import './Auction/MarketingRequestModal.css'; // استخدام CSS الجديد
-import { locationService } from '../utils/LocationForFiltters'; // استيراد الخدمة
+import './Auction/MarketingRequestModal.css';
+import { locationService } from '../utils/LocationForFiltters';
 
 function CreateAd() {
   const { currentUser } = useAuth();
@@ -64,38 +64,33 @@ function CreateAd() {
     setRegions(allRegions);
   }, []);
 
-  // تحديث المدن عند تغيير المنطقة
- // تحديث المدن عند تغيير المنطقة
-// في useEffect الخاص بتحديث المدن - الحل السريع
-useEffect(() => {
-  if (adFormData.region) {
-    const citiesObject = locationService.getCitiesByRegion();
-    const regionCities = citiesObject[adFormData.region] || [];
-    
-    setCities(regionCities);
-    
-    // إعادة تعيين المدينة إذا لم تكن متاحة في المنطقة الجديدة
-    if (!regionCities.includes(adFormData.city)) {
-      setAdFormData(prev => ({
-        ...prev,
-        city: ''
-      }));
+  useEffect(() => {
+    if (adFormData.region) {
+      const citiesObject = locationService.getCitiesByRegion();
+      const regionCities = citiesObject[adFormData.region] || [];
+      
+      setCities(regionCities);
+      
+      if (!regionCities.includes(adFormData.city)) {
+        setAdFormData(prev => ({
+          ...prev,
+          city: ''
+        }));
+      }
+    } else {
+      setCities([]);
     }
-  } else {
-    setCities([]);
-  }
-}, [adFormData.region, adFormData.city]);
+  }, [adFormData.region, adFormData.city]);
 
   const handleRegionChange = (e) => {
     const region = e.target.value;
     setAdFormData(prev => ({
       ...prev,
       region: region,
-      city: '' // إعادة تعيين المدينة عند تغيير المنطقة
+      city: ''
     }));
   };
 
-  // معالج تحديث المدينة
   const handleCityChange = (e) => {
     const city = e.target.value;
     setAdFormData(prev => ({
@@ -107,7 +102,6 @@ useEffect(() => {
   // التحقق من اكتمال البيانات الضرورية للخطوة الحالية
   const validateCurrentStep = () => {
     if (currentUser?.user_type === 'شركة مزادات') {
-      // التحقق من خطوات المزادات
       if (currentStep === 1) {
         return Boolean(adFormData.title && adFormData.description);
       } else if (currentStep === 2) {
@@ -116,7 +110,6 @@ useEffect(() => {
         return Boolean(adFormData.cover_image);
       }
     } else {
-      // التحقق من خطوات الأراضي
       if (currentStep === 1) {
         return Boolean(
           adFormData.announcement_number && 
@@ -134,11 +127,18 @@ useEffect(() => {
         if (adFormData.purpose === 'بيع') {
           return Boolean(adFormData.price_per_sqm);
         } else if (adFormData.purpose === 'استثمار') {
-          return Boolean(
+          // التحقق من الحقول المطلوبة للاستثمار
+          const investmentFieldsValid = Boolean(
             adFormData.investment_duration && 
-            adFormData.estimated_investment_value && 
-            (!currentUser?.user_type === 'وكيل شرعي' || adFormData.agency_number)
+            adFormData.estimated_investment_value
           );
+          
+          // إذا كان وكيل شرعي، نتحقق من agency_number
+          if (currentUser?.user_type === 'وكيل شرعي') {
+            return investmentFieldsValid && Boolean(adFormData.agency_number);
+          }
+          
+          return investmentFieldsValid;
         }
         return true;
       } else if (currentStep === 4) {
@@ -154,8 +154,10 @@ useEffect(() => {
       const maxSteps = currentUser?.user_type === 'شركة مزادات' ? 3 : 4;
       if (currentStep < maxSteps) {
         setCurrentStep(currentStep + 1);
+        toast.success(`تم الانتقال إلى الخطوة ${currentStep + 1}`);
       } else {
         setFormComplete(true);
+        toast.success('تم استكمال جميع البيانات بنجاح!');
       }
     } else {
       toast.error('يرجى إكمال جميع الحقول المطلوبة قبل الانتقال للخطوة التالية');
@@ -166,15 +168,25 @@ useEffect(() => {
   const handlePrevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      toast.success(`تم الرجوع إلى الخطوة ${currentStep - 1}`);
     }
   };
 
   // إضافة إعلان جديد
   const handleAddAd = async () => {
     setFormLoading(true);
+    
+    // عرض رسالة تحميل
+    const loadingToast = toast.loading('جاري إضافة الإعلان...');
 
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('يرجى تسجيل الدخول أولاً');
+        navigate('/login');
+        return;
+      }
+
       const urls = getApiUrls();
       const formData = new FormData();
 
@@ -191,7 +203,6 @@ useEffect(() => {
           }
         });
 
-        // إضافة الصور والفيديوهات للمزادات
         if (adFormData.cover_image) {
           formData.append('cover_image', adFormData.cover_image);
         }
@@ -248,6 +259,8 @@ useEffect(() => {
         }
       }
 
+      console.log('إرسال البيانات إلى:', urls.create);
+      
       const response = await fetch(urls.create, {
         method: 'POST',
         headers: {
@@ -258,16 +271,25 @@ useEffect(() => {
 
       const result = await response.json();
       
-      if (result.status) {
+      console.log('نتيجة الاستجابة:', result);
+      
+      if (response.ok && result.status) {
+        toast.dismiss(loadingToast);
         toast.success('تم إضافة الإعلان بنجاح');
         resetForm();
-        navigate('/my-ads');
+        setTimeout(() => {
+          navigate('/my-ads');
+        }, 1500);
       } else {
-        toast.error(result.message || 'فشل في إضافة الإعلان');
+        toast.dismiss(loadingToast);
+        const errorMessage = result.message || 'فشل في إضافة الإعلان';
+        toast.error(errorMessage);
+        console.error('خطأ في الإضافة:', errorMessage);
       }
     } catch (error) {
-      toast.error('حدث خطأ أثناء إضافة الإعلان');
-      console.error('Error adding ad:', error);
+      toast.dismiss(loadingToast);
+      console.error('خطأ في الإتصال:', error);
+      toast.error('حدث خطأ في الإتصال بالخادم. يرجى المحاولة مرة أخرى.');
     } finally {
       setFormLoading(false);
       setFormComplete(false);
@@ -327,22 +349,28 @@ useEffect(() => {
           ...adFormData,
           cover_image: files[0]
         });
+        toast.success('تم رفع الصورة الرئيسية بنجاح');
       } else if (name === 'images') {
         setAdFormData({
           ...adFormData,
           images: Array.from(files)
         });
+        toast.success(`تم رفع ${files.length} صورة إضافية`);
       } else if (name === 'videos') {
         setAdFormData({
           ...adFormData,
           videos: Array.from(files)
         });
+        toast.success(`تم رفع ${files.length} فيديو`);
       }
     } else if (type === 'checkbox') {
       setAdFormData({
         ...adFormData,
         [name]: checked
       });
+      if (name === 'legal_declaration' && checked) {
+        toast.success('تم الموافقة على الإقرار القانوني');
+      }
     } else {
       setAdFormData({
         ...adFormData,
@@ -353,6 +381,13 @@ useEffect(() => {
 
   // العودة إلى صفحة الإعلانات
   const handleBackToAds = () => {
+    navigate('/my-ads');
+    toast('تم العودة إلى قائمة الإعلانات', { icon: '🏠' });
+  };
+
+  // إلغاء العملية
+  const handleCancel = () => {
+    toast.error('تم إلغاء عملية الإضافة');
     navigate('/my-ads');
   };
 
@@ -367,7 +402,6 @@ useEffect(() => {
 
   // نموذج خطوات المزادات
   const renderAuctionForm = () => {
-    // مؤشر التقدم للمزادات
     const renderAuctionProgress = () => (
       <div className="request-progress-container">
         <div className="request-progress-wrapper">
@@ -409,7 +443,7 @@ useEffect(() => {
             <div className="header-right">
               <button 
                 className="header-btn outline"
-                onClick={handleBackToAds}
+                onClick={handleCancel}
                 disabled={formLoading}
               >
                 إلغاء
@@ -639,7 +673,6 @@ useEffect(() => {
 
   // نموذج خطوات الأراضي
   const renderPropertyForm = () => {
-    // مؤشر التقدم للأراضي
     const renderPropertyProgress = () => (
       <div className="request-progress-container">
         <div className="request-progress-wrapper">
@@ -685,7 +718,7 @@ useEffect(() => {
             <div className="header-right">
               <button 
                 className="header-btn outline"
-                onClick={handleBackToAds}
+                onClick={handleCancel}
                 disabled={formLoading}
               >
                 إلغاء
@@ -744,7 +777,6 @@ useEffect(() => {
                           />
                         </div>
 
-                        {/* حقل المنطقة */}
                         <div className="form-group">
                           <label>المنطقة *</label>
                           <select
@@ -761,7 +793,6 @@ useEffect(() => {
                           </select>
                         </div>
 
-                        {/* حقل المدينة */}
                         <div className="form-group">
                           <label>المدينة *</label>
                           <select

@@ -53,45 +53,56 @@ function Favorites() {
   };
 
   // دالة لإزالة من المفضلة بناءً على النوع
-  const removeFavorite = async (favorite, e) => {
-    if (e) {
-      e.stopPropagation();
-    }
+const removeFavorite = async (favorite, e) => {
+  if (e) {
+    e.stopPropagation();
+  }
+  
+  try {
+    setRemovingId(favorite.id);
+    const token = localStorage.getItem('token');
     
-    try {
-      setRemovingId(favorite.id);
-      const token = localStorage.getItem('token');
-      
-      let url = '';
-      if (favorite.favoritable_type === 'App\\Models\\Property') {
-        url = `https://shahin-tqay.onrender.com/api/favorites/property/${favorite.favoritable_id}`;
-      } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
-        url = `https://shahin-tqay.onrender.com/api/favorites/auction/${favorite.favoritable_id}`;
-      } else {
-        throw new Error('نوع العنصر غير معروف');
-      }
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        // إزالة العنصر من القائمة محلياً
-        setFavorites(prev => prev.filter(fav => fav.id !== favorite.id));
-      } else {
-        throw new Error('فشل في إزالة العنصر');
-      }
-    } catch (error) {
-      console.error('Error removing favorite:', error);
-      alert('حدث خطأ أثناء إزالة العنصر من المفضلة');
-    } finally {
-      setRemovingId(null);
+    let url = '';
+    if (favorite.favoritable_type === 'App\\Models\\Property') {
+      url = `https://shahin-tqay.onrender.com/api/favorites/property/${favorite.favoritable_id}`;
+    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
+      url = `https://shahin-tqay.onrender.com/api/favorites/auction/${favorite.favoritable_id}`;
+    } else {
+      throw new Error('نوع العنصر غير معروف');
     }
-  };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      // إزالة العنصر من القائمة محلياً
+      setFavorites(prev => prev.filter(fav => fav.id !== favorite.id));
+      
+      // التحديث في التخزين المحلي أيضًا لتزامن الحالة مع PropertiesPage
+      if (favorite.favoritable_type === 'App\\Models\\Property') {
+        const propertyFavorites = JSON.parse(localStorage.getItem('propertyFavorites') || '[]');
+        const updatedPropertyFavorites = propertyFavorites.filter(id => id !== favorite.favoritable_id);
+        localStorage.setItem('propertyFavorites', JSON.stringify(updatedPropertyFavorites));
+      } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
+        const auctionFavorites = JSON.parse(localStorage.getItem('auctionFavorites') || '[]');
+        const updatedAuctionFavorites = auctionFavorites.filter(id => id !== favorite.favoritable_id);
+        localStorage.setItem('auctionFavorites', JSON.stringify(updatedAuctionFavorites));
+      }
+    } else {
+      throw new Error('فشل في إزالة العنصر');
+    }
+  } catch (error) {
+    console.error('Error removing favorite:', error);
+    alert('حدث خطأ أثناء إزالة العنصر من المفضلة');
+  } finally {
+    setRemovingId(null);
+  }
+};
 
   // دالة للانتقال إلى صفحة تفاصيل العنصر بناءً على النوع
   const handleViewItem = (id, type = null) => {
