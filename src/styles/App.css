@@ -3126,7 +3126,7 @@ body {
 }
 
 .interest-card:hover {
-  border-color: #e74c3c;
+  border-color: #4285c9;
 }
 
 /* تحسين العنوان */
@@ -3308,45 +3308,104 @@ body {
 }
 
 /* تصميم متجاوب */
+/* 🌟 نسخة فاخرة وجميلة جدًا للبطاقة في الهاتف */
 @media (max-width: 768px) {
-  .interests-container {
-    padding: 1rem;
+
+  /* البطاقة تصبح صغيرة + أنيقة */
+  .interest-card {
+    padding: 0.75rem 0.9rem;
+    margin-top: 15px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
   }
-  
-  .page-title {
-    font-size: 1.75rem;
-  }
-  
+
+  /* جعل جميع المسافات أصغر بكثير */
   .interest-header {
-    flex-direction: column;
-    align-items: flex-start;
+    margin-bottom: 0.4rem;
+    gap: 0.4rem;
   }
-  
+
+  /* عنوان صغير وأنيق */
+  .interest-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  /* المرجع يصبح أصغر */
+  .interest-reference {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+  }
+
+  /* شارة الحالة — صغيرة وناعمة */
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 10px;
+  }
+
+  /* التفاصيل تصبح مضغوطة جدا */
   .interest-details {
-    grid-template-columns: 1fr;
+    margin: 0.4rem 0;
+    padding: 0.4rem 0;
+    gap: 0.4rem;
+    grid-template-columns: 1fr; /* كلها تحت بعض */
   }
-  
+
+  .detail-label {
+    font-size: 0.7rem;
+  }
+
+  .detail-value {
+    font-size: 0.8rem;
+  }
+
+  /* الأزرار بشكل صغير وراقي */
   .interest-actions {
-    flex-direction: column;
+    margin-top: 0.5rem;
+    gap: 0.4rem;
   }
-  
+
   .view-details-btn,
-  .track-status-btn {
+  .track-status-btn,
+  .remove-favorite-btn,
+  .view-property-btn {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.75rem;
+    border-radius: 8px;
     width: 100%;
-    justify-content: center;
+  }
+
+  /* النصوص الطويلة لا تمدّ البطاقة */
+  .interest-title,
+  .detail-value,
+  .detail-label,
+  .interest-reference {
+    white-space: normal;
+    word-break: break-word;
   }
 }
 
+/* أصغر للايفون SE أو الشاشات الصغيرة */
 @media (max-width: 480px) {
-  .page-title {
-    font-size: 1.5rem;
-  }
-  
   .interest-card {
-    padding: 1rem;
+    padding: 0.6rem;
+    margin-top: 12px;
+    top: 25px;
+  }
+
+  .interest-title {
+    font-size: 0.9rem;
+  }
+
+  .detail-value {
+    font-size: 0.75rem;
   }
 }
-/* تحسينات للأجهزة الصغيرة  لماذا تخترنا*/
+
 /* تصميم الهاتف - الحل النهائي */
 .mobile-why-us {
   display: none;

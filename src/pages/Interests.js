@@ -64,18 +64,18 @@ function Interests() {
   };
 
   // دالة للحصول على أيقونة الحالة
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'قيد المراجعة':
-        return <FiClock />;
-      case 'مقبول':
-        return <FiCheckCircle />;
-      case 'مرفوض':
-        return <FiXCircle />;
-      default:
-        return <FiClock />;
-    }
-  };
+  // const getStatusIcon = (status) => {
+  //   switch (status) {
+  //     case 'قيد المراجعة':
+  //       return <FiClock />;
+  //     case 'مقبول':
+  //       return <FiCheckCircle />;
+  //     case 'مرفوض':
+  //       return <FiXCircle />;
+  //     default:
+  //       return <FiClock />;
+  //   }
+  // };
 
   // دالة للانتقال إلى صفحة تفاصيل الأرض
   const handleViewProperty = (propertyId) => {
@@ -136,7 +136,7 @@ function Interests() {
       <div className="interests-list">
         {interests.length === 0 ? (
           <div className="empty-state">
-            <FiHeart className="empty-icon" />
+            {/* <FiHeart className="empty-icon" /> */}
             <h3>لا توجد اهتمامات</h3>
             <p>لم تقم بالتعبير عن اهتمامك بأي عقار حتى الآن</p>
             <Link to="/lands-and-auctions-list" className="browse-btn">
@@ -157,7 +157,7 @@ function Interests() {
                     الأرض رقم #{interest.property_id}
                   </h3>
                   <span className={`status-badge ${getStatusColor(interest.status)}`}>
-                    {getStatusIcon(interest.status)}
+                    {(interest.status)}
                     {interest.status}
                   </span>
                 </div>
@@ -169,13 +169,13 @@ function Interests() {
 
               <div className="interest-details">
                 <div className="detail-item">
-                  <FiCalendar className="detail-icon" />
+                  {/* <FiCalendar className="detail-icon" /> */}
                   <span className="detail-label">تاريخ التقديم:</span>
                   <span className="detail-value">{formatDate(interest.created_at)}</span>
                 </div>
                 
                 <div className="detail-item">
-                  <FiHeart className="detail-icon" />
+                  {/* <FiHeart className="detail-icon" /> */}
                   <span className="detail-label">الرسالة:</span>
                   <span className="detail-value message-preview">
                     {interest.message || 'لا توجد رسالة'}
@@ -203,7 +203,7 @@ function Interests() {
                 </button>
                 
                 <div className="property-indicator">
-                  <FiMapPin />
+                  {/* <FiMapPin /> */}
                   <span>انقر على البطاقة لعرض الأرض</span>
                 </div>
               </div>

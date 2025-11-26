@@ -140,7 +140,7 @@ function MyRequests() {
   const getStatusClass = (status) => {
     switch (status) {
       case 'open':
-      case 'under_review':
+      case '':
         return 'status-pending';
       case 'approved':
         return 'status-approved';
@@ -218,7 +218,7 @@ function MyRequests() {
           className={`tab-btn ${activeTab === 'lands' ? 'active' : ''}`}
           onClick={() => setActiveTab('lands')}
         >
-          <FiHome className="tab-icon" />
+          {/* <FiHome className="tab-icon" /> */}
           طلبات الأراضي
           {landRequests.length > 0 && (
             <span className="tab-badge">{landRequests.length}</span>
@@ -229,7 +229,7 @@ function MyRequests() {
           className={`tab-btn ${activeTab === 'auctions' ? 'active' : ''}`}
           onClick={() => setActiveTab('auctions')}
         >
-          <FiClock className="tab-icon" />
+          {/* <FiClock className="tab-icon" /> */}
           طلبات المزادات
           {auctionRequests.length > 0 && (
             <span className="tab-badge">{auctionRequests.length}</span>
@@ -262,7 +262,7 @@ function MyRequests() {
               <div className="interest-header">
                 <div className="interest-title-section">
                   <div className="item-type-badge">
-                    {activeTab === 'lands' ? <FiHome /> : <FiClock />}
+                    {/* {activeTab === 'lands' ? <FiHome /> : <FiClock />} */}
                     {activeTab === 'lands' ? 'طلب أرض' : 'طلب مزاد'}
                   </div>
                   
@@ -275,7 +275,7 @@ function MyRequests() {
                 </div>
                 
                 <div className="interest-reference">
-                  <FiCalendar className="reference-icon" />
+                  {/* <FiCalendar className="reference-icon" /> */}
                   <span>تاريخ الطلب: {formatDate(request.created_at || request.createdAt)}</span>
                 </div>
               </div>
@@ -285,7 +285,7 @@ function MyRequests() {
                 {activeTab === 'lands' && (
                   <>
                     <div className="detail-item">
-                      <FiMapPin className="detail-icon" />
+                      {/* <FiMapPin className="detail-icon" /> */}
                       <span className="detail-label">الموقع:</span>
                       <span className="detail-value">
                         {request.region} - {request.city}
@@ -293,7 +293,7 @@ function MyRequests() {
                     </div>
                     
                     <div className="detail-item">
-                      <FiHome className="detail-icon" />
+                      {/* <FiHome className="detail-icon" /> */}
                       <span className="detail-label">نوع الأرض:</span>
                       <span className="detail-value">
                         {getLandType(request.type)}
@@ -329,7 +329,7 @@ function MyRequests() {
                 {activeTab === 'auctions' && (
                   <>
                     <div className="detail-item">
-                      <FiMapPin className="detail-icon" />
+                      {/* <FiMapPin className="detail-icon" /> */}
                       <span className="detail-label">الموقع:</span>
                       <span className="detail-value">
                         {request.region} - {request.city}
@@ -338,7 +338,7 @@ function MyRequests() {
 
                     {request.document_number && (
                       <div className="detail-item">
-                        <FiFileText className="detail-icon" />
+                        {/* <FiFileText className="detail-icon" /> */}
                         <span className="detail-label">رقم المستند:</span>
                         <span className="detail-value">
                           {request.document_number}
@@ -357,7 +357,7 @@ function MyRequests() {
 
                     {request.images && request.images.length > 0 && (
                       <div className="detail-item">
-                        <FiImage className="detail-icon" />
+                        {/* <FiImage className="detail-icon" /> */}
                         <span className="detail-label">المرفقات:</span>
                         <span className="detail-value">
                           {request.images.length} صورة
@@ -392,39 +392,39 @@ function MyRequests() {
       </div>
 
       {/* إحصائيات */}
-      {(landRequests.length > 0 || auctionRequests.length > 0) && (
+      {/* {(landRequests.length > 0 || auctionRequests.length > 0) && (
         <div className="requests-stats">
           <div className="stat-card">
-            <div className="stat-icon land-stat">
-              <FiHome />
-            </div>
+            <div className="stat-icon land-stat"> */}
+              {/* <FiHome /> */}
+            {/* </div>
             <div className="stat-info">
               <span className="stat-number">{landRequests.length}</span>
               <span className="stat-label">طلب أرض</span>
             </div>
-          </div>
+          </div> */}
           
-          <div className="stat-card">
-            <div className="stat-icon auction-stat">
-              <FiClock />
-            </div>
+          {/* <div className="stat-card">
+            <div className="stat-icon auction-stat"> */}
+              {/* <FiClock /> */}
+            {/* </div>
             <div className="stat-info">
               <span className="stat-number">{auctionRequests.length}</span>
               <span className="stat-label">طلب مزاد</span>
             </div>
-          </div>
+          </div> */}
           
-          <div className="stat-card">
-            <div className="stat-icon total-stat">
-              <FiFileText />
-            </div>
+          {/* <div className="stat-card">
+            <div className="stat-icon total-stat"> */}
+              {/* <FiFileText /> */}
+            {/* </div>
             <div className="stat-info">
               <span className="stat-number">{landRequests.length + auctionRequests.length}</span>
               <span className="stat-label">إجمالي الطلبات</span>
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
