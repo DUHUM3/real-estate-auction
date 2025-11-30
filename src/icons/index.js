@@ -50,9 +50,34 @@ import {
   FaYoutube,
   FaTiktok,
   FaSnapchatGhost,
-  FaList
+  FaList,
+  FaEdit, 
+  FaTrash, 
+  FaClipboardList, 
+  FaExclamationTriangle,
+  
 } from 'react-icons/fa';
 
+import { 
+  FiUser, 
+  FiMail, 
+  FiPhone, 
+  FiFileText,
+  FiHome,
+  // FiClockIcon,
+  FiClock,
+  FiCheckCircle,
+  FiXCircle,
+  FiDollarSign,
+  FiBriefcase
+} from 'react-icons/fi';
+
+import { 
+  MdBusiness, 
+  MdAssignment, 
+  MdBadge,
+  MdPerson 
+} from 'react-icons/md';
 // اصدر كل الأيقونات في object واحد
 const Icons = {
   FaHome, 
@@ -109,7 +134,28 @@ const Icons = {
   FaYoutube,
   FaTiktok,
   FaSnapchatGhost,
-  FaList
+  FaList,
+  FiUser, 
+  FiMail, 
+  FiPhone, 
+  FiFileText,
+  FiHome,
+  FiClock,
+  FiCheckCircle,
+  FiXCircle,
+  FiDollarSign,
+  FiBriefcase,
+  MdBusiness, 
+  MdAssignment, 
+  MdBadge,
+  FaTrash,
+  MdPerson,
+  FaEdit, 
+  FaSearch, 
+  FaClipboardList, 
+  FaExclamationTriangle,
+  // FiClockIcon
+
 };
 
 export default Icons;

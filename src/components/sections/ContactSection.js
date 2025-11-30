@@ -14,10 +14,8 @@ const ContactSection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   
-  // استخدام useRef للوصول إلى عنصر الرسالة
   const statusRef = useRef(null);
 
-  // قائمة الأسباب المسموحة
   const allowedReasons = [
     'استشارة عقارية',
     'استفسار عن خدمة',
@@ -39,7 +37,6 @@ const ContactSection = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // التحقق من حجم الملف (10MB كحد أقصى)
       if (file.size > 10 * 1024 * 1024) {
         alert('حجم الملف يجب أن لا يتجاوز 10MB');
         return;
@@ -51,7 +48,6 @@ const ContactSection = () => {
     }
   };
 
-  // دالة للتمرير إلى الرسالة
   const scrollToStatus = () => {
     if (statusRef.current) {
       statusRef.current.scrollIntoView({ 
@@ -59,9 +55,8 @@ const ContactSection = () => {
         block: 'center'
       });
       
-      // إضافة تأثير تركيز مرئي
       statusRef.current.style.transition = 'all 0.3s ease';
-      statusRef.current.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.3)';
+      statusRef.current.style.boxShadow = '0 0 0 3px rgba(83, 161, 221, 0.3)';
       
       setTimeout(() => {
         if (statusRef.current) {
@@ -77,13 +72,11 @@ const ContactSection = () => {
     setSubmitStatus(null);
 
     try {
-      // التحقق من صحة البيانات
       if (!formData.reason || !allowedReasons.includes(formData.reason)) {
         alert('يرجى اختيار سبب صحيح للتواصل');
         return;
       }
 
-      // إنشاء FormData لإرسال الملف
       const submitData = new FormData();
       submitData.append('reason', formData.reason);
       submitData.append('message', formData.message);
@@ -95,8 +88,7 @@ const ContactSection = () => {
         submitData.append('file', formData.file);
       }
 
-      // إرسال البيانات إلى API
-      const response = await fetch('https://shahin-tqay.onrender.com/api/contact', {
+      const response = await fetch('https://core-api-x41.shaheenplus.sa/api/contact', {
         method: 'POST',
         body: submitData
       });
@@ -106,12 +98,10 @@ const ContactSection = () => {
       if (result.success) {
         setSubmitStatus({ type: 'success', message: result.message });
         
-        // الانتظار قليلاً ثم التمرير إلى الرسالة
         setTimeout(() => {
           scrollToStatus();
         }, 100);
         
-        // إعادة تعيين النموذج
         setFormData({
           reason: '',
           message: '',
@@ -120,7 +110,6 @@ const ContactSection = () => {
           phone: '',
           file: null
         });
-        // إعادة تعيين حقل الملف
         const fileInput = document.getElementById('file-upload');
         if (fileInput) fileInput.value = '';
       } else {
@@ -129,7 +118,6 @@ const ContactSection = () => {
           message: result.message || 'حدث خطأ أثناء إرسال الرسالة' 
         });
         
-        // التمرير إلى رسالة الخطأ
         setTimeout(() => {
           scrollToStatus();
         }, 100);
@@ -141,7 +129,6 @@ const ContactSection = () => {
         message: 'حدث خطأ في الاتصال بالخادم' 
       });
       
-      // التمرير إلى رسالة الخطأ
       setTimeout(() => {
         scrollToStatus();
       }, 100);
@@ -151,21 +138,26 @@ const ContactSection = () => {
   };
 
   return (
-    <section className="contact-section" id="contact">
-      <div className="container">
-        <div className="section-header">
-          <h2 className="section-title">
+    <section className="bg-white py-20 relative" id="contact">
+      <div className="container mx-auto px-4">
+        {/* العنوان في أقصى اليمين */}
+        <div className="text-right mb-12">
+          <h2 className="text-1xl md:text-4xl font-bold text-[#343838] relative inline-block">
             تواصل معنا
-            <div className="transparent-box"></div>
+            <div className="absolute inset-0 bg-transparent opacity-20"></div>
           </h2>
         </div>
 
-        <div className="contact-form-container">
-          {/* عرض حالة الإرسال مع ref للوصول السهل */}
+        <div className="max-w-4xl mx-auto bg-gray-50 rounded-2xl p-6 md:p-8 shadow-lg border border-gray-200">
+          {/* عرض حالة الإرسال */}
           {submitStatus && (
             <div 
               ref={statusRef}
-              className={`submit-status ${submitStatus.type}`}
+              className={`p-4 mb-6 rounded-lg text-center font-bold transition-all duration-300 ${
+                submitStatus.type === 'success' 
+                  ? 'bg-green-100 text-green-800 border border-green-200' 
+                  : 'bg-red-100 text-red-800 border border-red-200'
+              }`}
               role="alert"
               aria-live="polite"
             >
@@ -173,17 +165,19 @@ const ContactSection = () => {
             </div>
           )}
 
-          <form className="contact-form" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* حقل سبب التواصل */}
-            <div className="form-group">
-              <label htmlFor="reason">سبب التواصل *</label>
+            <div className="space-y-2">
+              <label htmlFor="reason" className="block text-right text-gray-700 font-medium">
+                سبب التواصل *
+              </label>
               <select
                 id="reason"
                 name="reason"
                 value={formData.reason}
                 onChange={handleInputChange}
                 required
-                className="contact-select"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-transparent text-right bg-white"
               >
                 <option value="">اختر سبب التواصل</option>
                 {allowedReasons.map((reason, index) => (
@@ -195,8 +189,10 @@ const ContactSection = () => {
             </div>
 
             {/* حقل الرسالة */}
-            <div className="form-group">
-              <label htmlFor="message">كيف يمكننا مساعدتك؟ *</label>
+            <div className="space-y-2">
+              <label htmlFor="message" className="block text-right text-gray-700 font-medium">
+                كيف يمكننا مساعدتك؟ *
+              </label>
               <textarea
                 id="message"
                 name="message"
@@ -205,23 +201,26 @@ const ContactSection = () => {
                 placeholder="اشرح لنا احتياجاتك ونوع الاستشارة التي تبحث عنها..."
                 rows="5"
                 required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-transparent text-right resize-none"
               ></textarea>
             </div>
 
             {/* حقل رفع الملفات */}
-            <div className="form-group">
-              <label>ارفق ملف أو صورة (اختياري)</label>
-              <div className="file-upload-container">
+            <div className="space-y-2">
+              <label className="block text-right text-gray-700 font-medium">
+                ارفق ملف أو صورة (اختياري)
+              </label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#53a1dd] transition-colors duration-300">
                 <input
                   type="file"
                   id="file-upload"
-                  className="file-input"
+                  className="hidden"
                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                   onChange={handleFileChange}
                 />
-                <label htmlFor="file-upload" className="file-upload-label">
-                  <div className="upload-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  <div className="text-[#53a1dd] mb-3">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="mx-auto">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" />
                       <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2" />
                       <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2" />
@@ -229,21 +228,25 @@ const ContactSection = () => {
                       <polyline points="10,9 9,9 8,9" stroke="currentColor" strokeWidth="2" />
                     </svg>
                   </div>
-                  <div className="upload-text">
-                    <span className="upload-title">
+                  <div className="space-y-1">
+                    <div className="text-gray-700 font-medium">
                       {formData.file ? formData.file.name : 'انقر لرفع الملفات'}
-                    </span>
-                    <span className="upload-subtitle">PDF, Word, JPG, PNG (الحد الأقصى 10MB)</span>
+                    </div>
+                    <div className="text-gray-500 text-sm">
+                      PDF, Word, JPG, PNG (الحد الأقصى 10MB)
+                    </div>
                   </div>
                 </label>
               </div>
             </div>
 
             {/* معلومات الاتصال */}
-            <div className="contact-fields">
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="full_name">الاسم الكامل *</label>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label htmlFor="full_name" className="block text-right text-gray-700 font-medium">
+                    الاسم الكامل *
+                  </label>
                   <input
                     type="text"
                     id="full_name"
@@ -252,11 +255,14 @@ const ContactSection = () => {
                     onChange={handleInputChange}
                     placeholder="أدخل اسمك الكامل"
                     required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-transparent text-right"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="email">البريد الإلكتروني *</label>
+                <div className="space-y-2">
+                  <label htmlFor="email" className="block text-right text-gray-700 font-medium">
+                    البريد الإلكتروني *
+                  </label>
                   <input
                     type="email"
                     id="email"
@@ -265,14 +271,19 @@ const ContactSection = () => {
                     onChange={handleInputChange}
                     placeholder="example@email.com"
                     required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-transparent text-right"
                   />
                 </div>
               </div>
 
-              <div className="form-group phone-group">
-                <label htmlFor="phone">رقم الجوال (سعودي) *</label>
-                <div className="phone-input-container">
-                  <div className="country-code">+966</div>
+              <div className="space-y-2">
+                <label htmlFor="phone" className="block text-right text-gray-700 font-medium">
+                  رقم الجوال (سعودي) *
+                </label>
+                <div className="flex">
+                  <div className="flex items-center px-4 bg-gray-100 border border-gray-300 border-l-0 rounded-r-lg text-gray-600">
+                    +966
+                  </div>
                   <input
                     type="tel"
                     id="phone"
@@ -283,51 +294,36 @@ const ContactSection = () => {
                     pattern="[0-9]{9}"
                     maxLength="9"
                     required
-                    className="phone-input"
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-transparent text-right border-r-0"
                   />
                 </div>
-                <small className="phone-hint">يجب أن يبدأ الرقم بـ 5</small>
+                <small className="block text-right text-gray-500 text-sm mt-1">
+                  يجب أن يبدأ الرقم بـ 5
+                </small>
               </div>
             </div>
 
             <button 
               type="submit" 
-              className="submit-contact-btn"
+              className={`w-full py-4 px-6 rounded-lg font-bold text-white transition-all duration-300 ${
+                isLoading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-[#53a1dd] hover:bg-[#458bc2] hover:shadow-lg transform hover:-translate-y-1'
+              }`}
               disabled={isLoading}
             >
-              {isLoading ? 'جاري الإرسال...' : 'إرسال الرسالة'}
+              {isLoading ? (
+                <div className="flex items-center justify-center space-x-2 space-x-reverse">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>جاري الإرسال...</span>
+                </div>
+              ) : (
+                'إرسال الرسالة'
+              )}
             </button>
           </form>
         </div>
       </div>
-
-      <style jsx>{`
-        .submit-status {
-          padding: 12px;
-          margin-bottom: 20px;
-          border-radius: 8px;
-          text-align: center;
-          font-weight: bold;
-          transition: all 0.3s ease;
-        }
-        
-        .submit-status.success {
-          background-color: #d4edda;
-          color: #155724;
-          border: 1px solid #c3e6cb;
-        }
-        
-        .submit-status.error {
-          background-color: #f8d7da;
-          color: #721c24;
-          border: 1px solid #f5c6cb;
-        }
-        
-        .submit-contact-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      `}</style>
     </section>
   );
 };

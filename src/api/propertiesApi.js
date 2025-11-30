@@ -1,5 +1,5 @@
 // api/propertiesApi.js
-const API_BASE_URL = 'https://shahin-tqay.onrender.com/api';
+const API_BASE_URL = 'https://core-api-x41.shaheenplus.sa/api';
 
 export const propertiesApi = {
   // جلب العقارات مع الفلاتر
@@ -238,7 +238,7 @@ export const propertiesUtils = {
   // الحصول على صورة العقار
   getPropertyImageUrl: (property) => {
     if (property.cover_image) {
-      return `https://shahin-tqay.onrender.com/storage/${property.cover_image}`;
+      return `https://core-api-x41.shaheenplus.sa/storage/${property.cover_image}`;
     }
     return null;
   },

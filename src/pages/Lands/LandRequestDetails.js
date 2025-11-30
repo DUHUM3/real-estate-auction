@@ -79,7 +79,7 @@ const LandRequestDetails = () => {
       const token = localStorage.getItem('token');
       
       const response = await fetch(
-        `https://shahin-tqay.onrender.com/api/land-requests/${id}`,
+        `https://core-api-x41.shaheenplus.sa/api/land-requests/${id}`,
         {
           headers: { 
             'Authorization': `Bearer ${token}`,
@@ -123,7 +123,7 @@ const LandRequestDetails = () => {
         'Authorization': `Bearer ${token}`
       };
 
-      const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/request/${id}`, {
+      const response = await fetch(`https://core-api-x41.shaheenplus.sa/api/user/favorites/request/${id}`, {
         method: 'GET',
         headers: headers
       });
@@ -168,7 +168,7 @@ const LandRequestDetails = () => {
         'Authorization': `Bearer ${token}`
       };
 
-      const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/request/${id}`, {
+      const response = await fetch(`https://core-api-x41.shaheenplus.sa/api/user/favorites/request/${id}`, {
         method: isFavorite ? 'DELETE' : 'POST',
         headers: headers
       });
@@ -361,7 +361,7 @@ const LandRequestDetails = () => {
       }
 
       const response = await fetch(
-        `https://shahin-tqay.onrender.com/api/land-requests/${id}/offers`,
+        `https://core-api-x41.shaheenplus.sa/api/land-requests/${id}/offers`,
         {
           method: 'POST',
           headers: { 
@@ -535,7 +535,7 @@ const LandRequestDetails = () => {
         <div className="elegantImage_gallery">
           <div className="elegantMain_image">
             <img 
-              src={`https://shahin-tqay.onrender.com/storage/${images[selectedImage]}`} 
+              src={`https://core-api-x41.shaheenplus.sa/storage/${images[selectedImage]}`} 
               alt="Main" 
               onClick={() => setShowImageModal(true)}
             />
@@ -576,7 +576,7 @@ const LandRequestDetails = () => {
                   className={`elegantThumbnail ${selectedImage === index ? 'elegantActive' : ''}`}
                   onClick={() => setSelectedImage(index)}
                 >
-                  <img src={`https://shahin-tqay.onrender.com/storage/${image}`} alt={`Thumbnail ${index + 1}`} />
+                  <img src={`https://core-api-x41.shaheenplus.sa/storage/${image}`} alt={`Thumbnail ${index + 1}`} />
                 </div>
               ))}
             </div>
@@ -746,7 +746,7 @@ const LandRequestDetails = () => {
               <FaTimes />
             </button>
             <img 
-              src={`https://shahin-tqay.onrender.com/storage/${images[selectedImage]}`} 
+              src={`https://core-api-x41.shaheenplus.sa/storage/${images[selectedImage]}`} 
               alt="Enlarged view" 
             />
           </div>

@@ -1,7 +1,7 @@
 // api/notificationService.js
 import axios from 'axios';
 
-const API_URL = 'https://shahin-tqay.onrender.com/api';
+const API_URL = 'https://core-api-x41.shaheenplus.sa/api';
 
 // جلب آخر الإشعارات مع الباجينيشين
 export const fetchLatestNotifications = async (page = 1) => {

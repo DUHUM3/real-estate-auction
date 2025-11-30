@@ -1,5 +1,5 @@
 // api/auctionsApi.js
-const API_BASE_URL = 'https://shahin-tqay.onrender.com/api';
+const API_BASE_URL = 'https://core-api-x41.shaheenplus.sa/api';
 
 export const auctionsApi = {
   // جلب المزادات مع الفلاتر
@@ -87,7 +87,7 @@ export const auctionsUtils = {
   // الحصول على صورة المزاد
   getAuctionImageUrl: (auction) => {
     if (auction.cover_image) {
-      return `https://shahin-tqay.onrender.com/storage/${auction.cover_image}`;
+      return `https://core-api-x41.shaheenplus.sa/storage/${auction.cover_image}`;
     }
     return null;
   },

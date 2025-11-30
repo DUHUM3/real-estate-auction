@@ -2,11 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { authApi } from '../../api/authApi';
-import '../../styles/AuthModal.css';
-
 import toast from 'react-hot-toast';
-
-import { FiEye, FiEyeOff, FiX, FiUser, FiPhone, FiFile, FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiX, FiUser, FiPhone, FiFile, FiArrowLeft, FiArrowRight, FiMail, FiLock } from 'react-icons/fi';
 
 function Register({ onClose, onSwitchToLogin }) {
   const [userTypeId, setUserTypeId] = useState(1);
@@ -62,7 +59,6 @@ function Register({ onClose, onSwitchToLogin }) {
         [name]: file
       });
       
-      // حفظ معلومات الملف المرفوع
       if (file) {
         setUploadedFiles({
           ...uploadedFiles,
@@ -102,7 +98,6 @@ function Register({ onClose, onSwitchToLogin }) {
   const handleUserTypeChange = (typeId) => {
     setUserTypeId(parseInt(typeId));
     setCurrentStep(1);
-    // إعادة تعيين البيانات والأخطاء عند تغيير نوع المستخدم
     setFormData({
       full_name: '',
       email: '',
@@ -139,19 +134,16 @@ function Register({ onClose, onSwitchToLogin }) {
     });
   };
 
-  // دالة التحقق من الإيميل
   const isValidEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
-  // دالة التحقق من رقم الجوال السعودي
   const isValidPhone = (phone) => {
     const regex = /^(05)([0-9]{8})$/;
     return regex.test(phone);
   };
 
-  // دالة التحقق من رقم الهوية
   const isValidNationalId = (nationalId) => {
     const regex = /^[0-9]{10}$/;
     return regex.test(nationalId);
@@ -162,7 +154,6 @@ function Register({ onClose, onSwitchToLogin }) {
     let isValid = true;
 
     if (currentStep === 1) {
-      // التحقق من البيانات الشخصية
       if (!formData.full_name.trim()) {
         errors.full_name = "الرجاء إدخال الاسم الثلاثي";
         isValid = false;
@@ -179,7 +170,6 @@ function Register({ onClose, onSwitchToLogin }) {
         isValid = false;
       }
 
-      // التحقق من الحقول الإضافية بناءً على نوع المستخدم
       if (userTypeId === 2 || userTypeId === 3 || userTypeId === 5 || userTypeId === 6) {
         if (!formData.national_id.trim()) {
           errors.national_id = "الرجاء إدخال رقم الهوية";
@@ -198,7 +188,6 @@ function Register({ onClose, onSwitchToLogin }) {
       }
     } 
     else if (currentStep === 2) {
-      // التحقق من بيانات المنشأة والتراخيص
       if (userTypeId === 4 || userTypeId === 6) {
         if (!formData.entity_name.trim()) {
           errors.entity_name = "الرجاء إدخال اسم المنشأة";
@@ -233,7 +222,6 @@ function Register({ onClose, onSwitchToLogin }) {
       }
     } 
     else if (currentStep === 3 || (currentStep === 2 && ![4, 5, 6].includes(userTypeId))) {
-      // التحقق من بيانات تسجيل الدخول
       if (!formData.email.trim()) {
         errors.email = "الرجاء إدخال البريد الإلكتروني";
         isValid = false;
@@ -276,42 +264,36 @@ function Register({ onClose, onSwitchToLogin }) {
   const validateAllFields = () => {
     let errors = {};
 
-    // فحص الاسم الكامل
     if (!formData.full_name.trim()) {
       errors.full_name = "الرجاء إدخال الاسم الثلاثي";
     } else if (formData.full_name.trim().split(' ').length < 2) {
       errors.full_name = "الرجاء إدخال الاسم الثلاثي كاملاً";
     }
 
-    // فحص الإيميل
     if (!formData.email.trim()) {
       errors.email = "الرجاء إدخال البريد الإلكتروني";
     } else if (!isValidEmail(formData.email.trim())) {
       errors.email = "صيغة البريد الإلكتروني غير صحيحة";
     }
 
-    // فحص كلمة المرور
     if (!formData.password.trim()) {
       errors.password = "الرجاء إدخال كلمة المرور";
     } else if (formData.password.length < 6) {
       errors.password = "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
     }
 
-    // فحص تأكيد كلمة المرور
     if (!formData.password_confirmation.trim()) {
       errors.password_confirmation = "الرجاء تأكيد كلمة المرور";
     } else if (formData.password !== formData.password_confirmation) {
       errors.password_confirmation = "كلمات المرور غير متطابقة";
     }
 
-    // فحص رقم الجوال
     if (!formData.phone.trim()) {
       errors.phone = "الرجاء إدخال رقم الجوال";
     } else if (!isValidPhone(formData.phone.trim())) {
       errors.phone = "رقم الجوال يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام";
     }
 
-    // التحقق من الحقول الإضافية بناءً على نوع المستخدم
     if (userTypeId === 2 || userTypeId === 3 || userTypeId === 5 || userTypeId === 6) {
       if (!formData.national_id.trim()) {
         errors.national_id = "الرجاء إدخال رقم الهوية";
@@ -362,20 +344,17 @@ function Register({ onClose, onSwitchToLogin }) {
 
     if (!validateCurrentStep()) return;
     
-    // إذا كانت هناك خطوات أخرى، انتقل إليها بدلاً من إرسال النموذج
     const maxSteps = getMaxSteps();
     if (currentStep < maxSteps) {
       nextStep();
       return;
     }
 
-    // التحقق من جميع الحقول قبل الإرسال
     if (!validateAllFields()) return;
 
     setLoading(true);
 
     try {
-      // إعداد البيانات بناءً على نوع المستخدم
       const userData = {
         full_name: formData.full_name,
         email: formData.email,
@@ -385,20 +364,19 @@ function Register({ onClose, onSwitchToLogin }) {
         user_type_id: userTypeId
       };
 
-      // إضافة الحقول الإضافية بناءً على نوع المستخدم
-      if (userTypeId === 2) { // مالك أرض
+      if (userTypeId === 2) {
         userData.national_id = formData.national_id;
-      } else if (userTypeId === 3) { // وكيل شرعي
+      } else if (userTypeId === 3) {
         userData.national_id = formData.national_id;
         userData.agency_number = formData.agency_number;
-      } else if (userTypeId === 4) { // منشأة تجارية
+      } else if (userTypeId === 4) {
         userData.entity_name = formData.entity_name;
         userData.commercial_register = formData.commercial_register;
         userData.national_id = formData.national_id;
-      } else if (userTypeId === 5) { // وسيط عقاري
+      } else if (userTypeId === 5) {
         userData.national_id = formData.national_id;
         userData.license_number = formData.license_number;
-      } else if (userTypeId === 6) { // شركة مزادات
+      } else if (userTypeId === 6) {
         userData.national_id = formData.national_id;
         userData.entity_name = formData.entity_name;
         userData.commercial_register = formData.commercial_register;
@@ -407,7 +385,6 @@ function Register({ onClose, onSwitchToLogin }) {
         userData.license_file = formData.license_file;
       }
 
-      // استخدام الـ API المنفصل
       const response = await authApi.register(userData, userTypeId);
 
       const userDataResponse = {
@@ -431,13 +408,11 @@ function Register({ onClose, onSwitchToLogin }) {
     } catch (error) {
       console.error('Registration error:', error);
       
-      // معالجة أخطاء التسجيل المختلفة
       if (error.message?.includes("email") || error.message?.includes("البريد الإلكتروني")) {
         setFieldErrors({
           ...fieldErrors,
           email: "البريد الإلكتروني مستخدم بالفعل"
         });
-        // الرجوع إلى الخطوة التي تحتوي على حقل البريد الإلكتروني
         setCurrentStep(getMaxSteps());
       } else if (error.message?.includes("phone") || error.message?.includes("الجوال")) {
         setFieldErrors({
@@ -465,19 +440,17 @@ function Register({ onClose, onSwitchToLogin }) {
     }
   };
 
-  // تحديد عدد الخطوات بناءً على نوع المستخدم
   const getMaxSteps = () => {
     if (userTypeId === 1) {
-      return 2; // المستخدم العادي: بيانات شخصية + بيانات الدخول
+      return 2;
     } else if (userTypeId === 2 || userTypeId === 3) {
-      return 2; // مالك الأرض والوكيل الشرعي: بيانات شخصية + بيانات الدخول
+      return 2;
     } else if (userTypeId === 4 || userTypeId === 5 || userTypeId === 6) {
-      return 3; // المنشأة التجارية والوسيط العقاري وشركة المزادات: بيانات شخصية + بيانات منشأة + بيانات دخول
+      return 3;
     }
     return 2;
   };
 
-  // دالة لعرض عنوان الخطوة الحالية
   const getStepTitle = () => {
     if (currentStep === 1) {
       return "البيانات الشخصية";
@@ -492,250 +465,460 @@ function Register({ onClose, onSwitchToLogin }) {
     return "";
   };
 
-  // دالة لعرض التقدم في الخطوات
   const renderProgress = () => {
     const maxSteps = getMaxSteps();
     return (
-      <div className="registration-progress">
-        <div className="progress-title">{getStepTitle()}</div>
-        <div className="progress-steps">
-          <div className="step-dots">
+      <div className="mb-5">
+        <h3 className="text-base font-semibold text-gray-900 text-center mb-3">
+          {getStepTitle()}
+        </h3>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex space-x-1 ml-1">
             {[...Array(maxSteps)].map((_, index) => (
               <div 
                 key={index} 
-                className={`step-dot ${currentStep > index ? 'completed' : ''} ${currentStep === index + 1 ? 'active' : ''}`}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                  currentStep > index + 1 
+                    ? 'bg-green-500' 
+                    : currentStep === index + 1 
+                    ? 'bg-blue-600' 
+                    : 'bg-gray-300'
+                }`}
               ></div>
             ))}
           </div>
-          <div className="step-counter">
+          <span className="text-xs text-gray-600">
             الخطوة {currentStep} من {maxSteps}
-          </div>
+          </span>
         </div>
       </div>
     );
   };
 
-  // دالة لتنظيم الحقول في صفوف كل حقلين
-  const renderFieldRow = (fields) => {
-    const rows = [];
-    for (let i = 0; i < fields.length; i += 2) {
-      const field1 = fields[i];
-      const field2 = fields[i + 1];
-      
-      rows.push(
-        <div key={i} className="form-row">
-          <div className="form-group">
-            {field1}
-          </div>
-          {field2 && (
-            <div className="form-group">
-              {field2}
-            </div>
-          )}
-        </div>
-      );
-    }
-    return rows;
-  };
-
-  // عرض حقل رفع الملفات بتصميم محسن
   const renderFileUploadField = (name, label, errorMsg) => {
     const uploadedFile = uploadedFiles[name];
     
     return (
-      <div className="file-upload-field">
-        <label className="form-label">{label}</label>
-        <div className={`file-upload-container ${fieldErrors[name] ? "input-error" : ""} ${uploadedFile ? "has-file" : ""}`}>
+      <div className="mb-4">
+        <label className="block text-xs font-medium text-gray-700 mb-1">
+          {label}
+        </label>
+        <div className={`border-2 border-dashed rounded-xl p-3 text-center transition-all duration-200 ${
+          fieldErrors[name] 
+            ? 'border-red-300 bg-red-50' 
+            : uploadedFile 
+            ? 'border-green-300 bg-green-50' 
+            : 'border-gray-300 bg-gray-50 hover:border-gray-400'
+        }`}>
           <input 
             type="file" 
             name={name} 
             id={name}
             onChange={handleChange} 
-            className="file-input" 
+            className="hidden" 
             disabled={loading}
             accept=".pdf,.jpg,.jpeg,.png"
           />
-          <label htmlFor={name} className="file-upload-label">
+          <label htmlFor={name} className="cursor-pointer">
             {uploadedFile ? (
-              <div className="file-info">
-                <FiFile className="file-icon" />
-                <div className="file-details">
-                  <div className="file-name">{uploadedFile.name}</div>
-                  <div className="file-size">{uploadedFile.size}</div>
+              <div className="flex items-center justify-center gap-2">
+                <FiFile className="w-6 h-6 text-green-600" />
+                <div className="text-right">
+                  <div className="font-medium text-sm text-green-800 truncate max-w-[150px]">{uploadedFile.name}</div>
+                  <div className="text-xs text-green-600">{uploadedFile.size}</div>
                 </div>
               </div>
             ) : (
-              <div className="upload-placeholder">
-                <FiFile className="file-icon" />
-                <span>اختر ملفًا أو اسحبه هنا</span>
-                <small>PDF, JPG, PNG (الحد الأقصى 5MB)</small>
+              <div>
+                <FiFile className="w-5 h-5 text-gray-400 mx-auto mb-1" />
+                <div className="text-sm text-gray-600">اختر ملفًا أو اسحبه هنا</div>
+                <div className="text-xs text-gray-500 mt-1">PDF, JPG, PNG (الحد الأقصى 5MB)</div>
               </div>
             )}
           </label>
         </div>
-        {fieldErrors[name] && <p className="field-error-text">{errorMsg || fieldErrors[name]}</p>}
+        {fieldErrors[name] && (
+          <p className="mt-1 text-xs text-red-600">{errorMsg || fieldErrors[name]}</p>
+        )}
       </div>
     );
   };
 
-  // الخطوة الأولى: البيانات الشخصية
-  const renderPersonalInfoFields = () => {
-    const fields = [
-      <><label className="form-label">الاسم الثلاثي</label><div className="input-with-icon"><FiUser className="input-icon" /><input type="text" name="full_name" placeholder="الاسم الثلاثي" value={formData.full_name} onChange={handleChange} className={`form-input ${fieldErrors.full_name ? "input-error" : ""}`} disabled={loading} /></div>{fieldErrors.full_name && <p className="field-error-text">{fieldErrors.full_name}</p>}</>,
-      <><label className="form-label">رقم الجوال</label><div className="input-with-icon"><FiPhone className="input-icon" /><input type="tel" name="phone" placeholder="05xxxxxxxx" value={formData.phone} onChange={handleChange} className={`form-input ${fieldErrors.phone ? "input-error" : ""}`} disabled={loading} /></div>{fieldErrors.phone && <p className="field-error-text">{fieldErrors.phone}</p>}</>
-    ];
+  const renderCurrentStepFields = () => {
+    const maxSteps = getMaxSteps();
     
-    // إضافة حقول إضافية بناءً على نوع المستخدم
-    if (userTypeId === 2 || userTypeId === 3 || userTypeId === 5 || userTypeId === 6) {
-      fields.push(
-        <><label className="form-label">رقم الهوية</label><div className="input-with-icon"><input type="text" name="national_id" placeholder="رقم الهوية" value={formData.national_id} onChange={handleChange} className={`form-input ${fieldErrors.national_id ? "input-error" : ""}`} disabled={loading} /></div>{fieldErrors.national_id && <p className="field-error-text">{fieldErrors.national_id}</p>}</>
-      );
-    }
-    
-    if (userTypeId === 3) {
-      fields.push(
-        <><label className="form-label">رقم الوكالة الشرعية</label><div className="input-with-icon"><input type="text" name="agency_number" placeholder="رقم الوكالة الشرعية" value={formData.agency_number} onChange={handleChange} className={`form-input ${fieldErrors.agency_number ? "input-error" : ""}`} disabled={loading} /></div>{fieldErrors.agency_number && <p className="field-error-text">{fieldErrors.agency_number}</p>}</>
-      );
-    }
-    
-    return renderFieldRow(fields);
-  };
+    return (
+      <div className="space-y-4">
+        {/* Step 1: Personal Info */}
+        {currentStep === 1 && (
+          <>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  الاسم الثلاثي
+                </label>
+                <div className="relative">
+                  <FiUser className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                  <input
+                    type="text"
+                    name="full_name"
+                    placeholder="الاسم الثلاثي"
+                    value={formData.full_name}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                      fieldErrors.full_name ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  />
+                </div>
+                {fieldErrors.full_name && (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.full_name}</p>
+                )}
+              </div>
 
-  // الخطوة الثانية: بيانات المنشأة والتراخيص
-  const renderEntityFields = () => {
-    const fields = [];
-    
-    if (userTypeId === 4 || userTypeId === 6) {
-      fields.push(
-        <><label className="form-label">اسم المنشأة</label><div className="input-with-icon"><input type="text" name="entity_name" placeholder="اسم المنشأة" value={formData.entity_name} onChange={handleChange} className={`form-input ${fieldErrors.entity_name ? "input-error" : ""}`} disabled={loading} /></div>{fieldErrors.entity_name && <p className="field-error-text">{fieldErrors.entity_name}</p>}</>,
-        <><label className="form-label">رقم السجل التجاري</label><div className="input-with-icon"><input type="text" name="commercial_register" placeholder="رقم السجل التجاري" value={formData.commercial_register} onChange={handleChange} className={`form-input ${fieldErrors.commercial_register ? "input-error" : ""}`} disabled={loading} /></div>{fieldErrors.commercial_register && <p className="field-error-text">{fieldErrors.commercial_register}</p>}</>
-      );
-    }
-    
-    if (userTypeId === 5 || userTypeId === 6) {
-      fields.push(
-        <><label className="form-label">{userTypeId === 5 ? "رقم الترخيص العقاري" : "رقم ترخيص المزادات"}</label><div className="input-with-icon"><input type="text" name="license_number" placeholder={userTypeId === 5 ? "رقم الترخيص العقاري" : "رقم ترخيص المزادات"} value={formData.license_number} onChange={handleChange} className={`form-input ${fieldErrors.license_number ? "input-error" : ""}`} disabled={loading} /></div>{fieldErrors.license_number && <p className="field-error-text">{fieldErrors.license_number}</p>}</>
-      );
-    }
-    
-    // إضافة حقول رفع الملفات لشركات المزادات
-    if (userTypeId === 6) {
-      return (
-        <>
-          {renderFieldRow(fields)}
-          <div className="form-row full-width">
-            <div className="form-group">
-              {renderFileUploadField("commercial_register_file", "ملف السجل التجاري", "الرجاء رفع ملف السجل التجاري")}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  رقم الجوال
+                </label>
+                <div className="relative">
+                  <FiPhone className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="05xxxxxxxx"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                      fieldErrors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  />
+                </div>
+                {fieldErrors.phone && (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.phone}</p>
+                )}
+              </div>
             </div>
-            <div className="form-group">
-              {renderFileUploadField("license_file", "ملف ترخيص المزادات", "الرجاء رفع ملف الترخيص")}
+
+            {(userTypeId === 2 || userTypeId === 3 || userTypeId === 5 || userTypeId === 6) && (
+              <div className={userTypeId === 3 ? "grid grid-cols-1 gap-4" : ""}>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    رقم الهوية
+                  </label>
+                  <input
+                    type="text"
+                    name="national_id"
+                    placeholder="رقم الهوية"
+                    value={formData.national_id}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                      fieldErrors.national_id ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  />
+                  {fieldErrors.national_id && (
+                    <p className="mt-1 text-xs text-red-600">{fieldErrors.national_id}</p>
+                  )}
+                </div>
+
+                {userTypeId === 3 && (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      رقم الوكالة الشرعية
+                    </label>
+                    <input
+                      type="text"
+                      name="agency_number"
+                      placeholder="رقم الوكالة الشرعية"
+                      value={formData.agency_number}
+                      onChange={handleChange}
+                      disabled={loading}
+                      className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                        fieldErrors.agency_number ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    />
+                    {fieldErrors.agency_number && (
+                      <p className="mt-1 text-xs text-red-600">{fieldErrors.agency_number}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Step 2: Entity/License Info */}
+        {currentStep === 2 && (userTypeId === 4 || userTypeId === 5 || userTypeId === 6) && (
+          <>
+            {(userTypeId === 4 || userTypeId === 6) && (
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    اسم المنشأة
+                  </label>
+                  <input
+                    type="text"
+                    name="entity_name"
+                    placeholder="اسم المنشأة"
+                    value={formData.entity_name}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                      fieldErrors.entity_name ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  />
+                  {fieldErrors.entity_name && (
+                    <p className="mt-1 text-xs text-red-600">{fieldErrors.entity_name}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    رقم السجل التجاري
+                  </label>
+                  <input
+                    type="text"
+                    name="commercial_register"
+                    placeholder="رقم السجل التجاري"
+                    value={formData.commercial_register}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                      fieldErrors.commercial_register ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  />
+                  {fieldErrors.commercial_register && (
+                    <p className="mt-1 text-xs text-red-600">{fieldErrors.commercial_register}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {(userTypeId === 5 || userTypeId === 6) && (
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  {userTypeId === 5 ? "رقم الترخيص العقاري" : "رقم ترخيص المزادات"}
+                </label>
+                <input
+                  type="text"
+                  name="license_number"
+                  placeholder={userTypeId === 5 ? "رقم الترخيص العقاري" : "رقم ترخيص المزادات"}
+                  value={formData.license_number}
+                  onChange={handleChange}
+                  disabled={loading}
+                  className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                    fieldErrors.license_number ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                />
+                {fieldErrors.license_number && (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.license_number}</p>
+                )}
+              </div>
+            )}
+
+            {userTypeId === 6 && (
+              <div className="grid grid-cols-1 gap-3">
+                {renderFileUploadField("commercial_register_file", "ملف السجل التجاري", "الرجاء رفع ملف السجل التجاري")}
+                {renderFileUploadField("license_file", "ملف ترخيص المزادات", "الرجاء رفع ملف الترخيص")}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Step 3 or Step 2 for regular users: Login Info */}
+        {(currentStep === 3 || (currentStep === 2 && ![4, 5, 6].includes(userTypeId))) && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                البريد الإلكتروني
+              </label>
+              <div className="relative">
+                <FiMail className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="example@gmail.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  disabled={loading}
+                  className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                    fieldErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  dir="ltr"
+                />
+              </div>
+              {fieldErrors.email && (
+                <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                كلمة المرور
+              </label>
+              <div className="relative">
+                <FiLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  disabled={loading}
+                  className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                    fieldErrors.password ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  dir="ltr"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  disabled={loading}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                >
+                  {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                </button>
+              </div>
+              {fieldErrors.password && (
+                <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                تأكيد كلمة المرور
+              </label>
+              <div className="relative">
+                <FiLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="password_confirmation"
+                  placeholder="••••••••"
+                  value={formData.password_confirmation}
+                  onChange={handleChange}
+                  disabled={loading}
+                  className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                    fieldErrors.password_confirmation ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  dir="ltr"
+                />
+                <button
+                  type="button"
+                  onClick={toggleConfirmPasswordVisibility}
+                  disabled={loading}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                >
+                  {showConfirmPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                </button>
+              </div>
+              {fieldErrors.password_confirmation && (
+                <p className="mt-1 text-xs text-red-600">{fieldErrors.password_confirmation}</p>
+              )}
             </div>
           </div>
-        </>
-      );
-    }
-    
-    return renderFieldRow(fields);
+        )}
+      </div>
+    );
   };
 
-  // الخطوة الثالثة (أو الثانية للمستخدمين العاديين): بيانات الدخول
-  const renderLoginInfoFields = () => {
-    const fields = [
-      <><label className="form-label">البريد الإلكتروني</label><div className="input-with-icon"><input type="email" name="email" placeholder="example@email.com" value={formData.email} onChange={handleChange} className={`form-input ${fieldErrors.email ? "input-error" : ""}`} disabled={loading} /></div>{fieldErrors.email && <p className="field-error-text">{fieldErrors.email}</p>}</>,
-      <><label className="form-label">كلمة المرور</label><div className="password-input-container"><input type={showPassword ? "text" : "password"} name="password" placeholder="........." value={formData.password} onChange={handleChange} className={`form-input password-input ${fieldErrors.password ? "input-error" : ""}`} disabled={loading} /><button type="button" className="password-toggle-btn" onClick={togglePasswordVisibility} disabled={loading}>{showPassword ? <FiEyeOff /> : <FiEye />}</button></div>{fieldErrors.password && <p className="field-error-text">{fieldErrors.password}</p>}</>,
-      <><label className="form-label">تأكيد كلمة المرور</label><div className="password-input-container"><input type={showConfirmPassword ? "text" : "password"} name="password_confirmation" placeholder="........." value={formData.password_confirmation} onChange={handleChange} className={`form-input password-input ${fieldErrors.password_confirmation ? "input-error" : ""}`} disabled={loading} /><button type="button" className="password-toggle-btn" onClick={toggleConfirmPasswordVisibility} disabled={loading}>{showConfirmPassword ? <FiEyeOff /> : <FiEye />}</button></div>{fieldErrors.password_confirmation && <p className="field-error-text">{fieldErrors.password_confirmation}</p>}</>
-    ];
-    
-    return renderFieldRow(fields);
-  };
-
-  // عرض الحقول بناءً على الخطوة الحالية
-  const renderCurrentStepFields = () => {
-    if (currentStep === 1) {
-      return renderPersonalInfoFields();
-    } else if (currentStep === 2) {
-      if (userTypeId === 4 || userTypeId === 5 || userTypeId === 6) {
-        return renderEntityFields();
-      } else {
-        return renderLoginInfoFields();
-      }
-    } else if (currentStep === 3) {
-      return renderLoginInfoFields();
-    }
-    return null;
-  };
-
-  // أزرار التنقل بين الخطوات
   const renderNavigationButtons = () => {
     const maxSteps = getMaxSteps();
     return (
-      <div className="form-navigation-buttons">
+      <div className="flex gap-3 mt-5">
         {currentStep > 1 && (
           <button 
             type="button" 
-            className="btn-navigation btn-prev" 
             onClick={prevStep}
             disabled={loading}
+            className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border border-gray-300 text-sm text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <FiArrowRight className="btn-icon" /> السابق
+            <FiArrowRight className="w-3.5 h-3.5" />
+            السابق
           </button>
         )}
         
         <button 
-          type="submit" 
-          className={`btn-navigation ${currentStep === maxSteps ? "btn-register-submit" : "btn-next"}`}
+          type="submit"
           disabled={loading}
+          className={`flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+            currentStep === maxSteps 
+              ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow hover:shadow-md transform hover:-translate-y-0.5'
+              : 'bg-gray-800 text-white hover:bg-gray-900'
+          } disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
         >
-          {loading ? 'جاري التحميل...' : (currentStep === maxSteps ? 'إنشاء الحساب' : 'التالي')} {currentStep !== maxSteps && <FiArrowLeft className="btn-icon" />}
+          {loading ? (
+            <span className="flex items-center gap-1">
+              <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              جاري التحميل...
+            </span>
+          ) : (
+            <>
+              {currentStep === maxSteps ? 'إنشاء الحساب' : 'التالي'}
+              {currentStep !== maxSteps && <FiArrowLeft className="w-3.5 h-3.5" />}
+            </>
+          )}
         </button>
       </div>
     );
   };
 
   return (
-    <div className="auth-modal-overlay" onClick={handleOverlayClick}>
-      <div className="auth-modal register-modal">
-        <div className="auth-modal-header">
-          <button className="close-btn" onClick={onClose}>
-            <FiX size={22} />
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-3"
+      onClick={handleOverlayClick}
+    >
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        
+        {/* Header */}
+        <div className="flex justify-end p-2 sticky top-0 bg-white border-b border-gray-100">
+          <button 
+            onClick={onClose}
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-200"
+          >
+            <FiX size={18} className="text-gray-600" />
           </button>
         </div>
-        
-        <div className="auth-content">
-          {/* قسم الشعار */}
-          <div className="auth-hero-section">
-            <div className="logo-container">
-              <img 
-                src="/images/logo2.webp" 
-                alt="منصة الاراضي السعودية" 
-                className="auth-logo"
+
+        <div className="px-4 pb-4">
+          
+          {/* Hero Section */}
+          <div className="text-center mb-4">
+            <div className="flex justify-center mb-4">
+              <img
+                src="/images/logo2.webp"
+                alt="منصة الاراضي السعودية"
+                className="h-16 w-auto"
               />
             </div>
-            <p className="auth-subtitle">إبدأ رحلتك العقارية معنا</p>
-            <div className="auth-divider"></div>
+            <p className="text-gray-600 text-sm">
+              إبدأ رحلتك العقارية معنا
+            </p>
           </div>
 
-          {/* خيارات التسجيل */}
-          <div className="auth-options">
+          {/* Tabs */}
+          <div className="flex bg-gray-100 rounded-lg p-1 mb-4 text-sm">
             <button 
-              className="auth-option-btn" 
               onClick={onSwitchToLogin}
+              className="flex-1 py-2 px-3 text-gray-600 font-medium rounded-md hover:text-gray-900 transition-all duration-200"
             >
               تسجيل الدخول
             </button>
-            <button className="auth-option-btn active">
+            <button className="flex-1 py-2 px-3 bg-white text-gray-900 font-medium rounded-md shadow-sm transition-all duration-200">
               حساب جديد
             </button>
           </div>
 
-          {/* اختيار نوع المستخدم */}
-          <div className="user-type-section">
-            <label className="form-label">نوع الحساب</label>
+          {/* User Type Selection */}
+          <div className="mb-4">
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              نوع الحساب
+            </label>
             <select 
               value={userTypeId} 
               onChange={(e) => handleUserTypeChange(e.target.value)}
-              className="form-input user-type-select"
               disabled={loading}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
             >
               <option value={1}>مستخدم عادي</option>
               <option value={2}>مالك أرض</option>
@@ -746,16 +929,14 @@ function Register({ onClose, onSwitchToLogin }) {
             </select>
           </div>
           
-          {/* عرض مؤشر التقدم */}
+          {/* Progress Indicator */}
           {renderProgress()}
 
-          {/* نموذج التسجيل مع إمكانية التمرير */}
-          <div className="form-scroll-container">
-            <form onSubmit={handleSubmit} className="auth-form register-form">
-              {renderCurrentStepFields()}
-              {renderNavigationButtons()}
-            </form>
-          </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit}>
+            {renderCurrentStepFields()}
+            {renderNavigationButtons()}
+          </form>
         </div>
       </div>
     </div>

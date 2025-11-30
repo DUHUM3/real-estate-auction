@@ -1,7 +1,7 @@
 // src/api/landRequestApi.js
 import axios from 'axios';
 
-const API_BASE_URL = 'https://shahin-tqay.onrender.com/api';
+const API_BASE_URL = 'https://core-api-x41.shaheenplus.sa/api';
 
 const landApi = {
   submitLandRequest: async (formData) => {

@@ -1,129 +1,64 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
-import { 
-  FaPlus, 
-  FaEdit, 
-  FaTrash, 
-  FaFilter, 
-  FaSearch, 
-  FaTag,          
-  FaClipboardList, 
-  FaExclamationTriangle,
-  FaMapMarkerAlt,
-  FaCalendarAlt,
-  FaMoneyBillWave
-} from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import '../styles/MyAds.css';
+import { 
+  fetchAds, 
+  deleteAd, 
+  parseAdsData 
+} from '../api/adsApi';
+import MyAdsSkeleton from '../Skeleton/MyAdsSkeleton';
+
+// استيراد الأيقونات مباشرة
+import Icons from '../icons/index';
 
 function MyAds() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const [ads, setAds] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const queryClient = useQueryClient();
+  
   const [activeStatus, setActiveStatus] = useState('الكل');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
-  // الحصول على الروابط بناءً على نوع المستخدم
-  const getApiUrls = () => {
-    if (currentUser?.user_type === 'شركة مزادات') {
-      return {
-        base: 'https://shahin-tqay.onrender.com/api/user/auctions',
-        myAuctions: 'https://shahin-tqay.onrender.com/api/user/auctions',
-        single: (id) => `https://shahin-tqay.onrender.com/api/user/auctions/${id}`
-      };
-    } else {
-      return {
-        base: 'https://shahin-tqay.onrender.com/api/user/properties',
-        create: 'https://shahin-tqay.onrender.com/api/user/properties',
-        list: 'https://shahin-tqay.onrender.com/api/user/properties/my',
-        status: (status) => `https://shahin-tqay.onrender.com/api/user/properties/status/${status}`,
-        single: (id) => `https://shahin-tqay.onrender.com/api/user/properties/${id}`
-      };
-    }
-  };
+  // React Query لجلب الإعلانات
+  const {
+    data: adsData,
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['ads', currentUser?.user_type, activeStatus],
+    queryFn: () => fetchAds(currentUser?.user_type, activeStatus),
+    enabled: !!currentUser,
+    retry: 2,
+    staleTime: 2 * 60 * 1000, // 2 دقائق
+  });
 
-  // جلب الإعلانات من API
-  const fetchAds = async (status = 'الكل') => {
-    try {
-      setLoading(true);
-      setError('');
-      const token = localStorage.getItem('token');
-      const urls = getApiUrls();
-      
-      let url = currentUser?.user_type === 'شركة مزادات' ? urls.myAuctions : urls.list;
-      
-      // إذا كان هناك تصفية بالحالة ولم يكن المستخدم شركة مزادات
-      if (status !== 'الكل' && currentUser?.user_type !== 'شركة مزادات') {
-        url = urls.status(status);
-      }
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
-
-      const result = await response.json();
-      
-      if (result.status) {
-        // التعامل مع هيكل البيانات المختلف للمزادات والأراضي
-        if (currentUser?.user_type === 'شركة مزادات') {
-          // المزادات: result.data.data (مصفوفة داخل data)
-          setAds(result.data?.data || []);
-        } else {
-          // الأراضي: result.data (مصفوفة مباشرة)
-          setAds(result.data || []);
-        }
-      } else {
-        setError(result.message || 'فشل في جلب الإعلانات');
-      }
-    } catch (error) {
-      setError('حدث خطأ في الاتصال بالخادم');
-      console.error('Error fetching ads:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // تغيير تصفية الحالة
-  const handleStatusChange = (status) => {
-    setActiveStatus(status);
-    fetchAds(status);
-  };
-
-  // حذف إعلان
-  const deleteAd = async (adId) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا الإعلان؟')) return;
-
-    try {
-      const token = localStorage.getItem('token');
-      const urls = getApiUrls();
-      
-      const response = await fetch(urls.single(adId), {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
-
-      const result = await response.json();
-      
-      if (result.status) {
-        setAds(ads.filter(ad => ad.id !== adId));
-        alert('تم حذف الإعلان بنجاح');
-      } else {
-        alert(result.message || 'فشل في حذف الإعلان');
-      }
-    } catch (error) {
-      alert('حدث خطأ أثناء حذف الإعلان');
+  // React Query لحذف الإعلانات
+  const deleteMutation = useMutation({
+    mutationFn: ({ adId, userType }) => deleteAd(adId, userType),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['ads']);
+    },
+    onError: (error) => {
       console.error('Error deleting ad:', error);
+      alert('حدث خطأ أثناء حذف الإعلان');
     }
+  });
+
+  // معالجة حذف الإعلان
+  const handleDeleteAd = async (adId) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الإعلان؟')) return;
+    
+    deleteMutation.mutate({ 
+      adId, 
+      userType: currentUser?.user_type 
+    });
   };
+
+  // تحليل البيانات المسترجعة
+  const ads = adsData ? parseAdsData(adsData, currentUser?.user_type) : [];
 
   // الانتقال إلى صفحة إنشاء الإعلان
   const navigateToCreateAd = () => {
@@ -135,11 +70,6 @@ function MyAds() {
     navigate(`/edit-ad/${adId}`);
   };
 
-  // تحميل البيانات الأولية
-  useEffect(() => {
-    fetchAds();
-  }, [currentUser]);
-
   // بحث في الإعلانات
   const filteredAds = ads.filter(ad => {
     const searchText = searchTerm.toLowerCase();
@@ -148,23 +78,33 @@ function MyAds() {
       ad.description?.toLowerCase().includes(searchText) || 
       ad.region?.toLowerCase().includes(searchText) ||
       ad.city?.toLowerCase().includes(searchText) ||
-      ad.land_type?.toLowerCase().includes(searchText)
+      ad.land_type?.toLowerCase().includes(searchText) ||
+      ad.address?.toLowerCase().includes(searchText)
     );
   });
+
+  // تغيير تصفية الحالة
+  const handleStatusChange = (status) => {
+    setActiveStatus(status);
+  };
 
   // تنسيق الحالة
   const getStatusBadge = (status) => {
     const statusConfig = {
-      'قيد المراجعة': { text: 'قيد المراجعة', class: 'myads-status-pending' },
-      'مرفوض': { text: 'مرفوض', class: 'myads-status-rejected' },
-      'تم البيع': { text: 'تم البيع', class: 'myads-status-sold' },
-      'مفتوح': { text: 'مفتوح', class: 'myads-status-open' },
-      'مغلق': { text: 'مغلق', class: 'myads-status-closed' },
-      'مقبول': { text: 'مقبول', class: 'myads-status-accepted' },
-      'منتهي': { text: 'منتهي', class: 'myads-status-ended' }
+      'قيد المراجعة': { text: 'قيد المراجعة', class: 'bg-yellow-100 text-yellow-800' },
+      'مرفوض': { text: 'مرفوض', class: 'bg-red-100 text-red-800' },
+      'تم البيع': { text: 'تم البيع', class: 'bg-purple-100 text-purple-800' },
+      'مفتوح': { text: 'مفتوح', class: 'bg-green-100 text-green-800' },
+      'مغلق': { text: 'مغلق', class: 'bg-gray-100 text-gray-800' },
+      'مقبول': { text: 'مقبول', class: 'bg-blue-100 text-blue-800' },
+      'منتهي': { text: 'منتهي', class: 'bg-orange-100 text-orange-800' }
     };
-    const config = statusConfig[status] || { text: status, class: 'myads-status-pending' };
-    return <span className={`myads-status-badge ${config.class}`}>{config.text}</span>;
+    const config = statusConfig[status] || { text: status, class: 'bg-gray-100 text-gray-800' };
+    return (
+      <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.class}`}>
+        {config.text}
+      </span>
+    );
   };
 
   // تصحيح مسار الصورة
@@ -179,7 +119,7 @@ function MyAds() {
     }
     
     // إذا كان مساراً نسبياً
-    return `https://shahin-tqay.onrender.com/storage/${item.cover_image}`;
+    return `https://core-api-x41.shaheenplus.sa/storage/${item.cover_image}`;
   };
 
   // تنسيق التاريخ
@@ -202,176 +142,231 @@ function MyAds() {
     return `${parseFloat(price).toLocaleString('ar-SA')} ريال`;
   };
 
+  // استخدام الـ Skeleton أثناء التحميل
+  if (isLoading) {
+    return <MyAdsSkeleton />;
+  }
+
   return (
-    <div className="my-ads-page">
-      <div className="myads-page-container">
-        <div className="myads-header-row">
-          <div className="myads-header-controls">
-            <button className="myads-add-btn" onClick={navigateToCreateAd}>
-              <FaPlus /> 
-              {currentUser?.user_type === 'شركة مزادات' ? 'إضافة مزاد جديد' : 'إضافة إعلان جديد'}
-            </button>
-            <div className="myads-search-bar">
-              <div className="myads-search-input">
-                <FaSearch className="myads-search-icon" />
-                <input 
-                  type="text" 
+    <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* Combined Search, Filter and Add Bar */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <div className="flex flex-row items-center justify-between gap-4">
+            
+            {/* شريط البحث */}
+            <div className="flex-1 min-w-0">
+              <div className="relative">
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <Icons.FaSearch className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="text"
                   placeholder={
                     currentUser?.user_type === 'شركة مزادات' 
-                      ? 'ابحث في مزاداتك...' 
-                      : 'ابحث في إعلاناتك...'
+                      ? 'ابحث في المزادات...' 
+                      : 'ابحث في الإعلانات...'
                   }
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  className="block w-full pr-10 pl-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] transition duration-200"
                 />
               </div>
             </div>
+
+            {/* أزرار التصفية والإضافة */}
+            <div className="flex items-center gap-3">
+              
+              {/* زر التصفية - للأراضي فقط */}
+              {currentUser?.user_type !== 'شركة مزادات' && (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg font-medium transition duration-200 ${
+                      activeStatus !== 'الكل' || showFilters
+                        ? 'bg-[#53a1dd] text-white border-[#53a1dd]'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <Icons.FaFilter className="w-4 h-4" />
+                    <span className="hidden sm:inline">التصفية</span>
+                    {activeStatus !== 'الكل' && (
+                      <span className="w-2 h-2 bg-white rounded-full"></span>
+                    )}
+                  </button>
+
+                  {/* قائمة التصفية المنبثقة */}
+                  {showFilters && (
+                    <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                      <div className="p-2">
+                        <div className="text-xs font-medium text-gray-500 mb-2 px-2">الحالة</div>
+                        {['الكل', 'قيد المراجعة', 'مقبول', 'مرفوض', 'تم البيع'].map((status) => (
+                          <button
+                            key={status}
+                            onClick={() => {
+                              handleStatusChange(status);
+                              setShowFilters(false);
+                            }}
+                            className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-md transition duration-200 ${
+                              activeStatus === status
+                                ? 'bg-[#53a1dd] text-white'
+                                : 'text-gray-700 hover:bg-gray-100'
+                            }`}
+                          >
+                            <span>{status}</span>
+                            {activeStatus === status && (
+                              <Icons.FaCheck className="w-3 h-3" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* زر الإضافة */}
+              <button 
+                onClick={navigateToCreateAd}
+                className="flex items-center gap-2 bg-[#53a1dd] hover:bg-[#4689c0] text-white font-medium py-2.5 px-4 rounded-lg transition duration-200"
+              >
+                <Icons.FaPlus className="w-4 h-4" />
+                <span className="hidden sm:inline">
+                  {currentUser?.user_type === 'شركة مزادات' ? 'مزاد جديد' : 'إعلان جديد'}
+                </span>
+                <span className="sm:hidden">جديد</span>
+              </button>
+            </div>
           </div>
+
+          {/* شريط التصفية السريع - يظهر فقط عند التصفية */}
+          {currentUser?.user_type !== 'شركة مزادات' && activeStatus !== 'الكل' && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">الحالة المحددة:</span>
+                <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+                  <span>{activeStatus}</span>
+                  <button
+                    onClick={() => handleStatusChange('الكل')}
+                    className="hover:text-blue-900 transition duration-200"
+                  >
+                    <Icons.FaTimes className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* تصفية الحالة - للأراضي فقط */}
-        {currentUser?.user_type !== 'شركة مزادات' && (
-          <div className="myads-status-filter">
-            <button 
-              className={`myads-status-btn ${activeStatus === 'الكل' ? 'active' : ''}`}
-              onClick={() => handleStatusChange('الكل')}
-            >
-              الكل
-            </button>
-            <button 
-              className={`myads-status-btn ${activeStatus === 'قيد المراجعة' ? 'active' : ''}`}
-              onClick={() => handleStatusChange('قيد المراجعة')}
-            >
-              قيد المراجعة
-            </button>
-            <button 
-              className={`myads-status-btn ${activeStatus === 'مقبول' ? 'active' : ''}`}
-              onClick={() => handleStatusChange('مقبول')}
-            >
-              مقبول
-            </button>
-            <button 
-              className={`myads-status-btn ${activeStatus === 'مرفوض' ? 'active' : ''}`}
-              onClick={() => handleStatusChange('مرفوض')}
-            >
-              مرفوض
-            </button>
-            <button 
-              className={`myads-status-btn ${activeStatus === 'تم البيع' ? 'active' : ''}`}
-              onClick={() => handleStatusChange('تم البيع')}
-            >
-              تم البيع
-            </button>
-          </div>
-        )}
+        {/* إحصائيات النتائج */}
+        <div className="mb-6">
+          <p className="text-gray-600 text-sm">
+            عرض {filteredAds.length} {currentUser?.user_type === 'شركة مزادات' ? 'مزاد' : 'إعلان'} 
+            {searchTerm && ` لنتائج البحث عن: "${searchTerm}"`}
+            {activeStatus !== 'الكل' && ` - الحالة: ${activeStatus}`}
+          </p>
+        </div>
 
-        {loading ? (
-          <div className="elegantLoading_container">
-            <div className="elegantLoader"></div>
-            <p>
-              {currentUser?.user_type === 'شركة مزادات' 
-                ? 'جاري تحميل المزادات...' 
-                : 'جاري تحميل الإعلانات...'
-              }
-            </p>
-          </div>
-        ) : error ? (
-          <div className="myads-error-state">
-            <div className="myads-error-icon">
-              <FaExclamationTriangle />
+        {/* Content */}
+        {error ? (
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Icons.FaExclamationTriangle className="w-8 h-8 text-red-500" />
             </div>
-            <p>{error}</p>
-            <button className="myads-btn myads-btn-primary" onClick={() => fetchAds(activeStatus)}>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">حدث خطأ</h3>
+            <p className="text-gray-600 mb-6">{error.message || 'فشل في جلب الإعلانات'}</p>
+            <button 
+              onClick={() => refetch()}
+              className="bg-[#53a1dd] hover:bg-[#4689c0] text-white font-medium py-2 px-6 rounded-lg transition duration-200"
+            >
               إعادة المحاولة
             </button>
           </div>
         ) : filteredAds.length > 0 ? (
-          <div className="myads-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAds.map(ad => (
-              <div key={ad.id} className="myads-card">
-                <div className="myads-img">
+              <div key={ad.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                {/* Image Section */}
+                <div className="relative h-48 overflow-hidden">
                   <img 
                     src={getImageUrl(ad)}
-                    alt={ad.title} 
+                    alt={ad.title}
+                    className="w-full h-full object-cover transition duration-300 hover:scale-105"
                     onError={(e) => {
                       e.target.src = 'https://via.placeholder.com/300x150/f8f9fa/6c757d?text=لا+توجد+صورة';
                     }}
                   />
-                  {getStatusBadge(ad.status)}
+                  <div className="absolute top-3 left-3">
+                    {getStatusBadge(ad.status)}
+                  </div>
                 </div>
-                <div className="myads-content">
-                  <h3 className="myads-title">{ad.title}</h3>
+
+                {/* Content Section */}
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2">
+                    {ad.title}
+                  </h3>
                   
-                  <div className="myads-info">
+                  {/* Information */}
+                  <div className="space-y-2 mb-4">
                     {currentUser?.user_type === 'شركة مزادات' ? (
                       <>
-                        {/* معلومات المزاد */}
-                        <div className="myads-info-item">
-                          <FaCalendarAlt className="myads-info-icon" />
-                          <span className="myads-info-value">
-                            {formatDate(ad.created_at)}
-                          </span>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Icons.FaCalendarAlt className="w-4 h-4 text-[#53a1dd]" />
+                          <span>{formatDate(ad.created_at)}</span>
                         </div>
-                        <div className="myads-info-item">
-                          <FaMapMarkerAlt className="myads-info-icon" />
-                          <span className="myads-info-value">
-                            {ad.address || 'لا يوجد عنوان'}
-                          </span>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Icons.FaMapMarkerAlt className="w-4 h-4 text-[#53a1dd]" />
+                          <span className="line-clamp-1">{ad.address || 'لا يوجد عنوان'}</span>
                         </div>
                       </>
                     ) : (
                       <>
-                        {/* معلومات الأرض */}
-                        <div className="myads-info-item">
-                          <FaMapMarkerAlt className="myads-info-icon" />
-                          <span className="myads-info-value">
-                            {ad.region} {ad.city ? `- ${ad.city}` : ''}
-                          </span>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Icons.FaMapMarkerAlt className="w-4 h-4 text-[#53a1dd]" />
+                          <span>{ad.region} {ad.city ? `- ${ad.city}` : ''}</span>
                         </div>
-                        <div className="myads-info-item">
-                          <FaTag className="myads-info-icon" />
-                          <span className="myads-info-value">
-                            {ad.land_type} - {ad.purpose}
-                          </span>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Icons.FaTag className="w-4 h-4 text-[#53a1dd]" />
+                          <span>{ad.land_type} - {ad.purpose}</span>
                         </div>
                         {ad.price_per_sqm && (
-                          <div className="myads-info-item">
-                            <FaMoneyBillWave className="myads-info-icon" />
-                            <span className="myads-info-value">
-                              سعر المتر: {formatPrice(ad.price_per_sqm)}
-                            </span>
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Icons.FaMoneyBillWave className="w-4 h-4 text-[#53a1dd]" />
+                            <span>سعر المتر: {formatPrice(ad.price_per_sqm)}</span>
                           </div>
                         )}
                         {ad.total_area && (
-                          <div className="myads-info-item">
-                            <span className="myads-info-label">المساحة:</span>
-                            <span className="myads-info-value">
-                              {parseFloat(ad.total_area).toLocaleString('ar-SA')} م²
-                            </span>
+                          <div className="flex justify-between text-sm text-gray-600">
+                            <span>المساحة:</span>
+                            <span className="font-medium">{parseFloat(ad.total_area).toLocaleString('ar-SA')} م²</span>
                           </div>
                         )}
                       </>
                     )}
                   </div>
-                  
-                  <div className="myads-footer">
-                    <span className="myads-date">
+
+                  {/* Footer */}
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <span className="text-sm text-gray-500">
                       {formatDate(ad.created_at)}
                     </span>
-                    <div className="myads-actions">
+                    <div className="flex gap-2">
                       <button 
-                        className="myads-action-btn myads-edit-btn"
                         onClick={() => navigateToEditAd(ad.id)}
+                        className="p-2 text-gray-400 hover:text-[#53a1dd] hover:bg-blue-50 rounded-lg transition duration-200"
                         title="تعديل"
                       >
-                        <FaEdit />
+                        <Icons.FaEdit className="w-4 h-4" />
                       </button>
                       <button 
-                        className="myads-action-btn myads-delete-btn"
-                        onClick={() => deleteAd(ad.id)}
+                        onClick={() => handleDeleteAd(ad.id)}
+                        disabled={deleteMutation.isLoading}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition duration-200 disabled:opacity-50"
                         title="حذف"
                       >
-                        <FaTrash />
+                        <Icons.FaTrash className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -380,26 +375,29 @@ function MyAds() {
             ))}
           </div>
         ) : (
-          <div className="myads-empty-state">
-            <div className="myads-empty-icon">
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               {currentUser?.user_type === 'شركة مزادات' ? (
-                <FaTag size={48} />
+                <Icons.FaTag className="w-8 h-8 text-gray-400" />
               ) : (
-                <FaClipboardList size={48} />
+                <Icons.FaClipboardList className="w-8 h-8 text-gray-400" />
               )}
             </div>
-            <h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
               {currentUser?.user_type === 'شركة مزادات' ? 'لا توجد مزادات' : 'لا توجد إعلانات'}
             </h3>
-            <p>
-              {searchTerm 
-                ? 'لا توجد نتائج تطابق بحثك'
+            <p className="text-gray-600 mb-6">
+              {searchTerm || activeStatus !== 'الكل'
+                ? 'لا توجد نتائج تطابق بحثك أو التصفية المحددة'
                 : currentUser?.user_type === 'شركة مزادات' 
                   ? 'لم تقم بإضافة أي مزادات بعد'
                   : 'لم تقم بإضافة أي إعلانات بعد'
               }
             </p>
-            <button className="myads-btn myads-btn-primary" onClick={navigateToCreateAd}>
+            <button 
+              onClick={navigateToCreateAd}
+              className="bg-[#53a1dd] hover:bg-[#4689c0] text-white font-medium py-2 px-6 rounded-lg transition duration-200"
+            >
               {currentUser?.user_type === 'شركة مزادات' ? 'إضافة مزاد جديد' : 'إضافة إعلان جديد'}
             </button>
           </div>

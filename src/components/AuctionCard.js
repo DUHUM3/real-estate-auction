@@ -43,49 +43,67 @@ const AuctionCard = ({
   };
 
   return (
-    <div className="auction-card" onClick={() => onClick && onClick(id, 'auction')}>
-      <div className="auction-header">
-        <span className="auction-company">{auctionCompany}</span>
+    <div 
+      className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-2 border border-gray-100"
+      onClick={() => onClick && onClick(id, 'auction')}
+    >
+      {/* هيدر الشركة */}
+      <div className="bg-blue-400 px-5 py-3">
+        <span className="text-white text-sm font-semibold">
+          {auctionCompany}
+        </span>
       </div>
-      <div className="auction-image">
+      
+      {/* الصورة */}
+      <div className="relative overflow-hidden">
         <img
           src={img || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"}
           alt={title || "أرض عقارية"}
+          className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
         />
-        <div className="auction-timer">
-          <Icons.FaCalendarAlt className="timer-icon" /> {daysLeft} يوم متبقي
+        
+        {/* العداد */}
+        <div className="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center">
+          <Icons.FaCalendarAlt className="ml-2" />
+          {daysLeft} يوم متبقي
         </div>
-        {/* <div className="card-actions">
-          <button
-            className={`action-btn favorite-btn ${favorite ? 'active' : ''} ${isLoading ? 'loading' : ''}`}
-            onClick={handleFavoriteClick}
-            disabled={isLoading}
-          >
-            <Icons.FaBookmark />
-          </button>
-        </div> */}
       </div>
-      <div className="auction-content">
-        <h3>{title}</h3>
-        <p className="location">
-          <Icons.FaMapMarkerAlt className="location-icon" />
+      
+      {/* المحتوى */}
+      <div className="p-6">
+        {/* العنوان */}
+        <h3 className="text-gray-800 text-lg font-semibold mb-3 line-clamp-2 min-h-[3rem]">
+          {title}
+        </h3>
+        
+        {/* الموقع */}
+        <div className="flex items-center text-gray-600 text-sm mb-4">
+          <Icons.FaMapMarkerAlt className="ml-2 text-amber-500" />
           {location}
-        </p>
-        <div className="auction-details">
-          <span><Icons.FaRulerCombined className="details-icon" /> {area} متر²</span>
-          <span><Icons.FaUsers className="details-icon" /> {bidders} مزايد</span>
         </div>
-        <div className="auction-actions">
-          <button
-            className="details-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClick && onClick(id, 'auction');
-            }}
-          >
-            تفاصيل المزاد
-          </button>
+        
+        {/* التفاصيل */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center text-gray-700 text-sm">
+            <Icons.FaRulerCombined className="ml-2 text-gray-400" />
+            {area} متر²
+          </div>
+          <div className="flex items-center text-gray-700 text-sm">
+            <Icons.FaUsers className="ml-2 text-gray-400" />
+            {bidders} مزايد
+          </div>
         </div>
+        
+        {/* الزر */}
+        <button
+          className="w-full bg-gray-100 text-blue-400 py-3 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-semibold text-base"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick && onClick(id, 'auction');
+          }}
+        >
+          تفاصيل المزاد
+        </button>
       </div>
     </div>
   );

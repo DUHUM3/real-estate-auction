@@ -1,89 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { 
-  FiHeart, 
-  FiMapPin,
-  FiDollarSign,
-  FiCalendar,
-  FiEye,
-  FiHome,
-  FiX,
-  FiTrash2,
-  
-  FiClock
-} from 'react-icons/fi';
-// import '../styles/Interests.css'; // نفس الـ CSS المستخدم في الاهتمامات
+  fetchFavorites, 
+  removeFavorite,
+  parseFavoritesData 
+} from '../api/favoritesApi';
+import FavoritesSkeleton from '../Skeleton/FavoritesSkeleton';
+
+// استيراد الأيقونات
+import { 
+  FaHeart,
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaTag,
+  FaFileAlt,
+  FaTrash,
+  FaExclamationTriangle,
+  FaClock,
+  FaHome,
+  FaGavel,
+  FaEye
+} from 'react-icons/fa';
 
 function Favorites() {
-  const [favorites, setFavorites] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [removingId, setRemovingId] = useState(null);
   const navigate = useNavigate();
-
-  // جلب بيانات المفضلة
-  useEffect(() => {
-    fetchFavorites();
-  }, []);
-
-  const fetchFavorites = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await fetch('https://shahin-tqay.onrender.com/api/favorites', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('بيانات المفضلة:', data); // للتصحيح
-        setFavorites(data.favorites || []);
-      } else {
-        throw new Error('فشل في جلب البيانات');
-      }
-    } catch (error) {
-      console.error('Error fetching favorites:', error);
-      setError('حدث خطأ في جلب البيانات');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // دالة لإزالة من المفضلة بناءً على النوع
-const removeFavorite = async (favorite, e) => {
-  if (e) {
-    e.stopPropagation();
-  }
+  const queryClient = useQueryClient();
   
-  try {
-    setRemovingId(favorite.id);
-    const token = localStorage.getItem('token');
-    
-    let url = '';
-    if (favorite.favoritable_type === 'App\\Models\\Property') {
-      url = `https://shahin-tqay.onrender.com/api/favorites/property/${favorite.favoritable_id}`;
-    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
-      url = `https://shahin-tqay.onrender.com/api/favorites/auction/${favorite.favoritable_id}`;
-    } else {
-      throw new Error('نوع العنصر غير معروف');
-    }
+  const [activeTab, setActiveTab] = useState('all');
+  const [removingId, setRemovingId] = useState(null);
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+  // React Query لجلب المفضلة
+  const { 
+    data: favoritesData = [], 
+    isLoading,
+    error 
+  } = useQuery({
+    queryKey: ['favorites'],
+    queryFn: fetchFavorites,
+    retry: 2,
+    staleTime: 5 * 60 * 1000, // 5 دقائق
+  });
 
-    if (response.ok) {
-      // إزالة العنصر من القائمة محلياً
-      setFavorites(prev => prev.filter(fav => fav.id !== favorite.id));
+  // طفرة إزالة المفضلة
+  const removeFavoriteMutation = useMutation({
+    mutationFn: removeFavorite,
+    onMutate: async (favorite) => {
+      setRemovingId(favorite.id);
       
-      // التحديث في التخزين المحلي أيضًا لتزامن الحالة مع PropertiesPage
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries(['favorites']);
+
+      // Snapshot the previous value
+      const previousFavorites = queryClient.getQueryData(['favorites']);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(['favorites'], (old) => 
+        old.filter(fav => fav.id !== favorite.id)
+      );
+
+      // Update localStorage
       if (favorite.favoritable_type === 'App\\Models\\Property') {
         const propertyFavorites = JSON.parse(localStorage.getItem('propertyFavorites') || '[]');
         const updatedPropertyFavorites = propertyFavorites.filter(id => id !== favorite.favoritable_id);
@@ -93,23 +69,40 @@ const removeFavorite = async (favorite, e) => {
         const updatedAuctionFavorites = auctionFavorites.filter(id => id !== favorite.favoritable_id);
         localStorage.setItem('auctionFavorites', JSON.stringify(updatedAuctionFavorites));
       }
-    } else {
-      throw new Error('فشل في إزالة العنصر');
-    }
-  } catch (error) {
-    console.error('Error removing favorite:', error);
-    alert('حدث خطأ أثناء إزالة العنصر من المفضلة');
-  } finally {
-    setRemovingId(null);
-  }
-};
 
-  // دالة للانتقال إلى صفحة تفاصيل العنصر بناءً على النوع
+      return { previousFavorites };
+    },
+    onError: (error, favorite, context) => {
+      // Rollback to the previous value on error
+      queryClient.setQueryData(['favorites'], context.previousFavorites);
+      console.error('Error removing favorite:', error);
+      alert('حدث خطأ أثناء إزالة العنصر من المفضلة');
+    },
+    onSettled: () => {
+      setRemovingId(null);
+      // Ensure we refetch to stay in sync with server
+      queryClient.invalidateQueries(['favorites']);
+    },
+  });
+
+  // معالجة البيانات
+  const favorites = parseFavoritesData(favoritesData);
+
+  // دالة للتعامل مع إزالة المفضلة
+  const handleRemoveFavorite = async (favorite, e) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    if (!window.confirm('هل أنت متأكد من إزالة هذا العنصر من المفضلة؟')) return;
+    
+    removeFavoriteMutation.mutate(favorite);
+  };
+
+  // دالة للانتقال إلى صفحة تفاصيل العنصر
   const handleViewItem = (id, type = null) => {
-    // تحديد النوع بناءً على favoritable_type
     let itemType = type;
     if (!itemType) {
-      // البحث عن العنصر في المفضلة لتحديد نوعه
       const favoriteItem = favorites.find(fav => fav.favoritable_id === id);
       if (favoriteItem) {
         if (favoriteItem.favoritable_type === 'App\\Models\\Property') {
@@ -120,12 +113,32 @@ const removeFavorite = async (favorite, e) => {
       }
     }
     
-    console.log('التنقل إلى التفاصيل:', { id, type: itemType });
-    
     if (itemType === 'lands' || itemType === 'land') {
       navigate(`/lands/${id}/land`);
     } else {
       navigate(`/lands/${id}/auction`);
+    }
+  };
+
+  // تصفية العناصر حسب النوع
+  const filteredFavorites = favorites.filter(favorite => {
+    if (activeTab === 'all') return true;
+    if (activeTab === 'lands') return favorite.favoritable_type === 'App\\Models\\Property';
+    if (activeTab === 'auctions') return favorite.favoritable_type === 'App\\Models\\Auction';
+    return true;
+  });
+
+  // تنسيق التاريخ
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return dateString;
     }
   };
 
@@ -135,24 +148,34 @@ const removeFavorite = async (favorite, e) => {
     return parseFloat(price).toLocaleString('ar-SA');
   };
 
-  // تنسيق التاريخ
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return new Intl.DateTimeFormat('ar-SA', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }).format(date);
-    } catch (e) {
-      return dateString;
+  // الحصول على أيقونة النوع
+  const getTypeIcon = (type) => {
+    if (type === 'App\\Models\\Property') {
+      return <FaHome className="w-5 h-5 text-[#53a1dd]" />;
+    } else if (type === 'App\\Models\\Auction') {
+      return <FaGavel className="w-5 h-5 text-[#53a1dd]" />;
     }
+    return <FaHeart className="w-5 h-5 text-[#53a1dd]" />;
   };
 
-  // تنسيق الوقت
-  const formatTime = (timeString) => {
-    if (!timeString) return '';
-    return timeString.substring(0, 5); // إرجاع فقط الساعات والدقائق
+  // الحصول على نوع العنصر كنص
+  const getItemType = (type) => {
+    if (type === 'App\\Models\\Property') {
+      return 'أرض';
+    } else if (type === 'App\\Models\\Auction') {
+      return 'مزاد';
+    }
+    return 'عنصر';
+  };
+
+  // الحصول على عنوان العنصر
+  const getItemTitle = (favorite) => {
+    if (favorite.favoritable_type === 'App\\Models\\Property') {
+      return favorite.favoritable.title || `أرض ${favorite.favoritable.land_type || ''}`;
+    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
+      return favorite.favoritable.title || 'مزاد';
+    }
+    return 'عنصر';
   };
 
   // حساب السعر الإجمالي للأرض
@@ -163,265 +186,319 @@ const removeFavorite = async (favorite, e) => {
     return 0;
   };
 
-  // الحصول على عنوان العنصر بناءً على النوع
-  const getItemTitle = (favorite) => {
-    if (favorite.favoritable_type === 'App\\Models\\Property') {
-      return favorite.favoritable.title || `أرض ${favorite.favoritable.land_type}`;
-    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
-      return favorite.favoritable.title || 'مزاد';
-    }
-    return 'عنصر';
-  };
-
-  // الحصول على أيقونة العنصر بناءً على النوع
-  const getItemIcon = (favorite) => {
-    if (favorite.favoritable_type === 'App\\Models\\Property') {
-      return <FiHome className="detail-icon" />;
-    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
-      return <FiClock className="detail-icon" />;
-    }
-    return <FiHeart className="detail-icon" />;
-  };
-
-  // الحصول على نوع العنصر كنص
-  const getItemType = (favorite) => {
-    if (favorite.favoritable_type === 'App\\Models\\Property') {
-      return 'أرض';
-    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
-      return 'مزاد';
-    }
-    return 'عنصر';
-  };
-
-  // الحصول على نوع العنصر لاستخدامه في handleViewItem
-  const getItemTypeForNavigation = (favorite) => {
-    if (favorite.favoritable_type === 'App\\Models\\Property') {
-      return 'land';
-    } else if (favorite.favoritable_type === 'App\\Models\\Auction') {
-      return 'auction';
-    }
-    return null;
-  };
-
-  if (loading) {
-    return (
-      <div className="interests-container">
-        <div className="interests-loading">
-          <div className="loading-spinner"></div>
-          <p>جاري تحميل المفضلة...</p>
-        </div>
-      </div>
-    );
+  // استخدام الـ Skeleton أثناء التحميل
+  if (isLoading) {
+    return <FavoritesSkeleton />;
   }
 
+  // عرض الخطأ
   if (error) {
     return (
-      <div className="interests-container">
-        <div className="interests-error">
-          <FiX className="error-icon" />
-          <p>{error}</p>
-          <button className="retry-btn" onClick={fetchFavorites}>
-            إعادة المحاولة
-          </button>
+      <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaExclamationTriangle className="w-8 h-8 text-red-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">حدث خطأ</h3>
+            <p className="text-gray-600 mb-6">{error.message || 'فشل في جلب بيانات المفضلة'}</p>
+            <button 
+              onClick={() => queryClient.refetchQueries(['favorites'])}
+              className="bg-[#53a1dd] hover:bg-[#4689c0] text-white font-medium py-2 px-6 rounded-lg transition duration-200"
+            >
+              إعادة المحاولة
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="interests-container">
-      {/* عنوان الصفحة */}
-      {/* <div className="interests-header">
-        <h1 className="page-title">
-          <FiHeart className="title-icon" />
-          المفضلة
-        </h1>
-        <p className="page-subtitle">
-          العناصر التي قمت بإضافتها إلى المفضلة
-          {favorites.length > 0 && ` (${favorites.length} عنصر)`}
-        </p>
-      </div> */}
+    <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Header Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">المفضلة</h1>
+              <p className="text-gray-600">
+                العناصر التي قمت بإضافتها إلى المفضلة
+              </p>
+            </div>
 
-      {/* قائمة المفضلة */}
-      <div className="interests-list">
-        {favorites.length === 0 ? (
-          <div className="empty-state">
-            <FiHeart className="empty-icon" />
-            <h3>لا توجد عناصر في المفضلة</h3>
-            <p>لم تقم بإضافة أي عناصر إلى المفضلة حتى الآن</p>
-            <Link to="/lands-and-auctions-list" className="browse-btn">
-              تصفح الاراضي
-            </Link>
-          </div>
-        ) : (
-          favorites.map((favorite) => (
-            <div 
-              key={favorite.id} 
-              className="interest-card"
-              onClick={() => handleViewItem(favorite.favoritable_id, getItemTypeForNavigation(favorite))}
-              style={{ cursor: 'pointer' }}
-            >
-              <div className="interest-header">
-                <div className="interest-title-section">
-                  <div className="item-type-badge">
-                    {getItemIcon(favorite)}
-                    {getItemType(favorite)}
-                  </div>
-                  <h3 className="interest-title">
-                    {getItemTitle(favorite)}
-                  </h3>
-                  <span className={`status-badge ${favorite.favoritable.status === 'مفتوح' ? 'status-approved' : 'status-pending'}`}>
-                    <FiHeart />
-                    {favorite.favoritable.status}
-                  </span>
-                </div>
-                <div className="interest-reference">
-                  <FiCalendar className="reference-icon" />
-                  <span>أضيف في: {formatDate(favorite.created_at)}</span>
-                </div>
-              </div>
-
-              <div className="interest-details">
-                {/* تفاصيل الأرض */}
-                {favorite.favoritable_type === 'App\\Models\\Property' && (
-                  <>
-                    <div className="detail-item">
-                      <FiMapPin className="detail-icon" />
-                      <span className="detail-label">الموقع:</span>
-                      <span className="detail-value">
-                        {favorite.favoritable.region} - {favorite.favoritable.city}
-                      </span>
-                    </div>
-                    
-                    <div className="detail-item">
-                      <FiX className="detail-icon" />
-                      <span className="detail-label">المساحة:</span>
-                      <span className="detail-value">
-                        {formatPrice(favorite.favoritable.total_area)} م²
-                      </span>
-                    </div>
-
-                    {favorite.favoritable.price_per_sqm && (
-                      <div className="detail-item">
-                        <FiDollarSign className="detail-icon" />
-                        <span className="detail-label">سعر المتر:</span>
-                        <span className="detail-value">
-                          {formatPrice(favorite.favoritable.price_per_sqm)} ر.س
-                        </span>
-                      </div>
-                    )}
-
-                    {favorite.favoritable.total_area && favorite.favoritable.price_per_sqm && (
-                      <div className="detail-item">
-                        <FiHome className="detail-icon" />
-                        <span className="detail-label">السعر الإجمالي:</span>
-                        <span className="detail-value elegantTotal_price">
-                          {formatPrice(calculateTotalPrice(favorite.favoritable))} ر.س
-                        </span>
-                      </div>
-                    )}
-
-                    <div className="detail-item">
-                      <span className="detail-label">نوع الأرض:</span>
-                      <span className="detail-value">{favorite.favoritable.land_type}</span>
-                    </div>
-
-                    {favorite.favoritable.deed_number && (
-                      <div className="detail-item">
-                        <span className="detail-label">رقم الصك:</span>
-                        <span className="detail-value">{favorite.favoritable.deed_number}</span>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {/* تفاصيل المزاد */}
-                {favorite.favoritable_type === 'App\\Models\\Auction' && (
-                  <>
-                    <div className="detail-item">
-                      <FiMapPin className="detail-icon" />
-                      <span className="detail-label">العنوان:</span>
-                      <span className="detail-value">
-                        {favorite.favoritable.address}
-                      </span>
-                    </div>
-                    
-                    <div className="detail-item">
-                      <FiCalendar className="detail-icon" />
-                      <span className="detail-label">تاريخ المزاد:</span>
-                      <span className="detail-value">
-                        {formatDate(favorite.favoritable.auction_date)}
-                      </span>
-                    </div>
-
-                    <div className="detail-item">
-                      <FiClock className="detail-icon" />
-                      <span className="detail-label">وقت البدء:</span>
-                      <span className="detail-value">
-                        {formatTime(favorite.favoritable.start_time)}
-                      </span>
-                    </div>
-
-                    <div className="detail-item">
-                      <span className="detail-label">الوصف:</span>
-                      <span className="detail-value description-text">
-                        {favorite.favoritable.description}
-                      </span>
-                    </div>
-
-                    {favorite.favoritable.intro_link && (
-                      <div className="detail-item">
-                        <span className="detail-label">رابط التعريف:</span>
-                        <a 
-                          href={favorite.favoritable.intro_link} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="detail-value link"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          اضغط هنا للمشاهدة
-                        </a>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-
-              <div className="interest-actions">
-                <button 
-                  className="view-property-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleViewItem(favorite.favoritable_id, getItemTypeForNavigation(favorite));
-                  }}
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Tabs */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setActiveTab('all')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition duration-200 ${
+                    activeTab === 'all'
+                      ? 'bg-[#53a1dd] text-white shadow-sm'
+                      : 'text-gray-700 hover:text-gray-900'
+                  }`}
                 >
-                  <FiEye />
-                  <span>
-                    {favorite.favoritable_type === 'App\\Models\\Property' 
-                      ? 'عرض تفاصيل الأرض' 
-                      : 'عرض تفاصيل المزاد'
-                    }
-                  </span>
-                </button>
-                
-                <button 
-                  className="remove-favorite-btn"
-                  onClick={(e) => removeFavorite(favorite, e)}
-                  disabled={removingId === favorite.id}
-                >
-                  {removingId === favorite.id ? (
-                    <div className="loading-spinner-small"></div>
-                  ) : (
-                    <FiTrash2 />
+                  <FaHeart className="w-4 h-4" />
+                  <span>جميع العناصر</span>
+                  {favorites.length > 0 && (
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      activeTab === 'all' ? 'bg-white text-[#53a1dd]' : 'bg-gray-200 text-gray-700'
+                    }`}>
+                      {favorites.length}
+                    </span>
                   )}
-                  <span>
-                    {removingId === favorite.id ? 'جاري الإزالة...' : 'إزالة من المفضلة'}
-                  </span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('lands')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition duration-200 ${
+                    activeTab === 'lands'
+                      ? 'bg-[#53a1dd] text-white shadow-sm'
+                      : 'text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  <FaHome className="w-4 h-4" />
+                  <span>الأراضي</span>
+                  {favorites.filter(fav => fav.favoritable_type === 'App\\Models\\Property').length > 0 && (
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      activeTab === 'lands' ? 'bg-white text-[#53a1dd]' : 'bg-gray-200 text-gray-700'
+                    }`}>
+                      {favorites.filter(fav => fav.favoritable_type === 'App\\Models\\Property').length}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('auctions')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition duration-200 ${
+                    activeTab === 'auctions'
+                      ? 'bg-[#53a1dd] text-white shadow-sm'
+                      : 'text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  <FaGavel className="w-4 h-4" />
+                  <span>المزادات</span>
+                  {favorites.filter(fav => fav.favoritable_type === 'App\\Models\\Auction').length > 0 && (
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      activeTab === 'auctions' ? 'bg-white text-[#53a1dd]' : 'bg-gray-200 text-gray-700'
+                    }`}>
+                      {favorites.filter(fav => fav.favoritable_type === 'App\\Models\\Auction').length}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
-          ))
-        )}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          {/* Statistics */}
+          <div className="mb-6">
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+              <p className="text-blue-700 font-medium text-center">
+                عرض {filteredFavorites.length} عنصر في المفضلة
+              </p>
+            </div>
+          </div>
+
+          {/* Favorites Grid */}
+          {filteredFavorites.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {filteredFavorites.map((favorite) => (
+                <div 
+                  key={favorite.id} 
+                  className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition duration-200 cursor-pointer"
+                  onClick={() => handleViewItem(favorite.favoritable_id)}
+                >
+                  
+                  {/* Header */}
+                  <div className="p-4 border-b border-gray-200 bg-gray-50">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                          {getTypeIcon(favorite.favoritable_type)}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">
+                            {getItemTitle(favorite)}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {getItemType(favorite.favoritable_type)}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 px-3 py-1 rounded-full border bg-green-50 text-green-700 border-green-200">
+                        <FaHeart className="w-4 h-4 text-green-500" />
+                        <span className="text-sm font-medium">في المفضلة</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <FaCalendarAlt className="w-4 h-4 text-[#53a1dd]" />
+                      <span>تم الإضافة: {formatDate(favorite.created_at)}</span>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-4">
+                    <div className="space-y-3">
+                      {/* الموقع */}
+                      {(favorite.favoritable.region || favorite.favoritable.address) && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-blue-50 rounded flex items-center justify-center">
+                            <FaMapMarkerAlt className="w-4 h-4 text-[#53a1dd]" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">الموقع</p>
+                            <p className="font-medium text-gray-900">
+                              {favorite.favoritable.region || favorite.favoritable.address}
+                              {favorite.favoritable.city ? ` - ${favorite.favoritable.city}` : ''}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* المساحة (لطلبات الأراضي فقط) */}
+                      {favorite.favoritable_type === 'App\\Models\\Property' && favorite.favoritable.total_area && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-orange-50 rounded flex items-center justify-center">
+                            <FaFileAlt className="w-4 h-4 text-orange-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">المساحة</p>
+                            <p className="font-medium text-gray-900">
+                              {formatPrice(favorite.favoritable.total_area)} م²
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* سعر المتر (لطلبات الأراضي فقط) */}
+                      {favorite.favoritable_type === 'App\\Models\\Property' && favorite.favoritable.price_per_sqm && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-green-50 rounded flex items-center justify-center">
+                            <FaTag className="w-4 h-4 text-green-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">سعر المتر</p>
+                            <p className="font-medium text-gray-900">
+                              {formatPrice(favorite.favoritable.price_per_sqm)} ر.س
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* السعر الإجمالي (لطلبات الأراضي فقط) */}
+                      {favorite.favoritable_type === 'App\\Models\\Property' && 
+                       favorite.favoritable.total_area && 
+                       favorite.favoritable.price_per_sqm && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-purple-50 rounded flex items-center justify-center">
+                            <FaTag className="w-4 h-4 text-purple-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">السعر الإجمالي</p>
+                            <p className="font-medium text-gray-900">
+                              {formatPrice(calculateTotalPrice(favorite.favoritable))} ر.س
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* تاريخ المزاد (للمزادات فقط) */}
+                      {favorite.favoritable_type === 'App\\Models\\Auction' && favorite.favoritable.auction_date && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-blue-50 rounded flex items-center justify-center">
+                            <FaCalendarAlt className="w-4 h-4 text-[#53a1dd]" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">تاريخ المزاد</p>
+                            <p className="font-medium text-gray-900">
+                              {formatDate(favorite.favoritable.auction_date)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* وقت البدء (للمزادات فقط) */}
+                      {favorite.favoritable_type === 'App\\Models\\Auction' && favorite.favoritable.start_time && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-yellow-50 rounded flex items-center justify-center">
+                            <FaClock className="w-4 h-4 text-yellow-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">وقت البدء</p>
+                            <p className="font-medium text-gray-900">
+                              {favorite.favoritable.start_time.substring(0, 5)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* الوصف */}
+                      {favorite.favoritable.description && favorite.favoritable.description !== 'لا وصف' && (
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <p className="text-sm font-medium text-gray-700 mb-1">الوصف:</p>
+                          <p className="text-gray-600 text-sm leading-relaxed">
+                            {favorite.favoritable.description}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-200">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewItem(favorite.favoritable_id);
+                        }}
+                        className="flex items-center gap-2 text-[#53a1dd] hover:text-[#4689c0] font-medium transition duration-200"
+                      >
+                        <FaEye className="w-4 h-4" />
+                        <span>عرض التفاصيل</span>
+                      </button>
+                      
+                      <button 
+                        onClick={(e) => handleRemoveFavorite(favorite, e)}
+                        disabled={removingId === favorite.id}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition duration-200 disabled:opacity-50"
+                        title="إزالة من المفضلة"
+                      >
+                        {removingId === favorite.id ? (
+                          <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <FaTrash className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FaHeart className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                لا توجد عناصر في المفضلة
+              </h3>
+              <p className="text-gray-600 mb-6">
+                لم تقم بإضافة أي عناصر إلى المفضلة حتى الآن
+              </p>
+              <button 
+                onClick={() => navigate('/lands-and-auctions-list')}
+                className="bg-[#53a1dd] hover:bg-[#4689c0] text-white font-medium py-2 px-6 rounded-lg transition duration-200"
+              >
+                تصفح العناصر
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

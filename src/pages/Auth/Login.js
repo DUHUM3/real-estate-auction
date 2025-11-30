@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { authApi } from '../../api/authApi';
-import '../../styles/AuthModal.css';
-
 import toast from 'react-hot-toast';
-
 import { FiMail, FiLock, FiEye, FiEyeOff, FiX } from 'react-icons/fi';
 
 function Login({ onClose, onSwitchToRegister }) {
@@ -27,12 +24,10 @@ function Login({ onClose, onSwitchToRegister }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData({
       ...formData,
       [name]: value
     });
-
     setFieldErrors({
       ...fieldErrors,
       [name]: ''
@@ -43,7 +38,6 @@ function Login({ onClose, onSwitchToRegister }) {
     setShowPassword(!showPassword);
   };
 
-  // دالة التحقق من الإيميل
   const isValidEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -52,14 +46,12 @@ function Login({ onClose, onSwitchToRegister }) {
   const validateFields = () => {
     let errors = {};
 
-    // فحص الإيميل
     if (!formData.email.trim()) {
       errors.email = "الرجاء إدخال البريد الإلكتروني";
     } else if (!isValidEmail(formData.email.trim())) {
       errors.email = "صيغة البريد الإلكتروني غير صحيحة يجب ان يكون @gmail.com";
     }
 
-    // فحص كلمة المرور
     if (!formData.password.trim()) {
       errors.password = "الرجاء إدخال كلمة المرور";
     } else if (formData.password.length < 6) {
@@ -121,96 +113,144 @@ function Login({ onClose, onSwitchToRegister }) {
   };
 
   return (
-    <div className="auth-modal-overlay" onClick={handleOverlayClick}>
-      <div className="auth-modal login-modal">
-        <div className="auth-modal-header">
-          <button className="close-btn" onClick={onClose}>
-            <FiX size={22} />
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={handleOverlayClick}
+    >
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+        
+        {/* Header */}
+        <div className="flex justify-end p-4">
+          <button 
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+          >
+            <FiX size={22} className="text-gray-600" />
           </button>
         </div>
 
-        <div className="auth-content">
-
-          <div className="auth-hero-section">
-            <div className="logo-container">
+        <div className="px-8 pb-8">
+          
+          {/* Hero Section */}
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
               <img
                 src="/images/logo2.webp"
                 alt="منصة الاراضي السعودية"
-                className="auth-logo"
+                className="h-16 w-auto"
               />
             </div>
-            <p className="auth-subtitle">إبدأ رحلتك العقارية معنا</p>
-            <div className="auth-divider"></div>
+            {/* <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              مرحباً بعودتك
+            </h2> */}
+            <p className="text-gray-600">
+              إبدأ رحلتك العقارية معنا
+            </p>
           </div>
 
-          <div className="auth-options">
-            <button className="auth-option-btn active">تسجيل الدخول</button>
-            <button className="auth-option-btn" onClick={onSwitchToRegister}>
+          {/* Tabs */}
+          <div className="flex bg-gray-100 rounded-2xl p-1 mb-6">
+            <button className="flex-1 py-3 px-4 bg-white text-gray-900 font-semibold rounded-xl shadow-sm transition-all duration-200">
+              تسجيل الدخول
+            </button>
+            <button 
+              onClick={onSwitchToRegister}
+              className="flex-1 py-3 px-4 text-gray-600 font-semibold rounded-xl hover:text-gray-900 transition-all duration-200"
+            >
               حساب جديد
             </button>
           </div>
 
-          {/* نموذج تسجيل الدخول */}
-          <form onSubmit={handleSubmit} className="auth-form">
-
-            {/* البريد الإلكتروني */}
-            <div className="form-group">
-              <label className="form-label">البريد الإلكتروني</label>
-              <div className="input-with-icon">
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            
+            {/* Email Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                البريد الإلكتروني
+              </label>
+              <div className="relative">
                 <input
                   type="text"
                   name="email"
-                  placeholder="example@email.com"
+                  placeholder="example@gmail.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`form-input ${fieldErrors.email ? "input-error" : ""}`}
                   disabled={loading}
+                  className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                    fieldErrors.email 
+                      ? 'border-red-500 bg-red-50' 
+                      : 'border-gray-300 bg-white'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
+                <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
-
               {fieldErrors.email && (
-                <p className="field-error-text">{fieldErrors.email}</p>
+                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  {fieldErrors.email}
+                </p>
               )}
             </div>
 
-            {/* كلمة المرور */}
-            <div className="form-group password-group">
-              <label className="form-label">كلمة المرور</label>
-
-              <div className="password-input-container">
+            {/* Password Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                كلمة المرور
+              </label>
+              <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  placeholder="........."
+                  placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`form-input password-input ${fieldErrors.password ? "input-error" : ""}`}
                   disabled={loading}
+                  className={`w-full px-4 py-3 pr-12 border rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                    fieldErrors.password 
+                      ? 'border-red-500 bg-red-50' 
+                      : 'border-gray-300 bg-white'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
-
+                <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <button
                   type="button"
-                  className="password-toggle-btn"
                   onClick={togglePasswordVisibility}
                   disabled={loading}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                 >
-                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                  {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                 </button>
               </div>
-
               {fieldErrors.password && (
-                <p className="field-error-text">{fieldErrors.password}</p>
+                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  {fieldErrors.password}
+                </p>
               )}
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
-              className="btn-login-submit"
               disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  جاري تسجيل الدخول...
+                </span>
+              ) : (
+                'تسجيل الدخول'
+              )}
             </button>
           </form>
+
+          {/* Additional Links */}
+          <div className="mt-6 text-center">
+            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200">
+              نسيت كلمة المرور؟
+            </button>
+          </div>
         </div>
       </div>
     </div>

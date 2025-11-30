@@ -38,7 +38,7 @@ function Home({ onLoginClick }) {
         ? `/api/favorites/property/${id}`
         : `/api/favorites/auction/${id}`;
 
-      const response = await fetch(`https://shahin-tqay.onrender.com${endpoint}`, {
+      const response = await fetch(`https://core-api-x41.shaheenplus.sa${endpoint}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${currentUser.token}`,

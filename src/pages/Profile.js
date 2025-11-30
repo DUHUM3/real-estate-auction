@@ -1,173 +1,113 @@
-import React, { useState, useEffect } from 'react';
+// pages/Profile.js
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
+
+// استيراد الأيقونات مباشرة
+import { FiUser, FiMail, FiPhone, FiEdit2, FiSave, FiX, FiHome, FiClock, FiCheckCircle, FiXCircle, FiDollarSign, FiBriefcase, FiFileText } from 'react-icons/fi';
+import { MdBusiness, MdPerson, MdAssignment, MdBadge } from 'react-icons/md';
+
+// استيراد API functions
 import { 
-  FiUser, 
-  FiMail, 
-  FiPhone, 
-  FiEdit2, 
-  FiSave, 
-  FiX,
-  FiFileText,
-  FiHome,
-  FiClock,
-  FiCheckCircle,
-  FiXCircle,
-  FiDollarSign,
-  FiBriefcase
-} from 'react-icons/fi';
-import { 
-  MdBusiness, 
-  MdAssignment, 
-  MdBadge,
-  MdPerson 
-} from 'react-icons/md';
-import '../styles/Profile.css';
+  fetchProfileData, 
+  fetchUserStats, 
+  updateProfileData, 
+  shouldShowStats 
+} from '../api/profileApi';
+
+import ProfileSkeleton from '../Skeleton/ProfileSkeleton';
 
 function Profile() {
-  const { currentUser, updateUser } = useAuth();
+  const { updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [apiData, setApiData] = useState(null);
-  const [stats, setStats] = useState(null);
-  const [statsLoading, setStatsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  // جلب البيانات من API الملف الشخصي
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('token');
-        const response = await fetch('https://shahin-tqay.onrender.com/api/profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
+  // React Query for profile data
+  const {
+    data: apiData,
+    isLoading: profileLoading,
+    error: profileError,
+    refetch: refetchProfile
+  } = useQuery({
+    queryKey: ['profile'],
+    queryFn: fetchProfileData,
+    retry: 2,
+    staleTime: 5 * 60 * 1000,
+  });
 
-        if (response.ok) {
-          const data = await response.json();
-          setApiData(data);
-          
-          const initialFormData = {
-            full_name: data.user.full_name || '',
-            email: data.user.email || '',
-            phone: data.user.phone || '',
-            user_type: data.user.user_type || 'individual',
-          };
+  // React Query for stats
+  const {
+    data: statsData,
+    isLoading: statsLoading,
+    error: statsError
+  } = useQuery({
+    queryKey: ['userStats'],
+    queryFn: fetchUserStats,
+    enabled: !!apiData && shouldShowStats(apiData),
+    retry: 2,
+  });
 
-          if (data.user.details) {
-            initialFormData.business_name = data.user.details.business_name || '';
-            initialFormData.commercial_register = data.user.details.commercial_register || '';
-            initialFormData.national_id = data.user.details.national_id || '';
-          }
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: updateProfileData,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(['profile']);
+      updateUser(formData);
+      setIsEditing(false);
+    },
+    onError: (error) => {
+      console.error('Error updating profile:', error);
+    }
+  });
 
-          setFormData(initialFormData);
-        }
-      } catch (error) {
-        console.error('Error fetching profile data:', error);
-      } finally {
-        setLoading(false);
+  // Initialize form data when apiData is available
+  React.useEffect(() => {
+    if (apiData && !isEditing) {
+      const initialFormData = {
+        full_name: apiData.user.full_name || '',
+        email: apiData.user.email || '',
+        phone: apiData.user.phone || '',
+        user_type: apiData.user.user_type || 'individual',
+      };
+
+      if (apiData.user.details) {
+        initialFormData.business_name = apiData.user.details.business_name || '';
+        initialFormData.commercial_register = apiData.user.details.commercial_register || '';
+        initialFormData.national_id = apiData.user.details.national_id || '';
       }
-    };
 
-    fetchProfileData();
-  }, []);
-
-  // جلب إحصائيات المستخدم
-  useEffect(() => {
-    const fetchUserStats = async () => {
-      try {
-        setStatsLoading(true);
-        const token = localStorage.getItem('token');
-        const response = await fetch('https://shahin-tqay.onrender.com/api/user/properties/stats', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const statsData = await response.json();
-          setStats(statsData.data);
-        }
-      } catch (error) {
-        console.error('Error fetching user stats:', error);
-      } finally {
-        setStatsLoading(false);
-      }
-    };
-
-    fetchUserStats();
-  }, []);
-
-  /**
-   * التحقق مما إذا كان يجب عرض الإحصائيات
-   * إخفاء الإحصائيات عن المستخدم العام وشركة المزادات
-   */
-  const shouldShowStats = () => {
-    if (!apiData) return false;
-    
-    const userType = apiData.user.user_type;
-    // إخفاء الإحصائيات عن المستخدم العام وشركة المزادات
-    return userType !== 'مستخدم عام' && userType !== 'شركة مزادات';
-  };
+      setFormData(initialFormData);
+    }
+  }, [apiData, isEditing]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [name]: value
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const token = localStorage.getItem('token');
-      
-      const submitData = {
-        full_name: formData.full_name,
-        email: formData.email,
-        phone: formData.phone,
-        user_type: formData.user_type
+    
+    const submitData = {
+      full_name: formData.full_name,
+      email: formData.email,
+      phone: formData.phone,
+      user_type: formData.user_type
+    };
+
+    if (formData.business_name || formData.commercial_register || formData.national_id) {
+      submitData.details = {
+        business_name: formData.business_name,
+        commercial_register: formData.commercial_register,
+        national_id: formData.national_id
       };
-
-      if (formData.business_name || formData.commercial_register || formData.national_id) {
-        submitData.details = {
-          business_name: formData.business_name,
-          commercial_register: formData.commercial_register,
-          national_id: formData.national_id
-        };
-      }
-
-      const response = await fetch('https://shahin-tqay.onrender.com/api/profile', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(submitData)
-      });
-
-      if (response.ok) {
-        updateUser(formData);
-        setIsEditing(false);
-        const updatedResponse = await fetch('https://shahin-tqay.onrender.com/api/profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (updatedResponse.ok) {
-          const updatedData = await updatedResponse.json();
-          setApiData(updatedData);
-        }
-      }
-    } catch (error) {
-      console.error('Error updating profile:', error);
     }
+
+    updateProfileMutation.mutate(submitData);
   };
 
   const handleCancel = () => {
@@ -212,32 +152,28 @@ function Profile() {
     }
   };
 
-  const getUserTypeIcon = () => {
-    const userType = apiData?.user?.user_type;
-    if (userType === 'company' || userType === 'جهة تجارية') {
-      return <MdBusiness className="profile-type-icon" />;
-    }
-    return <MdPerson className="profile-type-icon" />;
+  const getUserInitial = () => {
+    const name = apiData?.user?.full_name || 'م';
+    return name.charAt(0);
   };
 
-  if (loading) {
-    return (
-      <div className="profile-container">
-        <div className="profile-loading">
-          <div className="profile-spinner"></div>
-          <p>جاري تحميل البيانات...</p>
-        </div>
-      </div>
-    );
+  // Show skeleton while loading
+  if (profileLoading) {
+    return <ProfileSkeleton />;
   }
 
-  if (!apiData) {
+  // Show error state
+  if (profileError) {
     return (
-      <div className="profile-container">
-        <div className="profile-error">
-          <FiXCircle className="error-icon" />
-          <p>حدث خطأ في جلب البيانات</p>
-          <button className="retry-btn" onClick={() => window.location.reload()}>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 pt-16">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
+          <FiXCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">حدث خطأ في جلب البيانات</h2>
+          <p className="text-gray-600 mb-6">تعذر تحميل بيانات الملف الشخصي</p>
+          <button 
+            onClick={() => refetchProfile()}
+            className="bg-[#53a1dd] hover:bg-[#4689c0] text-white font-medium py-2 px-6 rounded-lg transition duration-200"
+          >
             إعادة المحاولة
           </button>
         </div>
@@ -245,306 +181,332 @@ function Profile() {
     );
   }
 
+  const stats = statsData?.data;
+
   return (
-    <div className="profile-container">
-      {/* بطاقة المعلومات الرئيسية */}
-      <div className="profile-header">
-        <div className="profile-avatar-section">
-          <div className="avatar-circle">
-            <FiUser className="avatar-icon2" />
-          </div>
-          <div className={`status-dot ${apiData?.user?.status}`}></div>
-        </div>
-        
-        <div className="profile-info">
-          <h2 className="profile-name">{apiData.user.full_name || 'المستخدم'}</h2>
-          <div className="profile-type">
-            {getUserTypeIcon()}
-            <span>{renderUserTypeText()}</span>
-          </div>
-          <div className="profile-contact">
-            <FiMail className="contact-icon" />
-            <span>{apiData.user.email}</span>
-          </div>
-          <div className="profile-contact">
-            <FiPhone className="contact-icon" />
-            <span>{apiData.user.phone || 'لم يتم إضافة رقم الجوال'}</span>
+    <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header Card */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+            {/* Avatar Section - تم التعديل هنا */}
+            <div className="relative">
+              <div className="w-20 h-20 bg-[#53a1dd] rounded-full flex items-center justify-center">
+                <span className="text-white text-2xl font-bold">{getUserInitial()}</span>
+              </div>
+              <div className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white ${
+                apiData?.user?.status === 'active' ? 'bg-green-500' : 'bg-gray-400'
+              }`} />
+            </div>
+            
+            {/* Profile Info */}
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                {apiData?.user?.full_name || 'المستخدم'}
+              </h1>
+              <div className="flex flex-wrap gap-4 text-gray-600">
+                <div className="flex items-center gap-2">
+                  <MdPerson className="w-4 h-4" />
+                  <span className="text-sm">{renderUserTypeText()}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FiMail className="w-4 h-4" />
+                  <span className="text-sm">{apiData?.user?.email}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FiPhone className="w-4 h-4" />
+                  <span className="text-sm">{apiData?.user?.phone || 'لم يتم إضافة رقم الجوال'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            {/* <div className="flex gap-3">
+              {!isEditing ? (
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center gap-2 bg-[#53a1dd] hover:bg-[#4689c0] text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+                >
+                  <FiEdit2 className="w-4 h-4" />
+                  <span>تعديل</span>
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button 
+                    onClick={handleSubmit}
+                    disabled={updateProfileMutation.isLoading}
+                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 disabled:opacity-50"
+                  >
+                    <FiSave className="w-4 h-4" />
+                    <span>{updateProfileMutation.isLoading ? 'جاري الحفظ...' : 'حفظ'}</span>
+                  </button>
+                  <button 
+                    onClick={handleCancel}
+                    className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+                  >
+                    <FiX className="w-4 h-4" />
+                    <span>إلغاء</span>
+                  </button>
+                </div>
+              )}
+            </div> */}
           </div>
         </div>
 
-        {/* <div className="profile-actions">
-          {!isEditing ? (
-            <button className="edit-btn" onClick={() => setIsEditing(true)}>
-              <FiEdit2 />
-              <span>تعديل</span>
-            </button>
-          ) : (
-            <div className="action-buttons">
-              <button className="save-btn" onClick={handleSubmit}>
-                <FiSave />
-                <span>حفظ</span>
-              </button>
-              <button className="cancel-btn" onClick={handleCancel}>
-                <FiX />
-                <span>إلغاء</span>
-              </button>
+        {/* Statistics Section - تم التعديل هنا */}
+        {shouldShowStats(apiData) && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
+              <FiHome className="w-5 h-5 text-[#53a1dd]" />
+              إحصائيات الاراضي
+            </h3>
+            
+            {statsLoading ? (
+              <div className="grid grid-cols-5 gap-2">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="bg-gray-200 rounded-lg h-16"></div>
+                  </div>
+                ))}
+              </div>
+            ) : statsError ? (
+              <div className="text-center py-8 text-gray-500">
+                <FiXCircle className="w-12 h-12 mx-auto mb-2 text-red-400" />
+                <span>تعذر تحميل الإحصائيات</span>
+              </div>
+            ) : stats ? (
+              <div className="grid grid-cols-5 gap-2">
+                <div className="bg-blue-50 rounded-lg p-3 text-center">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <FiHome className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div className="text-lg font-bold text-gray-900">{stats.total}</div>
+                  <div className="text-xs text-gray-600">الإجمالي</div>
+                </div>
+                
+                <div className="bg-yellow-50 rounded-lg p-3 text-center">
+                  <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <FiClock className="w-5 h-5 text-yellow-600" />
+                  </div>
+                  <div className="text-lg font-bold text-gray-900">{stats.under_review}</div>
+                  <div className="text-xs text-gray-600">قيد المراجعة</div>
+                </div>
+                
+                <div className="bg-green-50 rounded-lg p-3 text-center">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <FiCheckCircle className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div className="text-lg font-bold text-gray-900">{stats.approved}</div>
+                  <div className="text-xs text-gray-600">معتمدة</div>
+                </div>
+                
+                <div className="bg-red-50 rounded-lg p-3 text-center">
+                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <FiXCircle className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div className="text-lg font-bold text-gray-900">{stats.rejected}</div>
+                  <div className="text-xs text-gray-600">مرفوضة</div>
+                </div>
+                
+                <div className="bg-purple-50 rounded-lg p-3 text-center">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                    <FiDollarSign className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div className="text-lg font-bold text-gray-900">{stats.sold}</div>
+                  <div className="text-xs text-gray-600">تم بيعها</div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        )}
+
+        {/* Personal Information */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
+            <FiUser className="w-5 h-5 text-[#53a1dd]" />
+            المعلومات الشخصية
+          </h3>
+          
+          <div className="space-y-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <FiUser className="w-4 h-4 text-gray-500" />
+                <span className="font-medium text-gray-700">الاسم الثلاثي</span>
+              </div>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="full_name"
+                  value={formData.full_name || ''}
+                  onChange={handleChange}
+                  className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
+                  placeholder="أدخل اسمك الثلاثي"
+                />
+              ) : (
+                <span className="text-gray-900">{apiData?.user?.full_name || 'غير محدد'}</span>
+              )}
             </div>
-          )}
-        </div> */}
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <FiMail className="w-4 h-4 text-gray-500" />
+                <span className="font-medium text-gray-700">البريد الإلكتروني</span>
+              </div>
+              {isEditing ? (
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email || ''}
+                  onChange={handleChange}
+                  className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
+                  placeholder="أدخل بريدك الإلكتروني"
+                />
+              ) : (
+                <span className="text-gray-900">{apiData?.user?.email || 'غير محدد'}</span>
+              )}
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <FiPhone className="w-4 h-4 text-gray-500" />
+                <span className="font-medium text-gray-700">رقم الجوال</span>
+              </div>
+              {isEditing ? (
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone || ''}
+                  onChange={handleChange}
+                  className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
+                  placeholder="أدخل رقم جوالك"
+                />
+              ) : (
+                <span className="text-gray-900">{apiData?.user?.phone || 'غير محدد'}</span>
+              )}
+            </div>
+
+            {isEditing && (
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <MdAssignment className="w-4 h-4 text-gray-500" />
+                  <span className="font-medium text-gray-700">نوع الحساب</span>
+                </div>
+                <select 
+                  name="user_type"
+                  value={formData.user_type || 'individual'}
+                  onChange={handleChange}
+                  className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
+                >
+                  <option value="individual">فرد</option>
+                  <option value="company">شركة</option>
+                  <option value="جهة تجارية">جهة تجارية</option>
+                </select>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Business Information */}
+        {(hasDetails() || (isEditing && isCommercialEntity())) && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
+              <MdBusiness className="w-5 h-5 text-[#53a1dd]" />
+              معلومات المنشأة
+            </h3>
+            
+            <div className="space-y-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <FiBriefcase className="w-4 h-4 text-gray-500" />
+                  <span className="font-medium text-gray-700">اسم المنشأة</span>
+                </div>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="business_name"
+                    value={formData.business_name || ''}
+                    onChange={handleChange}
+                    className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
+                    placeholder="أدخل اسم المنشأة"
+                  />
+                ) : (
+                  <span className="text-gray-900">
+                    {apiData?.user?.details?.business_name || 'غير محدد'}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <FiFileText className="w-4 h-4 text-gray-500" />
+                  <span className="font-medium text-gray-700">السجل التجاري</span>
+                </div>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="commercial_register"
+                    value={formData.commercial_register || ''}
+                    onChange={handleChange}
+                    className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
+                    placeholder="أدخل رقم السجل التجاري"
+                  />
+                ) : (
+                  <span className="text-gray-900">
+                    {apiData?.user?.details?.commercial_register || 'غير محدد'}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <MdBadge className="w-4 h-4 text-gray-500" />
+                  <span className="font-medium text-gray-700">رقم الهوية الوطنية</span>
+                </div>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="national_id"
+                    value={formData.national_id || ''}
+                    onChange={handleChange}
+                    className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
+                    placeholder="أدخل رقم الهوية الوطنية"
+                  />
+                ) : (
+                  <span className="text-gray-900">
+                    {apiData?.user?.details?.national_id || 'غير محدد'}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Documents Section */}
+        {hasDetails() && apiData?.user?.details?.commercial_file && (
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
+              <FiFileText className="w-5 h-5 text-[#53a1dd]" />
+              الوثائق والمستندات
+            </h3>
+            
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <FiFileText className="w-5 h-5 text-gray-500" />
+                  <span className="font-medium text-gray-700">السجل التجاري</span>
+                </div>
+                <button
+                  onClick={() => window.open(apiData.user.details.commercial_file, '_blank')}
+                  className="flex items-center gap-2 bg-[#53a1dd] hover:bg-[#4689c0] text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+                >
+                  <FiFileText className="w-4 h-4" />
+                  <span>عرض المستند</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* بطاقة الإحصائيات - تظهر فقط للمستخدمين المسموح لهم */}
-      {shouldShowStats() && (
-        <div className="stats-section">
-          <h3 className="section-title">
-            <FiHome className="title-icon" />
-            إحصائيات الاراضي
-          </h3>
-          {statsLoading ? (
-            <div className="stats-loading">
-              <div className="loading-spinner"></div>
-              <span>جاري التحميل...</span>
-            </div>
-          ) : stats ? (
-            <div className="stats-grid">
-              <div className="stat-item">
-                <div className="stat-icon total">
-                  <FiHome />
-                </div>
-                <div className="stat-content">
-                  <span className="stat-number">{stats.total}</span>
-                  <span className="stat-label">الإجمالي</span>
-                </div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-icon pending">
-                  <FiClock />
-                </div>
-                <div className="stat-content">
-                  <span className="stat-number">{stats.under_review}</span>
-                  <span className="stat-label">قيد المراجعة</span>
-                </div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-icon approved">
-                  <FiCheckCircle />
-                </div>
-                <div className="stat-content">
-                  <span className="stat-number">{stats.approved}</span>
-                  <span className="stat-label">معتمدة</span>
-                </div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-icon rejected">
-                  <FiXCircle />
-                </div>
-                <div className="stat-content">
-                  <span className="stat-number">{stats.rejected}</span>
-                  <span className="stat-label">مرفوضة</span>
-                </div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-icon sold">
-                  <FiDollarSign />
-                </div>
-                <div className="stat-content">
-                  <span className="stat-number">{stats.sold}</span>
-                  <span className="stat-label">تم بيعها</span>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="stats-error">
-              <FiXCircle />
-              <span>تعذر تحميل الإحصائيات</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* المعلومات الشخصية */}
-      <div className="info-section">
-        <h3 className="section-title">
-          <FiUser className="title-icon" />
-          المعلومات الشخصية
-        </h3>
-        <div className="info-list">
-          <div className="info-item">
-            <div className="info-label">
-              <FiUser className="label-icon" />
-              <span>الاسم الثلاثي</span>
-            </div>
-            {isEditing ? (
-              <input
-                type="text"
-                name="full_name"
-                value={formData.full_name || ''}
-                onChange={handleChange}
-                className="input-field"
-                placeholder="أدخل اسمك الثلاثي"
-              />
-            ) : (
-              <span className="info-value">{apiData?.user?.full_name || 'غير محدد'}</span>
-            )}
-          </div>
-
-          <div className="info-item">
-            <div className="info-label">
-              <FiMail className="label-icon" />
-              <span>البريد الإلكتروني</span>
-            </div>
-            {isEditing ? (
-              <input
-                type="email"
-                name="email"
-                value={formData.email || ''}
-                onChange={handleChange}
-                className="input-field"
-                placeholder="أدخل بريدك الإلكتروني"
-              />
-            ) : (
-              <span className="info-value">{apiData?.user?.email || 'غير محدد'}</span>
-            )}
-          </div>
-
-          <div className="info-item">
-            <div className="info-label">
-              <FiPhone className="label-icon" />
-              <span>رقم الجوال</span>
-            </div>
-            {isEditing ? (
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone || ''}
-                onChange={handleChange}
-                className="input-field"
-                placeholder="أدخل رقم جوالك"
-              />
-            ) : (
-              <span className="info-value">{apiData?.user?.phone || 'غير محدد'}</span>
-            )}
-          </div>
-
-          {isEditing && (
-            <div className="info-item">
-              <div className="info-label">
-                <MdAssignment className="label-icon" />
-                <span>نوع الحساب</span>
-              </div>
-              <select 
-                name="user_type"
-                value={formData.user_type || 'individual'}
-                onChange={handleChange}
-                className="select-field"
-              >
-                <option value="individual">فرد</option>
-                <option value="company">شركة</option>
-                <option value="جهة تجارية">جهة تجارية</option>
-              </select>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* معلومات إضافية */}
-      {(hasDetails() || (isEditing && isCommercialEntity())) && (
-        <div className="info-section">
-          <h3 className="section-title">
-            <MdBusiness className="title-icon" />
-            معلومات المنشأة
-          </h3>
-          <div className="info-list">
-            <div className="info-item">
-              <div className="info-label">
-                <FiBriefcase className="label-icon" />
-                <span>اسم المنشأة</span>
-              </div>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="business_name"
-                  value={formData.business_name || ''}
-                  onChange={handleChange}
-                  className="input-field"
-                  placeholder="أدخل اسم المنشأة"
-                />
-              ) : (
-                <span className="info-value">
-                  {apiData?.user?.details?.business_name || 'غير محدد'}
-                </span>
-              )}
-            </div>
-
-            <div className="info-item">
-              <div className="info-label">
-                <FiFileText className="label-icon" />
-                <span>السجل التجاري</span>
-              </div>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="commercial_register"
-                  value={formData.commercial_register || ''}
-                  onChange={handleChange}
-                  className="input-field"
-                  placeholder="أدخل رقم السجل التجاري"
-                />
-              ) : (
-                <span className="info-value">
-                  {apiData?.user?.details?.commercial_register || 'غير محدد'}
-                </span>
-              )}
-            </div>
-
-            <div className="info-item">
-              <div className="info-label">
-                <MdBadge className="label-icon" />
-                <span>رقم الهوية الوطنية</span>
-              </div>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="national_id"
-                  value={formData.national_id || ''}
-                  onChange={handleChange}
-                  className="input-field"
-                  placeholder="أدخل رقم الهوية الوطنية"
-                />
-              ) : (
-                <span className="info-value">
-                  {apiData?.user?.details?.national_id || 'غير محدد'}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* الوثائق والمستندات */}
-      {hasDetails() && apiData?.user?.details?.commercial_file && (
-        <div className="docs-section">
-          <h3 className="section-title">
-            <FiFileText className="title-icon" />
-            الوثائق والمستندات
-          </h3>
-          <div className="docs-list">
-            <div className="doc-item">
-              <div className="doc-info">
-                <FiFileText className="doc-icon" />
-                <span className="doc-name">السجل التجاري</span>
-              </div>
-              <button
-                className="doc-btn"
-                onClick={() => window.open(apiData.user.details.commercial_file, '_blank')}
-              >
-                <FiFileText />
-                <span>عرض المستند</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

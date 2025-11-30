@@ -125,8 +125,8 @@ const PropertyDetailsPage = () => {
     try {
       setLoading(true);
       const url = type === 'land' 
-        ? `https://shahin-tqay.onrender.com/api/properties/${id}`
-        : `https://shahin-tqay.onrender.com/api/auctions/${id}`;
+        ? `https://core-api-x41.shaheenplus.sa/api/properties/${id}`
+        : `https://core-api-x41.shaheenplus.sa/api/auctions/${id}`;
 
       const headers = {
         'Content-Type': 'application/json',
@@ -179,7 +179,7 @@ const PropertyDetailsPage = () => {
         'Authorization': `Bearer ${token}`
       };
 
-      const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/${type}/${id}`, {
+      const response = await fetch(`https://core-api-x41.shaheenplus.sa/api/user/favorites/${type}/${id}`, {
         method: 'GET',
         headers: headers
       });
@@ -228,7 +228,7 @@ const PropertyDetailsPage = () => {
         'Authorization': `Bearer ${token}`
       };
 
-      const response = await fetch(`https://shahin-tqay.onrender.com/api/user/favorites/${type}/${id}`, {
+      const response = await fetch(`https://core-api-x41.shaheenplus.sa/api/user/favorites/${type}/${id}`, {
         method: isFavorite ? 'DELETE' : 'POST',
         headers: headers
       });
@@ -334,7 +334,7 @@ const PropertyDetailsPage = () => {
   };
 
   const getImageUrl = (imagePath) => {
-    return imagePath ? `https://shahin-tqay.onrender.com/storage/${imagePath}` : null;
+    return imagePath ? `https://core-api-x41.shaheenplus.sa/storage/${imagePath}` : null;
   };
 
   const getAllImages = () => {
@@ -463,7 +463,7 @@ const PropertyDetailsPage = () => {
       console.log('الـ Token المستخدم:', token ? 'موجود' : 'غير موجود');
 
       // استخدام الرابط الجديد
-      const response = await fetch(`https://shahin-tqay.onrender.com/api/properties/${id}/interest`, {
+      const response = await fetch(`https://core-api-x41.shaheenplus.sa/api/properties/${id}/interest`, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(requestData),

@@ -48,13 +48,13 @@ function CreateAd() {
   const getApiUrls = () => {
     if (currentUser?.user_type === 'شركة مزادات') {
       return {
-        base: 'https://shahin-tqay.onrender.com/api/user/auctions',
-        create: 'https://shahin-tqay.onrender.com/api/user/auctions'
+        base: 'https://core-api-x41.shaheenplus.sa/api/user/auctions',
+        create: 'https://core-api-x41.shaheenplus.sa/api/user/auctions'
       };
     } else {
       return {
-        base: 'https://shahin-tqay.onrender.com/api/user/properties',
-        create: 'https://shahin-tqay.onrender.com/api/user/properties'
+        base: 'https://core-api-x41.shaheenplus.sa/api/user/properties',
+        create: 'https://core-api-x41.shaheenplus.sa/api/user/properties'
       };
     }
   };

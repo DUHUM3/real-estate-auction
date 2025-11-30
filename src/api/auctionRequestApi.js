@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://shahin-tqay.onrender.com/api';
+const API_BASE_URL = 'https://core-api-x41.shaheenplus.sa/api';
 
 // Create axios instance with common config
 const apiClient = axios.create({
