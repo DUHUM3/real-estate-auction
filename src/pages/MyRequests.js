@@ -254,7 +254,7 @@ function MyRequests() {
                   }`}
                 >
                   <FaGavel className="w-4 h-4" />
-                  <span>طلبات المزادات</span>
+                  <span>طلبات التسويق</span>
                   {auctionRequests.length > 0 && (
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       activeTab === 'auctions' ? 'bg-white text-[#53a1dd]' : 'bg-gray-200 text-gray-700'
@@ -283,7 +283,7 @@ function MyRequests() {
           <div className="mb-6">
             <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
               <p className="text-blue-700 font-medium text-center">
-                عرض {currentRequests.length} {activeTab === 'lands' ? 'طلب أرض' : 'طلب مزاد'}
+                عرض {currentRequests.length} {activeTab === 'lands' ? 'طلب أرض' : 'طلب تسويق'}
               </p>
             </div>
           </div>
@@ -440,12 +440,12 @@ function MyRequests() {
                 <FaFileAlt className="w-8 h-8 text-gray-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {activeTab === 'lands' ? 'لا توجد طلبات أراضي' : 'لا توجد طلبات مزادات'}
+                {activeTab === 'lands' ? 'لا توجد طلبات أراضي' : 'لا توجد طلبات تسويق'}
               </h3>
               <p className="text-gray-600 mb-6">
                 {activeTab === 'lands' 
                   ? 'لم تقم بتقديم أي طلبات أراضي حتى الآن' 
-                  : 'لم تقم بتقديم أي طلبات مزادات حتى الآن'
+                  : 'لم تقم بتقديم أي طلبات تسويق حتى الآن'
                 }
               </p>
               {/* <button 

@@ -256,15 +256,33 @@ body {
   border-radius: 10px;
   font-family: 'Tajawal', sans-serif;
   font-size: 15.5px;
-  background-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(255, 255, 255, 0.85); /* جعل الخلفية أكثر وضوحاً */
   outline: none;
   transition: all 0.35s ease;
+  color: #333; /* لون النص الداكن */
+  border: 1px solid rgba(255, 255, 255, 0.3); /* إضافة حدود */
+  /* إضافة placeholder واضح */
+  &::placeholder {
+    color: #666;
+    opacity: 1; /* تأكد من ظهور الـ placeholder */
+  }
 }
 
+/* إزالة تأثير الضوء (box-shadow) عند التركيز */
 .filter-form input:focus {
-  background-color: rgba(255, 255, 255, 1);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
-  transform: scale(1.02);
+  background-color: rgba(255, 255, 255, 0.95);
+  /* إزالة box-shadow الذي يسبب اللمعان */
+  box-shadow: none !important;
+  /* إزالة transform الذي يسبب التكبير */
+  transform: none !important;
+  /* إضافة حدود أكثر وضوحاً */
+  border: 1px solid var(--primary-color);
+  /* التأكيد على النص الذي يتم كتابته */
+  color: #000;
+  /* التأكد من ظهور placeholder عند التركيز إذا كان فارغاً */
+  &::placeholder {
+    color: #999;
+  }
 }
 
 /* ===== أيقونة البحث ===== */
@@ -363,12 +381,12 @@ body {
     min-width: 0;
   }
 
-  .filter-form input {
+  /* .filter-form input {
     font-size: 14px;
     padding: 10px 12px 10px 38px;
     height: 42px;
     border-radius: 8px;
-  }
+  } */
 
   .search-icon {
     left: 10px;

@@ -2,8 +2,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ModalContext } from '../../App';
-import { useAuth } from '../../context/AuthContext'; // استيراد useAuth
-import { toast, Toaster } from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
+// استبدال react-hot-toast بـ react-toastify
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   FaMapMarkerAlt,
   FaRulerCombined,
@@ -18,18 +20,58 @@ import {
   FaTimes,
   FaPaperPlane,
   FaEdit,
-  FaExclamationCircle,
-  FaCheckCircle,
   FaHandshake,
   FaCity
 } from 'react-icons/fa';
-import '../../styles/PropertyDetailsModal.css';
+
+// دالة مساعدة لعرض الرسائل
+const showToast = (type, message, duration = 3000) => {
+  const isMobile = window.innerWidth < 768;
+  
+  const options = {
+    position: "top-right",
+    autoClose: duration,
+    rtl: true,
+    theme: "light",
+    style: {
+      fontSize: isMobile ? "12px" : "14px",
+      fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+      borderRadius: isMobile ? "6px" : "8px",
+      minHeight: isMobile ? "40px" : "50px",
+      padding: isMobile ? "8px 10px" : "12px 14px",
+      marginTop: isMobile ? "10px" : "0",
+    },
+    bodyStyle: {
+      fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+      fontSize: isMobile ? "12px" : "14px",
+      textAlign: "right",
+      direction: "rtl",
+    },
+  };
+
+  switch(type) {
+    case 'success':
+      toast.success(message, options);
+      break;
+    case 'error':
+      toast.error(message, options);
+      break;
+    case 'info':
+      toast.info(message, options);
+      break;
+    case 'warning':
+      toast.warning(message, options);
+      break;
+    default:
+      toast(message, options);
+  }
+};
 
 const LandRequestDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { openLogin } = useContext(ModalContext);
-  const { currentUser } = useAuth(); // استخدام useAuth
+  const { currentUser } = useAuth();
 
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,21 +87,21 @@ const LandRequestDetails = () => {
   // دالة لعرض رسائل الخطأ من API
   const showApiError = (errorObj) => {
     if (typeof errorObj === 'string') {
-      toast.error(errorObj);
+      showToast('error', errorObj);
     } else if (errorObj.message) {
-      toast.error(errorObj.message);
+      showToast('error', errorObj.message);
     } else if (errorObj.details) {
-      toast.error(errorObj.details);
+      showToast('error', errorObj.details);
     } else if (errorObj.error) {
-      toast.error(errorObj.error);
+      showToast('error', errorObj.error);
     } else {
-      toast.error('حدث خطأ غير متوقع');
+      showToast('error', 'حدث خطأ غير متوقع');
     }
   };
 
   // دالة لعرض رسائل النجاح
   const showApiSuccess = (message) => {
-    toast.success(message);
+    showToast('success', message);
   };
 
   useEffect(() => {
@@ -233,7 +275,6 @@ const LandRequestDetails = () => {
    * دالة الحصول على نوع المستخدم الحالي
    */
   const getCurrentUserType = () => {
-    // استخدام currentUser من AuthContext أولاً، ثم localStorage كبديل
     return currentUser?.user_type || localStorage.getItem('user_type');
   };
 
@@ -244,10 +285,8 @@ const LandRequestDetails = () => {
     const userType = getCurrentUserType();
     console.log('نوع المستخدم الحالي:', userType);
     
-    // الأنواع المسموح لها بتقديم العروض (جميع الأنواع عدا شركة مزادات)
     const allowedTypes = ['مالك أرض', 'وكيل عقارات', 'مستثمر', 'فرد', 'مالك ارض', 'وكيل عقاري'];
     
-    // إذا لم يكن هناك نوع مستخدم (مستخدم غير مسجل)، نسمح له بتسجيل الدخول أولاً
     if (!userType) {
       return true;
     }
@@ -255,60 +294,30 @@ const LandRequestDetails = () => {
     return allowedTypes.includes(userType);
   };
 
-  /**
-   * دالة الحصول على رسالة الخطأ
-   */
-  const getOfferErrorMessage = () => {
-    const userType = getCurrentUserType();
-    
-    if (userType === 'شركة مزادات') {
-      return 'عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات';
-    }
-    
-    return 'عذراً، ليس لديك صلاحية لتقديم العروض';
-  };
-
   const handleShowOfferForm = () => {
     const token = localStorage.getItem('token');
-    console.log('التحقق من token في handleShowOfferForm:', token);
-    console.log('بيانات المستخدم الحالي:', currentUser);
     
     if (!token) {
-      // إذا لم يكن المستخدم مسجل الدخول، افتح نافذة تسجيل الدخول
-      console.log('المستخدم غير مسجل الدخول - فتح نافذة تسجيل الدخول');
       openLogin(() => {
-        // هذه الدالة ستنفذ بعد تسجيل الدخول بنجاح
-        console.log('تم تسجيل الدخول بنجاح - التحقق من نوع المستخدم');
-        
-        // بعد تسجيل الدخول، currentUser سيكون محدثاً
         const userType = getCurrentUserType();
-        console.log('نوع المستخدم بعد التسجيل:', userType);
         
         if (userType === 'شركة مزادات') {
-          console.log('شركة مزادات - غير مسموح بتقديم العروض');
-          toast.error('عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات');
+          showToast('error', 'عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات', 5000);
           return;
         }
         
-        console.log('المستخدم مسجل الدخول ومسموح له - فتح فورم العرض');
         setShowOfferForm(true);
       });
       return;
     }
     
-    // التحقق من نوع المستخدم للمستخدمين المسجلين
     const userType = getCurrentUserType();
-    console.log('نوع المستخدم الحالي للمستخدم المسجل:', userType);
     
-    // إذا كان المستخدم شركة مزادات، منع تقديم العرض
     if (userType === 'شركة مزادات') {
-      console.log('شركة مزادات - غير مسموح بتقديم العروض');
-      toast.error('عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات');
+      showToast('error', 'عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات', 5000);
       return;
     }
     
-    // إذا كان مسجل الدخول وليس شركة مزادات، اعرض فورم العرض مباشرة
-    console.log('المستخدم مسجل الدخول ومسموح له - عرض فورم العرض مباشرة');
     setShowOfferForm(true);
   };
 
@@ -320,7 +329,7 @@ const LandRequestDetails = () => {
 
   const validateForm = () => {
     if (offerMessage.trim().length < 10) {
-      showApiError("تفاصيل العرض يجب أن تكون أكثر من 10 أحرف");
+      showToast('error', "تفاصيل العرض يجب أن تكون أكثر من 10 أحرف", 5000);
       return false;
     }
     return true;
@@ -330,11 +339,10 @@ const LandRequestDetails = () => {
     e.preventDefault();
     
     if (!offerMessage.trim()) {
-      showApiError('يرجى إدخال تفاصيل العرض');
+      showToast('error', 'يرجى إدخال تفاصيل العرض', 3000);
       return;
     }
 
-    // التحقق من صحة النموذج
     if (!validateForm()) {
       return;
     }
@@ -346,16 +354,15 @@ const LandRequestDetails = () => {
       const token = localStorage.getItem('token');
       
       if (!token) {
-        showApiError('يجب تسجيل الدخول أولاً');
+        showToast('error', 'يجب تسجيل الدخول أولاً', 3000);
         setOfferLoading(false);
         navigate('/login');
         return;
       }
 
-      // التحقق النهائي من صلاحية المستخدم قبل الإرسال
       const userType = getCurrentUserType();
       if (userType === 'شركة مزادات') {
-        showApiError('عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات');
+        showToast('error', 'عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات', 5000);
         setOfferLoading(false);
         return;
       }
@@ -377,7 +384,6 @@ const LandRequestDetails = () => {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        // نجاح - إغلاق الفورم فوراً وإظهار رسالة النجاح
         setOfferMessage('');
         setOfferLoading(false);
         
@@ -386,9 +392,8 @@ const LandRequestDetails = () => {
           success: true,
           message: successMessage
         });
-        showApiSuccess(successMessage);
+        showToast('success', successMessage);
         
-        // إغلاق الفورم بعد نجاح الإرسال مباشرة
         setTimeout(() => {
           setShowOfferForm(false);
           setSubmitResult(null);
@@ -451,27 +456,41 @@ const LandRequestDetails = () => {
 
   if (loading) {
     return (
-      <div className="elegantLoading_container">
-        <div className="elegantLoader"></div>
-        <p>جاري تحميل تفاصيل الطلب...</p>
+      <div className="flex flex-col items-center justify-center min-h-[50vh] px-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+        <p className="text-gray-600 text-lg">جاري تحميل تفاصيل الطلب...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="elegantError_container">
-        <p>{error}</p>
-        <button onClick={() => navigate(-1)}>العودة</button>
+      <div className="max-w-2xl mx-auto px-4 py-8 text-center">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
+          <p className="text-red-600 text-lg mb-4">{error}</p>
+          <button 
+            onClick={() => navigate(-1)} 
+            className="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+          >
+            العودة
+          </button>
+        </div>
       </div>
     );
   }
 
   if (!request) {
     return (
-      <div className="elegantError_container">
-        <p>البيانات غير متوفرة</p>
-        <button onClick={() => navigate(-1)}>العودة</button>
+      <div className="max-w-2xl mx-auto px-4 py-8 text-center">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-6">
+          <p className="text-yellow-700 text-lg mb-4">البيانات غير متوفرة</p>
+          <button 
+            onClick={() => navigate(-1)} 
+            className="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+          >
+            العودة
+          </button>
+        </div>
       </div>
     );
   }
@@ -479,52 +498,27 @@ const LandRequestDetails = () => {
   const images = getAllImages();
 
   return (
-    <div className="elegantDetails_container">
-      {/* Toaster للإشعارات */}
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#fff',
-            color: '#000',
-            direction: 'rtl',
-            fontFamily: 'Arial, sans-serif',
-            border: '1px solid #e0e0e0',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#22c55e',
-              secondary: '#fff',
-            },
-          },
-          error: {
-            duration: 5000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
-            },
-          },
-        }}
-      />
-
+    <div className="max-w-4xl mx-auto px-4 pb-6 pt-4" dir="rtl">
       {/* Header */}
-      <div className="elegantDetails_header">
-        <button onClick={() => navigate(-1)} className="elegantBack_btn">
+      <div className="flex justify-between items-center mb-6">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
+        >
           <FaArrowLeft />
           <span>العودة</span>
         </button>
-        <div className="elegantHeader_actions">
+        <div className="flex gap-2">
           <button 
-            className={`elegantFavorite_btn ${isFavorite ? 'elegantActive' : ''}`}
+            className={`p-2.5 rounded-lg border ${isFavorite ? 'border-red-300 bg-red-50 text-red-500' : 'border-gray-300 hover:bg-gray-50'}`}
             onClick={toggleFavorite}
           >
             <FaHeart />
           </button>
-          <button className="elegantShare_btn" onClick={shareItem}>
+          <button 
+            className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50"
+            onClick={shareItem}
+          >
             <FaShare />
           </button>
         </div>
@@ -532,15 +526,16 @@ const LandRequestDetails = () => {
 
       {/* Image Gallery */}
       {images.length > 0 && (
-        <div className="elegantImage_gallery">
-          <div className="elegantMain_image">
+        <div className="mb-8">
+          <div className="relative rounded-xl overflow-hidden mb-4">
             <img 
               src={`https://core-api-x41.shaheenplus.sa/storage/${images[selectedImage]}`} 
               alt="Main" 
+              className="w-full h-80 object-cover cursor-pointer"
               onClick={() => setShowImageModal(true)}
             />
             <button 
-              className="elegantExpand_btn"
+              className="absolute top-3 left-3 p-2 bg-white bg-opacity-90 rounded-lg hover:bg-opacity-100"
               onClick={() => setShowImageModal(true)}
             >
               <FaExpand />
@@ -549,19 +544,19 @@ const LandRequestDetails = () => {
             {images.length > 1 && (
               <>
                 <button 
-                  className="elegantGallery_nav elegantPrev"
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 p-2 bg-white bg-opacity-90 rounded-lg hover:bg-opacity-100"
                   onClick={() => setSelectedImage(prev => prev === 0 ? images.length - 1 : prev - 1)}
                 >
                   <FaArrowRight />
                 </button>
                 <button 
-                  className="elegantGallery_nav elegantNext"
+                  className="absolute top-1/2 left-3 transform -translate-y-1/2 p-2 bg-white bg-opacity-90 rounded-lg hover:bg-opacity-100"
                   onClick={() => setSelectedImage(prev => (prev + 1) % images.length)}
                 >
                   <FaLeft />
                 </button>
                 
-                <div className="elegantGallery_count">
+                <div className="absolute bottom-3 left-3 px-2 py-1 bg-black bg-opacity-60 text-white text-xs rounded">
                   {selectedImage + 1} / {images.length}
                 </div>
               </>
@@ -569,14 +564,18 @@ const LandRequestDetails = () => {
           </div>
           
           {images.length > 1 && (
-            <div className="elegantThumbnails">
+            <div className="flex gap-2 overflow-x-auto pb-2">
               {images.map((image, index) => (
                 <div
                   key={index}
-                  className={`elegantThumbnail ${selectedImage === index ? 'elegantActive' : ''}`}
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden cursor-pointer border-2 ${selectedImage === index ? 'border-blue-500' : 'border-transparent'}`}
                   onClick={() => setSelectedImage(index)}
                 >
-                  <img src={`https://core-api-x41.shaheenplus.sa/storage/${image}`} alt={`Thumbnail ${index + 1}`} />
+                  <img 
+                    src={`https://core-api-x41.shaheenplus.sa/storage/${image}`} 
+                    alt={`Thumbnail ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               ))}
             </div>
@@ -585,64 +584,68 @@ const LandRequestDetails = () => {
       )}
 
       {/* Main Content */}
-      <div className="elegantDetails_content">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         {/* العنوان أولاً */}
-        <div className="elegantTitle_section">
-          <h1>طلب أرض #{request.id}</h1>
-          <div className={`elegantStatus_badge ${getStatusClass(request.status)}`}>
+        <div className="flex justify-between items-start mb-4">
+          <h1 className="text-2xl font-bold text-gray-800">طلب أرض #{request.id}</h1>
+          <div className={`px-3 py-1 rounded-full text-sm font-bold ${
+            request.status === 'open' ? 'bg-green-100 text-green-800' :
+            request.status === 'closed' ? 'bg-red-100 text-red-800' :
+            'bg-gray-100 text-gray-800'
+          }`}>
             {getStatusLabel(request.status)}
           </div>
         </div>
 
-        {/* الوصف مباشرة تحت العنوان بدون عنوان */}
-        <div className="elegantDescription_section">
-          <p>{request.description}</p>
+        {/* الوصف */}
+        <div className="mb-6">
+          <p className="text-gray-600 leading-relaxed">{request.description}</p>
         </div>
 
         {/* التاريخ */}
-        <div className="elegantDate_section">
+        <div className="text-sm text-gray-500 mb-6">
           <span>تاريخ الإنشاء: {request.created_at}</span>
         </div>
 
         {/* الموقع */}
-        <div className="elegantLocation_section">
-          <FaMapMarkerAlt className="elegantSection_icon" />
-          <div className="elegantLocation_info">
-            <h3>الموقع</h3>
-            <p>{request.region} - {request.city}</p>
+        <div className="flex items-start gap-3 mb-6 p-4 bg-gray-50 rounded-lg">
+          <FaMapMarkerAlt className="text-amber-500 mt-1" />
+          <div>
+            <h3 className="font-bold text-gray-700 mb-1">الموقع</h3>
+            <p className="text-gray-600">{request.region} - {request.city}</p>
           </div>
         </div>
 
         {/* تفاصيل الطلب */}
-        <div className="elegantSpecs_section">
-          <h3>تفاصيل الطلب</h3>
-          <div className="elegantSpecs_grid">
-            <div className="elegantSpec_item">
-              <FaHandshake />
+        <div className="mb-8">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">تفاصيل الطلب</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <FaHandshake className="text-blue-500" />
               <div>
-                <span className="elegantSpec_label">الغرض</span>
-                <span className="elegantSpec_value">{getPurposeLabel(request.purpose)}</span>
+                <span className="block text-sm text-gray-500">الغرض</span>
+                <span className="font-semibold text-gray-700">{getPurposeLabel(request.purpose)}</span>
               </div>
             </div>
-            <div className="elegantSpec_item">
-              <FaBuilding />
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <FaBuilding className="text-blue-500" />
               <div>
-                <span className="elegantSpec_label">النوع</span>
-                <span className="elegantSpec_value">{getTypeLabel(request.type)}</span>
+                <span className="block text-sm text-gray-500">النوع</span>
+                <span className="font-semibold text-gray-700">{getTypeLabel(request.type)}</span>
               </div>
             </div>
-            <div className="elegantSpec_item">
-              <FaRulerCombined />
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <FaRulerCombined className="text-blue-500" />
               <div>
-                <span className="elegantSpec_label">المساحة المطلوبة</span>
-                <span className="elegantSpec_value">{formatPrice(request.area)} م²</span>
+                <span className="block text-sm text-gray-500">المساحة المطلوبة</span>
+                <span className="font-semibold text-gray-700">{formatPrice(request.area)} م²</span>
               </div>
             </div>
-            <div className="elegantSpec_item">
-              <FaCity />
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <FaCity className="text-blue-500" />
               <div>
-                <span className="elegantSpec_label">المدينة</span>
-                <span className="elegantSpec_value">{request.city}</span>
+                <span className="block text-sm text-gray-500">المدينة</span>
+                <span className="font-semibold text-gray-700">{request.city}</span>
               </div>
             </div>
           </div>
@@ -650,9 +653,9 @@ const LandRequestDetails = () => {
 
         {/* Offer Button */}
         {request.status === 'open' && (
-          <div className="elegantInterest_section" id="offer">
+          <div className="mb-6" id="offer">
             <button 
-              className="elegantInterest_btn" 
+              className="w-full py-3.5 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-all text-lg"
               onClick={handleShowOfferForm}
             >
               تقديم عرض
@@ -662,9 +665,9 @@ const LandRequestDetails = () => {
 
         {/* Closed Message */}
         {request.status !== 'open' && (
-          <div className="elegantClosed_message">
-            <div className="elegantClosed_icon">🔒</div>
-            <p className="elegantClosed_text">
+          <div className="text-center py-6 border-t border-gray-200 mt-6">
+            <div className="text-3xl mb-3">🔒</div>
+            <p className="text-gray-600">
               هذا الطلب {request.status === 'closed' ? 'مغلق' : 'مكتمل'} ولا يمكن تقديم عروض جديدة
             </p>
           </div>
@@ -673,81 +676,92 @@ const LandRequestDetails = () => {
 
       {/* Offer Form Modal */}
       {showOfferForm && (
-        <div className="elegantForm_modal">
-          <div className="elegantForm_content">
-            <button 
-              className="elegantModal_close" 
-              onClick={handleCloseOfferForm}
-            >
-              <FaTimes />
-            </button>
-            <h3>تقديم عرض على الطلب</h3>
-            
-            {submitResult ? (
-              <div className={`elegantSubmit_result ${submitResult.success ? 'success' : 'error'}`}>
-                <p>{submitResult.message}</p>
-                {submitResult.success ? (
-                  <button onClick={handleCloseOfferForm} className="elegantCloseResult_btn">
-                    إغلاق
-                  </button>
-                ) : (
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                    <button onClick={() => setSubmitResult(null)} className="elegantTryAgain_btn">
-                      حاول مرة أخرى
-                    </button>
-                    <button onClick={handleCloseOfferForm} className="elegantCloseResult_btn">
-                      إلغاء
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <form onSubmit={handleOfferSubmit}>
-                <div className="elegantForm_group">
-                  <label>
-                    <FaEdit />
-                    <span>تفاصيل العرض</span>
-                  </label>
-                  <textarea
-                    name="offerMessage"
-                    value={offerMessage}
-                    onChange={(e) => setOfferMessage(e.target.value)}
-                    placeholder="أدخل تفاصيل العرض هنا... مثلاً: لدي أرض تناسب متطلباتك في الموقع المطلوب مع توفر جميع الخدمات..."
-                    rows={5}
-                    required
-                  />
-                  <div className="elegantForm_hint">
-                    اكتب وصفاً واضحاً ومفصلاً لعرضك (يجب أن يكون أكثر من 10 أحرف)
-                  </div>
-                </div>
-                
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-800">تقديم عرض على الطلب</h3>
                 <button 
-                  type="submit" 
-                  className="elegantSubmit_btn"
-                  disabled={offerLoading}
+                  className="p-2 rounded-lg hover:bg-gray-100"
+                  onClick={handleCloseOfferForm}
                 >
-                  <FaPaperPlane className="elegantSubmit_icon" />
-                  {offerLoading ? 'جاري الإرسال...' : 'إرسال العرض'}
+                  <FaTimes />
                 </button>
-              </form>
-            )}
+              </div>
+              
+              {submitResult ? (
+                <div className={`p-6 rounded-lg text-center ${submitResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                  <p className={`mb-4 ${submitResult.success ? 'text-green-700' : 'text-red-700'}`}>
+                    {submitResult.message}
+                  </p>
+                  {submitResult.success ? (
+                    <button 
+                      onClick={handleCloseOfferForm} 
+                      className="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    >
+                      إغلاق
+                    </button>
+                  ) : (
+                    <div className="flex gap-3 justify-center">
+                      <button 
+                        onClick={handleCloseOfferForm} 
+                        className="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50"
+                      >
+                        إلغاء
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <form onSubmit={handleOfferSubmit}>
+                  <div className="mb-6">
+                    <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
+                      <FaEdit />
+                      <span>تفاصيل العرض</span>
+                    </label>
+                    <textarea
+                      name="offerMessage"
+                      value={offerMessage}
+                      onChange={(e) => setOfferMessage(e.target.value)}
+                      placeholder="أدخل تفاصيل العرض هنا... مثلاً: لدي أرض تناسب متطلباتك في الموقع المطلوب مع توفر جميع الخدمات..."
+                      rows={5}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
+                      required
+                    />
+                    <div className="text-xs text-gray-500 mt-2">
+                      اكتب وصفاً واضحاً ومفصلاً لعرضك (يجب أن يكون أكثر من 10 أحرف)
+                    </div>
+                  </div>
+                  
+                  <button 
+                    type="submit" 
+                    className="w-full py-3.5 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={offerLoading}
+                  >
+                    <FaPaperPlane />
+                    {offerLoading ? 'جاري الإرسال...' : 'إرسال العرض'}
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       )}
 
       {/* Image Modal */}
       {showImageModal && images.length > 0 && (
-        <div className="elegantImage_modal">
-          <div className="elegantModal_content">
+        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-4xl">
             <button 
-              className="elegantModal_close" 
+              className="absolute top-4 left-4 p-2 bg-white bg-opacity-90 rounded-lg hover:bg-opacity-100 z-10"
               onClick={() => setShowImageModal(false)}
             >
-              <FaTimes />
+              <FaTimes className="text-xl" />
             </button>
             <img 
               src={`https://core-api-x41.shaheenplus.sa/storage/${images[selectedImage]}`} 
               alt="Enlarged view" 
+              className="w-full h-auto rounded-lg"
             />
           </div>
         </div>

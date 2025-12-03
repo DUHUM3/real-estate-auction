@@ -9,6 +9,7 @@ import {
   FaExclamationTriangle, 
   FaUpload, 
   FaTimes,
+  FaEye,
   FaPlus,
   FaBan // أيقونة جديدة للتحذير
 } from 'react-icons/fa';
@@ -662,13 +663,13 @@ function CreateLandRequest() {
               )}
               
               <div className="success-actions">
-                <button 
-                  onClick={handleCreateNew} 
-                  className="btn primary"
-                >
-                  <FaPlus className="btn-icon" />
-                  إنشاء طلب جديد
-                </button>
+               <button 
+  onClick={() => navigate('/my-requests')}
+  className="btn outline"
+>
+  <FaEye className="btn-icon" /> {/* أو أي أيقونة تناسب */}
+  عرض طلباتي
+</button>
               </div>
             </div>
           ) : (
