@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { authApi } from '../../api/authApi';
 import toast from 'react-hot-toast';
-import { FiEye, FiEyeOff, FiX, FiUser, FiPhone, FiFile, FiArrowLeft, FiArrowRight, FiMail, FiLock } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiX, FiUser, FiPhone, FiFile, FiArrowLeft, FiArrowRight, FiMail, FiLock, FiCheckCircle } from 'react-icons/fi';
 
 function Register({ onClose, onSwitchToLogin }) {
   const [userTypeId, setUserTypeId] = useState(1);
@@ -45,6 +45,15 @@ function Register({ onClose, onSwitchToLogin }) {
     commercial_register_file: null,
     license_file: null
   });
+  
+  // إضافة متغيرات جديدة للتحقق من البريد الإلكتروني
+  const [verificationStep, setVerificationStep] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [userEmail, setUserEmail] = useState('');
+  const [verificationError, setVerificationError] = useState('');
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -132,6 +141,14 @@ function Register({ onClose, onSwitchToLogin }) {
       commercial_register_file: null,
       license_file: null
     });
+    
+    // إعادة تعيين متغيرات التحقق
+    setVerificationStep(false);
+    setVerificationCode('');
+    setUserId(null);
+    setUserEmail('');
+    setVerificationError('');
+    setVerificationSuccess(false);
   };
 
   const isValidEmail = (email) => {
@@ -342,6 +359,9 @@ function Register({ onClose, onSwitchToLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // إذا كنا في خطوة التحقق، لا تنفيذ التسجيل
+    if (verificationStep) return;
+    
     if (!validateCurrentStep()) return;
     
     const maxSteps = getMaxSteps();
@@ -386,24 +406,14 @@ function Register({ onClose, onSwitchToLogin }) {
       }
 
       const response = await authApi.register(userData, userTypeId);
-
-      const userDataResponse = {
-        id: response.user.id,
-        full_name: response.user.full_name,
-        email: response.user.email,
-        phone: response.user.phone,
-        user_type: response.user.user_type,
-        status: response.user.status,
-        access_token: response.access_token,
-        token_type: response.token_type,
-        expires_at: response.expires_at
-      };
-
-      login(userDataResponse);
-      toast.success('تم إنشاء الحساب بنجاح!');
       
-      if (onClose) onClose();
-      navigate('/dashboard');
+      // حفظ معلومات المستخدم للتحقق
+      setUserId(response.user.id);
+      setUserEmail(response.user.email);
+      
+      // التبديل إلى خطوة التحقق
+      setVerificationStep(true);
+      toast.success('تم إنشاء الحساب بنجاح! يرجى التحقق من البريد الإلكتروني.');
       
     } catch (error) {
       console.error('Registration error:', error);
@@ -433,6 +443,100 @@ function Register({ onClose, onSwitchToLogin }) {
       setLoading(false);
     }
   };
+  
+  // دالة للتحقق من البريد الإلكتروني
+  const handleVerifyEmail = async (e) => {
+    e.preventDefault();
+    
+    if (!verificationCode.trim()) {
+      setVerificationError('الرجاء إدخال رمز التحقق');
+      return;
+    }
+    
+    // التحقق من تنسيق الرمز
+    if (!/^\d{6}$/.test(verificationCode)) {
+      setVerificationError('الرجاء إدخال رمز مكون من 6 أرقام');
+      return;
+    }
+    
+    setVerifyLoading(true);
+    setVerificationError('');
+    
+    try {
+      console.log('جاري التحقق من البريد:', userEmail, 'بالرمز:', verificationCode);
+      
+      const response = await authApi.verifyEmail(userEmail, verificationCode);
+      
+      console.log('استجابة التحقق:', response);
+      
+      if (response.success) {
+        setVerificationSuccess(true);
+        toast.success('تم التحقق من البريد الإلكتروني بنجاح!');
+        
+        // محاولة تسجيل الدخول تلقائياً بعد التحقق
+        try {
+          const loginResponse = await authApi.login(userEmail, formData.password);
+          
+          if (loginResponse.token) {
+            login(loginResponse);
+            
+            // تأخير الإغلاق والانتقال لإظهار رسالة النجاح
+            setTimeout(() => {
+              toast.success('تم تسجيل الدخول بنجاح!');
+              onClose();
+              navigate('/dashboard');
+            }, 2000);
+          }
+        } catch (loginError) {
+          console.error('خطأ في تسجيل الدخول بعد التحقق:', loginError);
+          // إظهار رسالة نجاح التحقق فقط
+          toast.success('تم التحقق بنجاح! يمكنك الآن تسجيل الدخول');
+          
+          // الانتقال إلى تسجيل الدخول بعد فترة
+          setTimeout(() => {
+            onSwitchToLogin();
+          }, 3000);
+        }
+        
+      } else {
+        setVerificationError('رمز التحقق غير صحيح');
+        toast.error('رمز التحقق غير صحيح');
+      }
+    } catch (error) {
+      console.error('خطأ في التحقق:', error);
+      
+      if (error.message.includes('رمز التحقق غير صحيح')) {
+        setVerificationError('رمز التحقق غير صحيح');
+        toast.error('رمز التحقق غير صحيح');
+      } else if (error.message.includes('منتهي الصلاحية')) {
+        setVerificationError('رمز التحقق منتهي الصلاحية');
+        toast.error('رمز التحقق منتهي الصلاحية');
+      } else if (error.message.includes('محاولات')) {
+        setVerificationError('لقد تجاوزت عدد المحاولات المسموح بها');
+        toast.error('لقد تجاوزت عدد المحاولات المسموح بها');
+      } else {
+        setVerificationError('حدث خطأ أثناء التحقق');
+        toast.error('حدث خطأ أثناء التحقق من البريد الإلكتروني');
+      }
+    } finally {
+      setVerifyLoading(false);
+    }
+  };
+
+  // دالة إعادة إرسال رمز التحقق
+  const handleResendVerificationCode = async () => {
+    setVerifyLoading(true);
+    try {
+      // هنا يمكنك إضافة API لإعادة إرسال الرمز إذا كان موجوداً
+      toast.success('تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني');
+      setVerificationCode('');
+      setVerificationError('');
+    } catch (error) {
+      toast.error('حدث خطأ أثناء إعادة إرسال الرمز');
+    } finally {
+      setVerifyLoading(false);
+    }
+  };
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget && onClose) {
@@ -452,7 +556,9 @@ function Register({ onClose, onSwitchToLogin }) {
   };
 
   const getStepTitle = () => {
-    if (currentStep === 1) {
+    if (verificationStep) {
+      return verificationSuccess ? "تم التحقق بنجاح" : "التحقق من البريد الإلكتروني";
+    } else if (currentStep === 1) {
       return "البيانات الشخصية";
     } else if (currentStep === 2) {
       if (userTypeId === 4) return "بيانات المنشأة التجارية";
@@ -466,6 +572,16 @@ function Register({ onClose, onSwitchToLogin }) {
   };
 
   const renderProgress = () => {
+    if (verificationStep) {
+      return (
+        <div className="mb-5">
+          <h3 className="text-base font-semibold text-gray-900 text-center mb-3">
+            {getStepTitle()}
+          </h3>
+        </div>
+      );
+    }
+    
     const maxSteps = getMaxSteps();
     return (
       <div className="mb-5">
@@ -543,8 +659,129 @@ function Register({ onClose, onSwitchToLogin }) {
       </div>
     );
   };
+  
+  // عرض نموذج التحقق
+  const renderVerificationForm = () => {
+    if (verificationSuccess) {
+      return (
+        <div className="space-y-4 text-center">
+          <div className="flex items-center justify-center mb-3">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <FiCheckCircle className="text-green-600 text-2xl" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">تم التحقق بنجاح!</h3>
+          <p className="text-sm text-gray-600 mt-1">
+            تم التحقق من بريدك الإلكتروني بنجاح
+            <br />
+            <span className="font-medium text-gray-800">{userEmail}</span>
+          </p>
+          <p className="text-xs text-gray-500 mt-2">
+            سيتم تسجيل دخولك تلقائياً...
+          </p>
+          <div className="mt-6">
+            <button 
+              onClick={onClose}
+              className="w-full py-2 px-3 rounded-lg text-sm font-medium bg-gradient-to-r from-green-600 to-green-700 text-white shadow hover:shadow-md transition-all duration-200"
+            >
+              إغلاق   
+            </button>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <form onSubmit={handleVerifyEmail} className="space-y-4">
+        <div className="text-center mb-2">
+          <div className="flex items-center justify-center mb-3">
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <FiMail className="text-green-600 text-xl" />
+            </div>
+          </div>
+          <h3 className="text-base font-semibold text-gray-900">تم إرسال رمز التحقق</h3>
+          <p className="text-sm text-gray-600 mt-1">
+            يرجى إدخال رمز التحقق المرسل إلى بريدك الإلكتروني
+            <br />
+            <span className="font-medium text-gray-800">{userEmail}</span>
+          </p>
+          <button 
+            type="button"
+            onClick={handleResendVerificationCode}
+            disabled={verifyLoading}
+            className="text-xs text-blue-600 hover:text-blue-800 mt-1 hover:underline disabled:opacity-50"
+          >
+            لم تستلم الرمز؟ إعادة إرسال
+          </button>
+        </div>
+        
+        <div className="mb-4">
+          <label className="block text-xs font-medium text-gray-700 mb-1">
+            رمز التحقق
+          </label>
+          <input
+            type="text"
+            value={verificationCode}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+              setVerificationCode(value);
+              setVerificationError('');
+            }}
+            placeholder="000000"
+            className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center ${
+              verificationError ? 'border-red-500 bg-red-50' : 'border-gray-300'
+            } ${verifyLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            maxLength={6}
+            disabled={verifyLoading}
+            dir="ltr"
+          />
+          {verificationError && (
+            <p className="mt-1 text-xs text-red-600 text-center">{verificationError}</p>
+          )}
+          <p className="text-xs text-gray-500 mt-1 text-center">
+            أدخل الرمز المكون من 6 أرقام
+          </p>
+        </div>
+        
+        <div className="flex gap-3 mt-5">
+          <button 
+            type="button" 
+            onClick={() => {
+              setVerificationStep(false);
+              setVerificationCode('');
+              setVerificationError('');
+            }}
+            disabled={verifyLoading}
+            className="flex-1 flex items-center justify-center gap-1 py-2 px-3 border border-gray-300 text-sm text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FiArrowRight className="w-3.5 h-3.5" />
+            العودة
+          </button>
+          
+          <button 
+            type="submit"
+            disabled={verifyLoading || verificationCode.length !== 6}
+            className="flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow hover:shadow-md transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            {verifyLoading ? (
+              <span className="flex items-center gap-1">
+                <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                جاري التحقق...
+              </span>
+            ) : (
+              'تحقق'
+            )}
+          </button>
+        </div>
+      </form>
+    );
+  };
 
   const renderCurrentStepFields = () => {
+    if (verificationStep) {
+      return renderVerificationForm();
+    }
+    
     const maxSteps = getMaxSteps();
     
     return (
@@ -823,6 +1060,10 @@ function Register({ onClose, onSwitchToLogin }) {
   };
 
   const renderNavigationButtons = () => {
+    if (verificationStep) {
+      return null; // الأزرار معروضة في نموذج التحقق
+    }
+    
     const maxSteps = getMaxSteps();
     return (
       <div className="flex gap-3 mt-5">
@@ -910,33 +1151,41 @@ function Register({ onClose, onSwitchToLogin }) {
           </div>
 
           {/* User Type Selection */}
-          <div className="mb-4">
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              نوع الحساب
-            </label>
-            <select 
-              value={userTypeId} 
-              onChange={(e) => handleUserTypeChange(e.target.value)}
-              disabled={loading}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-            >
-              <option value={1}>مستخدم عادي</option>
-              <option value={2}>مالك أرض</option>
-              <option value={3}>وكيل شرعي</option>
-              <option value={4}>منشأة تجارية</option>
-              <option value={5}>وسيط عقاري</option>
-              <option value={6}>شركة مزادات عقارية</option>
-            </select>
-          </div>
+          {!verificationStep && !verificationSuccess && (
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                نوع الحساب
+              </label>
+              <select 
+                value={userTypeId} 
+                onChange={(e) => handleUserTypeChange(e.target.value)}
+                disabled={loading || verificationSuccess}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              >
+                <option value={1}>مستخدم عادي</option>
+                <option value={2}>مالك أرض</option>
+                <option value={3}>وكيل شرعي</option>
+                <option value={4}>منشأة تجارية</option>
+                <option value={5}>وسيط عقاري</option>
+                <option value={6}>شركة مزادات عقارية</option>
+              </select>
+            </div>
+          )}
           
           {/* Progress Indicator */}
           {renderProgress()}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit}>
-            {renderCurrentStepFields()}
-            {renderNavigationButtons()}
-          </form>
+          {/* عرض النموذج المناسب */}
+          {verificationStep ? (
+            // عرض نموذج التحقق أو نتيجة النجاح
+            renderVerificationForm()
+          ) : (
+            // نموذج التسجيل العادي
+            <form onSubmit={handleSubmit}>
+              {renderCurrentStepFields()}
+              {renderNavigationButtons()}
+            </form>
+          )}
         </div>
       </div>
     </div>

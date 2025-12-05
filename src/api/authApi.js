@@ -65,46 +65,35 @@ export const authApi = {
 
     return data;
   },
+  
+  // التحقق من البريد الإلكتروني - تم التحديث
+  verifyEmail: async (email, code) => {
+    const response = await fetch(`${API_BASE_URL}/email/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        email: email,
+        code: code
+      })
+    });
 
-  // استعادة كلمة المرور (للاستخدام المستقبلي)
-//   forgotPassword: async (email) => {
-//     const response = await fetch(`${API_BASE_URL}/forgot-password`, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'Accept': 'application/json'
-//       },
-//       body: JSON.stringify({ email })
-//     });
-
-//     const data = await response.json();
+    const data = await response.json();
     
-//     if (!response.ok) {
-//       throw new Error(data.message || 'حدث خطأ أثناء استعادة كلمة المرور');
-//     }
+    // التحقق من الاستجابة بناءً على البنية التي قدمتها
+    if (!response.ok || !data.success) {
+      // إذا كانت الاستجابة بنجاح ولكن success: false
+      if (data.success === false) {
+        throw new Error(data.message || 'رمز التحقق غير صحيح');
+      }
+      // إذا كان هناك خطأ في الاستجابة HTTP
+      throw new Error(data.message || 'حدث خطأ أثناء التحقق من البريد الإلكتروني');
+    }
 
-//     return data;
-//   },
-
-  // التحقق من البريد الإلكتروني (للاستخدام المستقبلي)
-//   verifyEmail: async (token) => {
-//     const response = await fetch(`${API_BASE_URL}/verify-email`, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'Accept': 'application/json'
-//       },
-//       body: JSON.stringify({ token })
-//     });
-
-//     const data = await response.json();
-    
-//     if (!response.ok) {
-//       throw new Error(data.message || 'فشل في التحقق من البريد الإلكتروني');
-//     }
-
-//     return data;
-//   }
+    return data;
+  },
 };
 
 export default authApi;
