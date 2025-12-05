@@ -219,7 +219,7 @@ const PropertiesPage = () => {
       case 'شركة مزادات':
         return 'إنشاء مزاد';
       default:
-        return 'انضم الآن';
+        return 'إنشاء الآن';
     }
   };
 

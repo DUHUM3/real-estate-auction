@@ -1,5 +1,3 @@
-// api/authApi.js
-
 const API_BASE_URL = 'https://core-api-x41.shaheenplus.sa/api';
 
 export const authApi = {
@@ -26,47 +24,45 @@ export const authApi = {
     return data;
   },
 
-  // التسجيل
-  register: async (userData, userTypeId) => {
-    const config = {
-      headers: {
-        'Accept': 'application/json'
-      }
-    };
-
-    // إعداد البيانات بناءً على نوع المستخدم
-    let apiData = userData;
-    
-    if (userTypeId === 6) {
-      // استخدام FormData لرفع الملفات
-      const formData = new FormData();
-      Object.keys(userData).forEach(key => {
-        if (userData[key] !== null && userData[key] !== undefined) {
-          formData.append(key, userData[key]);
-        }
+  // التسجيل - معدل
+  register: async (formData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json'
+        },
+        body: formData
       });
-      apiData = formData;
-      config.headers['Content-Type'] = 'multipart/form-data';
-    } else {
-      config.headers['Content-Type'] = 'application/json';
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        // تحسين رسائل الخطأ
+        let errorMessage = data.message || 'حدث خطأ أثناء إنشاء الحساب';
+        
+        // تحقق من وجود أخطاء مفصلة
+        if (data.errors) {
+          const errorKeys = Object.keys(data.errors);
+          if (errorKeys.length > 0) {
+            // عرض أول خطأ
+            const firstError = data.errors[errorKeys[0]];
+            if (Array.isArray(firstError) && firstError.length > 0) {
+              errorMessage = firstError[0];
+            }
+          }
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      return data;
+    } catch (error) {
+      throw error;
     }
-
-    const response = await fetch(`${API_BASE_URL}/register`, {
-      method: 'POST',
-      ...config,
-      body: userTypeId === 6 ? apiData : JSON.stringify(apiData)
-    });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'حدث خطأ أثناء إنشاء الحساب');
-    }
-
-    return data;
   },
   
-  // التحقق من البريد الإلكتروني - تم التحديث
+  // التحقق من البريد الإلكتروني
   verifyEmail: async (email, code) => {
     const response = await fetch(`${API_BASE_URL}/email/verify`, {
       method: 'POST',
@@ -82,13 +78,10 @@ export const authApi = {
 
     const data = await response.json();
     
-    // التحقق من الاستجابة بناءً على البنية التي قدمتها
     if (!response.ok || !data.success) {
-      // إذا كانت الاستجابة بنجاح ولكن success: false
       if (data.success === false) {
         throw new Error(data.message || 'رمز التحقق غير صحيح');
       }
-      // إذا كان هناك خطأ في الاستجابة HTTP
       throw new Error(data.message || 'حدث خطأ أثناء التحقق من البريد الإلكتروني');
     }
 
