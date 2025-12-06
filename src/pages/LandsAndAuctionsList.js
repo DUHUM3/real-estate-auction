@@ -498,25 +498,27 @@ const PropertiesPage = () => {
     );
   };
 
-  const renderPropertyCard = (property) => (
-    <div 
-      key={property.id} 
-      className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 transition-all hover:-translate-y-1 hover:shadow-md hover:border-blue-100 cursor-pointer flex flex-col h-full"
-      onClick={() => openDetails(property, 'land')}
-    >
-      <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden bg-gray-100">
-        {propertiesUtils.getPropertyImageUrl(property) ? (
-          <img 
-            src={propertiesUtils.getPropertyImageUrl(property)} 
-            alt={property.title || "صورة العقار"} 
-            loading="lazy" 
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full flex justify-center items-center bg-gradient-to-br from-gray-50 to-gray-200 text-blue-400">
-            <Icons.FaHome className="text-5xl" />
-          </div>
-        )}
+const renderPropertyCard = (property) => (
+  <div 
+    key={property.id} 
+    className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 transition-all hover:-translate-y-1 hover:shadow-md hover:border-blue-100 cursor-pointer flex flex-col h-full"
+    onClick={() => openDetails(property, 'land')}
+  >
+    <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden bg-gray-100">
+      {propertiesUtils.getPropertyImageUrl(property) ? (
+        <img 
+          src={propertiesUtils.getPropertyImageUrl(property)} 
+          alt={property.title || "صورة العقار"} 
+          loading="lazy" 
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        // تعديل الأيقونة هنا لتصبح في الوسط
+        <div className="w-full h-full flex flex-col justify-center items-center bg-gradient-to-br from-gray-50 to-gray-100 text-blue-400">
+          <Icons.FaHome className="text-6xl mb-2 opacity-70" />
+          <span className="text-sm text-gray-400 font-medium">لا توجد صورة</span>
+        </div>
+      )}
         <div className={`absolute top-3 right-3 py-1 px-3 rounded-full text-xs font-bold shadow-md z-10
           ${property.status === 'معروض' ? 'bg-green-500 text-white' :
             property.status === 'مباع' ? 'bg-red-500 text-white' :
@@ -597,25 +599,27 @@ const PropertiesPage = () => {
     </div>
   );
 
-  const renderAuctionCard = (auction) => (
-    <div 
-      key={auction.id} 
-      className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 transition-all hover:-translate-y-1 hover:shadow-md hover:border-blue-100 cursor-pointer flex flex-col h-full"
-      onClick={() => openDetails(auction, 'auction')}
-    >
-      <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden bg-gray-100">
-        {auctionsUtils.getAuctionImageUrl(auction) ? (
-          <img 
-            src={auctionsUtils.getAuctionImageUrl(auction)} 
-            alt={auctionsUtils.cleanText(auction.title) || "صورة المزاد"}
-            loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full flex justify-center items-center bg-gradient-to-br from-gray-50 to-gray-200 text-blue-400">
-            <Icons.FaImage className="text-5xl" />
-          </div>
-        )}
+ const renderAuctionCard = (auction) => (
+  <div 
+    key={auction.id} 
+    className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 transition-all hover:-translate-y-1 hover:shadow-md hover:border-blue-100 cursor-pointer flex flex-col h-full"
+    onClick={() => openDetails(auction, 'auction')}
+  >
+    <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden bg-gray-100">
+      {auctionsUtils.getAuctionImageUrl(auction) ? (
+        <img 
+          src={auctionsUtils.getAuctionImageUrl(auction)} 
+          alt={auctionsUtils.cleanText(auction.title) || "صورة المزاد"}
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        // تعديل الأيقونة هنا لتصبح في الوسط
+        <div className="w-full h-full flex flex-col justify-center items-center bg-gradient-to-br from-gray-50 to-gray-100 text-blue-400">
+          <Icons.FaGavel className="text-6xl mb-2 opacity-70" />
+          <span className="text-sm text-gray-400 font-medium">لا توجد صورة</span>
+        </div>
+      )}
         <div className={`absolute top-3 right-3 py-1 px-3 rounded-full text-xs font-bold shadow-md z-10
           ${auction.status === 'مفتوح' ? 'bg-green-500 text-white' :
             auction.status === 'مغلق' ? 'bg-gray-500 text-white' :
@@ -696,51 +700,87 @@ const PropertiesPage = () => {
     </button>
   );
 
-  const renderContent = () => {
-    if (isLoading) {
-      return <PropertyListSkeleton count={6} type={activeTab} />;
-    }
+ const renderContent = () => {
+  if (isLoading) {
+    return <PropertyListSkeleton count={6} type={activeTab} />;
+  }
 
-    if (error) {
-      return (
-        <div className="py-20 px-4 text-center bg-white rounded-xl shadow-sm border border-gray-200 my-5">
-          <p className="text-red-500 mb-5">حدث خطأ: {error.message}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="py-2.5 px-6 bg-white text-blue-500 border border-blue-500 font-bold rounded-md transition-all hover:bg-blue-50"
-          >
-            إعادة المحاولة
-          </button>
-        </div>
-      );
-    }
-
-    if (currentItems.length === 0) {
-      return (
-        <div className="py-16 px-4 text-center bg-white rounded-xl shadow-sm border border-dashed border-gray-200 my-5">
-          <div className="text-blue-100 mb-5">
-            {activeTab === 'lands' ? <Icons.FaHome size={36} /> : <Icons.FaGavel size={36} />}
-          </div>
-          <p className="text-gray-500 mb-5">لم يتم العثور على أي {activeTab === 'lands' ? 'أراضٍ' : 'مزادات'} تطابق معايير البحث</p>
-          <button 
-            onClick={resetFilters} 
-            className="py-2.5 px-6 bg-white text-blue-500 border border-blue-500 font-bold rounded-md transition-all hover:bg-blue-50"
-          >
-            إعادة تعيين الفلتر
-          </button>
-        </div>
-      );
-    }
-
+  if (error) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-        {activeTab === 'lands' 
-          ? currentItems.map(renderPropertyCard) 
-          : currentItems.map(renderAuctionCard)
-        }
+      <div className="py-20 px-4 text-center bg-white rounded-xl shadow-sm border border-gray-200 my-5">
+        <div className="flex justify-center mb-5">
+          <Icons.FaExclamationCircle className="text-red-500 text-5xl" />
+        </div>
+        <p className="text-red-500 mb-5">حدث خطأ: {error.message}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="py-2.5 px-6 bg-white text-blue-500 border border-blue-500 font-bold rounded-md transition-all hover:bg-blue-50"
+        >
+          إعادة المحاولة
+        </button>
       </div>
     );
-  };
+  }
+
+  if (currentItems.length === 0) {
+    return (
+      <div className="py-24 px-4 text-center bg-white rounded-xl shadow-sm border border-dashed border-gray-200 my-5">
+        {/* الأيقونة في الوسط مع تحسينات */}
+        <div className="flex justify-center items-center mb-6">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-50 to-gray-100 flex items-center justify-center">
+              {activeTab === 'lands' ? (
+                <Icons.FaHome className="text-blue-400 text-5xl opacity-70" />
+              ) : (
+                <Icons.FaGavel className="text-blue-400 text-5xl opacity-70" />
+              )}
+            </div>
+            {/* أيقونة صغيرة تدل على عدم التواجد */}
+            <div className="absolute -top-1 -left-1 w-10 h-10 rounded-full bg-red-50 border-4 border-white flex items-center justify-center">
+              <Icons.FaTimes className="text-red-400 text-lg" />
+            </div>
+          </div>
+        </div>
+        
+        <h3 className="text-xl font-bold text-gray-700 mb-3">
+          {activeTab === 'lands' ? 'لا توجد أراضي' : 'لا توجد مزادات'}
+        </h3>
+        <p className="text-gray-500 mb-5 max-w-md mx-auto">
+          {activeTab === 'lands' 
+            ? 'لم يتم العثور على أي أراضي تطابق معايير البحث. جرب تعديل الفلاتر أو البحث بعبارة أخرى.'
+            : 'لم يتم العثور على أي مزادات تطابق معايير البحث. جرب تعديل الفلاتر أو البحث بعبارة أخرى.'}
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <button 
+            onClick={resetFilters} 
+            className="py-3 px-8 bg-blue-500 text-white font-bold rounded-md transition-all hover:bg-blue-600 flex items-center justify-center gap-2"
+          >
+            <Icons.FaRedo className="text-sm" />
+            إعادة تعيين الفلاتر
+          </button>
+          
+          <button 
+            onClick={handleCreateNew} 
+            className="py-3 px-8 bg-white text-blue-500 border border-blue-500 font-bold rounded-md transition-all hover:bg-blue-50 flex items-center justify-center gap-2"
+          >
+            <Icons.FaPlus className="text-sm" />
+            {getCreateButtonText()}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+      {activeTab === 'lands' 
+        ? currentItems.map(renderPropertyCard) 
+        : currentItems.map(renderAuctionCard)
+      }
+    </div>
+  );
+};
 
   return (
     <div className="max-w-7xl mx-auto px-4 pb-6 relative pt-16 md:pt-20" dir="rtl">

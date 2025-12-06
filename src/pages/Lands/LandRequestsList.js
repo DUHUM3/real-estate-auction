@@ -461,63 +461,87 @@ function LandRequestsList() {
     </div>
   );
 
-  const renderContent = () => {
-    if (isLoading) {
-      return <RequestListSkeleton count={6} />;
-    }
+ // في دالة renderContent عند عدم وجود نتائج:
+const renderContent = () => {
+  if (isLoading) {
+    return <RequestListSkeleton count={6} />;
+  }
 
-    if (error) {
-      return (
-        <div className="py-20 px-4 text-center bg-white rounded-xl shadow-sm border border-gray-200 my-5">
-          <p className="text-red-500 mb-5">حدث خطأ أثناء تحميل البيانات</p>
-          <button 
-            onClick={() => refetch()} 
-            className="py-2.5 px-6 bg-white text-blue-500 border border-blue-500 font-bold rounded-md transition-all hover:bg-blue-50"
-          >
-            إعادة المحاولة
-          </button>
-        </div>
-      );
-    }
-
-    if (currentItems.length === 0) {
-      return (
-        <div className="py-16 px-4 text-center bg-white rounded-xl shadow-sm border border-dashed border-gray-200 my-5">
-          <div className="text-blue-100 mb-5">
-            <Icons.FaBuilding size={36} />
-          </div>
-          <h3 className="text-gray-700 font-bold mb-2">لا توجد طلبات</h3>
-          <p className="text-gray-500 mb-5">لم يتم العثور على أي طلبات تطابق معايير البحث</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button 
-              onClick={resetFilters} 
-              className="py-2.5 px-6 bg-white text-blue-500 border border-blue-500 font-bold rounded-md transition-all hover:bg-blue-50"
-            >
-              إعادة تعيين الفلتر
-            </button>
-            <button 
-              onClick={handleCreateRequest} 
-              className="py-2.5 px-6 bg-blue-500 text-white font-bold rounded-md transition-all hover:bg-blue-600 flex items-center justify-center gap-1.5"
-            >
-              <Icons.FaPlus /> كن أول من ينشئ طلب
-            </button>
-          </div>
-        </div>
-      );
-    }
-
+  if (error) {
     return (
-      <>
-        <div className="text-sm text-gray-600 mb-4 bg-gray-50 p-3 rounded-md">
-          <span>عرض {currentItems.length} من أصل {totalItems} طلب</span>
+      <div className="py-20 px-4 text-center bg-white rounded-xl shadow-sm border border-gray-200 my-5">
+        {/* أيقونة الخطأ في المنتصف */}
+        <div className="flex justify-center mb-5">
+          <Icons.FaExclamationCircle className="text-red-500 text-5xl" />
+        </div>
+        <p className="text-red-500 mb-5">حدث خطأ أثناء تحميل البيانات</p>
+        <button 
+          onClick={() => refetch()} 
+          className="py-2.5 px-6 bg-white text-blue-500 border border-blue-500 font-bold rounded-md transition-all hover:bg-blue-50 flex items-center justify-center gap-2 mx-auto"
+        >
+          <Icons.FaRedo className="text-sm" />
+          إعادة المحاولة
+        </button>
+      </div>
+    );
+  }
+
+  if (currentItems.length === 0) {
+    return (
+      <div className="py-24 px-4 text-center bg-white rounded-xl shadow-sm border border-dashed border-gray-200 my-5">
+        {/* الأيقونة في المنتصف مع التصميم الجديد */}
+        <div className="flex justify-center items-center mb-6">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-50 to-gray-100 flex items-center justify-center">
+              <Icons.FaHome className="text-blue-400 text-5xl opacity-70" />
+            </div>
+            {/* أيقونة صغيرة تدل على عدم التواجد */}
+            <div className="absolute -top-1 -left-1 w-10 h-10 rounded-full bg-red-50 border-4 border-white flex items-center justify-center">
+              <Icons.FaTimes className="text-red-400 text-lg" />
+            </div>
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-          {currentItems.map(renderRequestCard)}
+        <h3 className="text-xl font-bold text-gray-700 mb-3">
+          لا توجد طلبات أراضي
+        </h3>
+        <p className="text-gray-500 mb-5 max-w-md mx-auto">
+          لم يتم العثور على أي طلبات أراضي تطابق معايير البحث. جرب تعديل الفلاتر أو البحث بعبارة أخرى.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <button 
+            onClick={resetFilters} 
+            className="py-3 px-8 bg-blue-500 text-white font-bold rounded-md transition-all hover:bg-blue-600 flex items-center justify-center gap-2"
+          >
+            <Icons.FaRedo className="text-sm" />
+            إعادة تعيين الفلاتر
+          </button>
+          
+          <button 
+            onClick={handleCreateRequest} 
+            className="py-3 px-8 bg-white text-blue-500 border border-blue-500 font-bold rounded-md transition-all hover:bg-blue-50 flex items-center justify-center gap-2"
+          >
+            <Icons.FaPlus className="text-sm" />
+            كن أول من ينشئ طلب
+          </button>
         </div>
-      </>
+      </div>
     );
-  };
+  }
+
+  return (
+    <>
+      <div className="text-sm text-gray-600 mb-4 bg-gray-50 p-3 rounded-md">
+        <span>عرض {currentItems.length} من أصل {totalItems} طلب</span>
+      </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        {currentItems.map(renderRequestCard)}
+      </div>
+    </>
+  );
+};
 
   // Filters Component (Simplified for this file)
   const renderFilters = () => (

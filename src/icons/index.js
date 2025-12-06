@@ -55,6 +55,8 @@ import {
   FaTrash, 
   FaClipboardList, 
   FaExclamationTriangle,
+  FaExclamationCircle,
+  FaRedo,
   
 } from 'react-icons/fa';
 
@@ -155,6 +157,8 @@ const Icons = {
   FaClipboardList, 
   FaExclamationTriangle,
   // FiClockIcon
+  FaExclamationCircle,
+  FaRedo
 
 };
 

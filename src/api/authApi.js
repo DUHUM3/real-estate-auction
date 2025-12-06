@@ -87,6 +87,28 @@ export const authApi = {
 
     return data;
   },
+
+  // نسيان كلمة المرور
+  forgotPassword: async (email) => {
+    const response = await fetch(`${API_BASE_URL}/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        email: email
+      })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'حدث خطأ أثناء إرسال رابط إعادة التعيين');
+    }
+
+    return data;
+  },
 };
- 
+
 export default authApi;

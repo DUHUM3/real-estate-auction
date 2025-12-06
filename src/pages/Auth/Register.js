@@ -19,26 +19,26 @@ function Register({ onClose, onSwitchToLogin }) {
   const [verificationError, setVerificationError] = useState('');
   const [verificationSuccess, setVerificationSuccess] = useState(false);
   
-  const [formData, setFormData] = useState({
-    full_name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-    phone: '',
-    national_id: '',
-    user_type_id: 1,
-    // Type 3 fields
-    agency_number: '',
-    // Type 4 fields
-    business_name: '', 
-    commercial_register: '',
-    commercial_file: null,
-    // Type 5 fields
-    license_number: '',
-    license_file: null,
-    // Type 6 fields
-    auction_name: '',
-  });
+const [formData, setFormData] = useState({
+  full_name: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
+  phone: '',
+  national_id: '',
+  user_type_id: 1,
+  // Type 3 fields
+  agency_number: '',
+  // Type 4 fields
+  entity_name: '', // تغيير من business_name إلى entity_name
+  commercial_register: '',
+  commercial_file: null,
+  // Type 5 fields
+  license_number: '',
+  license_file: null,
+  // Type 6 fields
+  auction_name: '',
+});
 
   const [fieldErrors, setFieldErrors] = useState({});
   const [uploadedFiles, setUploadedFiles] = useState({});
@@ -181,28 +181,33 @@ function Register({ onClose, onSwitchToLogin }) {
           isValid = false;
         }
       }
-      else if (userTypeId === 6) {
-        if (!formData.auction_name.trim()) {
-          errors.auction_name = "الرجاء إدخال اسم شركة المزادات";
-          isValid = false;
-        }
-        if (!formData.commercial_register.trim()) {
-          errors.commercial_register = "الرجاء إدخال رقم السجل التجاري";
-          isValid = false;
-        }
-        if (!formData.commercial_file) {
-          errors.commercial_file = "الرجاء رفع ملف السجل التجاري";
-          isValid = false;
-        }
-        if (!formData.license_number.trim()) {
-          errors.license_number = "الرجاء إدخال رقم الترخيص";
-          isValid = false;
-        }
-        if (!formData.license_file) {
-          errors.license_file = "الرجاء رفع ملف الترخيص";
-          isValid = false;
-        }
-      }
+     if (userTypeId === 6) {
+  if (!formData.auction_name.trim()) {
+    errors.auction_name = "الرجاء إدخال اسم شركة المزادات";
+    isValid = false;
+  }
+  if (!formData.commercial_register.trim()) {
+    errors.commercial_register = "الرجاء إدخال رقم السجل التجاري";
+    isValid = false;
+  }
+  if (!formData.commercial_file) {
+    errors.commercial_file = "الرجاء رفع ملف السجل التجاري";
+    isValid = false;
+  }
+  if (!formData.license_number.trim()) {
+    errors.license_number = "الرجاء إدخال رقم الترخيص";
+    isValid = false;
+  }
+  if (!formData.license_file) {
+    errors.license_file = "الرجاء رفع ملف الترخيص";
+    isValid = false;
+  }
+  // إضافة التحقق من entity_name
+  if (!formData.entity_name.trim()) {
+    errors.entity_name = "الرجاء إدخال اسم الكيان";
+    isValid = false;
+  }
+}
     } 
     else if (currentStep === 3 || (currentStep === 2 && ![4, 5, 6].includes(userTypeId))) {
       // Validate login credentials
@@ -298,23 +303,26 @@ function Register({ onClose, onSwitchToLogin }) {
         }
       }
       
-      if (userTypeId === 6) {
-        if (formData.auction_name && formData.auction_name.trim()) {
-          formDataToSend.append('auction_name', formData.auction_name.trim());
-        }
-        if (formData.commercial_register && formData.commercial_register.trim()) {
-          formDataToSend.append('commercial_register', formData.commercial_register.trim());
-        }
-        if (formData.license_number && formData.license_number.trim()) {
-          formDataToSend.append('license_number', formData.license_number.trim());
-        }
-        if (formData.commercial_file) {
-          formDataToSend.append('commercial_file', formData.commercial_file);
-        }
-        if (formData.license_file) {
-          formDataToSend.append('license_file', formData.license_file);
-        }
-      }
+    if (userTypeId === 6) {
+  if (formData.auction_name && formData.auction_name.trim()) {
+    formDataToSend.append('auction_name', formData.auction_name.trim());
+  }
+  if (formData.entity_name && formData.entity_name.trim()) {
+    formDataToSend.append('entity_name', formData.entity_name.trim());
+  }
+  if (formData.commercial_register && formData.commercial_register.trim()) {
+    formDataToSend.append('commercial_register', formData.commercial_register.trim());
+  }
+  if (formData.license_number && formData.license_number.trim()) {
+    formDataToSend.append('license_number', formData.license_number.trim());
+  }
+  if (formData.commercial_file) {
+    formDataToSend.append('commercial_file', formData.commercial_file);
+  }
+  if (formData.license_file) {
+    formDataToSend.append('license_file', formData.license_file);
+  }
+}
 
       // Debug: عرض البيانات المرسلة
       console.log('Sending FormData:');
@@ -808,66 +816,85 @@ function Register({ onClose, onSwitchToLogin }) {
           </>
         )}
 
-        {currentStep === 2 && userTypeId === 6 && (
-          <>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">اسم شركة المزادات</label>
-              <div className="relative">
-                <FiHome className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
-                <input
-                  type="text"
-                  name="auction_name"
-                  placeholder="اسم شركة المزادات"
-                  value={formData.auction_name}
-                  onChange={handleChange}
-                  disabled={loading}
-                  className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                    fieldErrors.auction_name ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
-              </div>
-              {fieldErrors.auction_name && <p className="mt-1 text-xs text-red-600">{fieldErrors.auction_name}</p>}
-            </div>
+      {currentStep === 2 && userTypeId === 6 && (
+  <>
+    <div>
+      <label className="block text-xs font-medium text-gray-700 mb-1">اسم شركة المزادات</label>
+      <div className="relative">
+        <FiHome className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+        <input
+          type="text"
+          name="auction_name"
+          placeholder="اسم شركة المزادات"
+          value={formData.auction_name}
+          onChange={handleChange}
+          disabled={loading}
+          className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+            fieldErrors.auction_name ? 'border-red-500 bg-red-50' : 'border-gray-300'
+          } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        />
+      </div>
+      {fieldErrors.auction_name && <p className="mt-1 text-xs text-red-600">{fieldErrors.auction_name}</p>}
+    </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">رقم السجل التجاري</label>
-              <input
-                type="text"
-                name="commercial_register"
-                placeholder="رقم السجل التجاري"
-                value={formData.commercial_register}
-                onChange={handleChange}
-                disabled={loading}
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                  fieldErrors.commercial_register ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              />
-              {fieldErrors.commercial_register && <p className="mt-1 text-xs text-red-600">{fieldErrors.commercial_register}</p>}
-            </div>
+    <div>
+      <label className="block text-xs font-medium text-gray-700 mb-1">اسم الكيان</label>
+      <div className="relative">
+        <FiBriefcase className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+        <input
+          type="text"
+          name="entity_name"
+          placeholder="اسم الكيان القانوني"
+          value={formData.entity_name}
+          onChange={handleChange}
+          disabled={loading}
+          className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+            fieldErrors.entity_name ? 'border-red-500 bg-red-50' : 'border-gray-300'
+          } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        />
+      </div>
+      {fieldErrors.entity_name && <p className="mt-1 text-xs text-red-600">{fieldErrors.entity_name}</p>}
+    </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">رقم الترخيص</label>
-              <div className="relative">
-                <FiFile className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
-                <input
-                  type="text"
-                  name="license_number"
-                  placeholder="رقم الترخيص"
-                  value={formData.license_number}
-                  onChange={handleChange}
-                  disabled={loading}
-                  className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
-                    fieldErrors.license_number ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
-              </div>
-              {fieldErrors.license_number && <p className="mt-1 text-xs text-red-600">{fieldErrors.license_number}</p>}
-            </div>
+    <div>
+      <label className="block text-xs font-medium text-gray-700 mb-1">رقم السجل التجاري</label>
+      <input
+        type="text"
+        name="commercial_register"
+        placeholder="رقم السجل التجاري"
+        value={formData.commercial_register}
+        onChange={handleChange}
+        disabled={loading}
+        className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+          fieldErrors.commercial_register ? 'border-red-500 bg-red-50' : 'border-gray-300'
+        } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+      />
+      {fieldErrors.commercial_register && <p className="mt-1 text-xs text-red-600">{fieldErrors.commercial_register}</p>}
+    </div>
 
-            {renderFileUploadField("commercial_file", "ملف السجل التجاري", "الرجاء رفع ملف السجل التجاري")}
-            {renderFileUploadField("license_file", "ملف الترخيص", "الرجاء رفع ملف الترخيص")}
-          </>
-        )}
+    <div>
+      <label className="block text-xs font-medium text-gray-700 mb-1">رقم الترخيص</label>
+      <div className="relative">
+        <FiFile className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+        <input
+          type="text"
+          name="license_number"
+          placeholder="رقم الترخيص"
+          value={formData.license_number}
+          onChange={handleChange}
+          disabled={loading}
+          className={`w-full px-3 py-2 pr-8 text-sm border rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+            fieldErrors.license_number ? 'border-red-500 bg-red-50' : 'border-gray-300'
+          } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        />
+      </div>
+      {fieldErrors.license_number && <p className="mt-1 text-xs text-red-600">{fieldErrors.license_number}</p>}
+    </div>
+
+    {renderFileUploadField("commercial_file", "ملف السجل التجاري", "الرجاء رفع ملف السجل التجاري")}
+    {renderFileUploadField("license_file", "ملف الترخيص", "الرجاء رفع ملف الترخيص")}
+  </>
+)}
 
         {(currentStep === 3 || (currentStep === 2 && ![4, 5, 6].includes(userTypeId))) && (
           <div className="space-y-4">
