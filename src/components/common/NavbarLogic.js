@@ -146,6 +146,7 @@ export const useNavbarLogic = (onLoginClick, onRegisterClick) => {
     isLandOwner: () => currentUser?.user_type === 'مالك أرض',
     isPropertyOwner: () => currentUser?.user_type === 'وكيل عقارات',
     isInvestor: () => currentUser?.user_type === 'شركة مزادات',
+    isLegalAgent: () => currentUser?.user_type === 'وكيل شرعي',
   };
 
   /**

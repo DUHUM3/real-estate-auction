@@ -94,7 +94,7 @@ function Favorites() {
       e.stopPropagation();
     }
     
-    if (!window.confirm('هل أنت متأكد من إزالة هذا العنصر من المفضلة؟')) return;
+    // if (!window.confirm('هل أنت متأكد من إزالة هذا العنصر من المفضلة؟')) return;
     
     removeFavoriteMutation.mutate(favorite);
   };

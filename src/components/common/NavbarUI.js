@@ -45,6 +45,7 @@ const NavbarUI = ({
 }) => {
   
   const navigate = useNavigate();
+  const isLegalAgent = () => currentUser?.user_type === 'وكيل شرعي';
 
   // دالة التحقق من تسجيل الدخول والانتقال لصفحة التسويق
   const handleMarketingRequest = () => {
@@ -156,7 +157,7 @@ const renderUserDropdown = () => (
     )}
     
     {/* إخفاء حقل "اهتماماتي بالاراضي" عن شركة المزادات */}
-    {(isLandOwner() || isPropertyOwner()) && (
+    {(isLandOwner() || isPropertyOwner() || isLegalAgent()) && (
       <Link 
         to="/interests" 
         className="dropdown-item"
@@ -333,7 +334,7 @@ const renderUserDropdown = () => (
     )}
 
     {/* إخفاء حقل "اهتماماتي بالاراضي" عن شركة المزادات */}
-    {(isLandOwner() || isPropertyOwner()) && (
+    {(isLandOwner() || isPropertyOwner() || isLegalAgent()) && (
       <Link to="/interests" className="mobile-nav-link" onClick={handleCloseMenu}>
         <Icons.FaHandshake className="link-icon" />
         اهتماماتي بالاراضي

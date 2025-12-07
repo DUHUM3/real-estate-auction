@@ -773,12 +773,12 @@ const PropertyDetailsPage = () => {
                 <span className="block text-sm text-gray-500 mb-1">رقم الإعلان</span>
                 <span className="font-semibold text-gray-700">{data.announcement_number || 'غير محدد'}</span>
               </div>
-              {data.deed_number && (
+              {/* {data.deed_number && (
                 <div className="p-3 bg-blue-50 rounded-lg">
                   <span className="block text-sm text-blue-600 mb-1">رقم الصك</span>
                   <span className="font-semibold text-blue-700">{data.deed_number}</span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         )}

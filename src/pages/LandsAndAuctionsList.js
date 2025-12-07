@@ -200,7 +200,7 @@ const PropertiesPage = () => {
    */
   const isUserAuthorized = (userType) => {
     // الأنواع المسموح لها بالإنشاء
-    const authorizedTypes = ['مالك أرض', 'وكيل عقارات', 'وسيط عقاري', 'شركة مزادات'];
+    const authorizedTypes = ['مالك أرض', 'وكيل شرعي', 'وسيط عقاري', 'شركة مزادات'];
     return authorizedTypes.includes(userType);
   };
 
@@ -212,7 +212,7 @@ const PropertiesPage = () => {
     switch(userType) {
       case 'مالك أرض':
         return 'إنشاء أرض';
-      case 'وكيل عقارات':
+      case 'وكيل شرعي':
         return 'إنشاء أرض';
       case 'وسيط عقاري':
         return 'إنشاء أرض';  
@@ -268,7 +268,7 @@ const PropertiesPage = () => {
 
     switch(userType) {
       case 'مالك أرض':
-      case 'وكيل عقارات':
+      case 'وكيل شرعي':
       case 'وسيط عقاري':  
       case 'شركة مزادات':
         navigate('/create-ad');

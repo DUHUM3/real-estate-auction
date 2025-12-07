@@ -1,8 +1,9 @@
 // CreateAuctionRequest.js
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ModalContext } from '../../App'; // استيراد Context للنافذة المنبثقة
-import { toast, Toaster } from 'react-hot-toast'; // استيراد Toaster
+import { ModalContext } from '../../App';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { 
   FaArrowRight, 
   FaCheck, 
@@ -14,16 +15,18 @@ import {
   FaImage,
   FaPlus,
   FaHome,
-  FaBan // أيقونة جديدة للتحذير
+  FaBan,
+  FaChevronRight,
+  FaRegClock,
+  FaRegFileAlt
 } from 'react-icons/fa';
 import { marketingApi, validationService } from '../../api/auctionRequestApi';
 import { formHelpers, successHandler } from '../../utils/formHelpers';
 import { locationService } from '../../utils/LocationForFiltters';
-import './MarketingRequestModal.css';
 
 function CreateAuctionRequest() {
   const navigate = useNavigate();
-  const { openLogin } = useContext(ModalContext); // استخدام Context
+  const { openLogin } = useContext(ModalContext);
   
   const [formData, setFormData] = useState({
     region: '',
@@ -45,12 +48,9 @@ function CreateAuctionRequest() {
   const [imagesPreviews, setImagesPreviews] = useState([]);
   const [formTouched, setFormTouched] = useState(false);
   const [dragging, setDragging] = useState(false);
-
-  // حالة جديدة للتحقق من نوع المستخدم
   const [userType, setUserType] = useState(null);
   const [checkingUserType, setCheckingUserType] = useState(true);
 
-  // دالة لعرض رسائل الخطأ من API
   const showApiError = (errorObj) => {
     if (typeof errorObj === 'string') {
       toast.error(errorObj);
@@ -65,43 +65,30 @@ function CreateAuctionRequest() {
     }
   };
 
-  // دالة لعرض رسائل النجاح
   const showApiSuccess = (message) => {
     toast.success(message);
   };
 
-  // التحقق من نوع المستخدم عند تحميل المكون
   useEffect(() => {
     checkUserType();
   }, []);
 
-  // دالة للتحقق من نوع المستخدم
   const checkUserType = () => {
     try {
       setCheckingUserType(true);
-      
-      // 1. التحقق من localStorage أولاً
       const storedUserType = localStorage.getItem('user_type');
       const token = localStorage.getItem('token');
-      
-      console.log('🔍 التحقق من نوع المستخدم:', {
-        storedUserType,
-        hasToken: !!token
-      });
 
       if (!token) {
-        // إذا لم يكن هناك token، اعتبار المستخدم غير مسجل
         setUserType(null);
         setCheckingUserType(false);
         return;
       }
 
       if (storedUserType === 'شركة مزادات') {
-        console.log('🚫 المستخدم هو شركة مزادات - غير مسموح بإنشاء طلبات');
         setUserType('شركة مزادات');
         showApiError('عذراً، شركات المزادات غير مسموح لها بإنشاء طلبات تسويق منتجات عقارية');
       } else {
-        console.log('✅ المستخدم مسموح له بإنشاء طلبات - نوع المستخدم:', storedUserType);
         setUserType(storedUserType);
       }
       
@@ -113,18 +100,15 @@ function CreateAuctionRequest() {
     }
   };
 
-  // Initialize regions and cities
   useEffect(() => {
     setRegions(locationService.getRegions());
     setCities(locationService.getCitiesByRegion());
   }, []);
 
-  // Update available cities when region changes
   useEffect(() => {
     if (formData.region && cities[formData.region]) {
       setAvailableCities(cities[formData.region]);
       
-      // اختيار أول مدينة افتراضيا إذا تم اختيار منطقة جديدة
       if (!formData.city && cities[formData.region].length > 0) {
         setFormData(prev => ({
           ...prev,
@@ -140,7 +124,6 @@ function CreateAuctionRequest() {
     }
   }, [formData.region, cities]);
 
-  // إنشاء معاينات للصور المختارة
   useEffect(() => {
     const previews = [];
     images.forEach(file => {
@@ -249,18 +232,15 @@ function CreateAuctionRequest() {
     showApiSuccess('تم حذف الصورة بنجاح');
   };
 
-  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
-    // التحقق النهائي من نوع المستخدم قبل الإرسال
     if (userType === 'شركة مزادات') {
       showApiError('عذراً، شركات المزادات غير مسموح لها بإنشاء طلبات تسويق منتجات عقارية');
       return;
     }
 
-    // Validate form
     if (!formData.region || !formData.city || !formData.document_number || !formData.description) {
       showApiError('جميع الحقول مطلوبة');
       return;
@@ -276,11 +256,10 @@ function CreateAuctionRequest() {
       return;
     }
 
-    // Check authentication
     const token = localStorage.getItem('token');
     if (!token) {
       showApiError('يجب تسجيل الدخول أولاً');
-      openLogin(); // فتح نافذة تسجيل الدخول
+      openLogin();
       return;
     }
 
@@ -288,7 +267,6 @@ function CreateAuctionRequest() {
       setLoading(true);
       showApiSuccess('جاري إنشاء طلب التسويق...');
 
-      // Prepare form data for submission
       const submitData = new FormData();
       submitData.append('region', formData.region);
       submitData.append('city', formData.city);
@@ -300,7 +278,6 @@ function CreateAuctionRequest() {
         submitData.append('images[]', image);
       });
 
-      // Submit to API
       const response = await marketingApi.submitMarketingRequest(submitData);
       
       console.log('✅ تم إنشاء طلب التسويق:', response);
@@ -318,7 +295,6 @@ function CreateAuctionRequest() {
     }
   };
 
-  // API error handler
   const handleApiError = (err) => {
     if (err.response) {
       if (err.response.status === 401) {
@@ -364,57 +340,53 @@ function CreateAuctionRequest() {
 
   const handleCreateNew = () => {
     resetForm();
-    // showApiSuccess('تم إعادة تعيين النموذج لإنشاء طلب جديد');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // التحقق من صلاحية المستخدم لإنشاء الطلب
   const isUserAllowed = () => {
     return userType !== 'شركة مزادات';
   };
   
-  // تحديد حالة الزر بناء على البيانات المدخلة والصلاحية
   const isFormValid = isUserAllowed() && formData.region && formData.city && formData.document_number && 
                       formData.description && images.length > 0 && formData.terms_accepted;
 
-  // إذا كان المستخدم شركة مزادات، اعرض رسالة المنع
   if (checkingUserType) {
     return (
-      <div className="auction-request-container">
-        {/* Toaster للإشعارات */}
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#fff',
-              color: '#000',
-              direction: 'rtl',
-              fontFamily: 'Arial, sans-serif',
-              border: '1px solid #e0e0e0',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-            },
-            success: {
-              duration: 3000,
-              iconTheme: {
-                primary: '#22c55e',
-                secondary: '#fff',
-              },
-            },
-            error: {
-              duration: 5000,
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
-              },
-            },
-          }}
-        />
+      <div className="min-h-screen bg-gray-50">
+         <ToastContainer
+         position="top-right"
+         autoClose={4000}
+         closeOnClick
+         draggable
+         rtl
+         pauseOnHover
+         theme="light"
+         style={{
+           top: window.innerWidth < 768 ? "60px" : "20px",
+           right: "10px",
+           left: "auto",
+           width: "auto",
+           maxWidth: window.innerWidth < 768 ? "90%" : "400px",
+           fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+           fontSize: window.innerWidth < 768 ? "12px" : "14px",
+           zIndex: 999999
+         }}
+         toastStyle={{
+           borderRadius: "8px",
+           padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
+           marginBottom: "8px",
+           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+           minHeight: window.innerWidth < 768 ? "40px" : "50px",
+           direction: "rtl",
+           textAlign: "right",
+           fontSize: window.innerWidth < 768 ? "12px" : "14px",
+         }}
+         className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
+       />
         
-        <div className="request-loading">
-          <div className="loading-spinner"></div>
-          <p className="loading-text">جاري التحقق من الصلاحيات...</p>
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <div className="w-16 h-16 border-4 border-blue-100 border-t-[#53a1dd] rounded-full animate-spin mb-4"></div>
+          <p className="text-gray-600 text-lg">جاري التحقق من الصلاحيات...</p>
         </div>
       </div>
     );
@@ -422,88 +394,87 @@ function CreateAuctionRequest() {
 
   if (!isUserAllowed()) {
     return (
-      <div className="auction-request-container">
-        {/* Toaster للإشعارات */}
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#fff',
-              color: '#000',
-              direction: 'rtl',
-              fontFamily: 'Arial, sans-serif',
-              border: '1px solid #e0e0e0',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-            },
-            success: {
-              duration: 3000,
-              iconTheme: {
-                primary: '#22c55e',
-                secondary: '#fff',
-              },
-            },
-            error: {
-              duration: 5000,
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
-              },
-            },
-          }}
-        />
+      <div className="min-h-screen bg-gray-50">
+        <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        closeOnClick
+        draggable
+        rtl
+        pauseOnHover
+        theme="light"
+        style={{
+          top: window.innerWidth < 768 ? "60px" : "20px",
+          right: "10px",
+          left: "auto",
+          width: "auto",
+          maxWidth: window.innerWidth < 768 ? "90%" : "400px",
+          fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+          fontSize: window.innerWidth < 768 ? "12px" : "14px",
+          zIndex: 999999
+        }}
+        toastStyle={{
+          borderRadius: "8px",
+          padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
+          marginBottom: "8px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          minHeight: window.innerWidth < 768 ? "40px" : "50px",
+          direction: "rtl",
+          textAlign: "right",
+          fontSize: window.innerWidth < 768 ? "12px" : "14px",
+        }}
+        className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
+      />
 
-        {/* Header */}
-        <header className="request-header">
-          <div className="request-header-content">
-            <div className="header-left">
-              <button 
-                className="back-button"
-                onClick={() => navigate(-1)}
-                aria-label="رجوع"
-              >
-                <FaArrowRight className="back-icon" />
-                <span className="back-text">رجوع</span>
-              </button>
-            </div>
-            
-            <h1 className="header-title">طلب تسويق منتج عقاري</h1>
-            
-            <div className="header-right">
-              <button 
-                className="header-btn outline"
-                onClick={() => navigate(-1)}
-              >
-                إلغاء
-              </button>
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <button 
+                  onClick={() => navigate(-1)}
+                  className="flex items-center gap-2 text-gray-600 hover:text-[#53a1dd] p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                >
+                  <FaArrowRight className="text-lg" />
+                  <span className="hidden sm:inline">رجوع</span>
+                </button>
+              </div>
+              
+              <h1 className="text-xl font-bold text-gray-800 text-center">طلب تسويق منتج عقاري</h1>
+              
+              <div>
+                <button 
+                  onClick={() => navigate(-1)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  إلغاء
+                </button>
+              </div>
             </div>
           </div>
         </header>
 
-        {/* محتوى رسالة المنع */}
-        <main className="request-main-content">
-          <div className="request-container">
-            <div className="access-denied-container">
-              <div className="access-denied-icon">
-                <FaBan />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div className="p-8 md:p-12 text-center">
+              <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <FaBan className="text-3xl" />
               </div>
-              <h2 className="access-denied-title">غير مسموح</h2>
-              <p className="access-denied-message">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">غير مسموح</h2>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto">
                 عذراً، شركات المزادات غير مسموح لها بإنشاء طلبات تسويق منتجات عقارية.
                 <br />
                 يمكنك فقط تقديم عروض على الطلبات الموجودة.
               </p>
-              <div className="access-denied-actions">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button 
                   onClick={() => navigate('/auction-requests')}
-                  className="btn primary"
+                  className="px-6 py-3 bg-[#53a1dd] text-white rounded-lg hover:bg-[#478bc5] transition-colors font-medium"
                 >
                   تصفح الطلبات المتاحة
                 </button>
                 <button 
                   onClick={() => navigate('/')}
-                  className="btn outline"
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
                 >
                   العودة للرئيسية
                 </button>
@@ -516,333 +487,474 @@ function CreateAuctionRequest() {
   }
   
   return (
-    <div className="auction-request-container">
-      {/* Toaster للإشعارات */}
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#fff',
-            color: '#000',
-            direction: 'rtl',
-            fontFamily: 'Arial, sans-serif',
-            border: '1px solid #e0e0e0',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#22c55e',
-              secondary: '#fff',
-            },
-          },
-          error: {
-            duration: 5000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
-            },
-          },
-        }}
-      />
+    <div className="min-h-screen bg-gray-50">
+      <ToastContainer
+      position="top-right"
+      autoClose={4000}
+      closeOnClick
+      draggable
+      rtl
+      pauseOnHover
+      theme="light"
+      style={{
+        top: window.innerWidth < 768 ? "60px" : "20px",
+        right: "10px",
+        left: "auto",
+        width: "auto",
+        maxWidth: window.innerWidth < 768 ? "90%" : "400px",
+        fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+        fontSize: window.innerWidth < 768 ? "12px" : "14px",
+        zIndex: 999999
+      }}
+      toastStyle={{
+        borderRadius: "8px",
+        padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
+        marginBottom: "8px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        minHeight: window.innerWidth < 768 ? "40px" : "50px",
+        direction: "rtl",
+        textAlign: "right",
+        fontSize: window.innerWidth < 768 ? "12px" : "14px",
+      }}
+      className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
+    />
 
-      {/* Header */}
-      <header className="request-header">
-        <div className="request-header-content">
-          <div className="header-left">
-            <button 
-              className="back-button"
-              onClick={handleBack}
-              disabled={loading}
-              aria-label="رجوع"
-            >
-              <FaArrowRight className="back-icon" />
-              <span className="back-text">رجوع</span>
-            </button>
-          </div>
-          
-          <h1 className="header-title">طلب تسويق منتج عقاري</h1>
-          
-          <div className="header-right">
-            <button 
-              className="header-btn outline"
-              onClick={handleBack}
-              disabled={loading}
-            >
-              إلغاء
-            </button>
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <button 
+                onClick={handleBack}
+                disabled={loading}
+                className="flex items-center gap-2 text-gray-600 hover:text-[#53a1dd] p-2 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FaArrowRight className="text-lg" />
+                <span className="hidden sm:inline">رجوع</span>
+              </button>
+            </div>
+            
+            <h1 className="text-xl font-bold text-gray-800 text-center">طلب تسويق منتج عقاري</h1>
+            
+            <div>
+              <button 
+                onClick={handleBack}
+                disabled={loading}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                إلغاء
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Progress Steps */}
-      <div className="request-progress-container">
-        <div className="request-progress-wrapper">
-          <div className="request-progress-steps">
-            <div className={`progress-step ${!success ? 'active' : 'completed'}`}>
-              <div className="step-number">1</div>
-              <div className="step-text">بيانات الطلب</div>
-            </div>
-            <div className={`progress-step ${success ? 'active' : ''}`}>
-              <div className="step-number">2</div>
-              <div className="step-text">الإكمال</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <main className="request-main-content">
-        <div className="request-container">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {loading ? (
-            <div className="request-loading">
-              <div className="loading-spinner"></div>
-              <p className="loading-text">جاري إنشاء طلب التسويق...</p>
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="w-16 h-16 border-4 border-blue-100 border-t-[#53a1dd] rounded-full animate-spin mb-4"></div>
+              <p className="text-gray-600 text-lg">جاري إنشاء طلب التسويق...</p>
             </div>
           ) : success ? (
-            <div className="request-success">
-              <div className="success-icon">
-                <FaCheck />
+            <div className="p-8 md:p-12 text-center">
+              <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <FaCheck className="text-3xl" />
               </div>
-              <h2 className="success-title">تم إنشاء الطلب بنجاح</h2>
-              <p className="success-description">سيتم مراجعة طلبك من قبل فريق العمل المختص وسيتم إشعارك بنتيجة المراجعة قريباً</p>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">تم إنشاء الطلب بنجاح</h2>
+              <p className="text-gray-600 mb-8 max-w-lg mx-auto">
+                سيتم مراجعة طلبك من قبل فريق العمل المختص وسيتم إشعارك بنتيجة المراجعة قريباً
+              </p>
               
               {responseData && (
-                <div className="request-summary-card">
-                  <h3 className="summary-title">تفاصيل الطلب:</h3>
-                  <div className="summary-grid">
-                    <div className="summary-item">
-                      <strong>رقم الطلب:</strong>
-                      <span>#{responseData.id || '--'}</span>
+                <div className="bg-gray-50 rounded-lg p-6 mb-8 max-w-2xl mx-auto text-right">
+                  <h3 className="text-lg font-bold text-gray-800 mb-4 pb-2 border-b border-gray-200">تفاصيل الطلب:</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <strong className="text-gray-500 text-sm block mb-1">رقم الطلب:</strong>
+                      <span className="text-gray-800 font-medium">#{responseData.id || '--'}</span>
                     </div>
-                    <div className="summary-item">
-                      <strong>المنطقة:</strong>
-                      <span>{formData.region}</span>
+                    <div>
+                      <strong className="text-gray-500 text-sm block mb-1">المنطقة:</strong>
+                      <span className="text-gray-800 font-medium">{formData.region}</span>
                     </div>
-                    <div className="summary-item">
-                      <strong>المدينة:</strong>
-                      <span>{formData.city}</span>
+                    <div>
+                      <strong className="text-gray-500 text-sm block mb-1">المدينة:</strong>
+                      <span className="text-gray-800 font-medium">{formData.city}</span>
                     </div>
-                    <div className="summary-item">
-                      <strong>رقم الوثيقة:</strong>
-                      <span dir="ltr">{formData.document_number}</span>
+                    <div>
+                      <strong className="text-gray-500 text-sm block mb-1">رقم الوثيقة:</strong>
+                      <span className="text-gray-800 font-medium" dir="ltr">{formData.document_number}</span>
                     </div>
-                    <div className="summary-item full-width">
-                      <strong>الوصف:</strong>
-                      <span>{formData.description}</span>
+                    <div className="md:col-span-2">
+                      <strong className="text-gray-500 text-sm block mb-1">الوصف:</strong>
+                      <span className="text-gray-800">{formData.description}</span>
                     </div>
-                    <div className="summary-item full-width">
-                      <strong>المرفقات:</strong>
-                      <span>{images.length} صورة</span>
+                    <div className="md:col-span-2">
+                      <strong className="text-gray-500 text-sm block mb-1">المرفقات:</strong>
+                      <span className="text-gray-800">{images.length} صورة</span>
                     </div>
                   </div>
                 </div>
               )}
               
-              <div className="success-actions">
+              <div className="flex justify-center">
                 <button 
                   onClick={handleCreateNew} 
-                  className="btn primary"
+                  className="px-6 py-3 bg-[#53a1dd] text-white rounded-lg hover:bg-[#478bc5] transition-colors font-medium flex items-center gap-2"
                 >
-                  <FaPlus className="btn-icon" />
+                  <FaPlus />
                   إنشاء طلب جديد
                 </button>
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="request-form">
-              <div className="form-card">
-                <div className="form-section">
-                  <h3 className="section-title">
-                    المعلومات الأساسية
-                  </h3>
-                  <div className="form-grid">
-                    {/* المنطقة */}
-                    <div className="form-group">
-                      <label htmlFor="region">المنطقة <span className="required">*</span></label>
-                      <select 
-                        id="region"
-                        name="region"
-                        value={formData.region}
-                        onChange={handleInputChange}
-                        className="form-control"
-                        required
-                      >
-                        <option value="" disabled>اختر المنطقة</option>
-                        {regions.map(region => (
-                          <option key={region} value={region}>{region}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* المدينة */}
-                    <div className="form-group">
-                      <label htmlFor="city">المدينة <span className="required">*</span></label>
-                      <select 
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        className="form-control"
-                        disabled={!formData.region}
-                        required
-                      >
-                        <option value="" disabled>اختر المدينة</option>
-                        {availableCities.map(city => (
-                          <option key={city} value={city}>{city}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* رقم الوثيقة */}
-                    <div className="form-group">
-                      <label htmlFor="document_number">رقم الوثيقة <span className="required">*</span></label>
-                      <input
-                        type="text"
-                        id="document_number"
-                        name="document_number"
-                        value={formData.document_number}
-                        onChange={handleInputChange}
-                        className="form-control"
-                        placeholder="أدخل رقم وثيقة العقار"
-                        required
-                        dir="ltr"
-                      />
-                    </div>
-                  </div>
+            <div>
+              <div className="p-8">
+                <div className="text-center mb-8">
+                  <h1 className="text-2xl font-bold text-gray-800 mb-2">طلب تسويق منتج عقاري</h1>
+                  <p className="text-gray-600">املأ النموذج أدناه لإنشاء طلب تسويق جديد</p>
                 </div>
-
-                <div className="form-section">
-                  <h3 className="section-title">
-                    تفاصيل الطلب
-                  </h3>
-                  <div className="form-group">
-                    <label htmlFor="description">الوصف <span className="required">*</span></label>
-                    <textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      className="form-control"
-                      placeholder="أدخل وصف مفصل للعقار... (الموقع، المساحة، المميزات، الخدمات المتاحة، إلخ)"
-                      rows="5"
-                      required
-                    />
-                    <small className="input-hint">أدخل وصفاً تفصيلياً للعقار لزيادة فرص التسويق الناجح.</small>
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <h3 className="section-title">
-                    المرفقات
-                  </h3>
-                  <div className="form-group">
-                    <label>
-                      صور العقار <span className="required">*</span>
-                      <span className="count-badge">{images.length}/5</span>
-                    </label>
-                    
-                    {/* منطقة السحب والإفلات */}
-                    <div 
-                      className={`dropzone ${dragging ? 'dragging' : ''}`} 
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                      onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                    >
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleImageUpload}
-                        multiple
-                        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
-                        className="file-input"
-                        aria-label="اختيار صور العقار"
-                      />
+                
+                <form onSubmit={handleSubmit}>
+                  <div className="space-y-8">
+                    {/* المعلومات الأساسية */}
+                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-12 h-12 bg-[#53a1dd] text-white rounded-lg flex items-center justify-center">
+                          <FaFileAlt className="text-lg" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-800">المعلومات الأساسية</h3>
+                          <p className="text-gray-500 text-sm">أدخل المعلومات الأساسية للمنتج العقاري</p>
+                        </div>
+                      </div>
                       
-                      <div className="dropzone-content">
-                        <div className="upload-icon">
-                          <FaUpload />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            المنطقة <span className="text-red-500">*</span>
+                          </label>
+                          <select 
+                            name="region"
+                            value={formData.region}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition"
+                            required
+                          >
+                            <option value="" disabled>اختر المنطقة</option>
+                            {regions.map(region => (
+                              <option key={region} value={region}>{region}</option>
+                            ))}
+                          </select>
                         </div>
-                        <div className="upload-text">
-                          <p>اسحب الصور وأفلتها هنا، أو انقر للاختيار</p>
-                          <small>الحد الأقصى: 5 صور، حجم كل صورة لا يتجاوز 5MB</small>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            المدينة <span className="text-red-500">*</span>
+                          </label>
+                          <select 
+                            name="city"
+                            value={formData.city}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition disabled:bg-gray-50"
+                            disabled={!formData.region}
+                            required
+                          >
+                            <option value="" disabled>اختر المدينة</option>
+                            {availableCities.map(city => (
+                              <option key={city} value={city}>{city}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            رقم الوثيقة <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            name="document_number"
+                            value={formData.document_number}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition"
+                            placeholder="أدخل رقم وثيقة العقار"
+                            required
+                            dir="ltr"
+                          />
                         </div>
                       </div>
                     </div>
 
-                    {imagesPreviews.length > 0 && (
-                      <div className="image-previews">
-                        {imagesPreviews.map((image, index) => (
-                          <div key={index} className="image-preview-item">
-                            <div className="preview-container">
-                              <img src={image.preview} alt={`صورة ${index + 1}`} className="preview-image" />
-                              <button
-                                type="button"
-                                className="remove-image"
-                                onClick={() => removeImage(index)}
-                                aria-label="حذف الصورة"
-                              >
-                                <FaTimes />
-                              </button>
-                              <div className="image-details">
-                                <span className="image-name">{image.file.name.length > 15 ? 
-                                  image.file.name.substring(0, 12) + '...' + image.file.name.substring(image.file.name.lastIndexOf('.')) : 
-                                  image.file.name
-                                }</span>
-                                <span className="image-size">{(image.file.size / (1024 * 1024)).toFixed(2)} MB</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                    {/* تفاصيل الطلب */}
+                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-12 h-12 bg-[#53a1dd] text-white rounded-lg flex items-center justify-center">
+                          <FaMapMarkerAlt className="text-lg" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-800">تفاصيل الطلب</h3>
+                          <p className="text-gray-500 text-sm">أدخل وصفاً تفصيلياً للمنتج العقاري</p>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          الوصف <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          name="description"
+                          value={formData.description}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition"
+                          placeholder="أدخل وصف مفصل للعقار... (الموقع، المساحة، المميزات، الخدمات المتاحة، إلخ)"
+                          rows="5"
+                          required
+                        />
+                        <p className="text-gray-500 text-sm mt-2">
+                          أدخل وصفاً تفصيلياً للعقار لزيادة فرص التسويق الناجح.
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="form-section terms-section">
-                  <div className="form-group">
-                    <div className="checkbox-wrapper">
-                      <label className="checkbox-container">
+                    {/* المرفقات */}
+                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-[#53a1dd] text-white rounded-lg flex items-center justify-center">
+                            <FaImage className="text-lg" />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-800">المرفقات</h3>
+                            <p className="text-gray-500 text-sm">قم برفع صور للمنتج العقاري</p>
+                          </div>
+                        </div>
+                        <span className="px-3 py-1 bg-[#53a1dd] text-white rounded-full text-sm font-medium">
+                          {images.length}/5
+                        </span>
+                      </div>
+                      
+                      <div 
+                        className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer
+                          ${dragging ? 'border-[#53a1dd] bg-blue-50' : 'border-gray-300 hover:border-[#53a1dd] hover:bg-blue-50'}`}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                      >
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleImageUpload}
+                          multiple
+                          accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                          className="hidden"
+                        />
+                        
+                        <div className="flex flex-col items-center gap-4">
+                          <div className="w-20 h-20 bg-blue-100 text-[#53a1dd] rounded-full flex items-center justify-center">
+                            <FaUpload className="text-3xl" />
+                          </div>
+                          <div>
+                            <p className="text-gray-700 font-medium mb-2">
+                              اسحب الصور وأفلتها هنا، أو انقر للاختيار
+                            </p>
+                            <p className="text-gray-500 text-sm">
+                              الحد الأقصى: 5 صور، حجم كل صورة لا يتجاوز 5MB
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {imagesPreviews.length > 0 && (
+                        <div className="mt-8">
+                          <h4 className="text-lg font-bold text-gray-800 mb-4">الصور المرفوعة</h4>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            {imagesPreviews.map((image, index) => (
+                              <div key={index} className="relative group">
+                                <div className="aspect-square rounded-lg overflow-hidden shadow-sm border border-gray-200">
+                                  <img 
+                                    src={image.preview} 
+                                    alt={`صورة ${index + 1}`}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  />
+                                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity"></div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeImage(index)}
+                                  className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-lg"
+                                >
+                                  <FaTimes />
+                                </button>
+                                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-2 text-xs">
+                                  <div className="truncate">
+                                    {image.file.name.length > 15 ? 
+                                      image.file.name.substring(0, 12) + '...' + image.file.name.substring(image.file.name.lastIndexOf('.')) : 
+                                      image.file.name
+                                    }
+                                  </div>
+                                  <div className="text-gray-300">
+                                    {(image.file.size / (1024 * 1024)).toFixed(2)} MB
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* الشروط والأحكام */}
+                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                      <div className="flex items-start gap-4">
                         <input
                           type="checkbox"
                           name="terms_accepted"
                           checked={formData.terms_accepted}
                           onChange={handleInputChange}
+                          className="mt-1 w-5 h-5 text-[#53a1dd] rounded focus:ring-[#53a1dd]"
                           required
                         />
-                        <span className="checkmark"></span>
-                        <span className="checkbox-text">
-                          أوافق على <a href="#" className="terms-link">الشروط والأحكام</a> الخاصة بتسويق المنتجات العقارية
-                        </span>
-                      </label>
+                        <div>
+                          <label className="text-gray-700 block mb-2">
+                            أوافق على <a href="#" className="text-[#53a1dd] hover:text-[#478bc5] font-medium underline">الشروط والأحكام</a> الخاصة بتسويق المنتجات العقارية
+                          </label>
+                          <p className="text-gray-500 text-sm">
+                            قرأت وفهمت الشروط والأحكام وأوافق عليها بالكامل، وأقر بصحة جميع المعلومات المقدمة.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {error && (
+                      <div className="bg-red-50 border-r-4 border-red-500 p-4 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <FaExclamationTriangle className="text-red-500 flex-shrink-0" />
+                          <span className="text-red-700">{error}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-10 pt-8 border-t border-gray-200">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                      <button 
+                        type="button"
+                        onClick={handleBack}
+                        disabled={loading}
+                        className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        إلغاء
+                      </button>
+                      
+                      <button 
+                        type="submit" 
+                        className={`px-8 py-3 bg-[#53a1dd] text-white rounded-lg font-medium text-lg transition-colors w-full sm:w-auto
+                          ${!isFormValid || loading 
+                            ? 'opacity-60 cursor-not-allowed' 
+                            : 'hover:bg-[#478bc5] shadow-md hover:shadow-lg'}`}
+                        disabled={loading || !isFormValid}
+                      >
+                        {loading ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            جاري الإرسال...
+                          </span>
+                        ) : (
+                          <span className="flex items-center justify-center gap-2">
+                            <FaCheck />
+                            إنشاء طلب التسويق
+                          </span>
+                        )}
+                      </button>
                     </div>
                   </div>
-                </div>
-
-                {error && (
-                  <div className="error-message">
-                    <FaExclamationTriangle className="error-icon" />
-                    <span className="error-text">{error}</span>
+                </form>
+              </div>
+              
+              {/* خطوات التقدم */}
+              <div className="mt-12 pt-8 border-t border-gray-200">
+                <h3 className="text-lg font-bold text-gray-800 mb-6 text-center">خطوات إنشاء الطلب</h3>
+                <div className="flex flex-col md:flex-row items-center justify-between relative">
+                  {/* خطوط الاتصال */}
+                  <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
+                  
+                  <div className="relative z-10 flex flex-col items-center mb-8 md:mb-0 bg-white px-4">
+                    <div className="w-12 h-12 rounded-full bg-[#53a1dd] text-white flex items-center justify-center mb-3 shadow-md">
+                      <FaRegFileAlt className="text-lg" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">تعبئة النموذج</span>
+                    <span className="text-xs text-gray-500 mt-1">الخطوة الأولى</span>
                   </div>
-                )}
-
-                <div className="form-actions">
-                  <button 
-                    type="submit" 
-                    className={`btn primary large ${!isFormValid ? 'disabled' : ''}`}
-                    disabled={loading || !isFormValid}
-                  >
-                    <span className="btn-text">
-                      {loading ? 'جاري الإرسال...' : 'إنشاء طلب التسويق'}
-                    </span>
-                  </button>
+                  
+                  <div className="hidden md:block">
+                    <FaChevronRight className="text-gray-400" />
+                  </div>
+                  <div className="block md:hidden my-4">
+                    <FaChevronRight className="text-gray-400 rotate-90" />
+                  </div>
+                  
+                  <div className="relative z-10 flex flex-col items-center mb-8 md:mb-0 bg-white px-4">
+                    <div className="w-12 h-12 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center mb-3">
+                      <FaRegClock className="text-lg" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-400">المراجعة</span>
+                    <span className="text-xs text-gray-400 mt-1">الخطوة الثانية</span>
+                  </div>
+                  
+                  <div className="hidden md:block">
+                    <FaChevronRight className="text-gray-400" />
+                  </div>
+                  <div className="block md:hidden my-4">
+                    <FaChevronRight className="text-gray-400 rotate-90" />
+                  </div>
+                  
+                  <div className="relative z-10 flex flex-col items-center bg-white px-4">
+                    <div className="w-12 h-12 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center mb-3">
+                      <FaCheck className="text-lg" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-400">الإكمال</span>
+                    <span className="text-xs text-gray-400 mt-1">الخطوة الثالثة</span>
+                  </div>
                 </div>
               </div>
-            </form>
+            </div>
           )}
+        </div>
+        
+        {/* معلومات إضافية */}
+        <div className="mt-8 bg-white rounded-2xl shadow-lg p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-blue-50 text-[#53a1dd] rounded-lg flex items-center justify-center flex-shrink-0">
+                <FaRegClock />
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-800 mb-1">وقت المراجعة</h4>
+                <p className="text-gray-600 text-sm">يتم مراجعة الطلبات خلال ٢٤-٤٨ ساعة عمل</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-blue-50 text-[#53a1dd] rounded-lg flex items-center justify-center flex-shrink-0">
+                <FaExclamationTriangle />
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-800 mb-1">نقاط مهمة</h4>
+                <p className="text-gray-600 text-sm">تأكد من صحة جميع المعلومات قبل الإرسال</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-blue-50 text-[#53a1dd] rounded-lg flex items-center justify-center flex-shrink-0">
+                <FaCheck />
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-800 mb-1">ضمان الجودة</h4>
+                <p className="text-gray-600 text-sm">جميع الطلبات تخضع لمراجعة الجودة</p>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>

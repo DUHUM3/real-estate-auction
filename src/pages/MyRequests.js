@@ -421,14 +421,14 @@ function MyRequests() {
                       <div className="text-sm text-gray-500">
                         آخر تحديث: {formatDate(request.created_at)}
                       </div>
-                      <button 
+                      {/* <button 
                         onClick={() => handleDeleteRequest(request.id, request.type)}
                         disabled={deleteLandMutation.isLoading || deleteAuctionMutation.isLoading}
                         className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition duration-200 disabled:opacity-50"
                         title="حذف الطلب"
                       >
                         <FaTrash className="w-4 h-4" />
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>

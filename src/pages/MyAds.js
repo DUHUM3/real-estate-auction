@@ -49,7 +49,7 @@ function MyAds() {
 
   // معالجة حذف الإعلان
   const handleDeleteAd = async (adId) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا الإعلان؟')) return;
+    // if (!window.confirm('هل أنت متأكد من حذف هذا الإعلان؟')) return;
     
     deleteMutation.mutate({ 
       adId, 

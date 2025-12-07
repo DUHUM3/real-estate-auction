@@ -321,67 +321,99 @@ const TermsOfService = () => {
     }
   };
 
-   return (
-    <div className="privacy-policy-container">
-      {/* العنوان الرئيسي المضاف */}
-      <div className="privacy-header">
-        <h1>شروط الاستخدام</h1>
-        <p>شاهين بلس - حماية بياناتك وخصوصيتك أولوية لدينا</p>
+     return (
+    <div className="min-h-screen bg-gray-50 text-gray-800 font-tajawal rtl">
+      {/* العنوان الرئيسي */}
+      <div className="bg-white text-black text-center py-10 px-6 rounded-xl shadow-lg mb-8 mx-4 md:mx-auto mt-20 max-w-6xl">
+        <h1 className="text-3xl md:text-4xl font-semibold mb-4">شروط الاستخدام</h1>
+        <p className="text-lg md:text-xl opacity-90 font-light">
+          شاهين بلس - حماية بياناتك وخصوصيتك أولوية لدينا
+        </p>
       </div>
-      
-      <div className="content-wrapper">
-        <div className="sections-sidebar">
-          <h3>فهرس المحتويات</h3>
-          <ul>
-            {sections.map(section => (
-              <li 
-                key={section.id}
-                className={activeSection === section.id ? 'active' : ''}
-                onClick={() => scrollToSection(section.id)}
-              >
-                <span>{section.id}</span> {section.title}
-              </li>
-            ))}
-          </ul>
-        </div>
-        
-        <div className="section-content">
-          <div className="section-header">
-            <h2>
-              <span className="section-number">[{activeSection}]</span>
-              {sections.find(s => s.id === activeSection)?.title}
-            </h2>
+
+      <div className="max-w-6xl mx-auto px-4 md:px-6 pb-12">
+        <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
+          {/* الشريط الجانبي */}
+          <div className="lg:w-1/4">
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 sticky top-8">
+              <h3 className="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-4 mb-4">
+                فهرس المحتويات
+              </h3>
+              <ul className="space-y-2">
+                {sections.map(section => (
+                  <li
+                    key={section.id}
+                    className={`p-3 rounded-lg cursor-pointer transition-all duration-300 border border-transparent flex items-center ${
+                      activeSection === section.id
+                        ? 'bg-blue-50 text-blue-600 border-blue-200'
+                        : 'hover:bg-gray-50 hover:border-gray-200'
+                    }`}
+                    onClick={() => scrollToSection(section.id)}
+                  >
+                    <span className={`flex items-center justify-center w-7 h-7 rounded-md ml-3 text-sm font-semibold transition-all duration-300 ${
+                      activeSection === section.id
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {section.id}
+                    </span>
+                    {section.title}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <div className="section-text">
-            {sectionContent[activeSection]?.split('\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
-          
-          <div className="section-navigation">
-            {activeSection > 1 && (
-              <button 
-                className="nav-button prev"
-                onClick={() => scrollToSection(activeSection - 1)}
-              >
-                ← القسم السابق
-              </button>
-            )}
-            
-            {activeSection < sections.length && (
-              <button 
-                className="nav-button next"
-                onClick={() => scrollToSection(activeSection + 1)}
-              >
-                القسم التالي →
-              </button>
-            )}
+
+          {/* المحتوى الرئيسي */}
+          <div className="lg:w-3/4">
+            <div className="bg-white rounded-xl shadow-md p-6 md:p-8 border border-gray-100">
+              {/* عنوان القسم */}
+              <div className="border-b border-gray-100 pb-6 mb-8">
+                <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 flex items-center">
+                  <span className="bg-blue-50 text-blue-600 w-12 h-12 rounded-xl flex items-center justify-center ml-4 text-lg font-semibold border-2 border-blue-100">
+                    [{activeSection}]
+                  </span>
+                  {sections.find(s => s.id === activeSection)?.title}
+                </h2>
+              </div>
+
+              {/* نص القسم */}
+              <div className="space-y-6">
+                {sectionContent[activeSection]?.split('\n').map((paragraph, index) => (
+                  <p key={index} className="text-justify text-gray-700 text-lg leading-relaxed">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+
+              {/* أزرار التنقل */}
+              <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10 pt-8 border-t border-gray-100">
+                {activeSection > 1 && (
+                  <button
+                    className="px-6 py-3 bg-white text-blue-600 border-2 border-gray-200 rounded-lg cursor-pointer text-base font-medium transition-all duration-300 hover:bg-gray-50 hover:border-blue-400 hover:-translate-y-0.5 active:translate-y-0 order-2 sm:order-1 w-full sm:w-auto"
+                    onClick={() => scrollToSection(activeSection - 1)}
+                  >
+                    ← القسم السابق
+                  </button>
+                )}
+                
+                {activeSection < sections.length && (
+                  <button
+                    className="px-6 py-3 bg-white text-blue-600 border-2 border-gray-200 rounded-lg cursor-pointer text-base font-medium transition-all duration-300 hover:bg-gray-50 hover:border-blue-400 hover:-translate-y-0.5 active:translate-y-0 order-1 sm:order-2 w-full sm:w-auto"
+                    onClick={() => scrollToSection(activeSection + 1)}
+                  >
+                    القسم التالي →
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      
-      <div className="privacy-footer">
-        <p>حقوق الطبع والنشر © شاهين بلس 2025</p>
+
+      {/* الفوتر */}
+      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 text-center text-gray-600 max-w-6xl mx-4 md:mx-auto mb-8">
+        <p className="mb-2">حقوق الطبع والنشر © شاهين بلس 2025</p>
         <p>جميع الحقوق محفوظة لمؤسسة شاهين بلس</p>
       </div>
     </div>
