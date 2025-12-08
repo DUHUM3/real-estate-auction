@@ -265,7 +265,7 @@ const PropertiesPage = () => {
       showToast('error', 'عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة', 5000);
       return;
     }
-
+ 
     switch(userType) {
       case 'مالك أرض':
       case 'وكيل شرعي':
