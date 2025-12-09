@@ -57,7 +57,7 @@ import {
   FaExclamationTriangle,
   FaExclamationCircle,
   FaRedo,
-  
+  FaWhatsapp
 } from 'react-icons/fa';
 
 import { 
@@ -158,7 +158,8 @@ const Icons = {
   FaExclamationTriangle,
   // FiClockIcon
   FaExclamationCircle,
-  FaRedo
+  FaRedo,
+  FaWhatsapp
 
 };
 

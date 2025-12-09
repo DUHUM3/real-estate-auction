@@ -12,7 +12,7 @@ const WhyUsSection = () => {
       icon: <Icons.FaAward />,
       details: [
         "أكثر من 15 عاماً من الخبرة في السوق العقاري",
-        "شبكة واسعة من الشركاء والعملاء",
+        "عرض احترافي...وصول أسرع...صفقة أفضل",
         "معدل نجاح يتجاوز 95% في صفقاتنا"
       ]
     },
@@ -87,7 +87,7 @@ const WhyUsSection = () => {
         {/* العنوان في أقصى اليمين */}
         <div className="text-right mb-12">
           <h2 className="text-1xl md:text-4xl font-bold text-[#343838] relative inline-block">
-            لماذا تختارنا؟
+لماذا تستخدم شاهين بلس 
             <div className="absolute inset-0 bg-transparent opacity-20"></div>
           </h2>
         </div>

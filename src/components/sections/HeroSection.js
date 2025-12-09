@@ -88,7 +88,7 @@ const HeroSection = ({ onSellLandClick, onBrowseInvestments }) => {
           </div>
           <div className="ticker-item">
             <Icons.FaReact className="react-icon" />
-            <span>شركاء النجاح مع أكبر شركات التطوير العقاري في المملكة</span>
+            <span>شركاء النجاح مع أكبر شركات التطوير العقاري في المملكة العربية السعودية</span>
           </div>
           <div className="ticker-item">
             <Icons.FaReact className="react-icon" />
@@ -110,12 +110,12 @@ const HeroSection = ({ onSellLandClick, onBrowseInvestments }) => {
       <div className="hero-content container">
         <div className="hero-title-container">
           <div className="title-with-decoration7">
-            استثمر في أفضل <span className="land-word">الأراضي</span>
+              الصفقات الكبيرة تبدأ من<span className="land-word">هنا</span>
             <div className="transparent-box"></div>
           </div>
         </div>
 
-        <p>منصة متكاملة لشراء وبيع الأراضي والاراضي عبر مزادات إلكترونية آمنة وموثوقة</p>
+        <p>حلقة الوصل الذكية بين الرغبين بالشراء والمستثمرين وملاك الأراضي</p>
 
         <div className="search-filter">
           <form onSubmit={handleSearch} className="filter-form">
