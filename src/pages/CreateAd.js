@@ -11,18 +11,11 @@ import {
   FaFileAlt,
   FaRulerCombined,
   FaMoneyBillWave,
-  FaCalendarAlt,
-  FaClock,
   FaImage,
-  FaVideo,
-  FaTag,
   FaPlus,
-  FaBan,
   FaExclamationTriangle,
-  FaUpload,
   FaChevronRight,
   FaRegClock,
-  FaRegFileAlt
 } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -404,36 +397,37 @@ function CreateAd() {
 
     return (
       <div className="min-h-screen bg-gray-50">
-        <ToastContainer
-          position="top-right"
-          autoClose={4000}
-          closeOnClick
-          draggable
-          rtl
-          pauseOnHover
-          theme="light"
-          style={{
-            top: window.innerWidth < 768 ? "60px" : "20px",
-            right: "10px",
-            left: "auto",
-            width: "auto",
-            maxWidth: window.innerWidth < 768 ? "90%" : "400px",
-            fontFamily: "'Segoe UI', 'Cairo', sans-serif",
-            fontSize: window.innerWidth < 768 ? "12px" : "14px",
-            zIndex: 999999
-          }}
-          toastStyle={{
-            borderRadius: "8px",
-            padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
-            marginBottom: "8px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-            minHeight: window.innerWidth < 768 ? "40px" : "50px",
-            direction: "rtl",
-            textAlign: "right",
-            fontSize: window.innerWidth < 768 ? "12px" : "14px",
-          }}
-          className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
-        />
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        closeOnClick
+        draggable
+        rtl
+        pauseOnHover
+        theme="light"
+        // إعدادات مخصصة للتحكم في الموقع - زيادة القيمة لتنزيل الرسائل
+        style={{
+          top: window.innerWidth < 768 ? "80px" : "80px", // زدناها من 60/20 إلى 80/80
+          right: "10px",
+          left: "auto",
+          width: "auto",
+          maxWidth: window.innerWidth < 768 ? "90%" : "400px",
+          fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+          fontSize: window.innerWidth < 768 ? "12px" : "14px",
+          zIndex: 999999
+        }}
+        toastStyle={{
+          borderRadius: "8px",
+          padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
+          marginBottom: "8px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          minHeight: window.innerWidth < 768 ? "40px" : "50px",
+          direction: "rtl",
+          textAlign: "right",
+          fontSize: window.innerWidth < 768 ? "12px" : "14px",
+        }}
+        className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
+      />
 
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -804,36 +798,37 @@ function CreateAd() {
 
     return (
       <div className="min-h-screen bg-gray-50">
-        <ToastContainer
-          position="top-right"
-          autoClose={4000}
-          closeOnClick
-          draggable
-          rtl
-          pauseOnHover
-          theme="light"
-          style={{
-            top: window.innerWidth < 768 ? "60px" : "20px",
-            right: "10px",
-            left: "auto",
-            width: "auto",
-            maxWidth: window.innerWidth < 768 ? "90%" : "400px",
-            fontFamily: "'Segoe UI', 'Cairo', sans-serif",
-            fontSize: window.innerWidth < 768 ? "12px" : "14px",
-            zIndex: 999999
-          }}
-          toastStyle={{
-            borderRadius: "8px",
-            padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
-            marginBottom: "8px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-            minHeight: window.innerWidth < 768 ? "40px" : "50px",
-            direction: "rtl",
-            textAlign: "right",
-            fontSize: window.innerWidth < 768 ? "12px" : "14px",
-          }}
-          className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
-        />
+     <ToastContainer
+       position="top-right"
+       autoClose={4000}
+       closeOnClick
+       draggable
+       rtl
+       pauseOnHover
+       theme="light"
+       // إعدادات مخصصة للتحكم في الموقع - زيادة القيمة لتنزيل الرسائل
+       style={{
+         top: window.innerWidth < 768 ? "80px" : "80px", // زدناها من 60/20 إلى 80/80
+         right: "10px",
+         left: "auto",
+         width: "auto",
+         maxWidth: window.innerWidth < 768 ? "90%" : "400px",
+         fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+         fontSize: window.innerWidth < 768 ? "12px" : "14px",
+         zIndex: 999999
+       }}
+       toastStyle={{
+         borderRadius: "8px",
+         padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
+         marginBottom: "8px",
+         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+         minHeight: window.innerWidth < 768 ? "40px" : "50px",
+         direction: "rtl",
+         textAlign: "right",
+         fontSize: window.innerWidth < 768 ? "12px" : "14px",
+       }}
+       className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
+     />
 
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

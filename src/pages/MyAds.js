@@ -20,6 +20,11 @@ function MyAds() {
   const [activeStatus, setActiveStatus] = useState('الكل');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState({
+    show: false,
+    adId: null,
+    adTitle: ''
+  });
 
   // React Query لجلب الإعلانات
   const {
@@ -35,26 +40,50 @@ function MyAds() {
     staleTime: 2 * 60 * 1000, // 2 دقائق
   });
 
-  // React Query لحذف الإعلانات
+  // React Query لحذف الإعلانات مع الروابط الجديدة
   const deleteMutation = useMutation({
-    mutationFn: ({ adId, userType }) => deleteAd(adId, userType),
+    mutationFn: ({ adId, userType }) => {
+      // تحديد رابط الحذف بناءً على نوع المستخدم
+      const endpoint = userType === 'شركة مزادات' 
+        ? `/api/user/auctions/${adId}`
+        : `/api/user/properties/${adId}`;
+      
+      // استخدام دالة deleteAd مع الرابط المخصص
+      return deleteAd(adId, userType, endpoint);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['ads']);
+      setConfirmDelete({ show: false, adId: null, adTitle: '' });
     },
     onError: (error) => {
       console.error('Error deleting ad:', error);
       alert('حدث خطأ أثناء حذف الإعلان');
+      setConfirmDelete({ show: false, adId: null, adTitle: '' });
     }
   });
 
-  // معالجة حذف الإعلان
-  const handleDeleteAd = async (adId) => {
-    // if (!window.confirm('هل أنت متأكد من حذف هذا الإعلان؟')) return;
+  // معالجة حذف الإعلان مع تأكيد
+  const handleDeleteAd = (adId, adTitle) => {
+    setConfirmDelete({
+      show: true,
+      adId,
+      adTitle: adTitle || 'هذا الإعلان'
+    });
+  };
+
+  // تأكيد الحذف
+  const confirmDeleteAction = () => {
+    if (!confirmDelete.adId) return;
     
     deleteMutation.mutate({ 
-      adId, 
+      adId: confirmDelete.adId, 
       userType: currentUser?.user_type 
     });
+  };
+
+  // إلغاء الحذف
+  const cancelDelete = () => {
+    setConfirmDelete({ show: false, adId: null, adTitle: '' });
   };
 
   // تحليل البيانات المسترجعة
@@ -149,6 +178,53 @@ function MyAds() {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+      {/* نافذة تأكيد الحذف */}
+      {confirmDelete.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <Icons.FaExclamationTriangle className="w-5 h-5 text-red-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">تأكيد الحذف</h3>
+              </div>
+              
+              <p className="text-gray-600 mb-6">
+                هل أنت متأكد من حذف <span className="font-medium">{confirmDelete.adTitle}</span>؟ هذا الإجراء لا يمكن التراجع عنه.
+              </p>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelDelete}
+                  disabled={deleteMutation.isLoading}
+                  className="flex-1 py-2.5 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition duration-200 disabled:opacity-50"
+                >
+                  إلغاء
+                </button>
+                <button
+                  onClick={confirmDeleteAction}
+                  disabled={deleteMutation.isLoading}
+                  className="flex-1 py-2.5 px-4 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {deleteMutation.isLoading ? (
+                    <>
+                      <Icons.FaSpinner className="w-4 h-4 animate-spin" />
+                      جاري الحذف...
+                    </>
+                  ) : (
+                    <>
+                      <Icons.FaTrash className="w-4 h-4" />
+                      حذف
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto">
         
         {/* Combined Search, Filter and Add Bar */}
@@ -353,20 +429,24 @@ function MyAds() {
                       {formatDate(ad.created_at)}
                     </span>
                     <div className="flex gap-2">
-                      <button 
+                      {/* <button 
                         onClick={() => navigateToEditAd(ad.id)}
                         className="p-2 text-gray-400 hover:text-[#53a1dd] hover:bg-blue-50 rounded-lg transition duration-200"
                         title="تعديل"
                       >
                         <Icons.FaEdit className="w-4 h-4" />
-                      </button>
+                      </button> */}
                       <button 
-                        onClick={() => handleDeleteAd(ad.id)}
+                        onClick={() => handleDeleteAd(ad.id, ad.title)}
                         disabled={deleteMutation.isLoading}
                         className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition duration-200 disabled:opacity-50"
                         title="حذف"
                       >
-                        <Icons.FaTrash className="w-4 h-4" />
+                        {deleteMutation.isLoading && deleteMutation.variables?.adId === ad.id ? (
+                          <Icons.FaSpinner className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Icons.FaTrash className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </div>

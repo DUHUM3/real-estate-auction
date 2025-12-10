@@ -96,7 +96,7 @@ function App() {
             <div className="App">
 
               {/* Toast Container — بديل احترافي عن notifex */}
-            <ToastContainer
+         <ToastContainer
   position="top-right"
   autoClose={4000}
   closeOnClick
@@ -104,15 +104,15 @@ function App() {
   rtl
   pauseOnHover
   theme="light"
-  // إعدادات مخصصة للتحكم في الموقع
+  // إعدادات مخصصة للتحكم في الموقع - زيادة القيمة لتنزيل الرسائل
   style={{
-    top: window.innerWidth < 768 ? "60px" : "20px", // ننزلها شوي في الهواتف
+    top: window.innerWidth < 768 ? "80px" : "80px", // زدناها من 60/20 إلى 80/80
     right: "10px",
     left: "auto",
     width: "auto",
     maxWidth: window.innerWidth < 768 ? "90%" : "400px",
     fontFamily: "'Segoe UI', 'Cairo', sans-serif",
-    fontSize: window.innerWidth < 768 ? "12px" : "14px", // تصغير الخط في الهاتف
+    fontSize: window.innerWidth < 768 ? "12px" : "14px",
     zIndex: 999999
   }}
   toastStyle={{
@@ -120,15 +120,13 @@ function App() {
     padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
     marginBottom: "8px",
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-    minHeight: window.innerWidth < 768 ? "40px" : "50px", // تصغير الحجم في الهاتف
+    minHeight: window.innerWidth < 768 ? "40px" : "50px",
     direction: "rtl",
     textAlign: "right",
-    fontSize: window.innerWidth < 768 ? "12px" : "14px", // تأكيد تصغير الخط
+    fontSize: window.innerWidth < 768 ? "12px" : "14px",
   }}
-  // خاصية جديدة للموبايل
   className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
 />
-
               <Navbar onLoginClick={openLogin} onRegisterClick={openRegister} />
 
               <main>
