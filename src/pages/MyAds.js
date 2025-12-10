@@ -485,6 +485,6 @@ function MyAds() {
       </div>
     </div>
   );
-}
+} 
 
 export default MyAds;
