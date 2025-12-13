@@ -1,138 +1,144 @@
-import React, { useState } from 'react';
-import Icons from '../../icons/index';
+import React, { useState } from "react";
+import Icons from "../../icons/index";
 
 const ServicesSection = () => {
-  const [activeService, setActiveService] = useState('large-lands');
+  const [activeService, setActiveService] = useState("lands");
 
   const servicesData = {
-    'large-lands': {
-      title: 'الأراضي الكبيرة',
-      description: 'نقدم هذه الخدمة لملاك الأراضي، الوكلاء الشرعيين، المسوقين العقاريين المعتمدين، والمنشآت. نمكّن الجميع من عرض أراضيهم بطريقة احترافية والوصول إلى الجمهور المناسب سواء للبيع أو للاستثمار، بما يشمل الأراضي السكنية والتجارية والزراعية للمستثمرين الجادين والمطورين المعتمدين. نحول الارض الئ فرصة... والفرصة الئ صفقة.',
+    lands: {
+      title: "عرض وتسويق الأراضي",
+      icon: <Icons.FaLandmark />,
+      description:
+        "نقدّم حلول عرض وتسويق للأراضي ترتقي بقيمتها الحقيقية، وتربطها بالمستثمر الجاد ضمن بيئة احترافية تحفظ الخصوصية وتُحسن فرص إتمام الصفقة.",
       features: [
-        'أراضي سكنية وتجارية وزراعية',
-        'تسويق لمجموعة مختارة من المستثمرين',
-        'خدمة حصرية للملاك والوكلاء المعتمدين',
-        'تقييم مهني ودراسة جدوى شاملة'
-      ]
+        "نقدّم للأرض منصة تليق بقيمتها… ونصنع لها الطريق نحو المستثمر الجاد.",
+        "هنا لا نعرض الأرض فقط… بل نُبرز جوهرها ونتيحها لمن يستحقها.",
+        "نُسوق باحتراف، نحجب بياناتك بثقة، ونُغلق الصفقة بذكاء.",
+        "من أول نقرة… يبدأ مشوار البيع باحترافية لا تشبه أحدًا.",
+        "الأرض تُعرض… ونحن نصنع الفرصة.",
+      ],
     },
-    'auction-partnership': {
-      title: 'شراكة مميزة مع شركات المزادات',
-      description: 'نقوم بتسويق منتجاتكم العقارية ومساعدتكم على بيعها في أسرع وقت ممكن عبر شركات المزادات العقارية. ما يميزنا هو علاقتنا القوية مع مختلف شركات المزادات في المملكة العربية السعودية، مما يضمن عرض عقاراتكم بطريقة احترافية تحقق أفضل العوائد، مع توفير استشارات تسويقية لدعم قراراتكم الاستثمارية.',
+
+    requests: {
+      title: "نظام طلبات الشراء والاستثمار",
+      icon: <Icons.FaClipboardList />,
+      description:
+        "نظام ذكي يمكّنك من تسجيل طلبك الاستثماري بدقة، ليصل إليك العرض المناسب دون عناء البحث، وبآلية احترافية تختصر الوقت وترفع جودة القرار.",
       features: [
-        'فلل ومنازل وعمائر',
-        'أراضي ومزارع ومصانع',
-        'جميع أنواع الاراضي والمشاريع',
-        'علاقة قوية مع شركات المزادات المعتمدة'
-      ]
-    }
+        "وضّح رغبتك… ودع الفرص العقارية تتحرك نحوك.",
+        "طلب واحد منك… يكشف لك أفضل ما لدى الملاك والمسوقين.",
+        "نحوّل الطلب إلى عرض… والعرض إلى صفقة متقنة.",
+        "هنا لا تبحث… هنا يجدك العقار المناسب.",
+        "نربط احتياجك بالعقار الصحيح… في اللحظة الصحيحة.",
+      ],
+    },
+
+    auctionMarketing: {
+      title: "تسويق العقارات لشركات المزادات",
+      icon: <Icons.FaGavel />,
+      description:
+        "نربط عقارك بشركات المزادات المؤهلة، ونهيّئ له مسارًا احترافيًا من العرض وحتى التنفيذ، لضمان أفضل قيمة وأعلى كفاءة.",
+      features: [
+        "نُمهّد طريقك نحو شركات المزادات… ونمنح عقارك منصة ترتفع بقيمته.",
+        "من رفع العقار… إلى باب شركة المزاد. نحن نديرها باحتراف.",
+        "نوصلك بالمزاد المناسب… ونترك الخبراء يرفعون قيمة عقارك.",
+        "نُسوق عقارك بدقة… لتصل إليه يد المزاد القادرة على استثماره.",
+        "عقار يُعرض باحتراف… ومزاد يُنفّذ بثقة.",
+      ],
+    },
+
+    auctionEnable: {
+      title: "تمكين شركات المزادات من عرض المزاد ",
+      icon: <Icons.FaBullhorn />,
+      description:
+        "نوفّر لشركات المزادات منصة رقمية متكاملة لعرض مزاداتها والوصول إلى جمهور استثماري نوعي، ضمن بيئة احترافية تعزز الحضور وتوسّع نطاق التأثير.",
+      features: [
+        "منصة واحدة… تفتح لشركات المزادات أبواب الوصول إلى جمهور استثماري واسع.",
+        "نمنح مزاداتكم منصة لا تُشبه غيرها… حضور، وصول، واحتراف.",
+        "هنا ترتقي المزادات… وهنا يجدها المستثمر الذي تبحث عنه.",
+        "مزاد يُعرض بوضوح… ويصل بقوة… ويُتابعه جمهور نوعي.",
+        "نُسهّل العرض… ونُضاعف الوصول… ونرفع قيمة الحدث.",
+      ],
+    },
   };
 
   return (
-    <section className="py-10 md:py-16 bg-white" dir="rtl">
+    <section className="py-12 md:py-20 bg-white" dir="rtl">
       <div className="container mx-auto px-4 md:px-6">
-        {/* العنوان */}
-        <div className="relative mb-8 md:mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 text-right relative z-10">
+        <div className="mb-12">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 text-right mb-3">
             استكشفوا خدماتنا
           </h2>
-          <div className="absolute top-1/2 right-0 w-32 h-8 bg-[#53a1dd] bg-opacity-20 rounded-lg -z-10"></div>
+          <div className="w-24 h-1 bg-[#53a1dd] mr-auto"></div>
         </div>
 
-        {/* مؤشر النقاط للجوال */}
-        <div className="flex justify-center mb-6 md:hidden">
-          <div className="flex space-x-2 space-x-reverse">
-            <span className={`w-3 h-3 rounded-full ${activeService === 'large-lands' ? 'bg-[#53a1dd]' : 'bg-gray-300'}`}></span>
-            <span className={`w-3 h-3 rounded-full ${activeService === 'auction-partnership' ? 'bg-[#53a1dd]' : 'bg-gray-300'}`}></span>
-          </div>
-        </div>
-
-        {/* محتوى الخدمات */}
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8 mt-8">
-          {/* القائمة الجانبية */}
-          <div className="hidden md:block md:w-64 flex-shrink-0">
-            <ul className="space-y-3">
-              <li
-                className={`flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all duration-300 border ${
-                  activeService === 'large-lands' 
-                    ? 'bg-[#53a1dd] text-white border-[#53a1dd] transform -translate-x-1' 
-                    : 'bg-white border-gray-200 hover:border-[#53a1dd] text-gray-700'
-                }`}
-                onClick={() => setActiveService('large-lands')}
-              >
-                <Icons.FaLandmark className={`text-lg ${activeService === 'large-lands' ? 'text-white' : 'text-gray-500'}`} />
-                <span className="font-medium">الأراضي الكبيرة</span>
-              </li>
-              <li
-                className={`flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-all duration-300 border ${
-                  activeService === 'auction-partnership' 
-                    ? 'bg-[#53a1dd] text-white border-[#53a1dd] transform -translate-x-1' 
-                    : 'bg-white border-gray-200 hover:border-[#53a1dd] text-gray-700'
-                }`}
-                onClick={() => setActiveService('auction-partnership')}
-              >
-                <Icons.FaGavel className={`text-lg ${activeService === 'auction-partnership' ? 'text-white' : 'text-gray-500'}`} />
-                <span className="font-medium">شراكة مميزة مع شركات المزادات</span>
-              </li>
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* القائمة */}
+          <div className="lg:w-80">
+            <ul className="flex lg:flex-col overflow-x-auto lg:overflow-visible gap-2 pb-2 lg:pb-0">
+              {Object.keys(servicesData).map((key) => (
+                <li
+                  key={key}
+                  onClick={() => setActiveService(key)}
+                  className={`flex-shrink-0 lg:flex-shrink flex items-center gap-3 p-4 rounded-xl cursor-pointer border transition-all duration-300
+                    ${
+                      activeService === key
+                        ? "bg-gradient-to-l from-[#53a1dd] to-[#6ab0e2] text-white border-[#53a1dd] shadow-md"
+                        : "bg-white border-gray-200 hover:border-[#53a1dd] hover:shadow-sm"
+                    }`}
+                >
+                  <span
+                    className={`text-xl transition-colors ${
+                      activeService === key
+                        ? "text-white"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    {servicesData[key].icon}
+                  </span>
+                  <span className="font-medium whitespace-nowrap">
+                    {servicesData[key].title}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* تفاصيل الخدمة */}
-          <div className="flex-1 bg-white p-6 md:p-8 rounded-xl border border-gray-200 shadow-sm">
-            {/* رأس الخدمة */}
-            <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6 mb-6">
-              <div className="bg-[#53a1dd] w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center flex-shrink-0 self-start">
-                {activeService === 'large-lands' ? (
-                  <Icons.FaLandmark className="text-white text-xl md:text-2xl" />
-                ) : (
-                  <Icons.FaGavel className="text-white text-xl md:text-2xl" />
-                )}
+          {/* التفاصيل */}
+          <div className="flex-1 bg-white p-6 md:p-8 rounded-2xl border border-gray-200 shadow-lg transition-all duration-300">
+            <div className="flex flex-col sm:flex-row gap-5 mb-8">
+              <div className="bg-gradient-to-br from-[#53a1dd] to-[#6ab0e2] w-16 h-16 rounded-xl flex items-center justify-center shadow-md">
+                <div className="text-white text-2xl">
+                  {servicesData[activeService].icon}
+                </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl md:text-2xl font-bold text-[#53a1dd] mb-2">
+                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#2c3e50] mb-3">
                   {servicesData[activeService].title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed text-justify">
+                <p className="text-gray-700 leading-relaxed text-base md:text-lg">
                   {servicesData[activeService].description}
                 </p>
               </div>
             </div>
 
-            {/* الميزات */}
-            <ul className="space-y-3 mb-8">
-              {servicesData[activeService].features.map((feature, index) => (
-                <li key={index} className="flex items-start gap-3 text-gray-800">
-                  <Icons.FaCheck className="text-green-500 mt-1 flex-shrink-0" />
-                  <span className="leading-relaxed">{feature}</span>
-                </li>
-              ))}
-            </ul>
-
-            {/* أزرار التنقل للجوال */}
-            <div className="flex md:hidden justify-center mt-8">
-              <div className="flex gap-4">
-                <button
-                  className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                    activeService === 'large-lands' 
-                      ? 'bg-gray-300 cursor-not-allowed' 
-                      : 'bg-[#53a1dd] hover:bg-[#4790c9]'
-                  } text-white transition-colors duration-300`}
-                  onClick={() => setActiveService('large-lands')}
-                  disabled={activeService === 'large-lands'}
-                >
-                  <Icons.FaChevronRight />
-                </button>
-                <button
-                  className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                    activeService === 'auction-partnership' 
-                      ? 'bg-gray-300 cursor-not-allowed' 
-                      : 'bg-[#53a1dd] hover:bg-[#4790c9]'
-                  } text-white transition-colors duration-300`}
-                  onClick={() => setActiveService('auction-partnership')}
-                  disabled={activeService === 'auction-partnership'}
-                >
-                  <Icons.FaChevronLeft />
-                </button>
-              </div>
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+              <h4 className="text-lg font-semibold text-gray-800 mb-5 pr-2">
+                مميزات الخدمة
+              </h4>
+              <ul className="space-y-4">
+                {servicesData[activeService].features.map((feature, idx) => (
+                  <li 
+                    key={idx} 
+                    className="flex gap-3 p-3 hover:bg-white rounded-lg transition-colors duration-200"
+                  >
+                    <div className="bg-green-100 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <Icons.FaCheck className="text-green-600 text-sm" />
+                    </div>
+                    <span className="text-gray-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

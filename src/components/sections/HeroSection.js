@@ -1,122 +1,88 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Icons from '../../icons/index';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Icons from "../../icons";
 
 const HeroSection = ({ onSellLandClick, onBrowseInvestments }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
   const [firstImageLoaded, setFirstImageLoaded] = useState(false);
   const navigate = useNavigate();
 
-  // تحميل الصورة الأولى فوراً ثم باقي الصور
   useEffect(() => {
-    const imageUrls = [
-      '/images/slide1.jpg',
-      '/images/slide5.jpg', 
-      '/images/slide3.jpg'
+    const images = [
+      "/images/slide1.jpg",
+      "/images/slide5.jpg",
+      "/images/slide3.jpg",
     ];
 
-    // تحميل الصورة الأولى بشكل منفصل وفوري
-    const loadFirstImage = () => {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.src = imageUrls[0];
-        img.onload = () => {
-          setFirstImageLoaded(true);
-          resolve();
-        };
-        img.onerror = () => {
-          setFirstImageLoaded(true); // استمر حتى لو فشلت الصورة
-          resolve();
-        };
-      });
-    };
+    const img = new Image();
+    img.src = images[0];
+    img.onload = () => setFirstImageLoaded(true);
+    img.onerror = () => setFirstImageLoaded(true);
 
-    // تحميل باقي الصور في الخلفية
-    const loadRemainingImages = () => {
-      const promises = imageUrls.slice(1).map(url => {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.src = url;
-          img.onload = resolve;
-          img.onerror = resolve; // تجاهل الأخطاء للصور الأخرى
-        });
-      });
-
-      Promise.all(promises)
-        .then(() => {
-          setImagesLoaded(true);
-        })
-        .catch(() => {
-          setImagesLoaded(true);
-        });
-    };
-
-    // بدء تحميل الصورة الأولى ثم الباقي
-    loadFirstImage().then(loadRemainingImages);
+    images.slice(1).forEach((src) => {
+      const preload = new Image();
+      preload.src = src;
+    });
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % 3);
-    }, 5000);
+    const interval = setInterval(
+      () => setCurrentSlide((prev) => (prev + 1) % 3),
+      5000
+    );
     return () => clearInterval(interval);
   }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate('/lands-and-auctions-list', {
-      state: {
-        searchQuery: searchTerm,
-        searchFromHome: true
-      }
+    navigate("/lands-and-auctions-list", {
+      state: { searchQuery: searchTerm, searchFromHome: true },
     });
   };
 
   return (
     <section className="hero-section" id="home">
+      {/* الشريط المتحرك */}
       <div className="client-ticker">
         <div className="ticker-content">
-          <div className="ticker-item">
-            <Icons.FaReact className="react-icon" />
-            <span>عملاؤنا مستمرون في الثقة بخدماتنا منذ أكثر من 15 عاماً</span>
-          </div>
-          <div className="ticker-item">
-            <Icons.FaReact className="react-icon" />
-            <span>أكثر من 5000 عميل راضٍ عن خدماتنا العقارية المتميزة</span>
-          </div>
-          <div className="ticker-item">
-            <Icons.FaReact className="react-icon" />
-            <span>شركاء النجاح مع أكبر شركات التطوير العقاري في المملكة العربية السعودية</span>
-          </div>
-          <div className="ticker-item">
-            <Icons.FaReact className="react-icon" />
-            <span>نفخر بتقديم خدمات عقارية متكاملة بمعايير عالمية</span>
-          </div>
+          {[
+            "نربط الأطراف ونُغلق الصفقات باحترافية تحفظ الحقوق",
+            "من عرض الأرض إلى إتمام الصفقة… كل شيء يبدأ من هنا",
+            "مصداقية عالية، إدارة ذكية، ونتائج ملموسة",
+            "هنا تُصنع الفرص الاستثمارية الكبرى",
+            "منصة عقارية احترافية بمعايير السوق السعودي",
+            "منظومة ذكية تعيد تعريف الوساطة العقارية",
+          ].map((text, index) => (
+            <div className="ticker-item" key={index}>
+              <Icons.FaStar className="react-icon" />
+              <span>{text}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* عرض الخلفية فور تحميل الصورة الأولى */}
-      {firstImageLoaded && (
-        <div className={`hero-background slide-${currentSlide}`}></div>
+      {/* الخلفية */}
+      {firstImageLoaded ? (
+        <div className={`hero-background slide-${currentSlide}`} />
+      ) : (
+        <div className="hero-background loading-background" />
       )}
 
-      {/* خلفية بديلة أثناء التحميل */}
-      {!firstImageLoaded && (
-        <div className="hero-background loading-background"></div>
-      )}
-
+      {/* المحتوى */}
       <div className="hero-content container">
         <div className="hero-title-container">
-          <div className="title-with-decoration7">
-              الصفقات الكبيرة تبدأ من<span className="land-word">هنا</span>
+          <h1 className="title-with-decoration7">
+            الصفقات الكبرى تبدأ من <span className="land-word">هنا</span>
             <div className="transparent-box"></div>
-          </div>
+          </h1>
         </div>
 
-        <p>حلقة الوصل الذكية بين الرغبين بالشراء والمستثمرين وملاك الأراضي</p>
+        <p className="hero-subtitle">
+          حلقة الوصل الذكية بين المستثمرين وملاك الأراضي والفرص العقارية النوعية
+        </p>
 
+        {/* البحث */}
         <div className="search-filter">
           <form onSubmit={handleSearch} className="filter-form">
             <div className="filter-group">
@@ -125,21 +91,20 @@ const HeroSection = ({ onSellLandClick, onBrowseInvestments }) => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder=""
+                placeholder="ابحث عن أرض، فرصة استثمار، أو مزاد"
               />
-              <div className="typing-placeholder"></div>
             </div>
-            <button type="submit" className="search-submit">بحث</button>
+            <button type="submit" className="search-submit">
+              بحث
+            </button>
           </form>
         </div>
 
+        {/* الأزرار */}
         <div className="hero-buttons">
-          <button
-            className="hero-btn primary-btn"
-            onClick={onSellLandClick}
-          >
-            <Icons.FaSearch className="btn-icon" />
-            <span className="btn-text">اعرض أرضك للبيع</span>
+          <button className="hero-btn primary-btn" onClick={onSellLandClick}>
+            <Icons.FaLandmark className="btn-icon" />
+            <span>اعرض أرضك للبيع</span>
           </button>
 
           <button
@@ -147,7 +112,7 @@ const HeroSection = ({ onSellLandClick, onBrowseInvestments }) => {
             onClick={onBrowseInvestments}
           >
             <Icons.FaSearchDollar className="btn-icon" />
-            <span className="btn-text">ابحث عن استثمار</span>
+            <span>ابحث عن فرصة استثمار</span>
           </button>
         </div>
       </div>
