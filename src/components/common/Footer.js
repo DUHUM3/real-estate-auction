@@ -15,6 +15,25 @@ function Footer() {
     window.open(`https://wa.me/${formattedPhone}`, '_blank');
   };
 
+  // دالة لتنسيق الرقم
+const formatPhoneNumber = (number) => {
+  if (!number) return '';
+  
+  // إزالة أي مسافات أو أحرف غير رقمية
+  const cleaned = number.replace(/\D/g, '');
+  
+  // تنسيق الرقم حسب الطول
+  if (cleaned.length === 10) {
+    return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+  } else if (cleaned.length === 9) {
+    return cleaned.replace(/(\d{2})(\d{3})(\d{4})/, '$1 $2 $3');
+  }
+  
+  return number;
+};
+
+
+
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -76,7 +95,7 @@ function Footer() {
             
             <div className="contact-row">
               <Icons.FaEnvelope className="contact-icon" />
-              <span>info@shaheenplus.com</span>
+              <span>info@shaheenplus.sa</span>
             </div>
           </div>
         </div>

@@ -1,266 +1,450 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import Icons from '../../icons/index';
-import LandCard from '../LandCard';
-import AuctionCard from '../AuctionCard';
-import FiltersComponent from '../../utils/FiltersComponent';
-import PropertiesSkeleton from '../../Skeleton/PropertiesSkeleton';
+import React, { useState, memo, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import Icons from "../../icons/index";
+import LandCard from "../LandCard";
+import AuctionCard from "../AuctionCard";
+import FiltersComponent from "../../utils/FiltersComponent";
+import PropertiesSkeleton from "../../Skeleton/PropertiesSkeleton";
 
-const PropertiesSection = ({ onToggleFavorite, onPropertyClick }) => {
+// متغيرات البيئة - يجب إعدادها في ملف .env
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL ||
+  "https://core-api-x41.shaheenplus.sa/api";
+const STORAGE_BASE_URL =
+  process.env.REACT_APP_STORAGE_BASE_URL ||
+  "https://core-api-x41.shaheenplus.sa/storage";
+
+// إعدادات التطبيق
+const CONFIG = {
+  ITEMS_PER_PAGE: 7,
+  LANDS_ENDPOINT: "/properties/properties/latest",
+  AUCTIONS_ENDPOINT: "/properties/auctions/latest",
+  HORIZONTAL_SCROLL_CONFIG: {
+    MOBILE_COLUMNS: "min-w-[calc(100%/7)] flex-shrink-0", // كل كارد يأخذ 1/7 من عرض الشاشة
+    TABLET_COLUMNS: "min-w-[calc(100%/7)] flex-shrink-0",
+    DESKTOP_COLUMNS: "min-w-[calc(100%/7)] flex-shrink-0",
+  },
+};
+
+const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
   const navigate = useNavigate();
+
+  // الحالات المحلية
   const [showFilter, setShowFilter] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage] = useState(6);
-  const [filterType, setFilterType] = useState('lands');
-  
-  // حالة موحدة للفلاتر
+  const [filterType, setFilterType] = useState("lands");
+
+  // حالة موحدة للفلاتر مع قيم افتراضية محسنة
   const [filters, setFilters] = useState({
     // فلتر الأراضي
-    propertyType: '',
-    city: '',
-    region: '',
-    purpose: '',
-    minPrice: '',
-    maxPrice: '',
-    area: '',
-    land_type: '',
-    min_area: '',
-    max_area: '',
-    
+    propertyType: "",
+    city: "",
+    region: "",
+    purpose: "",
+    minPrice: "",
+    maxPrice: "",
+    area: "",
+    land_type: "",
+    min_area: "",
+    max_area: "",
+
     // فلتر المزادات
-    startDate: '',
-    endDate: '',
-    maxDaysLeft: '',
-    search: '',
-    company: '',
-    address: '',
-    date_from: '',
-    date_to: ''
+    startDate: "",
+    endDate: "",
+    maxDaysLeft: "",
+    search: "",
+    company: "",
+    address: "",
+    date_from: "",
+    date_to: "",
   });
 
-  // دالة لبناء query parameters
-  const buildQueryParams = (filterParams, type) => {
+  // دالة محسنة لبناء query parameters مع error handling
+  const buildQueryParams = useCallback((filterParams, type) => {
     const queryParams = new URLSearchParams();
-    
-    if (type === 'lands') {
-      if (filterParams.region) queryParams.append('region', filterParams.region);
-      if (filterParams.city) queryParams.append('city', filterParams.city);
-      if (filterParams.land_type) queryParams.append('land_type', filterParams.land_type);
-      if (filterParams.purpose) queryParams.append('purpose', filterParams.purpose);
-      if (filterParams.min_area) queryParams.append('min_area', filterParams.min_area);
-      if (filterParams.max_area) queryParams.append('max_area', filterParams.max_area);
-      if (filterParams.minPrice) queryParams.append('min_price', filterParams.minPrice);
-      if (filterParams.maxPrice) queryParams.append('max_price', filterParams.maxPrice);
-    } else {
-      if (filterParams.region) queryParams.append('region', filterParams.region);
-      if (filterParams.city) queryParams.append('city', filterParams.city);
-      if (filterParams.search) queryParams.append('search', filterParams.search);
-      if (filterParams.company) queryParams.append('company', filterParams.company);
-      if (filterParams.address) queryParams.append('address', filterParams.address);
-      if (filterParams.date_from) queryParams.append('date_from', filterParams.date_from);
-      if (filterParams.date_to) queryParams.append('date_to', filterParams.date_to);
+
+    try {
+      if (type === "lands") {
+        const landFilters = {
+          region: filterParams.region,
+          city: filterParams.city,
+          land_type: filterParams.land_type,
+          purpose: filterParams.purpose,
+          min_area: filterParams.min_area,
+          max_area: filterParams.max_area,
+          min_price: filterParams.minPrice,
+          max_price: filterParams.maxPrice,
+        };
+
+        Object.entries(landFilters).forEach(([key, value]) => {
+          if (value && value.toString().trim()) {
+            queryParams.append(key, value.toString().trim());
+          }
+        });
+      } else {
+        const auctionFilters = {
+          region: filterParams.region,
+          city: filterParams.city,
+          search: filterParams.search,
+          company: filterParams.company,
+          address: filterParams.address,
+          date_from: filterParams.date_from,
+          date_to: filterParams.date_to,
+        };
+
+        Object.entries(auctionFilters).forEach(([key, value]) => {
+          if (value && value.toString().trim()) {
+            queryParams.append(key, value.toString().trim());
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error building query parameters:", error);
     }
-    
+
     return queryParams.toString();
-  };
+  }, []);
 
-  // استخدام React Query لجلب بيانات الأراضي
-  const { 
-    data: landsData, 
-    isLoading: landsLoading, 
-    error: landsError,
-    refetch: refetchLands 
-  } = useQuery({
-    queryKey: ['lands', filters],
-    queryFn: async () => {
-      const queryParams = buildQueryParams(filters, 'lands');
-      const url = `https://core-api-x41.shaheenplus.sa/api/properties/properties/latest${queryParams ? `?${queryParams}` : ''}`;
-      
-      const response = await fetch(url);
-      const data = await response.json();
+  // دالة محسنة لمعالجة الصور
+  const processImageUrl = useCallback((coverImage) => {
+    if (
+      !coverImage ||
+      coverImage === "default_cover.jpg" ||
+      coverImage === ""
+    ) {
+      return null;
+    }
 
-      if (data.status && data.data) {
-        return {
-          lands: data.data.data.map(land => ({
+    // التحقق من كونها URL كاملة
+    if (coverImage.startsWith("http")) {
+      return coverImage;
+    }
+
+    return `${STORAGE_BASE_URL}/${coverImage}`;
+  }, []);
+
+  // دالة محسنة لمعالجة بيانات الأراضي
+  const processLandsData = useCallback(
+    (data) => {
+      if (!data?.status || !data?.data?.data) {
+        throw new Error("Invalid lands data format");
+      }
+
+      return {
+        lands: data.data.data.map((land) => {
+          const price = land.price_per_sqm
+            ? parseFloat(land.price_per_sqm).toLocaleString("ar-SA")
+            : land.estimated_investment_value
+            ? parseFloat(land.estimated_investment_value).toLocaleString(
+                "ar-SA"
+              )
+            : "غير محدد";
+
+          const area = land.total_area
+            ? parseFloat(land.total_area).toLocaleString("ar-SA")
+            : "غير محدد";
+
+          return {
             id: land.id,
-            img: land.cover_image && land.cover_image !== 'default_cover.jpg'
-              ? `https://core-api-x41.shaheenplus.sa/storage/${land.cover_image}`
-              : null,
-            title: land.title,
-            location: `${land.region}، ${land.city}`,
-            price: land.price_per_sqm
-              ? `${parseFloat(land.price_per_sqm).toLocaleString('ar-SA')}`
-              : land.estimated_investment_value
-                ? `${parseFloat(land.estimated_investment_value).toLocaleString('ar-SA')}`
-                : 'غير محدد',
-            area: parseFloat(land.total_area).toLocaleString('ar-SA'),
-            landType: land.land_type,
-            purpose: land.purpose,
-            status: land.status,
-            is_favorite: land.is_favorite || false
-          })),
-          filtersApplied: data.filters_applied || []
-        };
-      }
-      throw new Error('Failed to fetch lands');
+            img: processImageUrl(land.cover_image),
+            title: land.title || "عنوان غير متوفر",
+            location: `${land.region || "منطقة غير محددة"}، ${
+              land.city || "مدينة غير محددة"
+            }`,
+            price,
+            area,
+            landType: land.land_type || "غير محدد",
+            purpose: land.purpose || "غير محدد",
+            status: land.status || "active",
+            is_favorite: Boolean(land.is_favorite),
+          };
+        }),
+        filtersApplied: data.filters_applied || [],
+      };
     },
-    enabled: filterType === 'lands'
-  });
+    [processImageUrl]
+  );
 
-  // استخدام React Query لجلب بيانات المزادات
-  const { 
-    data: auctionsData, 
-    isLoading: auctionsLoading, 
-    error: auctionsError,
-    refetch: refetchAuctions 
+  // دالة محسنة لمعالجة بيانات المزادات
+  const processAuctionsData = useCallback(
+    (data) => {
+      if (!data?.success || !data?.data) {
+        throw new Error("Invalid auctions data format");
+      }
+
+      return {
+        auctions: data.data.map((auction) => {
+          let daysLeft = 0;
+          try {
+            if (auction.auction_date) {
+              const auctionDate = new Date(auction.auction_date);
+              const today = new Date();
+              daysLeft = Math.ceil(
+                (auctionDate - today) / (1000 * 60 * 60 * 24)
+              );
+              daysLeft = daysLeft > 0 ? daysLeft : 0;
+            }
+          } catch (error) {
+            console.error("Error calculating days left:", error);
+          }
+
+          return {
+            id: auction.id,
+            img: processImageUrl(auction.cover_image),
+            title: auction.title || "عنوان غير متوفر",
+            location: auction.address || "عنوان غير متوفر",
+            area: "غير محدد",
+            endDate: auction.auction_date,
+            auctionCompany: auction.company?.auction_name || "شركة المزاد",
+            daysLeft,
+            startTime: auction.start_time,
+            auctionDate: auction.auction_date,
+            isFavorite: Boolean(auction.is_favorite),
+          };
+        }),
+      };
+    },
+    [processImageUrl]
+  );
+
+  // استخدام React Query لجلب بيانات الأراضي مع error handling محسن
+  const {
+    data: landsData,
+    isLoading: landsLoading,
+    error: landsError,
+    refetch: refetchLands,
+    isFetching: landsFetching,
   } = useQuery({
-    queryKey: ['auctions', filters],
+    queryKey: ["lands", filters],
     queryFn: async () => {
-      const queryParams = buildQueryParams(filters, 'auctions');
-      const url = `https://core-api-x41.shaheenplus.sa/api/properties/auctions/latest${queryParams ? `?${queryParams}` : ''}`;
-      
-      const response = await fetch(url);
-      const data = await response.json();
+      try {
+        const queryParams = buildQueryParams(filters, "lands");
+        const url = `${API_BASE_URL}${CONFIG.LANDS_ENDPOINT}${
+          queryParams ? `?${queryParams}` : ""
+        }`;
 
-      if (data.success && data.data) {
-        return {
-          auctions: data.data.map(auction => {
-            const auctionDate = new Date(auction.auction_date);
-            const today = new Date();
-            const daysLeft = Math.ceil((auctionDate - today) / (1000 * 60 * 60 * 24));
+        const response = await fetch(url, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          // إضافة timeout للـ production
+          signal: AbortSignal.timeout(10000),
+        });
 
-            return {
-              id: auction.id,
-              img: auction.cover_image && auction.cover_image !== 'default_cover.jpg'
-                ? `https://core-api-x41.shaheenplus.sa/storage/${auction.cover_image}`
-                : null,
-              title: auction.title,
-              location: auction.address,
-              area: "غير محدد",
-              endDate: auction.auction_date,
-              auctionCompany: auction.company?.auction_name || 'شركة المزاد',
-              daysLeft: daysLeft > 0 ? daysLeft : 0,
-              startTime: auction.start_time,
-              auctionDate: auction.auction_date,
-              isFavorite: auction.is_favorite || false
-            };
-          })
-        };
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return processLandsData(data);
+      } catch (error) {
+        console.error("Error fetching lands:", error);
+        throw error;
       }
-      throw new Error('Failed to fetch auctions');
     },
-    enabled: filterType === 'auctions'
+    enabled: filterType === "lands",
+    staleTime: 5 * 60 * 1000, // 5 دقائق
+    cacheTime: 10 * 60 * 1000, // 10 دقائق
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  // معالج تغيير الفلاتر
-  const handleFilterChange = (e) => {
+  // استخدام React Query لجلب بيانات المزادات مع error handling محسن
+  const {
+    data: auctionsData,
+    isLoading: auctionsLoading,
+    error: auctionsError,
+    refetch: refetchAuctions,
+    isFetching: auctionsFetching,
+  } = useQuery({
+    queryKey: ["auctions", filters],
+    queryFn: async () => {
+      try {
+        const queryParams = buildQueryParams(filters, "auctions");
+        const url = `${API_BASE_URL}${CONFIG.AUCTIONS_ENDPOINT}${
+          queryParams ? `?${queryParams}` : ""
+        }`;
+
+        const response = await fetch(url, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          signal: AbortSignal.timeout(10000),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return processAuctionsData(data);
+      } catch (error) {
+        console.error("Error fetching auctions:", error);
+        throw error;
+      }
+    },
+    enabled: filterType === "auctions",
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
+
+  // معالج تغيير الفلاتر مع debouncing
+  const handleFilterChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-  };
+  }, []);
 
   // تطبيق الفلاتر
-  const applyFilters = () => {
-    if (filterType === 'lands') {
-      refetchLands();
-    } else {
-      refetchAuctions();
+  const applyFilters = useCallback(() => {
+    try {
+      if (filterType === "lands") {
+        refetchLands();
+      } else {
+        refetchAuctions();
+      }
+      setShowFilter(false);
+      setCurrentPage(0); // إعادة تعيين الصفحة
+    } catch (error) {
+      console.error("Error applying filters:", error);
     }
-    setShowFilter(false);
-  };
+  }, [filterType, refetchLands, refetchAuctions]);
 
   // إعادة تعيين الفلاتر
-  const resetFilters = () => {
-    setFilters({
-      propertyType: '',
-      city: '',
-      region: '',
-      purpose: '',
-      minPrice: '',
-      maxPrice: '',
-      area: '',
-      land_type: '',
-      min_area: '',
-      max_area: '',
-      startDate: '',
-      endDate: '',
-      maxDaysLeft: '',
-      search: '',
-      company: '',
-      address: '',
-      date_from: '',
-      date_to: ''
-    });
-    
-    // إعادة تحميل البيانات بدون فلاتر
+  const resetFilters = useCallback(() => {
+    const initialFilters = {
+      propertyType: "",
+      city: "",
+      region: "",
+      purpose: "",
+      minPrice: "",
+      maxPrice: "",
+      area: "",
+      land_type: "",
+      min_area: "",
+      max_area: "",
+      startDate: "",
+      endDate: "",
+      maxDaysLeft: "",
+      search: "",
+      company: "",
+      address: "",
+      date_from: "",
+      date_to: "",
+    };
+
+    setFilters(initialFilters);
+    setCurrentPage(0);
+
     setTimeout(() => {
-      if (filterType === 'lands') {
+      if (filterType === "lands") {
         refetchLands();
       } else {
         refetchAuctions();
       }
     }, 100);
-  };
+  }, [filterType, refetchLands, refetchAuctions]);
 
-  const lands = landsData?.lands || [];
-  const auctions = auctionsData?.auctions || [];
-  const displayedItems = filterType === 'lands' ? lands : auctions;
-  const startIndex = currentPage * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = displayedItems.slice(startIndex, endIndex);
+  // معالج تغيير نوع الفلتر
+  const handleFilterTypeChange = useCallback((type) => {
+    setFilterType(type);
+    setCurrentPage(0);
+    setShowFilter(false);
+  }, []);
 
-  const isLoading = filterType === 'lands' ? landsLoading : auctionsLoading;
+  // معالج التنقل لعرض الكل
+  const handleViewAll = useCallback(() => {
+    if (filterType === "lands") {
+      navigate("/lands-and-auctions-list");
+    } else {
+      navigate("/lands-and-auctions-list", {
+        state: {
+          activeTab: "auctions",
+        },
+      });
+    }
+  }, [filterType, navigate]);
 
-  // بيانات للفلاتر
-  const landTypes = ['سكني', 'تجاري', 'زراعي', 'صناعي', 'مختلط'];
-  const purposes = ['بيع', 'استثمار'];
+  // حساب البيانات المعروضة
+  const computedData = useMemo(() => {
+    const lands = landsData?.lands || [];
+    const auctions = auctionsData?.auctions || [];
+    const displayedItems = filterType === "lands" ? lands : auctions;
+    const startIndex = currentPage * CONFIG.ITEMS_PER_PAGE;
+    const endIndex = startIndex + CONFIG.ITEMS_PER_PAGE;
+    const currentItems = displayedItems.slice(startIndex, endIndex);
+
+    return {
+      lands,
+      auctions,
+      displayedItems,
+      currentItems,
+      hasMore: endIndex < displayedItems.length,
+      totalItems: displayedItems.length,
+    };
+  }, [landsData, auctionsData, filterType, currentPage]);
+
+  const isLoading = filterType === "lands" ? landsLoading : auctionsLoading;
+  const isFetching = filterType === "lands" ? landsFetching : auctionsFetching;
+
+  // بيانات ثابتة للفلاتر
+  const filterOptions = useMemo(
+    () => ({
+      landTypes: ["سكني", "تجاري", "زراعي", "صناعي", "مختلط"],
+      purposes: ["بيع", "استثمار"],
+    }),
+    []
+  );
 
   return (
     <section className="py-20 bg-gray-50" id="properties">
       <div className="container mx-auto px-4">
+        {/* مؤشر التحميل العلوي */}
+        {isFetching && (
+          <div className="fixed top-0 left-0 w-full h-1 bg-blue-200 z-50">
+            <div className="h-full bg-blue-400 animate-pulse"></div>
+          </div>
+        )}
+
         {/* الفلاتر المطبقة */}
-        <div className="mb-6">
-          {landsData?.filtersApplied && landsData.filtersApplied.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
-              <span className="text-blue-400 text-sm">
-                الفلاتر المطبقة: {landsData.filtersApplied.join('، ')}
-              </span>
-            </div>
-          )}
-        </div>
+        {landsData?.filtersApplied && landsData.filtersApplied.length > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6">
+            <span className="text-blue-600 text-sm font-medium">
+              الفلاتر المطبقة: {landsData.filtersApplied.join("، ")}
+            </span>
+          </div>
+        )}
 
         {/* الهيدر */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           {/* التبويبات */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-gray-200 w-full sm:w-auto">
             <button
-              className={`px-6 py-3 font-medium text-lg border-b-2 transition-colors duration-200 ${
-                filterType === 'lands' 
-                  ? 'border-blue-400 text-blue-400' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              className={`px-6 py-3 font-medium text-lg border-b-2 transition-all duration-200 relative ${
+                filterType === "lands"
+                  ? "border-blue-400 text-blue-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
-              onClick={() => {
-                setFilterType('lands');
-                setCurrentPage(0);
-                setShowFilter(false);
-              }}
+              onClick={() => handleFilterTypeChange("lands")}
+              disabled={isFetching}
             >
               الأراضي
             </button>
             <button
-              className={`px-6 py-3 font-medium text-lg border-b-2 transition-colors duration-200 ${
-                filterType === 'auctions' 
-                  ? 'border-blue-400 text-blue-400' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              className={`px-6 py-3 font-medium text-lg border-b-2 transition-all duration-200 relative ${
+                filterType === "auctions"
+                  ? "border-blue-400 text-blue-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
-              onClick={() => {
-                setFilterType('auctions');
-                setCurrentPage(0);
-                setShowFilter(false);
-              }}
+              onClick={() => handleFilterTypeChange("auctions")}
+              disabled={isFetching}
             >
               المزادات
             </button>
@@ -268,95 +452,142 @@ const PropertiesSection = ({ onToggleFavorite, onPropertyClick }) => {
 
           {/* زر الفلتر */}
           <button
-            className="flex items-center gap-2 bg-blue-400 text-white px-6 py-3 rounded-lg hover:bg-blue-400 transition-colors duration-200 font-medium"
+            className="flex items-center gap-2 bg-[#3a83f2] text-white px-6 py-3 rounded-lg hover:bg-[#2f6fd1] disabled:bg-gray-400 transition-colors duration-200 font-medium w-full sm:w-auto justify-center sm:justify-start"
             onClick={() => setShowFilter(!showFilter)}
+            disabled={isFetching}
           >
             <Icons.FaFilter className="text-sm" />
-            {showFilter ? 'إخفاء الفلتر' : 'عرض الفلتر'}
+            {showFilter ? "إخفاء الفلتر" : "عرض الفلتر"}
           </button>
         </div>
 
-        {/* الفلتر المتقدم */}
-        <div className={`bg-white rounded-xl shadow-sm mb-8 overflow-hidden transition-all duration-400 ${
-          showFilter ? 'max-h-[500px] p-6 border border-gray-200' : 'max-h-0 border-0'
-        }`}>
+        {/* الفلتر المتقدم مع إضافة scrollbar */}
+        <div
+          className={`bg-white rounded-xl shadow-sm mb-8 overflow-hidden transition-all duration-400 ${
+            showFilter
+              ? "max-h-[80vh] p-6 border border-gray-200"
+              : "max-h-0 border-0"
+          }`}
+        >
           {showFilter && (
-            <FiltersComponent
-              activeTab={filterType === 'lands' ? 'lands' : 'auctions'}
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onResetFilters={resetFilters}
-              onApplyFilters={applyFilters}
-              landTypes={landTypes}
-              purposes={purposes}
-              showSearch={true}
-            />
+            <div className="max-h-[calc(80vh-3rem)] overflow-y-auto pr-2 custom-scrollbar">
+              <FiltersComponent
+                activeTab={filterType === "lands" ? "lands" : "auctions"}
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                onResetFilters={resetFilters}
+                onApplyFilters={applyFilters}
+                landTypes={filterOptions.landTypes}
+                purposes={filterOptions.purposes}
+                showSearch={true}
+                isLoading={isFetching}
+              />
+            </div>
           )}
         </div>
 
-        {/* البطاقات */}
+        {/* عرض الأخطاء */}
+        {(landsError || auctionsError) && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-2">
+              <Icons.FaExclamationTriangle className="text-red-500" />
+              <span className="text-red-700 font-medium">
+                حدث خطأ في تحميل البيانات. يرجى المحاولة مرة أخرى.
+              </span>
+            </div>
+            <button
+              className="mt-2 text-red-600 underline hover:no-underline"
+              onClick={() =>
+                filterType === "lands" ? refetchLands() : refetchAuctions()
+              }
+            >
+              إعادة المحاولة
+            </button>
+          </div>
+        )}
+
+        {/* البطاقات - العرض الأفقي دائماً */}
         <div className="properties-container">
           {isLoading ? (
-            <PropertiesSkeleton type={filterType} />
+            <div className="flex gap-4 overflow-x-auto pb-4">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="min-w-80 flex-shrink-0">
+                  <PropertiesSkeleton type={filterType} />
+                </div>
+              ))}
+            </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {currentItems.length > 0 ? (
-                  currentItems.map(item => (
-                    filterType === 'lands' ? (
-                      <LandCard
-                        key={item.id}
-                        {...item}
-                        onClick={onPropertyClick}
-                        onToggleFavorite={onToggleFavorite}
-                        isFavorite={item.is_favorite || false}
-                      />
-                    ) : (
-                      <AuctionCard
-                        key={item.id}
-                        {...item}
-                        onClick={onPropertyClick}
-                        onToggleFavorite={onToggleFavorite}
-                        isFavorite={item.is_favorite || false}
-                      />
-                    )
-                  ))
-                ) : (
-                  <div className="col-span-full text-center py-12">
-                    <div className="bg-white rounded-xl shadow-sm p-8">
-                      <p className="text-gray-500 text-lg">
-                        لا توجد {filterType === 'lands' ? 'أراضي' : 'مزادات'} متاحة في الوقت الحالي
-                      </p>
+              {computedData.currentItems.length > 0 ? (
+                <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+                  {computedData.currentItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className={`${CONFIG.HORIZONTAL_SCROLL_CONFIG.MOBILE_COLUMNS} sm:${CONFIG.HORIZONTAL_SCROLL_CONFIG.TABLET_COLUMNS} lg:${CONFIG.HORIZONTAL_SCROLL_CONFIG.DESKTOP_COLUMNS} snap-start`}
+                    >
+                      {filterType === "lands" ? (
+                        <LandCard
+                          {...item}
+                          onClick={onPropertyClick}
+                          onToggleFavorite={onToggleFavorite}
+                          isFavorite={item.is_favorite}
+                        />
+                      ) : (
+                        <AuctionCard
+                          {...item}
+                          onClick={onPropertyClick}
+                          onToggleFavorite={onToggleFavorite}
+                          isFavorite={item.isFavorite}
+                        />
+                      )}
                     </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="bg-white rounded-xl shadow-sm p-8 mx-auto max-w-md">
+                    <div className="text-gray-400 text-6xl mb-4">
+                      {filterType === "lands" ? "🏞️" : "🏛️"}
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                      لا توجد نتائج
+                    </h3>
+                    <p className="text-gray-500 text-lg">
+                      لا توجد {filterType === "lands" ? "أراضي" : "مزادات"}{" "}
+                      متاحة حسب المعايير المحددة
+                    </p>
+                    {Object.values(filters).some((filter) => filter) && (
+                      <button
+                        className="mt-4 text-blue-400 hover:text-blue-500 underline"
+                        onClick={resetFilters}
+                      >
+                        مسح جميع الفلاتر
+                      </button>
+                    )}
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </>
           )}
 
           {/* زر عرض الكل */}
-          <div className="text-center">
-            <button
-              className="border-2 border-blue-400 text-blue-400 px-8 py-3 rounded-lg hover:bg-blue-400 hover:text-white transition-all duration-200 font-semibold"
-              onClick={() => {
-                if (filterType === 'lands') {
-                  navigate('/lands-and-auctions-list');
-                } else {
-                  navigate('/lands-and-auctions-list', {
-                    state: {
-                      activeTab: 'auctions'
-                    }
-                  });
-                }
-              }}
-            >
-              عرض الكل
-            </button>
-          </div>
+          {computedData.totalItems > CONFIG.ITEMS_PER_PAGE && (
+            <div className="text-center mt-8">
+              <button
+                className="border-2 border-blue-400 text-blue-400 px-8 py-3 rounded-lg hover:bg-blue-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold"
+                onClick={handleViewAll}
+                disabled={isFetching}
+              >
+                عرض الكل ({computedData.totalItems})
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
   );
-};
+});
+
+PropertiesSection.displayName = "PropertiesSection";
 
 export default PropertiesSection;
