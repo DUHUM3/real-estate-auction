@@ -8,208 +8,327 @@ import {
   FaChevronLeft,
   FaChevronRight,
 } from "react-icons/fa";
-import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, Target, Rocket, Shield, Zap } from "lucide-react";
 
 // ثوابت التطبيق
 const CONFIG = {
-  AUTO_SLIDE_INTERVAL: 5000, // 5 ثواني
-  ANIMATION_DURATION: 300,
+  AUTO_SLIDE_INTERVAL: 6000,
+  ANIMATION_DURATION: 400,
+  COLORS: {
+    primary: "#53a1dd",
+    primaryLight: "#e6f2ff",
+    primaryDark: "#4a8fc7",
+    accent: "#ffd700",
+    textDark: "#1a202c",
+    textLight: "#4a5568",
+  },
 };
 
-// بيانات البطاقات
+// بيانات البطاقات - مُحسّنة مع أقسام وأيقونات
 const CARDS_DATA = [
   {
     id: 1,
     title: "القيم الجوهرية",
     titleEn: "Core Values",
-    icon: FaHandshake,
-    color: "#53a1dd",
-    details: [
-      "الشفافية: التزام كامل بتقديم معلومات واضحة وإجراءات موثوقة في كل مرحلة",
-      "الاحترافية: إدارة جميع الخدمات والعمليات بمعايير عالية وخبرة متخصصة",
-      "الابتكار: تطوير حلول وتقنيات عقارية رقمية تعزز التجربة وتدعم اتخاذ القرار",
-      "الموثوقية: بناء علاقة ثقة طويلة الأمد مع العملاء والمعلنين وشركات المزادات",
-      "حفظ الحقوق: آليات واضحة لضمان حقوق المنصة والمعلنين والمشترين",
-      "خدمة العميل: تسهيل الوصول للفرص المناسبة وتقديم دعم متواصل",
-      "الشراكة: اعتبار جميع الأطراف شركاء أساسيين في نجاح المنصة",
+    icon: Shield,
+    color: CONFIG.COLORS.primary,
+    sections: [
+      {
+        title: "الشفافية والوضوح",
+        items: ["معلومات واضحة وإجراءات موثوقة في كل مرحلة", "تقارير شفافة للعملاء والمستثمرين"],
+      },
+      {
+        title: "الاحترافية والتميز",
+        items: ["معايير عالية في كل عملية", "خبرة متخصصة في كل تفصيل"],
+      },
+      {
+        title: "الابتكار والتطوير",
+        items: ["حلول وتقنيات عقارية رقمية متطورة", "تجارب مستخدم محسنة باستمرار"],
+      },
+      {
+        title: "الموثوقية والثقة",
+        items: ["بناء علاقات طويلة الأمد", "التزام بالوعود والاتفاقيات"],
+      },
     ],
   },
   {
     id: 2,
     title: "الأهداف الاستراتيجية",
     titleEn: "Strategic Goals",
-    icon: FaChartLine,
-    color: "#53a1dd",
-    details: [
-      "بناء منصة عقارية موثوقة وفعّالة تربط جميع أطراف السوق تحت مظلة واحدة",
-      "تسهيل وتسريع عمليات البيع والشراء والاستثمار العقاري عبر خدمات رقمية متكاملة",
-      "تمكين شركات المزادات من الوصول لشريحة أكبر من المستثمرين عبر قناة رسمية واحترافية",
-      "توفير نظام متطور لإدارة الطلبات يربط العملاء بالمعلنين بطريقة مباشرة وذكية",
-      "حماية حقوق وعمولات جميع الأطراف عبر أنظمة واضحة ومؤتمتة داخل المنصة",
-      "تطوير خدمات تقنية مبتكرة ترفع من جودة التجربة العقارية وتزيد من فرص إتمام الصفقات",
-      "تعزيز الثقة في القطاع العقاري من خلال الشفافية، الدقة، وإدارة العمليات باحترافية عالية",
-      "دعم التحول الرقمي للعقار في المملكة بما يتوافق مع رؤية السعودية 2030",
+    icon: Target,
+    color: CONFIG.COLORS.primary,
+    sections: [
+      {
+        title: "بناء منصة موثوقة",
+        items: ["ربط جميع أطراف السوق العقاري", "توفير بيئة آمنة وفعّالة"],
+      },
+      {
+        title: "تسهيل العمليات",
+        items: ["تسريع عمليات البيع والشراء", "خدمات رقمية متكاملة"],
+      },
+      {
+        title: "تمكين شركات المزادات",
+        items: ["الوصول لشريحة أكبر من المستثمرين", "قنوات احترافية وعالية الجودة"],
+      },
+      {
+        title: "إدارة الطلبات الذكية",
+        items: ["ربط العملاء بالمعلنين مباشرة", "أنظمة مطابقة ذكية"],
+      },
     ],
   },
-
   {
     id: 3,
     title: "الرسالة",
     titleEn: "Mission",
+    icon: Rocket,
+    color: CONFIG.COLORS.primary,
     description:
       "تقديم حلول عقارية مبتكرة تجمع بين التكنولوجيا، الاحترافية، والشراكات الفعّالة، من خلال منظومة خدمات تشمل عرض الأراضي، إدارة الطلبات، ربط العملاء بشركات المزادات، وتمكين هذه الشركات من عرض مزاداتها داخل المنصة، بما يضمن شفافية التعامل، حماية الحقوق، ورفع كفاءة السوق العقاري في المملكة.",
-    icon: FaPaperPlane,
-    color: "#53a1dd",
+    highlights: [
+      "حلول عقارية مبتكرة",
+      "تكنولوجيا متطورة",
+      "شراكات فعالة",
+      "خدمات متكاملة",
+      "شفافية كاملة",
+      "حماية الحقوق",
+      "كفاءة عالية",
+    ],
   },
   {
     id: 4,
     title: "الرؤية",
     titleEn: "Vision",
+    icon: Zap,
+    color: CONFIG.COLORS.primary,
     description:
       "أن تكون شاهين بلس المنصة العقارية الأذكى والأكثر موثوقية في المملكة العربية السعودية، والمرجع الأول الذي يجمع بين تسويق وعرض الأراضي، وتفعيل الطلبات العقارية، وعرض المزادات، ضمن منظومة رقمية متكاملة تحفظ الحقوق وتُسهل إتمام الصفقات بجودة عالية",
-    icon: FaEye,
-    color: "#53a1dd",
+    visionPoints: [
+      "المنصة الأذكى في المملكة",
+      "الأكثر موثوقية وثقة",
+      "المرجع الأول للعقار",
+      "منظومة رقمية متكاملة",
+      "حفظ الحقوق والالتزامات",
+      "إتمام صفقات بجودة عالية",
+    ],
   },
 ];
 
-// مكون البطاقة في الشاشات الكبيرة
+// مكون البطاقة في الشاشات الكبيرة - تصميم مصغّر
 const DesktopCard = ({ card, isActive }) => {
   const IconComponent = card.icon;
 
   return (
-    <div
-      className={`bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 md:p-12 min-h-[500px] flex flex-col justify-between shadow-2xl border border-gray-200 relative overflow-hidden transition-all duration-500 ${
-        isActive ? "opacity-100" : "opacity-0"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.4 }}
+      className={`bg-white rounded-2xl p-6 min-h-[450px] flex flex-col shadow-xl border border-gray-100 relative overflow-hidden ${
+        isActive ? "block" : "hidden"
       }`}
-      role="tabpanel"
-      aria-labelledby={`tab-${card.id}`}
-      aria-hidden={!isActive}
     >
-      {/* زخرفة خلفية */}
-      <div
-        className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-blue-100/30 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"
-        aria-hidden="true"
-      ></div>
-      <div
-        className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-yellow-100/20 to-transparent rounded-full blur-3xl translate-x-1/2 translate-y-1/2"
-        aria-hidden="true"
-      ></div>
+      {/* الشريط العلوي الملون */}
+      <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#53a1dd] to-[#4a8fc7] rounded-t-2xl"></div>
 
-      <div className="flex items-start gap-8 md:gap-10 flex-1 relative z-10">
-        {/* الأيقونة */}
-        <div
-          className="text-4xl md:text-5xl h-24 w-24 md:h-28 md:w-28 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-lg transition-transform duration-300 hover:scale-110"
-          style={{ color: card.color }}
-          aria-hidden="true"
-        >
-          <IconComponent />
+      <div className="flex-1 flex flex-col relative z-10">
+        {/* العنوان والأيقونة */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="bg-gradient-to-br from-[#53a1dd] to-[#4a8fc7] p-3 rounded-xl shadow-md flex-shrink-0">
+            <IconComponent className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1 text-right">
+            <h3 className="text-2xl font-bold text-gray-900 mb-1">
+              {card.title}
+            </h3>
+            <p className="text-[#53a1dd] text-base font-medium">
+              {card.titleEn}
+            </p>
+          </div>
         </div>
 
-        {/* المحتوى */}
-        <div className="flex-1 text-right">
-          <h3
-            className="text-2xl md:text-3xl font-bold mb-4 md:mb-6"
-            style={{ color: card.color }}
+        {/* الوصف المختصر */}
+        {card.description && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-gray-600 text-base leading-relaxed mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100 text-right"
           >
-            {card.title}
-            <span className="text-lg md:text-xl text-gray-500 mr-2">
-              ({card.titleEn})
-            </span>
-          </h3>
+            {card.description}
+          </motion.p>
+        )}
 
-          {card.description && (
-            <p className="text-gray-700 text-lg md:text-xl leading-relaxed mb-6 md:mb-8 border-r-4 border-yellow-500 pr-4 md:pr-6">
-              {card.description}
-            </p>
-          )}
-
-          {card.details && (
-            <div className="text-right">
-              <ul className="space-y-3" role="list">
-                {card.details.map((detail, index) => (
-                  <li
-                    key={index}
-                    className="text-gray-600 text-base md:text-lg relative pr-8 leading-relaxed transition-all duration-300 hover:text-gray-800 hover:pr-10"
-                  >
-                    <FaCheck
-                      className="text-green-500 absolute right-0 top-1 text-sm md:text-base"
-                      aria-hidden="true"
-                    />
-                    {detail}
-                  </li>
-                ))}
-              </ul>
+        {/* محتوى تفصيلي */}
+        <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
+          {card.sections ? (
+            <div className="space-y-4">
+              {card.sections.map((section, sectionIndex) => (
+                <motion.div
+                  key={sectionIndex}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: sectionIndex * 0.08 }}
+                  className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm hover:shadow transition-shadow duration-200"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1.5 h-6 bg-gradient-to-b from-[#53a1dd] to-[#4a8fc7] rounded-full"></div>
+                    <h4 className="text-lg font-bold text-gray-800">
+                      {section.title}
+                    </h4>
+                  </div>
+                  <ul className="space-y-1.5 pr-5">
+                    {section.items.map((item, itemIndex) => (
+                      <motion.li
+                        key={itemIndex}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: (sectionIndex * 0.08) + (itemIndex * 0.04) }}
+                        className="text-gray-600 text-sm flex items-start gap-2 text-right"
+                      >
+                        <FaCheck className="text-[#53a1dd] mt-0.5 flex-shrink-0 text-xs" />
+                        <span className="flex-1">{item}</span>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </motion.div>
+              ))}
             </div>
-          )}
+          ) : card.highlights ? (
+            <div className="grid grid-cols-2 gap-3">
+              {card.highlights.map((highlight, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.08 }}
+                  className="bg-gradient-to-r from-blue-50 to-white p-3 rounded-lg border border-blue-100 text-center"
+                >
+                  <span className="text-[#53a1dd] font-semibold text-sm">
+                    {highlight}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          ) : card.visionPoints ? (
+            <div className="space-y-3">
+              {card.visionPoints.map((point, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.08 }}
+                  className="flex items-center gap-2 p-3 bg-gradient-to-l from-blue-50 to-transparent rounded-lg text-right"
+                >
+                  <div className="w-2 h-2 bg-[#53a1dd] rounded-full flex-shrink-0"></div>
+                  <span className="text-gray-700 text-sm flex-1">{point}</span>
+                </motion.div>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
-// مكون البطاقة في الأجهزة المحمولة
+// مكون البطاقة في الأجهزة المحمولة - بدون تغيير
 const MobileCard = ({ card, isActive }) => {
   const IconComponent = card.icon;
 
-  return (
-    <div
-      className={`w-full bg-white rounded-xl p-5 md:p-6 shadow-lg mb-6 transition-all duration-500 ${
-        isActive ? "block opacity-100 scale-100" : "hidden opacity-0 scale-95"
-      }`}
-      role="tabpanel"
-      aria-labelledby={`mobile-tab-${card.id}`}
-      aria-hidden={!isActive}
-    >
-      {/* الأيقونة */}
-      <div
-        className="text-3xl h-20 w-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-md transition-transform duration-300 hover:scale-110"
-        style={{ color: card.color }}
-        aria-hidden="true"
-      >
-        <IconComponent />
-      </div>
+  if (!isActive) return null;
 
-      {/* العنوان */}
-      <h3
-        className="text-xl md:text-2xl font-semibold mb-3 text-center"
-        style={{ color: card.color }}
-      >
-        {card.title}
-        <span className="block text-sm md:text-base text-gray-500 mt-1">
-          ({card.titleEn})
-        </span>
-      </h3>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="bg-white rounded-2xl p-6 shadow-xl mb-6 border border-gray-100 relative overflow-hidden"
+    >
+      {/* شريط علوي ملون */}
+      <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-[#53a1dd] to-[#4a8fc7] rounded-t-2xl"></div>
+
+      {/* العنوان والأيقونة */}
+      <div className="flex items-center gap-4 mb-6">
+        <div className="bg-gradient-to-br from-[#53a1dd] to-[#4a8fc7] p-3 rounded-xl">
+          <IconComponent className="w-6 h-6 text-white" />
+        </div>
+        <div className="flex-1 text-right">
+          <h3 className="text-xl font-bold text-gray-900">{card.title}</h3>
+          <p className="text-[#53a1dd] text-sm">{card.titleEn}</p>
+        </div>
+      </div>
 
       {/* الوصف */}
       {card.description && (
-        <p className="text-gray-600 text-base md:text-lg leading-relaxed mb-4 text-center px-2">
+        <p className="text-gray-600 text-sm leading-relaxed mb-6 bg-blue-50 p-4 rounded-xl">
           {card.description}
         </p>
       )}
 
-      {/* التفاصيل */}
-      {card.details && (
-        <div className="text-right mt-4">
-          <ul className="space-y-2" role="list">
-            {card.details.map((detail, idx) => (
-              <li
-                key={idx}
-                className="text-gray-600 text-sm md:text-base relative pr-6 leading-relaxed text-right"
+      {/* المحتوى */}
+      <div className="space-y-4">
+        {card.sections ? (
+          card.sections.slice(0, 3).map((section, sectionIndex) => (
+            <div key={sectionIndex} className="border border-gray-100 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-1.5 h-6 bg-[#53a1dd] rounded-full"></div>
+                <h4 className="text-sm font-bold text-gray-800">{section.title}</h4>
+              </div>
+              <ul className="space-y-1 pr-4">
+                {section.items.slice(0, 2).map((item, itemIndex) => (
+                  <li key={itemIndex} className="text-xs text-gray-600 flex items-start gap-1">
+                    <FaCheck className="text-[#53a1dd] mt-0.5 flex-shrink-0 text-xs" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        ) : card.highlights ? (
+          <div className="flex flex-wrap gap-2">
+            {card.highlights.slice(0, 4).map((highlight, index) => (
+              <span
+                key={index}
+                className="px-3 py-1.5 bg-blue-50 text-[#53a1dd] text-xs font-medium rounded-full border border-blue-100"
               >
-                <FaCheck
-                  className="text-green-500 absolute right-0 top-0.5 text-xs md:text-sm"
-                  aria-hidden="true"
-                />
-                {detail}
-              </li>
+                {highlight}
+              </span>
             ))}
-          </ul>
-        </div>
-      )}
-    </div>
+          </div>
+        ) : card.visionPoints ? (
+          <div className="space-y-2">
+            {card.visionPoints.slice(0, 4).map((point, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-[#53a1dd] rounded-full"></div>
+                <span className="text-sm text-gray-700">{point}</span>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </motion.div>
   );
 };
+
+// المؤشرات
+const Indicators = ({ count, activeIndex, onClick }) => (
+  <div className="flex justify-center gap-2">
+    {Array.from({ length: count }).map((_, index) => (
+      <button
+        key={index}
+        onClick={() => onClick(index)}
+        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+          index === activeIndex
+            ? 'bg-[#53a1dd] w-6'
+            : 'bg-gray-300 hover:bg-gray-400'
+        }`}
+        aria-label={`الانتقال إلى البطاقة ${index + 1}`}
+      />
+    ))}
+  </div>
+);
 
 // المكون الرئيسي
 const WhyUsSection = () => {
@@ -253,10 +372,10 @@ const WhyUsSection = () => {
   // معالجة لوحة المفاتيح
   const handleKeyDown = useCallback(
     (e) => {
-      if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+      if (e.key === "ArrowRight") {
         e.preventDefault();
         prevCard();
-      } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+      } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         nextCard();
       }
@@ -272,197 +391,184 @@ const WhyUsSection = () => {
     return () => clearInterval(interval);
   }, [isPaused, nextCard]);
 
-  // البطاقة الحالية
-  const currentCard = useMemo(() => CARDS_DATA[activeTab], [activeTab]);
-
   return (
-    <section
-      className="bg-white py-12 md:py-20 relative"
-      aria-labelledby="why-us-heading"
-    >
-      <div className="container mx-auto px-4">
-        {/* العنوان */}
+    <section className="py-12 md:py-16 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      {/* عناصر زخرفية أصغر */}
+      <div className="absolute top-0 right-0 w-48 h-48 bg-blue-100 rounded-full mix-blend-multiply filter blur-2xl opacity-20"></div>
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-100 rounded-full mix-blend-multiply filter blur-2xl opacity-20"></div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        {/* العنوان الرئيسي - مصغّر */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-12 md:mb-16 text-right"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-10 md:mb-12"
         >
-          <div className="inline-flex items-center gap-3 mb-4">
-            <Sparkles className="w-6 h-6 text-blue-500" />
-            <span className="text-sm font-semibold text-blue-600 uppercase tracking-wider">
-              خدماتنا المميزة
-            </span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#53a1dd] to-[#4a8fc7] rounded-full text-white mb-4 text-xs">
+            <Sparkles className="w-3 h-3" />
+            <span className="font-medium">لماذا شاهين بلس؟</span>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-3 leading-tight">
-            لماذا تتستخدم شاهين بلس؟
+          
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+            قيمنا و <span className="text-[#53a1dd]">أهدافنا</span>
           </h2>
-          <div className="w-28 h-1.5 bg-gradient-to-l from-blue-600 to-cyan-500 rounded-full"></div>
-          <p className="mt-4 text-lg text-slate-600 max-w-2xl">
-            نقدّم تجربة عقارية متكاملة تربط العارضين بالمستثمرين عبر حلول رقمية
-            موثوقة وفعّالة.
+          
+          <div className="w-20 h-1 bg-gradient-to-r from-[#53a1dd] to-[#4a8fc7] rounded-full mx-auto mb-4"></div>
+          
+          <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto">
+            نؤمن أن نجاحك العقاري يبدأ من فهم واضح لقيمنا وطموحنا المشترك
           </p>
         </motion.div>
 
-        {/* الشاشات الكبيرة */}
-        <div
+        {/* الشاشات الكبيرة - مصغّر */}
+        <div 
           className="hidden lg:block"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           onKeyDown={handleKeyDown}
-          role="tablist"
-          aria-label="بطاقات لماذا تستخدم شاهين بلس"
+          tabIndex={0}
         >
-          {/* البطاقات */}
-          <div className="relative">
+          {/* تبويبات مصغرة في الأعلى */}
+          <div className="grid grid-cols-4 gap-4 mb-8">
             {CARDS_DATA.map((card, index) => (
-              <div
+              <button
                 key={card.id}
-                className={`${index === activeTab ? "block" : "hidden"}`}
+                onClick={() => goToCard(index)}
+                disabled={isTransitioning}
+                className={`p-4 rounded-xl text-right transition-all duration-300 ${
+                  activeTab === index
+                    ? 'bg-gradient-to-br from-[#53a1dd] to-[#4a8fc7] text-white shadow-lg transform scale-102'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg'
+                }`}
               >
-                <DesktopCard card={card} isActive={index === activeTab} />
-              </div>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${
+                    activeTab === index ? 'bg-white/20' : 'bg-blue-50'
+                  }`}>
+                    <card.icon className={`w-5 h-5 ${
+                      activeTab === index ? 'text-white' : 'text-[#53a1dd]'
+                    }`} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold mb-0.5">{card.title}</h3>
+                    <p className={`text-xs ${
+                      activeTab === index ? 'text-white/90' : 'text-gray-500'
+                    }`}>{card.titleEn}</p>
+                  </div>
+                </div>
+              </button>
             ))}
           </div>
 
-          {/* أزرار التحكم والتبويبات */}
-          <div className="flex justify-between items-center mt-8 md:mt-12 pt-6 md:pt-8 border-t border-gray-300">
-            {/* أزرار التنقل */}
-            <div className="flex gap-4">
-              <button
-                className="bg-[#53a1dd] text-white border-none w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 shadow-lg hover:bg-[#458bc2] hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={prevCard}
-                disabled={isTransitioning}
-                aria-label="البطاقة السابقة"
-                type="button"
-              >
-                <FaChevronRight aria-hidden="true" />
-              </button>
-              <button
-                className="bg-[#53a1dd] text-white border-none w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 shadow-lg hover:bg-[#458bc2] hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={nextCard}
-                disabled={isTransitioning}
-                aria-label="البطاقة التالية"
-                type="button"
-              >
-                <FaChevronLeft aria-hidden="true" />
-              </button>
-            </div>
-
-            {/* التبويبات */}
-            <div className="flex gap-3 flex-wrap justify-center flex-1">
-              {CARDS_DATA.map((card, index) => (
-                <button
-                  key={card.id}
-                  id={`tab-${card.id}`}
-                  className={`px-4 py-2 md:px-5 md:py-3 rounded-lg cursor-pointer transition-all duration-300 text-sm font-medium whitespace-nowrap border-2 ${
-                    activeTab === index
-                      ? "bg-[#53a1dd] border-[#53a1dd] text-white -translate-y-1 shadow-lg"
-                      : "bg-white border-gray-300 text-gray-600 hover:border-[#53a1dd] hover:text-[#53a1dd]"
-                  } focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:ring-offset-2 disabled:opacity-50`}
-                  onClick={() => goToCard(index)}
-                  disabled={isTransitioning}
-                  role="tab"
-                  aria-selected={activeTab === index}
-                  aria-controls={`tabpanel-${card.id}`}
-                  type="button"
-                >
-                  {card.title}
-                </button>
-              ))}
-            </div>
+          {/* البطاقة الرئيسية */}
+          <div className="mb-8">
+            <AnimatePresence mode="wait">
+              <DesktopCard 
+                key={activeTab}
+                card={CARDS_DATA[activeTab]} 
+                isActive={true} 
+              />
+            </AnimatePresence>
           </div>
 
-          {!isPaused && (
-            <div
-              key={activeTab} // 👈 هذا هو الحل
-              className="mt-6 h-1 bg-gray-200 rounded-full overflow-hidden"
-              aria-hidden="true"
-            >
-              <div
-                className="h-full bg-gradient-to-l from-blue-600 to-cyan-500"
-                style={{
-                  animation: `progress ${CONFIG.AUTO_SLIDE_INTERVAL}ms linear`,
-                }}
+          {/* أزرار التنقل المصغّرة */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={prevCard}
+                disabled={isTransitioning}
+                className="w-12 h-12 rounded-full bg-white border border-[#53a1dd] text-[#53a1dd] flex items-center justify-center hover:bg-[#53a1dd] hover:text-white transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+                aria-label="البطاقة السابقة"
+              >
+                <FaChevronRight className="text-sm" />
+              </button>
+              
+              <Indicators 
+                count={CARDS_DATA.length} 
+                activeIndex={activeTab} 
+                onClick={goToCard}
               />
+              
+              <button
+                onClick={nextCard}
+                disabled={isTransitioning}
+                className="w-12 h-12 rounded-full bg-white border border-[#53a1dd] text-[#53a1dd] flex items-center justify-center hover:bg-[#53a1dd] hover:text-white transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+                aria-label="البطاقة التالية"
+              >
+                <FaChevronLeft className="text-sm" />
+              </button>
             </div>
-          )}
+
+            {/* مؤشر التلقائي */}
+            {!isPaused && (
+              <div className="w-40 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <motion.div
+                  key={activeTab}
+                  className="h-full bg-gradient-to-r from-[#53a1dd] to-[#4a8fc7]"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: CONFIG.AUTO_SLIDE_INTERVAL / 1000, ease: "linear" }}
+                />
+              </div>
+            )}
+
+            {/* عداد البطاقات */}
+            <div className="text-sm text-gray-600 font-medium">
+              <span className="text-[#53a1dd] font-bold">{activeTab + 1}</span>
+              <span className="mx-1">/</span>
+              <span>{CARDS_DATA.length}</span>
+            </div>
+          </div>
         </div>
 
-        {/* الأجهزة المحمولة */}
-        <div
-          className="block lg:hidden"
-          onTouchStart={() => setIsPaused(true)}
-          onTouchEnd={() => setIsPaused(false)}
-          role="tablist"
-          aria-label="بطاقات لماذا تستخدم شاهين بلس"
-        >
-          <div className="w-full relative">
-            {CARDS_DATA.map((card, index) => (
-              <MobileCard
-                key={card.id}
-                card={card}
-                isActive={activeTab === index}
-              />
-            ))}
+        {/* الأجهزة المحمولة - بدون تغيير */}
+        <div className="lg:hidden">
+          <div className="mb-6">
+            <Indicators 
+              count={CARDS_DATA.length} 
+              activeIndex={activeTab} 
+              onClick={goToCard}
+            />
+          </div>
 
-            {/* أزرار التحكم والمؤشرات */}
-            <div className="flex items-center justify-center gap-4 mt-6">
-              <button
-                className="bg-[#53a1dd] text-white border-none rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center cursor-pointer transition-all duration-300 shadow-md hover:bg-[#458bc2] focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:ring-offset-2 disabled:opacity-50"
-                onClick={prevCard}
-                disabled={isTransitioning}
-                aria-label="البطاقة السابقة"
-                type="button"
-              >
-                <FaChevronRight aria-hidden="true" />
-              </button>
+          <AnimatePresence mode="wait">
+            <MobileCard 
+              key={activeTab}
+              card={CARDS_DATA[activeTab]} 
+              isActive={true} 
+            />
+          </AnimatePresence>
 
-              {/* المؤشرات */}
-              <div className="flex gap-2" role="tablist">
-                {CARDS_DATA.map((card, index) => (
-                  <button
-                    key={card.id}
-                    id={`mobile-tab-${card.id}`}
-                    className={`w-3 h-3 rounded-full border-none cursor-pointer transition-all duration-300 ${
-                      activeTab === index
-                        ? "bg-[#53a1dd] scale-125"
-                        : "bg-gray-300 hover:bg-gray-400"
-                    } focus:outline-none focus:ring-2 focus:ring-[#d4af37]`}
-                    onClick={() => goToCard(index)}
-                    disabled={isTransitioning}
-                    role="tab"
-                    aria-selected={activeTab === index}
-                    aria-label={`الانتقال إلى ${card.title}`}
-                    type="button"
-                  ></button>
-                ))}
-              </div>
-
-              <button
-                className="bg-[#53a1dd] text-white border-none rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center cursor-pointer transition-all duration-300 shadow-md hover:bg-[#458bc2] focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:ring-offset-2 disabled:opacity-50"
-                onClick={nextCard}
-                disabled={isTransitioning}
-                aria-label="البطاقة التالية"
-                type="button"
-              >
-                <FaChevronLeft aria-hidden="true" />
-              </button>
+          {/* أزرار التنقل للجوال */}
+          <div className="flex items-center justify-center gap-6 mt-6">
+            <button
+              onClick={prevCard}
+              disabled={isTransitioning}
+              className="w-10 h-10 rounded-full bg-white border border-[#53a1dd] text-[#53a1dd] flex items-center justify-center hover:bg-[#53a1dd] hover:text-white transition-all duration-300 shadow-md disabled:opacity-50"
+              aria-label="البطاقة السابقة"
+            >
+              <FaChevronRight className="text-xs" />
+            </button>
+            
+            <div className="text-center">
+              <span className="text-xs font-medium text-gray-600">البطاقة</span>
+              <p className="text-lg font-bold text-[#53a1dd]">
+                {activeTab + 1} / {CARDS_DATA.length}
+              </p>
             </div>
+            
+            <button
+              onClick={nextCard}
+              disabled={isTransitioning}
+              className="w-10 h-10 rounded-full bg-white border border-[#53a1dd] text-[#53a1dd] flex items-center justify-center hover:bg-[#53a1dd] hover:text-white transition-all duration-300 shadow-md disabled:opacity-50"
+              aria-label="البطاقة التالية"
+            >
+              <FaChevronLeft className="text-xs" />
+            </button>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes progress {
-          from {
-            width: 0%;
-          }
-          to {
-            width: 100%;
-          }
-        }
-      `}</style>
     </section>
   );
 };

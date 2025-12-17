@@ -1,10 +1,22 @@
-import React from 'react';
-import '../../styles/Footer.css';
-import Icons from '../../icons';
+import React from "react";
 import { FaXTwitter } from "react-icons/fa6";
+import {
+  FaHome,
+  FaYoutube,
+  FaInstagram,
+  FaSnapchatGhost,
+  FaPhone,
+  FaWhatsapp,
+  FaEnvelope,
+  FaShieldAlt,
+  FaFileContract,
+  FaChevronLeft,
+  FaPaperPlane,
+} from "react-icons/fa";
+import { FiUser } from "react-icons/fi";
 
 function Footer() {
-  const phoneNumber = "+966 56 606 5406";
+  const phoneNumber = "+966566065406";
   const formattedPhone = phoneNumber.replace(/\s/g, "");
 
   const handlePhoneClick = () => {
@@ -12,114 +24,304 @@ function Footer() {
   };
 
   const handleWhatsAppClick = () => {
-    window.open(`https://wa.me/${formattedPhone}`, '_blank');
+    window.open(`https://wa.me/${formattedPhone}`, "_blank");
   };
 
-  // دالة لتنسيق الرقم
-const formatPhoneNumber = (number) => {
-  if (!number) return '';
-  
-  // إزالة أي مسافات أو أحرف غير رقمية
-  const cleaned = number.replace(/\D/g, '');
-  
-  // تنسيق الرقم حسب الطول
-  if (cleaned.length === 10) {
-    return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
-  } else if (cleaned.length === 9) {
-    return cleaned.replace(/(\d{2})(\d{3})(\d{4})/, '$1 $2 $3');
-  }
-  
-  return number;
-};
-
-
+  const formatPhoneNumber = (number) => {
+    if (!number) return "";
+    const cleaned = number.replace(/\D/g, "");
+    if (cleaned.startsWith("966")) {
+      const rest = cleaned.substring(3);
+      if (rest.length === 9) {
+        return `+966 ${rest.substring(0, 2)} ${rest.substring(
+          2,
+          5
+        )} ${rest.substring(5)}`;
+      }
+    }
+    if (cleaned.length === 10) {
+      return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, "$1 $2 $3");
+    } else if (cleaned.length === 9) {
+      return cleaned.replace(/(\d{2})(\d{3})(\d{4})/, "$1 $2 $3");
+    }
+    return number;
+  };
 
   return (
-    <footer className="footer">
-      <div className="footer-container">
-        {/* الشعار والروابط الاجتماعية */}
-        <div className="footer-top">
-          <div className="footer-logo">
-            <div className="logo-icon">
-              <Icons.FaHome />
+    <footer style={styles.footer}>
+      {/* خط أزرق في بداية الفوتر مثل باقي الأقسام */}
+      <div
+        style={{
+          height: "1px",
+          backgroundColor: "#d0e8f7",
+          marginBottom: "16px",
+        }}
+      ></div>
+
+      <div style={styles.container}>
+        {/* الشعار والوصف */}
+        <div style={styles.topSection}>
+          <div style={styles.logoSection}>
+            <div style={styles.logo}>
+              <FaHome style={styles.logoIcon} />
+              <span style={styles.logoText}>شاهين بلس</span>
             </div>
-            <span className="logo-text">شاهين بلس</span>
+            <p style={styles.description}>
+              أول منصة متخصصة بعرض وتسويق الأراضي والمزادات العقارية
+            </p>
           </div>
 
-          <div className="social-links">
-            {/* الروابط الأساسية المؤكدة وجودها */}
-            <a href="https://x.com/shaheenplus100" className="social-link" aria-label="X" target="_blank" rel="noopener noreferrer">
-              <FaXTwitter />
-            </a>
-            <a href="https://www.youtube.com/@shaheenplus100" className="social-link" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
-              <Icons.FaYoutube />
-            </a>
-            <a href="https://www.tiktok.com/@shaheenplus100" className="social-link" aria-label="TikTok" target="_blank" rel="noopener noreferrer">
-              <Icons.FaTiktok />
-            </a>
-            <a href="https://snapchat.com/t/TtC1xfDa" className="social-link" aria-label="Snapchat" target="_blank" rel="noopener noreferrer">
-              <Icons.FaSnapchatGhost />
-            </a>
-            
-            {/* الروابط الأخرى مع أيقونات بديلة */}
-            <a href="https://www.instagram.com/shaheenplus100/" className="social-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
-              <Icons.FaInstagram />
-            </a>
-            <a href="https://t.me/+A1UFtDBKyD1jMDBk" className="social-link" aria-label="Telegram" target="_blank" rel="noopener noreferrer">
-              <Icons.FaPaperPlane />
-            </a>
-            {/* <a href="https://whatsapp.com/channel/0029VbBSvScCcW4wJJH4Rb41" className="social-link" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
-              <Icons.FiPhone />
-            </a> */}
-          </div>
-        </div>
-
-        {/* المحتوى الرئيسي */}
-        <div className="footer-content">
-          <p className="footer-description">
-اول منصه متخصصه بعرض وتسويق الأرضي و المزادات العقارية وتلبية الرغبات العقارية
-          </p>
-
-          <div className="contact-info-compact">
-            <div className="contact-row clickable" onClick={handlePhoneClick}>
-              <Icons.FaPhone className="contact-icon" />
-              <span>{phoneNumber}</span>
-              <Icons.FaChevronLeft className="contact-action-icon" />
+          {/* معلومات الاتصال */}
+          <div style={styles.contactSection}>
+            <div style={styles.contactItem} onClick={handlePhoneClick}>
+              <FaPhone style={styles.contactIcon} />
+              <span
+                style={{
+                  ...styles.contactText,
+                  direction: "ltr",
+                  unicodeBidi: "plaintext",
+                }}
+              >
+                {formatPhoneNumber(phoneNumber)}
+              </span>
             </div>
-            
-            <div className="contact-row clickable" onClick={handleWhatsAppClick}>
-              <Icons.FaWhatsapp className="contact-icon" />
-              <span>واتساب مباشر</span>
-              <Icons.FaChevronLeft className="contact-action-icon" />
+            <div style={styles.contactItem} onClick={handleWhatsAppClick}>
+              <FaWhatsapp style={styles.contactIcon} />
+              <span style={styles.contactText}>واتساب</span>
             </div>
-            
-            <div className="contact-row">
-              <Icons.FaEnvelope className="contact-icon" />
-              <span>info@shaheenplus.sa</span>
+            <div style={styles.contactItem}>
+              <FaEnvelope style={styles.contactIcon} />
+              <span style={styles.contactText}>info@shaheenplus.sa</span>
             </div>
           </div>
         </div>
 
-        <div className="footer-bottom">
-          <p className="copyright">&copy; 2025 شاهين بلس. جميع الحقوق محفوظة.</p>
-          <div className="footer-bottom-links">
-            <a href="/privacy-policy" className="bottom-link">
-              <Icons.FaShieldAlt className="link-icon" />
+        {/* الشهادات */}
+        <div style={styles.certificatesSection}>
+          <a
+            href="https://www.positivessl.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={styles.certificateLink}
+          >
+            <img
+              src="https://www.positivessl.com/images/seals/positivessl_trust_seal_lg_222x54.png"
+              alt="SSL Secure"
+              style={styles.sslImage}
+            />
+          </a>
+
+          <a
+            href="https://www.business.sa/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={styles.certificateLink}
+          >
+            <img
+              src="/images/saudibusiness.png"
+              alt="المركز السعودي للأعمال"
+              style={styles.businessImage}
+            />
+          </a>
+        </div>
+
+        {/* الروابط الاجتماعية */}
+        <div style={styles.socialSection}>
+          <a
+            href="https://x.com/shaheenplus100"
+            style={styles.socialLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaXTwitter />
+          </a>
+          <a
+            href="https://www.youtube.com/@shaheenplus100"
+            style={styles.socialLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaYoutube />
+          </a>
+          <a
+            href="https://www.instagram.com/shaheenplus100/"
+            style={styles.socialLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaInstagram />
+          </a>
+          <a
+            href="https://snapchat.com/t/TtC1xfDa"
+            style={styles.socialLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaSnapchatGhost />
+          </a>
+          <a
+            href="https://t.me/+A1UFtDBKyD1jMDBk"
+            style={styles.socialLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaPaperPlane />
+          </a>
+        </div>
+
+        {/* الروابط السفلية وحقوق النشر */}
+        <div style={styles.bottomSection}>
+          <div style={styles.bottomLinks}>
+            <a href="/privacy-policy" style={styles.bottomLink}>
+              <FaShieldAlt style={styles.bottomLinkIcon} />
               سياسة الخصوصية
             </a>
-            <a href="/terms-of-service" className="bottom-link">
-              <Icons.FaFileContract className="link-icon" />
+            <a href="/terms-of-service" style={styles.bottomLink}>
+              <FaFileContract style={styles.bottomLinkIcon} />
               شروط الاستخدام
             </a>
-            <a href="/contact" className="bottom-link">
-              <Icons.FiUser className="link-icon" />
+            <a href="/contact" style={styles.bottomLink}>
+              <FiUser style={styles.bottomLinkIcon} />
               اتصل بنا
             </a>
           </div>
+          <p style={styles.copyright}>© 2025 شاهين بلس. جميع الحقوق محفوظة.</p>
         </div>
       </div>
     </footer>
   );
 }
+
+const styles = {
+  footer: {
+    backgroundColor: "#ffffff",
+    padding: "24px 16px",
+    fontFamily: "Arial, sans-serif",
+    direction: "rtl",
+  },
+  container: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+  },
+  topSection: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: "24px",
+    marginBottom: "20px",
+    paddingBottom: "20px",
+    borderBottom: "1px solid #d0e8f7",
+  },
+  logoSection: {
+    flex: "1",
+    minWidth: "250px",
+  },
+  logo: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    marginBottom: "12px",
+  },
+  logoIcon: {
+    fontSize: "24px",
+    color: "#4a90e2",
+  },
+  logoText: {
+    fontSize: "20px",
+    fontWeight: "bold",
+    color: "#333",
+  },
+  description: {
+    fontSize: "13px",
+    color: "#666",
+    lineHeight: "1.5",
+    margin: 0,
+  },
+  contactSection: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  },
+  contactItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    cursor: "pointer",
+    transition: "color 0.3s",
+  },
+  contactIcon: {
+    fontSize: "16px",
+    color: "#4a90e2",
+  },
+  contactText: {
+    fontSize: "13px",
+    color: "#555",
+  },
+  certificatesSection: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "32px",
+    padding: "16px 0",
+    marginBottom: "20px",
+    borderBottom: "1px solid #d0e8f7",
+    flexWrap: "wrap",
+  },
+  certificateLink: {
+    display: "block",
+    transition: "opacity 0.3s",
+  },
+  sslImage: {
+    height: "40px",
+    width: "auto",
+  },
+  businessImage: {
+    height: "50px",
+    width: "auto",
+  },
+  socialSection: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "16px",
+    marginBottom: "20px",
+    paddingBottom: "20px",
+    borderBottom: "1px solid #d0e8f7",
+  },
+  socialLink: {
+    color: "#4a90e2",
+    fontSize: "20px",
+    transition: "color 0.3s",
+    cursor: "pointer",
+  },
+  bottomSection: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "12px",
+  },
+  bottomLinks: {
+    display: "flex",
+    gap: "20px",
+    flexWrap: "wrap",
+    justifyContent: "center",
+  },
+  bottomLink: {
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    fontSize: "12px",
+    color: "#4a90e2",
+    textDecoration: "none",
+    transition: "color 0.3s",
+  },
+  bottomLinkIcon: {
+    fontSize: "12px",
+  },
+  copyright: {
+    fontSize: "12px",
+    color: "#666",
+    margin: 0,
+  },
+};
 
 export default Footer;

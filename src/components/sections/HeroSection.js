@@ -218,8 +218,8 @@ const HeroSection = ({ onSellLandClick, onBrowseInvestments }) => {
               disabled={isSearching || !searchTerm.trim()}
               aria-label="إرسال البحث"
               className="
-    bg-[#3a83f3]
-    hover:bg-[#2f72d6]
+    bg-[#53a1dd]
+    hover:bg-[#53a1dd]
     text-white
     px-6 py-3
     rounded-lg
@@ -228,8 +228,6 @@ const HeroSection = ({ onSellLandClick, onBrowseInvestments }) => {
     duration-300
     shadow-sm
     hover:shadow-md
-    disabled:opacity-60
-    disabled:cursor-not-allowed
   "
             >
               {isSearching ? "جاري البحث..." : "بحث"}

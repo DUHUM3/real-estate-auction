@@ -94,7 +94,7 @@ const LandCard = ({
         )}
 
         {/* السعر */}
-        <div className="flex items-center text-[#3a83f2] text-xl font-bold mb-6">
+        <div className="flex items-center text-[#53a1dd] text-xl font-bold mb-6">
           <Icons.FaMoneyBillWave className="ml-2 text-amber-500 text-lg" />
           {price} ريال
         </div>
@@ -103,7 +103,7 @@ const LandCard = ({
         <button
           className="
             mt-auto w-full
-            bg-[#3a83f2] text-white
+            bg-[#53a1dd] text-white
             py-3 rounded-lg
             hover:opacity-90
             transition-colors duration-200

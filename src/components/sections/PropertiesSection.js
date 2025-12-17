@@ -15,15 +15,22 @@ const STORAGE_BASE_URL =
   process.env.REACT_APP_STORAGE_BASE_URL ||
   "https://core-api-x41.shaheenplus.sa/storage";
 
-// إعدادات التطبيق
+// إعدادات التطبيق مع اللون الجديد
 const CONFIG = {
   ITEMS_PER_PAGE: 7,
   LANDS_ENDPOINT: "/properties/properties/latest",
   AUCTIONS_ENDPOINT: "/properties/auctions/latest",
   HORIZONTAL_SCROLL_CONFIG: {
-    MOBILE_COLUMNS: "min-w-[calc(100%/7)] flex-shrink-0", // كل كارد يأخذ 1/7 من عرض الشاشة
+    MOBILE_COLUMNS: "min-w-[calc(100%/7)] flex-shrink-0",
     TABLET_COLUMNS: "min-w-[calc(100%/7)] flex-shrink-0",
     DESKTOP_COLUMNS: "min-w-[calc(100%/7)] flex-shrink-0",
+  },
+  COLORS: {
+    primary: "#53a1dd",
+    primaryHover: "#4a8fc7",
+    primaryLight: "#e6f2ff",
+    border: "#53a1dd",
+    text: "#53a1dd",
   },
 };
 
@@ -106,7 +113,7 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
     return queryParams.toString();
   }, []);
 
-  // دالة محسنة لمعالجة الصور
+  // دالة محسنة لمعالجة الصور مع حجم ثابت للصور
   const processImageUrl = useCallback((coverImage) => {
     if (
       !coverImage ||
@@ -166,7 +173,7 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
     [processImageUrl]
   );
 
-  // دالة محسنة لمعالجة بيانات المزادات
+  // دالة محسنة لمعالجة بيانات المزادات مع تحسينات
   const processAuctionsData = useCallback(
     (data) => {
       if (!data?.success || !data?.data) {
@@ -189,9 +196,12 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
             console.error("Error calculating days left:", error);
           }
 
+          // معالجة الصور لتتضمن معلومات الحجم الثابت
+          const img = processImageUrl(auction.cover_image);
+          
           return {
             id: auction.id,
-            img: processImageUrl(auction.cover_image),
+            img,
             title: auction.title || "عنوان غير متوفر",
             location: auction.address || "عنوان غير متوفر",
             area: "غير محدد",
@@ -201,6 +211,9 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
             startTime: auction.start_time,
             auctionDate: auction.auction_date,
             isFavorite: Boolean(auction.is_favorite),
+            // معلومات إضافية للعرض الثابت
+            hasImage: !!img,
+            imageUrl: img,
           };
         }),
       };
@@ -245,8 +258,8 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
       }
     },
     enabled: filterType === "lands",
-    staleTime: 5 * 60 * 1000, // 5 دقائق
-    cacheTime: 10 * 60 * 1000, // 10 دقائق
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -311,7 +324,7 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
         refetchAuctions();
       }
       setShowFilter(false);
-      setCurrentPage(0); // إعادة تعيين الصفحة
+      setCurrentPage(0);
     } catch (error) {
       console.error("Error applying filters:", error);
     }
@@ -409,14 +422,14 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
         {/* مؤشر التحميل العلوي */}
         {isFetching && (
           <div className="fixed top-0 left-0 w-full h-1 bg-blue-200 z-50">
-            <div className="h-full bg-blue-400 animate-pulse"></div>
+            <div className="h-full bg-[#53a1dd] animate-pulse"></div>
           </div>
         )}
 
         {/* الفلاتر المطبقة */}
         {landsData?.filtersApplied && landsData.filtersApplied.length > 0 && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6">
-            <span className="text-blue-600 text-sm font-medium">
+            <span className="text-[#53a1dd] text-sm font-medium">
               الفلاتر المطبقة: {landsData.filtersApplied.join("، ")}
             </span>
           </div>
@@ -429,7 +442,7 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
             <button
               className={`px-6 py-3 font-medium text-lg border-b-2 transition-all duration-200 relative ${
                 filterType === "lands"
-                  ? "border-blue-400 text-blue-400"
+                  ? "border-[#53a1dd] text-[#53a1dd]"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
               onClick={() => handleFilterTypeChange("lands")}
@@ -440,7 +453,7 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
             <button
               className={`px-6 py-3 font-medium text-lg border-b-2 transition-all duration-200 relative ${
                 filterType === "auctions"
-                  ? "border-blue-400 text-blue-400"
+                  ? "border-[#53a1dd] text-[#53a1dd]"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
               onClick={() => handleFilterTypeChange("auctions")}
@@ -452,7 +465,7 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
 
           {/* زر الفلتر */}
           <button
-            className="flex items-center gap-2 bg-[#3a83f2] text-white px-6 py-3 rounded-lg hover:bg-[#2f6fd1] disabled:bg-gray-400 transition-colors duration-200 font-medium w-full sm:w-auto justify-center sm:justify-start"
+            className="flex items-center gap-2 bg-[#53a1dd] hover:bg-[#4a8fc7] text-white px-6 py-3 rounded-lg disabled:bg-gray-400 transition-colors duration-200 font-medium w-full sm:w-auto justify-center sm:justify-start"
             onClick={() => setShowFilter(!showFilter)}
             disabled={isFetching}
           >
@@ -558,7 +571,7 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
                     </p>
                     {Object.values(filters).some((filter) => filter) && (
                       <button
-                        className="mt-4 text-blue-400 hover:text-blue-500 underline"
+                        className="mt-4 text-[#53a1dd] hover:text-[#4a8fc7] underline"
                         onClick={resetFilters}
                       >
                         مسح جميع الفلاتر
@@ -574,7 +587,7 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
           {computedData.totalItems > CONFIG.ITEMS_PER_PAGE && (
             <div className="text-center mt-8">
               <button
-                className="border-2 border-blue-400 text-blue-400 px-8 py-3 rounded-lg hover:bg-blue-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold"
+                className="border-2 border-[#53a1dd] text-[#53a1dd] px-8 py-3 rounded-lg hover:bg-[#53a1dd] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold"
                 onClick={handleViewAll}
                 disabled={isFetching}
               >

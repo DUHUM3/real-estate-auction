@@ -1,3 +1,4 @@
+
 @import url('./fonts.css');
 
 /* 🌟 إعدادات عامة */
@@ -6,7 +7,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  background: #3a83f3; /* تغيير هنا */
+  background: #53a1dd; /* اللون الجديد عندما يكون في الأعلى */
   color: #ffffff;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
   z-index: 1000;
@@ -18,7 +19,7 @@
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd; /* النصوص تصبح باللون 53a1dd عند التمرير */
 }
 
 /* 🌟 الحاوية */
@@ -69,7 +70,7 @@
 }
 
 .navbar.scrolled .logo-image {
-  filter: brightness(0) saturate(100%) invert(42%) sepia(91%) saturate(1542%) hue-rotate(202deg) brightness(96%) contrast(95%); /* تغيير هنا للون الجديد */
+  filter: brightness(0) saturate(100%) invert(44%) sepia(68%) saturate(1304%) hue-rotate(176deg) brightness(93%) contrast(91%);
 }
 
 .nav-logo:hover {
@@ -110,7 +111,7 @@
 }
 
 .navbar.scrolled .nav-link {
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
 }
 
 .link-icon {
@@ -126,8 +127,8 @@
 }
 
 .navbar.scrolled .nav-link:hover {
-  color: #2d69d1; /* تغيير هنا (لون أغمق للون الجديد) */
-  background: rgba(58, 131, 243, 0.05); /* تغيير هنا */
+  color: #3a7cb7;
+  background: rgba(83, 161, 221, 0.05);
 }
 
 .nav-link.active {
@@ -137,8 +138,8 @@
 }
 
 .navbar.scrolled .nav-link.active {
-  color: #3a83f3; /* تغيير هنا */
-  background: rgba(58, 131, 243, 0.1); /* تغيير هنا */
+  color: #53a1dd;
+  background: rgba(83, 161, 221, 0.1);
 }
 
 .nav-link.active::after {
@@ -154,7 +155,7 @@
 }
 
 .navbar.scrolled .nav-link.active::after {
-  background: #3a83f3; /* تغيير هنا */
+  background: #53a1dd;
 }
 
 /* 🌟 أزرار المصادقة */
@@ -166,12 +167,12 @@
 
 .login-btn {
   background: linear-gradient(135deg, #ffffff, #f0f0f0);
-  color: #ffffff !important;
+  color: #ffffff !important; /* تأكيد لون النص الأزرق */
   padding: 0.5rem 0.9rem;
   border-radius: 20px;
   border: 2px solid #ffffff;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 600; /* زيادة سماكة الخط لتحسين القراءة */
   font-size: 0.9rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
@@ -181,21 +182,21 @@
 }
 
 .navbar.scrolled .login-btn {
-  background: linear-gradient(135deg, #3a83f3, #2d69d1); /* تغيير هنا */
-  color: #ffffff !important;
-  border: 2px solid #3a83f3; /* تغيير هنا */
-  box-shadow: 0 2px 8px rgba(58, 131, 243, 0.3); /* تغيير هنا */
+  background: linear-gradient(135deg, #53a1dd, #3a7cb7);
+  color: #ffffff !important; /* تأكيد لون النص الأبيض عند التمرير */
+  border: 2px solid #53a1dd;
+  box-shadow: 0 2px 8px rgba(83, 161, 221, 0.3);
 }
 
 /* إصلاح زر التسجيل الجديد */
 .register-btn {
   background: transparent;
-  color: #ffffff !important;
+  color: #ffffff !important; /* تأكيد لون النص الأبيض */
   padding: 0.5rem 0.9rem;
   border-radius: 20px;
   border: 2px solid #ffffff;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 600; /* زيادة سماكة الخط */
   font-size: 0.9rem;
   transition: all 0.3s ease;
   display: flex;
@@ -204,18 +205,18 @@
 }
 
 .navbar.scrolled .register-btn {
-  color: #3a83f3 !important; /* تغيير هنا */
-  border: 2px solid #3a83f3; /* تغيير هنا */
+  color: #53a1dd !important; /* تأكيد لون النص الأزرق عند التمرير */
+  border: 2px solid #53a1dd;
 }
 
 .register-btn:hover {
   background: #ffffff;
-  color: #3a83f3 !important; /* تغيير هنا */
+  color: #53a1dd !important;
   transform: translateY(-2px);
 }
 
 .navbar.scrolled .register-btn:hover {
-  background: #3a83f3; /* تغيير هنا */
+  background: #53a1dd;
   color: #ffffff !important;
 }
 
@@ -230,8 +231,8 @@
 }
 
 .navbar.scrolled .login-btn:hover {
-  background: linear-gradient(135deg, #2d69d1, #1f56b3); /* تغيير هنا */
-  box-shadow: 0 4px 12px rgba(58, 131, 243, 0.4); /* تغيير هنا */
+  background: linear-gradient(135deg, #3a7cb7, #2d6ba3);
+  box-shadow: 0 4px 12px rgba(83, 161, 221, 0.4);
 }
 
 /* 🌟 زر القائمة (الهاتف) */
@@ -257,7 +258,7 @@
 }
 
 .navbar.scrolled .mobile-menu-btn span {
-  background: #3a83f3; /* تغيير هنا */
+  background: #53a1dd;
 }
 
 .mobile-menu-btn:hover span {
@@ -265,7 +266,7 @@
 }
 
 .navbar.scrolled .mobile-menu-btn:hover span {
-  background: #2d69d1; /* تغيير هنا */
+  background: #3a7cb7;
 }
 
 /* 🌟 القائمة المنسدلة */
@@ -324,7 +325,7 @@
 
 .dropdown-item:hover {
   background-color: #f8f9fa;
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
 }
 
 .dropdown-item:last-child {
@@ -337,7 +338,7 @@
 }
 
 .mobile-nav-link, .mobile-dropdown-item {
-  color: #333 !important;
+  color: #333 !important; /* ضمان لون النص */
   text-align: right !important;
 }
 
@@ -361,7 +362,6 @@
   text-align: right !important;
   direction: rtl;
 }
-
 /* 🌟 الإشعارات */
 .notifications-container {
   position: relative;
@@ -382,7 +382,7 @@
 }
 
 .navbar.scrolled .notification-btn:hover {
-  background-color: rgba(58, 131, 243, 0.1); /* تغيير هنا */
+  background-color: rgba(83, 161, 221, 0.1);
 }
 
 .notification-icon {
@@ -391,7 +391,7 @@
 }
 
 .navbar.scrolled .notification-icon {
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
 }
 
 .notification-badge {
@@ -433,7 +433,7 @@
 .notifications-header h3 {
   margin: 0 0 4px 0;
   font-size: 16px;
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
 }
 
 .notifications-count {
@@ -444,13 +444,14 @@
 .notifications-list {
   max-height: 300px;
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: 4px; /* مساحة لشريط التمرير */
 }
-
 .custom-scrollbar {
+  /* للمتصفحات التي تدعم WebKit (Chrome, Safari, Edge) */
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
 }
+
 
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
@@ -468,11 +469,11 @@
 }
 
 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-  background: rgba(58, 131, 243, 0.3); /* تغيير هنا */
+  background: rgba(83, 161, 221, 0.3);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(58, 131, 243, 0.5); /* تغيير هنا */
+  background: rgba(83, 161, 221, 0.5);
 }
 
 /* للمتصفحات التي تدعم Firefox */
@@ -482,7 +483,7 @@
 }
 
 .custom-scrollbar:hover {
-  scrollbar-color: rgba(58, 131, 243, 0.3) transparent; /* تغيير هنا */
+  scrollbar-color: rgba(83, 161, 221, 0.3) transparent;
 }
 
 /* تحسينات إضافية للتمرير السلس */
@@ -549,7 +550,7 @@
   text-align: center;
   padding: 12px;
   background: #f8f9fa;
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
   text-decoration: none;
   border-top: 1px solid #f0f0f0;
   font-size: 14px;
@@ -581,14 +582,14 @@
 }
 
 .navbar.scrolled .user-profile-btn:hover {
-  background-color: rgba(58, 131, 243, 0.1); /* تغيير هنا */
+  background-color: rgba(83, 161, 221, 0.1);
 }
 
 .user-avatar {
   width: 36px;
   height: 36px;
   background: #ffffff;
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -599,9 +600,9 @@
 }
 
 .navbar.scrolled .user-avatar {
-  background: #3a83f3; /* تغيير هنا */
+  background: #53a1dd;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(58, 131, 243, 0.3); /* تغيير هنا */
+  box-shadow: 0 2px 8px rgba(83, 161, 221, 0.3);
 }
 
 .avatar-icon {
@@ -618,7 +619,7 @@
 }
 
 .navbar.scrolled .user-name {
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
 }
 
 .user-dropdown {
@@ -724,7 +725,7 @@
     background: none;
     border: none;
     font-size: 2rem;
-    color: #3a83f3; /* تغيير هنا */
+    color: #53a1dd;
     cursor: pointer;
     transition: color 0.3s ease;
   }
@@ -846,20 +847,20 @@
 .mobile-sidebar {
   position: fixed;
   top: 0;
-  right: -100%;
-  left: auto;
+  right: -100%; /* تغيير من left إلى right */
+  left: auto; /* إزالة left */
   width: 320px;
   height: 100vh;
   background: #ffffff;
   z-index: 1002;
-  transition: right 0.3s ease-in-out;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  transition: right 0.3s ease-in-out; /* تغيير من left إلى right */
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15); /* عكس اتجاه الظل */
   display: flex;
   flex-direction: column;
 }
 
 .mobile-sidebar.active {
-  right: 0;
+  right: 0; /* تغيير من left إلى right */
   left: auto;
 }
 
@@ -893,7 +894,7 @@
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
   cursor: pointer;
   padding: 0.5rem;
 }
@@ -935,12 +936,12 @@
 
 .mobile-nav-link:hover {
   background: #f8f9fa;
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
 }
 
 .mobile-nav-link.active {
-  background: rgba(58, 131, 243, 0.1); /* تغيير هنا */
-  color: #3a83f3; /* تغيير هنا */
+  background: rgba(83, 161, 221, 0.1);
+  color: #53a1dd;
   font-weight: 600;
 }
 
@@ -949,6 +950,7 @@
   margin-right: 0 !important;
   font-size: 1.2rem;
 }
+
 
 /* 🌟 القوائم المنسدلة في الجانبية */
 .mobile-nav-dropdown {
@@ -992,7 +994,7 @@
 
 .mobile-dropdown-item:hover {
   background: #e9ecef;
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
 }
 
 .mobile-dropdown-item .dropdown-icon {
@@ -1000,7 +1002,6 @@
   margin-right: 0 !important;
   font-size: 1rem;
 }
-
 /* 🌟 معلومات المستخدم في الجانبية */
 .mobile-user-info {
   display: flex;
@@ -1014,7 +1015,7 @@
 .mobile-user-avatar {
   width: 40px;
   height: 40px;
-  background: #3a83f3; /* تغيير هنا */
+  background: #53a1dd;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -1077,14 +1078,13 @@
     margin-bottom: 0.5rem;
   }
 }
-
 /* 🌟 إعدادات عامة */
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background: #3a83f3; /* تغيير هنا */
+  background: #53a1dd;
   color: #ffffff;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
   z-index: 1000;
@@ -1096,7 +1096,7 @@
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
 }
 
 /* 🌟 الحاوية الرئيسية */
@@ -1144,7 +1144,7 @@
 }
 
 .navbar.scrolled .logo-image {
-  filter: brightness(0) saturate(100%) invert(42%) sepia(91%) saturate(1542%) hue-rotate(202deg) brightness(96%) contrast(95%); /* تغيير هنا */
+  filter: brightness(0) saturate(100%) invert(44%) sepia(68%) saturate(1304%) hue-rotate(176deg) brightness(93%) contrast(91%);
 }
 
 /* 🌟 القوائم الرئيسية للكمبيوتر */
@@ -1171,7 +1171,7 @@
 }
 
 .navbar.scrolled .nav-link {
-  color: #3a83f3; /* تغيير هنا */
+  color: #53a1dd;
 }
 
 .link-icon {
@@ -1180,7 +1180,6 @@
   font-size: 1rem;
   color: inherit;
 }
-
 .nav-link:hover {
   color: #e0e0e0;
   background: rgba(255, 255, 255, 0.1);
@@ -1188,8 +1187,8 @@
 }
 
 .navbar.scrolled .nav-link:hover {
-  color: #2d69d1; /* تغيير هنا */
-  background: rgba(58, 131, 243, 0.05); /* تغيير هنا */
+  color: #3a7cb7;
+  background: rgba(83, 161, 221, 0.05);
 }
 
 .nav-link.active {
@@ -1199,8 +1198,8 @@
 }
 
 .navbar.scrolled .nav-link.active {
-  color: #3a83f3; /* تغيير هنا */
-  background: rgba(58, 131, 243, 0.1); /* تغيير هنا */
+  color: #53a1dd;
+  background: rgba(83, 161, 221, 0.1);
 }
 
 /* 🌟 عناصر التحكم للكمبيوتر */
@@ -1239,7 +1238,7 @@
 }
 
 .navbar.scrolled .mobile-menu-btn span {
-  background: #3a83f3; /* تغيير هنا */
+  background: #53a1dd;
 }
 
 /* 🌟 التصميم المتجاوب للهاتف */
@@ -1266,11 +1265,11 @@
   }
 
   .logo-section {
-    order: 1;
+    order: 1; /* الشعار على اليسار */
   }
 
   .nav-controls-section {
-    order: 2;
+    order: 2; /* أيقونة القائمة على اليمين */
   }
 
   /* تصغير الشعار في الهاتف */
@@ -1312,6 +1311,23 @@
   z-index: 1001;
 }
 
+/* باقي CSS للقوائم المنسدلة والإشعارات يبقى كما هو */
+
+/* تحسينات للشاشات الصغيرة جداً */
+@media (max-width: 480px) {
+  .logo-image {
+    height: 28px;
+  }
+
+  .nav-logo {
+    gap: 0.3rem;
+  }
+
+  .mobile-sidebar {
+    width: 280px;
+  }
+}
+
 /* 🌟 إظهار عناصر الكمبيوتر فقط في الشاشات الكبيرة */
 @media (min-width: 901px) {
   .mobile-sidebar,
@@ -1325,6 +1341,8 @@
     display: flex;
   }
 }
+
+/* باقي CSS يبقى كما هو بدون تغيير */
 
 /* إزالة الخط السفلي من جميع الروابط */
 .nav-link {

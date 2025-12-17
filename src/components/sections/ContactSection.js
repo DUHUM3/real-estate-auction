@@ -348,7 +348,11 @@ const ContactSection = () => {
           <div className="inline-block">
             <h2 className="text-3xl md:text-5xl font-bold text-gray-800 mb-4 relative">
               تواصل معنا
-              <div className="absolute -bottom-2 right-0 w-20 h-1 bg-gradient-to-l from-blue-500 to-teal-400 rounded-full"></div>
+              <div
+                className="absolute -bottom-2 right-0 w-20 h-1 
+                      bg-gradient-to-l from-[#53a1dd] to-[#a7d1f5] 
+                      rounded-full"
+              ></div>
             </h2>
             <p className="text-gray-600 text-lg mt-6">
               نحن هنا لمساعدتك في جميع احتياجاتك العقارية
@@ -673,7 +677,7 @@ const ContactSection = () => {
                   className={`w-full py-5 px-8 rounded-xl font-bold text-white text-lg transition-all duration-300 transform ${
                     isLoading
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 hover:shadow-2xl hover:-translate-y-1 focus:ring-4 focus:ring-blue-200"
+                      : "bg-gradient-to-r from-[#53a1dd] to-[#3a83f2] hover:from-[#3a83f2] hover:to-[#2f6fd1] hover:shadow-2xl hover:-translate-y-1 focus:ring-4 focus:ring-blue-200"
                   }`}
                   disabled={isLoading}
                 >
