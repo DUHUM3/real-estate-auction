@@ -115,7 +115,7 @@ function Login({ onClose, onSwitchToRegister }) {
       //   position: "top-center",
       //   autoClose: 3000
       // });
-      
+       
       if (onClose) onClose();
       
       setTimeout(() => {
