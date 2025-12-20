@@ -548,7 +548,7 @@ const renderContent = () => {
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-5">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Search */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">بحث</label>
           <input
             type="text"
@@ -558,7 +558,7 @@ const renderContent = () => {
             className="w-full py-2 px-3 border border-gray-200 rounded-md focus:outline-none focus:border-blue-400 text-sm"
             placeholder="ابحث في الطلبات..."
           />
-        </div>
+        </div> */}
 
         {/* Region */}
         <div>

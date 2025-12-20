@@ -45,8 +45,8 @@ function MyAds() {
     mutationFn: ({ adId, userType }) => {
       // تحديد رابط الحذف بناءً على نوع المستخدم
       const endpoint = userType === 'شركة مزادات' 
-        ? `/api/user/auctions/${adId}`
-        : `/api/user/properties/${adId}`;
+        ? `https://core-api-x41.shaheenplus.sa/api/user/auctions/${adId}`
+        : `https://core-api-x41.shaheenplus.sa/api/user/properties/${adId}`;
       
       // استخدام دالة deleteAd مع الرابط المخصص
       return deleteAd(adId, userType, endpoint);
@@ -485,6 +485,6 @@ function MyAds() {
       </div>
     </div>
   );
-} 
+}   
 
 export default MyAds;

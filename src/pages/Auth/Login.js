@@ -111,10 +111,10 @@ function Login({ onClose, onSwitchToRegister }) {
 
       login(userData);
       
-      toast.success('تم تسجيل الدخول بنجاح!', {
-        position: "top-center",
-        autoClose: 3000
-      });
+      // toast.success('تم تسجيل الدخول بنجاح!', {
+      //   position: "top-center",
+      //   autoClose: 3000
+      // });
       
       if (onClose) onClose();
       

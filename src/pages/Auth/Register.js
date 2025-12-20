@@ -411,11 +411,11 @@ const [formData, setFormData] = useState({
           const loginResponse = await authApi.login(userEmail, formData.password);
           if (loginResponse.token) {
             login(loginResponse);
-            setTimeout(() => {
-              toast.success('تم تسجيل الدخول بنجاح!', { position: "top-center" });
-              onClose();
-              navigate('/dashboard');
-            }, 2000);
+            // setTimeout(() => {
+            //   toast.success('تم تسجيل الدخول بنجاح!', { position: "top-center" });
+            //   onClose();
+            //   navigate('/dashboard');
+            // }, 2000);
           }
         } catch (loginError) {
           toast.success('تم التحقق بنجاح! يمكنك الآن تسجيل الدخول', { position: "top-center" });
