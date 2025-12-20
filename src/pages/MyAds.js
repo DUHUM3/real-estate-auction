@@ -26,7 +26,6 @@ function MyAds() {
     adTitle: ''
   });
 
-  // React Query لجلب الإعلانات
   const {
     data: adsData,
     isLoading,
