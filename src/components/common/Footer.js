@@ -98,31 +98,17 @@ function Footer() {
 
         {/* الشهادات */}
         <div style={styles.certificatesSection}>
-          <a
-            href="https://www.positivessl.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.certificateLink}
-          >
-            <img
-              src="https://www.positivessl.com/images/seals/positivessl_trust_seal_lg_222x54.png"
-              alt="SSL Secure"
-              style={styles.sslImage}
-            />
-          </a>
+          <img
+            src="https://www.positivessl.com/images/seals/positivessl_trust_seal_lg_222x54.png"
+            alt="SSL Secure"
+            style={styles.sslImage}
+          />
 
-          <a
-            href="https://www.business.sa/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.certificateLink}
-          >
-            <img
-              src="/images/saudibusiness.png"
-              alt="المركز السعودي للأعمال"
-              style={styles.businessImage}
-            />
-          </a>
+          <img
+            src="/images/saudibusiness.png"
+            alt="المركز السعودي للأعمال"
+            style={styles.businessImage}
+          />
         </div>
 
         {/* الروابط الاجتماعية */}
