@@ -9,6 +9,9 @@ import {
   Phone,
   Mail,
   User,
+  MapPin,
+  Send,
+  MessageSquare,
 } from "lucide-react";
 
 const ContactSection = () => {
@@ -25,6 +28,7 @@ const ContactSection = () => {
   const [submitStatus, setSubmitStatus] = useState(null);
   const [errors, setErrors] = useState({});
   const [isDragActive, setIsDragActive] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
 
   const statusRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -54,81 +58,93 @@ const ContactSection = () => {
     []
   );
 
-  // Validation functions
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const MAX_MESSAGE_LENGTH = 1000;
+  const MIN_MESSAGE_LENGTH = 10;
+
+  const sanitizeInput = useCallback((input) => {
+    return input
+      .replace(/[<>]/g, "")
+      .replace(/javascript:/gi, "")
+      .replace(/on\w+=/gi, "")
+      .trim();
+  }, []);
+
   const validateField = useCallback(
     (name, value) => {
+      const sanitized = sanitizeInput(value);
+      
       switch (name) {
         case "full_name":
-          return value.trim().length < 2
-            ? "الاسم يجب أن يكون أكثر من حرفين"
-            : "";
+          if (sanitized.length < 2) return "الاسم يجب أن يكون حرفين على الأقل";
+          if (sanitized.length > 100) return "الاسم طويل جداً";
+          if (!/^[\u0600-\u06FFa-zA-Z\s]+$/.test(sanitized))
+            return "الاسم يحتوي على أحرف غير صالحة";
+          return "";
         case "email":
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          return !emailRegex.test(value) ? "البريد الإلكتروني غير صحيح" : "";
+          const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+          if (!emailRegex.test(sanitized)) return "البريد الإلكتروني غير صحيح";
+          if (sanitized.length > 254) return "البريد الإلكتروني طويل جداً";
+          return "";
         case "phone":
           const phoneRegex = /^05[0-9]{8}$/;
-          return !phoneRegex.test(value)
-            ? "رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام"
-            : "";
+          if (!phoneRegex.test(sanitized))
+            return "رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام";
+          return "";
         case "message":
-          return value.trim().length < 10
-            ? "الرسالة يجب أن تكون أكثر من 10 أحرف"
-            : "";
+          if (sanitized.length < MIN_MESSAGE_LENGTH)
+            return `الرسالة يجب أن تكون ${MIN_MESSAGE_LENGTH} أحرف على الأقل`;
+          if (sanitized.length > MAX_MESSAGE_LENGTH)
+            return `الرسالة يجب ألا تتجاوز ${MAX_MESSAGE_LENGTH} حرف`;
+          return "";
         case "reason":
-          return !value || !allowedReasons.includes(value)
-            ? "يرجى اختيار سبب للتواصل"
-            : "";
+          if (!value || !allowedReasons.includes(value))
+            return "يرجى اختيار سبب صالح للتواصل";
+          return "";
         default:
           return "";
       }
     },
-    [allowedReasons]
+    [allowedReasons, sanitizeInput]
   );
 
-  const validateFile = useCallback(
-    (file) => {
-      if (!file) return "";
+  const validateFile = useCallback((file) => {
+    if (!file) return "";
 
-      if (file.size > 10 * 1024 * 1024) {
-        return "حجم الملف يجب أن لا يتجاوز 10MB";
-      }
+    if (file.size > MAX_FILE_SIZE) {
+      return "حجم الملف يجب ألا يتجاوز 5MB";
+    }
 
-      if (!allowedFileTypes.includes(file.type)) {
-        return "نوع الملف غير مدعوم. يرجى اختيار ملف PDF أو Word أو صورة";
-      }
+    if (!allowedFileTypes.includes(file.type)) {
+      return "نوع الملف غير مدعوم";
+    }
 
-      return "";
-    },
-    [allowedFileTypes]
-  );
+    const fileName = file.name;
+    if (fileName.length > 255) return "اسم الملف طويل جداً";
+    if (!/^[\w\-. ]+$/.test(fileName.replace(/\.[^.]+$/, "")))
+      return "اسم الملف يحتوي على أحرف غير صالحة";
+
+    return "";
+  }, [allowedFileTypes]);
 
   const handleInputChange = useCallback(
     (e) => {
       const { name, value } = e.target;
+      const sanitized = sanitizeInput(value);
 
       setFormData((prev) => ({
         ...prev,
-        [name]: value,
+        [name]: sanitized,
       }));
 
-      // Clear error when user starts typing
       if (errors[name]) {
         setErrors((prev) => ({
           ...prev,
           [name]: "",
         }));
       }
-
-      // Real-time validation for better UX
-      const error = validateField(name, value);
-      if (error) {
-        setErrors((prev) => ({
-          ...prev,
-          [name]: error,
-        }));
-      }
     },
-    [errors, validateField]
+    [errors, sanitizeInput]
   );
 
   const handleFileChange = useCallback(
@@ -186,15 +202,6 @@ const ContactSection = () => {
         behavior: "smooth",
         block: "center",
       });
-
-      statusRef.current.style.transition = "all 0.3s ease";
-      statusRef.current.style.transform = "scale(1.02)";
-
-      setTimeout(() => {
-        if (statusRef.current) {
-          statusRef.current.style.transform = "scale(1)";
-        }
-      }, 1000);
     }
   }, []);
 
@@ -250,9 +257,9 @@ const ContactSection = () => {
     try {
       const submitData = new FormData();
       submitData.append("reason", formData.reason);
-      submitData.append("message", formData.message.trim());
-      submitData.append("full_name", formData.full_name.trim());
-      submitData.append("email", formData.email.trim());
+      submitData.append("message", formData.message);
+      submitData.append("full_name", formData.full_name);
+      submitData.append("email", formData.email);
       submitData.append("phone", `+966${formData.phone}`);
 
       if (formData.file) {
@@ -260,7 +267,7 @@ const ContactSection = () => {
       }
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
 
       const response = await fetch(
         "https://core-api-x41.shaheenplus.sa/api/contact",
@@ -271,6 +278,7 @@ const ContactSection = () => {
           headers: {
             Accept: "application/json",
           },
+          credentials: "same-origin",
         }
       );
 
@@ -285,16 +293,13 @@ const ContactSection = () => {
       if (result.success) {
         setSubmitStatus({
           type: "success",
-          message:
-            result.message || "تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.",
+          message: result.message || "تم إرسال رسالتك بنجاح!",
         });
         resetForm();
       } else {
         setSubmitStatus({
           type: "error",
-          message:
-            result.message ||
-            "حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.",
+          message: result.message || "حدث خطأ أثناء إرسال الرسالة.",
         });
       }
 
@@ -305,11 +310,9 @@ const ContactSection = () => {
       let errorMessage = "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.";
 
       if (error.name === "AbortError") {
-        errorMessage =
-          "انتهت مهلة الطلب. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.";
+        errorMessage = "انتهت مهلة الطلب. يرجى المحاولة مرة أخرى.";
       } else if (!navigator.onLine) {
-        errorMessage =
-          "لا يوجد اتصال بالإنترنت. يرجى التحقق من اتصالك والمحاولة مرة أخرى.";
+        errorMessage = "لا يوجد اتصال بالإنترنت.";
       }
 
       setSubmitStatus({
@@ -332,173 +335,382 @@ const ContactSection = () => {
   };
 
   return (
-    <section
-      className="bg-gradient-to-br from-gray-50 to-white py-20 relative overflow-hidden"
-      id="contact"
-    >
-      {/* Background decoration */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-10 right-10 w-72 h-72 bg-blue-400 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 left-10 w-96 h-96 bg-green-400 rounded-full blur-3xl"></div>
+    <section className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 py-16 md:py-24 overflow-hidden" id="contact">
+      {/* Background Decorations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#53a1dd] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#4a8fc7] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse delay-700"></div>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
-        <div className="text-right mb-16">
-          <div className="inline-block">
-            <h2 className="text-3xl md:text-5xl font-bold text-gray-800 mb-4 relative">
-              تواصل معنا
-              <div
-                className="absolute -bottom-2 right-0 w-20 h-1 
-                      bg-gradient-to-l from-[#53a1dd] to-[#a7d1f5] 
-                      rounded-full"
-              ></div>
-            </h2>
-            <p className="text-gray-600 text-lg mt-6">
-              نحن هنا لمساعدتك في جميع احتياجاتك العقارية
-            </p>
+      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        {/* Header Section */}
+        <div className="text-center mb-12 md:mb-16">
+          <div className="inline-flex items-center justify-center p-2 bg-[#e8f3fc] rounded-full mb-4">
+            <MessageSquare className="w-6 h-6 text-[#53a1dd]" />
+          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            تواصل معنا
+          </h2>
+          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
+            نحن هنا لمساعدتك في جميع استفساراتك العقارية. تواصل معنا وسنرد عليك في أقرب وقت ممكن
+          </p>
+          <div className="flex justify-center mt-6">
+            <div className="w-24 h-1 bg-gradient-to-r from-[#53a1dd] via-[#4a8fc7] to-[#53a1dd] rounded-full"></div>
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-100 backdrop-blur-sm">
-            {/* Status Message */}
-            {submitStatus && (
-              <div
-                ref={statusRef}
-                className={`p-6 mb-8 rounded-2xl text-center font-medium transition-all duration-500 transform ${
-                  submitStatus.type === "success"
-                    ? "bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 border border-green-200 shadow-lg"
-                    : "bg-gradient-to-r from-red-50 to-pink-50 text-red-800 border border-red-200 shadow-lg"
-                }`}
-                role="alert"
-                aria-live="polite"
-              >
-                <div className="flex items-center justify-center space-x-2 space-x-reverse">
-                  {submitStatus.type === "success" ? (
-                    <Check className="w-6 h-6 text-green-600" />
-                  ) : (
-                    <AlertCircle className="w-6 h-6 text-red-600" />
-                  )}
-                  <span className="text-lg">{submitStatus.message}</span>
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+          {/* Contact Info Cards */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Phone Card */}
+            <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#53a1dd] to-[#4a8fc7] rounded-xl flex items-center justify-center shadow-lg">
+                  <Phone className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">اتصل بنا</h3>
+                  <p className="text-sm text-gray-600 mb-3">نحن متاحون للرد على استفساراتك</p>
+                  <a href="tel:+966566065406" className="text-[#53a1dd] hover:text-[#4a8fc7] font-semibold inline-flex items-center gap-2 transition-colors" dir="ltr">
+                    <span>+966 56 606 5406</span>
+                  </a>
                 </div>
               </div>
-            )}
+            </div>
 
-            <form className="space-y-8" onSubmit={handleSubmit} noValidate>
-              {/* Contact Reason */}
-              <div className="space-y-3">
-                <label
-                  htmlFor="reason"
-                  className="block text-right text-gray-700 font-semibold text-lg"
-                >
-                  سبب التواصل *
-                </label>
-                <select
-                  id="reason"
-                  name="reason"
-                  value={formData.reason}
-                  onChange={handleInputChange}
-                  required
-                  className={`w-full px-6 py-4 border-2 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-right bg-white text-lg ${
-                    errors.reason
-                      ? "border-red-400"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                  aria-describedby={errors.reason ? "reason-error" : undefined}
-                >
-                  <option value="">اختر سبب التواصل</option>
-                  {allowedReasons.map((reason, index) => (
-                    <option key={index} value={reason}>
-                      {reason}
-                    </option>
-                  ))}
-                </select>
-                {errors.reason && (
-                  <p
-                    id="reason-error"
-                    className="text-red-600 text-sm text-right flex items-center justify-end space-x-1 space-x-reverse"
-                  >
-                    <AlertCircle className="w-4 h-4" />
-                    <span>{errors.reason}</span>
-                  </p>
-                )}
+            {/* Email Card */}
+            <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#53a1dd] to-[#4a8fc7] rounded-xl flex items-center justify-center shadow-lg">
+                  <Mail className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">راسلنا</h3>
+                  <p className="text-sm text-gray-600 mb-3">أرسل لنا رسالة عبر البريد الإلكتروني</p>
+                  <a href="mailto:info@shaheenplus.sa" className="text-[#53a1dd] hover:text-[#4a8fc7] font-semibold inline-flex items-center gap-2 transition-colors">
+                    <span>info@shaheenplus.sa</span>
+                  </a>
+                </div>
               </div>
+            </div>
 
-              {/* Message */}
-              <div className="space-y-3">
-                <label
-                  htmlFor="message"
-                  className="block text-right text-gray-700 font-semibold text-lg"
-                >
-                  كيف يمكننا مساعدتك؟ *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  placeholder="اشرح لنا احتياجاتك ونوع الاستشارة التي تبحث عنها..."
-                  rows="6"
-                  required
-                  className={`w-full px-6 py-4 border-2 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-right resize-none text-lg leading-relaxed ${
-                    errors.message
-                      ? "border-red-400"
-                      : "border-gray-200 hover:border-gray-300"
+            {/* Address Card */}
+            <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#53a1dd] to-[#4a8fc7] rounded-xl flex items-center justify-center shadow-lg">
+                  <MapPin className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">موقعنا</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    المملكة العربية السعودية<br />
+                    نخدم جميع مناطق المملكة
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Working Hours */}
+            <div className="bg-gradient-to-br from-[#53a1dd] to-[#4a8fc7] rounded-2xl p-6 shadow-lg text-white">
+              <h3 className="text-lg font-bold mb-4 text-right">أوقات العمل</h3>
+              <div className="space-y-3 text-right">
+                <div className="flex justify-between items-center pb-3 border-b border-white border-opacity-20">
+                  <span className="text-blue-100">9:00 ص - 6:00 م</span>
+                  <span className="font-semibold">السبت - الخميس</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-100">مغلق</span>
+                  <span className="font-semibold">الجمعة</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-3xl p-6 md:p-10 shadow-2xl border border-gray-100">
+              {/* Status Message */}
+              {submitStatus && (
+                <div
+                  ref={statusRef}
+                  className={`mb-6 p-5 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-500 ${
+                    submitStatus.type === "success"
+                      ? "bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 border-2 border-green-200"
+                      : "bg-gradient-to-r from-red-50 to-rose-50 text-red-800 border-2 border-red-200"
                   }`}
-                  aria-describedby={
-                    errors.message ? "message-error" : undefined
-                  }
-                />
-                <div className="flex justify-between items-center text-sm text-gray-500">
-                  <span>{formData.message.length} / 1000</span>
-                  {errors.message && (
-                    <p
-                      id="message-error"
-                      className="text-red-600 flex items-center space-x-1 space-x-reverse"
+                  role="alert"
+                >
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+                    submitStatus.type === "success" ? "bg-green-100" : "bg-red-100"
+                  }`}>
+                    {submitStatus.type === "success" ? (
+                      <Check className="w-5 h-5" />
+                    ) : (
+                      <AlertCircle className="w-5 h-5" />
+                    )}
+                  </div>
+                  <span className="flex-1 font-semibold text-right">{submitStatus.message}</span>
+                </div>
+              )}
+
+              <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+                {/* Reason Select */}
+                <div className="group">
+                  <label
+                    htmlFor="reason"
+                    className="block text-right text-gray-800 font-bold mb-3 text-sm"
+                  >
+                    سبب التواصل <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="reason"
+                      name="reason"
+                      value={formData.reason}
+                      onChange={handleInputChange}
+                      onFocus={() => setFocusedField("reason")}
+                      onBlur={() => setFocusedField(null)}
+                      required
+                      className={`w-full px-4 py-4 pr-12 border-2 rounded-xl focus:ring-4 focus:ring-[#e8f3fc] focus:border-[#53a1dd] transition-all duration-300 text-right bg-white appearance-none cursor-pointer font-medium ${
+                        errors.reason 
+                          ? "border-red-400 bg-red-50" 
+                          : focusedField === "reason"
+                          ? "border-[#53a1dd] shadow-lg"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
                     >
+                      <option value="" className="text-gray-400">اختر سبب التواصل</option>
+                      {allowedReasons.map((reason, index) => (
+                        <option key={index} value={reason} className="text-gray-900">
+                          {reason}
+                        </option>
+                      ))}
+                    </select>
+                    <MessageSquare className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none transition-colors ${
+                      focusedField === "reason" ? "text-[#53a1dd]" : "text-gray-400"
+                    }`} />
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                  {errors.reason && (
+                    <p className="text-red-600 text-sm text-right mt-2 flex items-center justify-end gap-2 animate-in slide-in-from-top-2">
+                      <span>{errors.reason}</span>
                       <AlertCircle className="w-4 h-4" />
-                      <span>{errors.message}</span>
                     </p>
                   )}
                 </div>
-              </div>
 
-              {/* File Upload */}
-              <div className="space-y-3">
-                <label className="block text-right text-gray-700 font-semibold text-lg">
-                  ارفق ملف أو صورة (اختياري)
-                </label>
-                <div
-                  className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer ${
-                    isDragActive
-                      ? "border-blue-400 bg-blue-50"
-                      : errors.file
-                      ? "border-red-300 bg-red-50"
-                      : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
-                  }`}
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                    onChange={(e) => handleFileChange(e.target.files[0])}
+                {/* Name and Email Grid */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Name */}
+                  <div className="group">
+                    <label
+                      htmlFor="full_name"
+                      className="block text-right text-gray-800 font-bold mb-3 text-sm"
+                    >
+                      الاسم الكامل <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="full_name"
+                        name="full_name"
+                        value={formData.full_name}
+                        onChange={handleInputChange}
+                        onFocus={() => setFocusedField("full_name")}
+                        onBlur={() => setFocusedField(null)}
+                        placeholder="أدخل اسمك الكامل"
+                        maxLength="100"
+                        required
+                        className={`w-full px-4 py-4 pr-12 border-2 rounded-xl focus:ring-4 focus:ring-[#e8f3fc] focus:border-[#53a1dd] transition-all duration-300 text-right font-medium ${
+                          errors.full_name 
+                            ? "border-red-400 bg-red-50" 
+                            : focusedField === "full_name"
+                            ? "border-[#53a1dd] shadow-lg"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                      />
+                      <User className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors ${
+                        focusedField === "full_name" ? "text-[#53a1dd]" : "text-gray-400"
+                      }`} />
+                    </div>
+                    {errors.full_name && (
+                      <p className="text-red-600 text-sm text-right mt-2 flex items-center justify-end gap-2 animate-in slide-in-from-top-2">
+                        <span>{errors.full_name}</span>
+                        <AlertCircle className="w-4 h-4" />
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Email */}
+                  <div className="group">
+                    <label
+                      htmlFor="email"
+                      className="block text-right text-gray-800 font-bold mb-3 text-sm"
+                    >
+                      البريد الإلكتروني <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        onFocus={() => setFocusedField("email")}
+                        onBlur={() => setFocusedField(null)}
+                        placeholder="example@email.com"
+                        maxLength="254"
+                        required
+                        className={`w-full px-4 py-4 pr-12 border-2 rounded-xl focus:ring-4 focus:ring-[#e8f3fc] focus:border-[#53a1dd] transition-all duration-300 text-right font-medium ${
+                          errors.email 
+                            ? "border-red-400 bg-red-50" 
+                            : focusedField === "email"
+                            ? "border-[#53a1dd] shadow-lg"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                      />
+                      <Mail className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors ${
+                        focusedField === "email" ? "text-[#53a1dd]" : "text-gray-400"
+                      }`} />
+                    </div>
+                    {errors.email && (
+                      <p className="text-red-600 text-sm text-right mt-2 flex items-center justify-end gap-2 animate-in slide-in-from-top-2">
+                        <span>{errors.email}</span>
+                        <AlertCircle className="w-4 h-4" />
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="group">
+                  <label
+                    htmlFor="phone"
+                    className="block text-right text-gray-800 font-bold mb-3 text-sm"
+                  >
+                    رقم الجوال <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex rounded-xl overflow-hidden shadow-sm">
+                    <div className={`flex items-center px-5 bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-l-0 text-gray-700 font-bold transition-colors ${
+                      focusedField === "phone" ? "border-[#53a1dd]" : "border-gray-200"
+                    }`}>
+                      <Phone className="w-4 h-4 ml-2 text-gray-500" />
+                      <span dir="ltr">966+</span>
+                    </div>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      onFocus={() => setFocusedField("phone")}
+                      onBlur={() => setFocusedField(null)}
+                      placeholder="5X XXX XXXX"
+                      pattern="05[0-9]{8}"
+                      maxLength="10"
+                      required
+                      dir="ltr"
+                      className={`flex-1 px-4 py-4 border-2 border-r-0 focus:ring-4 focus:ring-[#e8f3fc] focus:border-[#53a1dd] transition-all duration-300 text-left font-medium ${
+                        errors.phone 
+                          ? "border-red-400 bg-red-50" 
+                          : focusedField === "phone"
+                          ? "border-[#53a1dd]"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    />
+                  </div>
+                  {errors.phone && (
+                    <p className="text-red-600 text-sm text-right mt-2 flex items-center justify-end gap-2 animate-in slide-in-from-top-2">
+                      <span>{errors.phone}</span>
+                      <AlertCircle className="w-4 h-4" />
+                    </p>
+                  )}
+                </div>
+
+                {/* Message */}
+                <div className="group">
+                  <label
+                    htmlFor="message"
+                    className="block text-right text-gray-800 font-bold mb-3 text-sm"
+                  >
+                    رسالتك <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    onFocus={() => setFocusedField("message")}
+                    onBlur={() => setFocusedField(null)}
+                    placeholder="اكتب رسالتك هنا..."
+                    rows="5"
+                    maxLength={MAX_MESSAGE_LENGTH}
+                    required
+                    className={`w-full px-4 py-4 border-2 rounded-xl focus:ring-4 focus:ring-[#e8f3fc] focus:border-[#53a1dd] transition-all duration-300 text-right resize-none font-medium leading-relaxed ${
+                      errors.message 
+                        ? "border-red-400 bg-red-50" 
+                        : focusedField === "message"
+                        ? "border-[#53a1dd] shadow-lg"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
                   />
+                  <div className="flex justify-between items-center mt-2 text-sm">
+                    <span className={`transition-colors ${
+                      formData.message.length > MAX_MESSAGE_LENGTH * 0.9 
+                        ? "text-orange-600 font-semibold" 
+                        : "text-gray-500"
+                    }`}>
+                      {formData.message.length} / {MAX_MESSAGE_LENGTH}
+                    </span>
+                    {errors.message && (
+                      <p className="text-red-600 flex items-center gap-2 animate-in slide-in-from-top-2">
+                        <span>{errors.message}</span>
+                        <AlertCircle className="w-4 h-4" />
+                      </p>
+                    )}
+                  </div>
+                </div>
 
-                  {formData.file ? (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-center space-x-3 space-x-reverse">
-                        <FileText className="w-8 h-8 text-blue-600" />
-                        <div className="text-right">
-                          <div className="font-medium text-gray-800">
+                {/* File Upload */}
+                <div className="group">
+                  <label className="block text-right text-gray-800 font-bold mb-3 text-sm">
+                    مرفق <span className="text-gray-400 text-xs font-normal">(اختياري)</span>
+                  </label>
+                  <div
+                    className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 cursor-pointer overflow-hidden ${
+                      isDragActive
+                        ? "border-[#53a1dd] bg-[#e8f3fc] scale-105 shadow-lg"
+                        : errors.file
+                        ? "border-red-300 bg-red-50"
+                        : "border-gray-300 hover:border-[#53a1dd] hover:bg-gray-50"
+                    }`}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={(e) => handleFileChange(e.target.files[0])}
+                    />
+
+                    {formData.file ? (
+                      <div className="flex items-center justify-center gap-4 animate-in fade-in zoom-in duration-300">
+                        <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[#53a1dd] to-[#4a8fc7] rounded-xl flex items-center justify-center shadow-lg">
+                          <FileText className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="flex-1 text-right min-w-0">
+                          <div className="font-bold text-gray-900 text-sm truncate">
                             {formData.file.name}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-xs text-gray-500 mt-1">
                             {formatFileSize(formData.file.size)}
                           </div>
                         </div>
@@ -509,214 +721,56 @@ const ContactSection = () => {
                             setFormData((prev) => ({ ...prev, file: null }));
                             fileInputRef.current.value = "";
                           }}
-                          className="text-red-500 hover:text-red-700 transition-colors"
+                          className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
                         >
                           <X className="w-5 h-5" />
                         </button>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <Upload
-                        className={`w-12 h-12 mx-auto ${
-                          isDragActive ? "text-blue-500" : "text-gray-400"
-                        }`}
-                      />
-                      <div className="space-y-2">
-                        <div className="text-gray-700 font-medium text-lg">
-                          {isDragActive
-                            ? "اترك الملف هنا"
-                            : "انقر لرفع الملفات أو اسحب الملف هنا"}
+                    ) : (
+                      <div className="animate-in fade-in duration-300">
+                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#e8f3fc] to-[#c8e2f9] rounded-2xl flex items-center justify-center">
+                          <Upload className="w-8 h-8 text-[#53a1dd]" />
                         </div>
-                        <div className="text-gray-500">
-                          PDF, Word, JPG, PNG (الحد الأقصى 10MB)
+                        <div className="font-bold text-gray-800 mb-2">
+                          اسحب الملف هنا أو انقر للتحميل
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          PDF, Word, صور (حد أقصى 5MB)
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-                {errors.file && (
-                  <p className="text-red-600 text-sm text-right flex items-center justify-end space-x-1 space-x-reverse">
-                    <AlertCircle className="w-4 h-4" />
-                    <span>{errors.file}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Contact Information */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Full Name */}
-                <div className="space-y-3">
-                  <label
-                    htmlFor="full_name"
-                    className="block text-right text-gray-700 font-semibold text-lg"
-                  >
-                    الاسم الكامل *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="full_name"
-                      name="full_name"
-                      value={formData.full_name}
-                      onChange={handleInputChange}
-                      placeholder="أدخل اسمك الكامل"
-                      required
-                      className={`w-full px-6 py-4 pr-12 border-2 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-right text-lg ${
-                        errors.full_name
-                          ? "border-red-400"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                      aria-describedby={
-                        errors.full_name ? "name-error" : undefined
-                      }
-                    />
-                    <User className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    )}
                   </div>
-                  {errors.full_name && (
-                    <p
-                      id="name-error"
-                      className="text-red-600 text-sm text-right flex items-center justify-end space-x-1 space-x-reverse"
-                    >
+                  {errors.file && (
+                    <p className="text-red-600 text-sm text-right mt-2 flex items-center justify-end gap-2 animate-in slide-in-from-top-2">
+                      <span>{errors.file}</span>
                       <AlertCircle className="w-4 h-4" />
-                      <span>{errors.full_name}</span>
                     </p>
                   )}
                 </div>
 
-                {/* Email */}
-                <div className="space-y-3">
-                  <label
-                    htmlFor="email"
-                    className="block text-right text-gray-700 font-semibold text-lg"
-                  >
-                    البريد الإلكتروني *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="example@email.com"
-                      required
-                      className={`w-full px-6 py-4 pr-12 border-2 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-right text-lg ${
-                        errors.email
-                          ? "border-red-400"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                      aria-describedby={
-                        errors.email ? "email-error" : undefined
-                      }
-                    />
-                    <Mail className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  </div>
-                  {errors.email && (
-                    <p
-                      id="email-error"
-                      className="text-red-600 text-sm text-right flex items-center justify-end space-x-1 space-x-reverse"
-                    >
-                      <AlertCircle className="w-4 h-4" />
-                      <span>{errors.email}</span>
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Phone */}
-              <div className="space-y-3">
-                <label
-                  htmlFor="phone"
-                  className="block text-right text-gray-700 font-semibold text-lg"
-                >
-                  رقم الجوال (سعودي) *
-                </label>
-                <div className="flex">
-                  <div className="flex items-center px-6 bg-gray-100 border-2 border-gray-200 border-l-0 rounded-r-xl text-gray-600 font-medium text-lg">
-                    <Phone className="w-5 h-5 ml-2" />
-                    +966
-                  </div>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="5X XXX XXXX"
-                    pattern="05[0-9]{8}"
-                    maxLength="10"
-                    required
-                    className={`flex-1 px-6 py-4 border-2 rounded-l-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 text-right border-r-0 text-lg ${
-                      errors.phone
-                        ? "border-red-400"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    aria-describedby={errors.phone ? "phone-error" : undefined}
-                  />
-                </div>
-                {errors.phone ? (
-                  <p
-                    id="phone-error"
-                    className="text-red-600 text-sm text-right flex items-center justify-end space-x-1 space-x-reverse"
-                  >
-                    <AlertCircle className="w-4 h-4" />
-                    <span>{errors.phone}</span>
-                  </p>
-                ) : (
-                  <small className="block text-right text-gray-500 text-sm">
-                    يجب أن يبدأ الرقم بـ 05 ويتكون من 10 أرقام
-                  </small>
-                )}
-              </div>
-
-              {/* Submit Button */}
-              <div className="pt-6">
+                {/* Submit Button */}
                 <button
                   type="submit"
-                  className={`w-full py-5 px-8 rounded-xl font-bold text-white text-lg transition-all duration-300 transform ${
+                  className={`w-full py-5 px-6 rounded-xl font-bold text-white text-lg transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 active:scale-95 ${
                     isLoading
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-[#53a1dd] to-[#3a83f2] hover:from-[#3a83f2] hover:to-[#2f6fd1] hover:shadow-2xl hover:-translate-y-1 focus:ring-4 focus:ring-blue-200"
+                      : "bg-gradient-to-r from-[#53a1dd] via-[#4a8fc7] to-[#3d7db3] hover:from-[#4a8fc7] hover:via-[#3d7db3] hover:to-[#306a9f]"
                   }`}
                   disabled={isLoading}
                 >
                   {isLoading ? (
-                    <div className="flex items-center justify-center space-x-3 space-x-reverse">
+                    <div className="flex items-center justify-center gap-3">
                       <Loader2 className="w-6 h-6 animate-spin" />
                       <span>جاري الإرسال...</span>
                     </div>
                   ) : (
-                    <span className="flex items-center justify-center space-x-2 space-x-reverse">
+                    <span className="flex items-center justify-center gap-3">
                       <span>إرسال الرسالة</span>
-                      <Check className="w-5 h-5" />
+                      <Send className="w-5 h-5" />
                     </span>
                   )}
                 </button>
-              </div>
-            </form>
-
-            {/* Additional Info */}
-            <div className="mt-12 pt-8 border-t border-gray-200">
-              <div className="text-center text-gray-600">
-                <p className="text-lg mb-2">أو تواصل معنا مباشرة</p>
-                <div className="flex flex-wrap justify-center items-center gap-6 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-blue-600" />
-                    <span
-                      className="ltr"
-                      style={{ direction: "ltr", unicodeBidi: "embed" }}
-                    >
-                      +966 56 606 5406
-                    </span>
-                  </div>
-
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <Mail className="w-4 h-4 text-blue-600" />
-                    <span>info@shaheenplus.sa</span>
-                  </div>
-                </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>

@@ -124,9 +124,6 @@ const ServicesSection = () => {
               </h2>
               <div className="w-20 md:w-28 h-1 md:h-1.5 bg-gradient-to-l from-[#53a1dd] to-[#4a8fc7] rounded-full"></div>
             </div>
-            
-            {/* Mobile indicator - Hidden on large screens */}
-            
           </div>
           
           <p className="mt-3 md:mt-4 text-sm md:text-lg text-slate-600 max-w-2xl">
@@ -145,26 +142,6 @@ const ServicesSection = () => {
             {/* Mobile Navigation Controls - Only visible on small screens */}
             <div className="block md:hidden mb-6">
               <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4">
-                {/* Current Service Card */}
-                <div className="mb-4">
-                  <div className={`bg-gradient-to-l ${currentService.color} rounded-xl p-4 text-white`}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="bg-white/20 backdrop-blur-sm w-10 h-10 rounded-lg flex items-center justify-center">
-                        {React.createElement(currentService.icon, {
-                          className: "w-5 h-5",
-                          strokeWidth: 2.5
-                        })}
-                      </div>
-                      <h3 className="text-lg font-bold flex-1 text-right">
-                        {currentService.title}
-                      </h3>
-                    </div>
-                    <p className="text-sm text-white/90 leading-relaxed">
-                      {currentService.shortDescription}
-                    </p>
-                  </div>
-                </div>
-
                 {/* Navigation Buttons */}
                 <div className="flex items-center justify-between">
                   <button
