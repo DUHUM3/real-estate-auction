@@ -144,7 +144,8 @@ export const useNavbarLogic = (onLoginClick, onRegisterClick) => {
   const userTypeCheckers = {
     isGeneralUser: () => currentUser?.user_type === 'مستخدم عام',
     isLandOwner: () => currentUser?.user_type === 'مالك أرض',
-    isPropertyOwner: () => currentUser?.user_type === 'وكيل عقارات',
+    isCommercialEntity: () => currentUser?.user_type === 'جهة تجارية',
+    isPropertyOwner: () => currentUser?.user_type === 'وسيط عقاري',
     isInvestor: () => currentUser?.user_type === 'شركة مزادات',
     isLegalAgent: () => currentUser?.user_type === 'وكيل شرعي',
   };

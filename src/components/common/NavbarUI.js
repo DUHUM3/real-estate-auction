@@ -32,6 +32,7 @@ const NavbarUI = ({
   isGeneralUser,
   isLandOwner,
   isPropertyOwner,
+  isCommercialEntity,
   isInvestor,
   handleCloseMenu,
   handleMobileMenuToggle,
@@ -157,7 +158,7 @@ const renderUserDropdown = () => (
     )}
     
     {/* إخفاء حقل "اهتماماتي بالاراضي" عن شركة المزادات */}
-    {(isLandOwner() || isPropertyOwner() || isLegalAgent()) && (
+    {(isLandOwner() || isPropertyOwner() || isLegalAgent() || isCommercialEntity()) && (
       <Link 
         to="/interests" 
         className="dropdown-item"
@@ -334,7 +335,7 @@ const renderUserDropdown = () => (
     )}
 
     {/* إخفاء حقل "اهتماماتي بالاراضي" عن شركة المزادات */}
-    {(isLandOwner() || isPropertyOwner() || isLegalAgent()) && (
+    {(isLandOwner() || isPropertyOwner() || isLegalAgent() || isCommercialEntity()  ) && (
       <Link to="/interests" className="mobile-nav-link" onClick={handleCloseMenu}>
         <Icons.FaHandshake className="link-icon" />
         اهتماماتي بالاراضي
