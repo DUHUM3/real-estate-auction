@@ -98,13 +98,7 @@ const ServicesSection = () => {
   const prevService = serviceKeys[(currentIndex - 1 + serviceKeys.length) % serviceKeys.length];
 
   return (
-    <section className="relative py-12 md:py-20 lg:py-32 bg-gradient-to-br from-slate-50 via-white to-slate-50 overflow-hidden" dir="rtl">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000"></div>
-      </div>
-
+    <section className="relative py-12 md:py-20 lg:py-32 bg-white overflow-hidden" dir="rtl">
       <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
         {/* Header - Improved for mobile */}
         <motion.div 

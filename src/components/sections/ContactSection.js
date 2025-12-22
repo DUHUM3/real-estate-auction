@@ -73,7 +73,7 @@ const ContactSection = () => {
   const validateField = useCallback(
     (name, value) => {
       const sanitized = sanitizeInput(value);
-      
+
       switch (name) {
         case "full_name":
           if (sanitized.length < 2) return "الاسم يجب أن يكون حرفين على الأقل";
@@ -108,24 +108,27 @@ const ContactSection = () => {
     [allowedReasons, sanitizeInput]
   );
 
-  const validateFile = useCallback((file) => {
-    if (!file) return "";
+  const validateFile = useCallback(
+    (file) => {
+      if (!file) return "";
 
-    if (file.size > MAX_FILE_SIZE) {
-      return "حجم الملف يجب ألا يتجاوز 5MB";
-    }
+      if (file.size > MAX_FILE_SIZE) {
+        return "حجم الملف يجب ألا يتجاوز 5MB";
+      }
 
-    if (!allowedFileTypes.includes(file.type)) {
-      return "نوع الملف غير مدعوم";
-    }
+      if (!allowedFileTypes.includes(file.type)) {
+        return "نوع الملف غير مدعوم";
+      }
 
-    const fileName = file.name;
-    if (fileName.length > 255) return "اسم الملف طويل جداً";
-    if (!/^[\w\-. ]+$/.test(fileName.replace(/\.[^.]+$/, "")))
-      return "اسم الملف يحتوي على أحرف غير صالحة";
+      const fileName = file.name;
+      if (fileName.length > 255) return "اسم الملف طويل جداً";
+      if (!/^[\w\-. ]+$/.test(fileName.replace(/\.[^.]+$/, "")))
+        return "اسم الملف يحتوي على أحرف غير صالحة";
 
-    return "";
-  }, [allowedFileTypes]);
+      return "";
+    },
+    [allowedFileTypes]
+  );
 
   const handleInputChange = useCallback(
     (e) => {
@@ -335,13 +338,10 @@ const ContactSection = () => {
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 py-16 md:py-24 overflow-hidden" id="contact">
-      {/* Background Decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#53a1dd] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#4a8fc7] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse delay-700"></div>
-      </div>
-
+    <section
+      className="relative bg-white py-16 md:py-24 overflow-hidden"
+      id="contact"
+    >
       <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         {/* Header Section */}
         <div className="text-center mb-12 md:mb-16">
@@ -352,7 +352,8 @@ const ContactSection = () => {
             تواصل معنا
           </h2>
           <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
-            نحن هنا لمساعدتك في جميع استفساراتك العقارية. تواصل معنا وسنرد عليك في أقرب وقت ممكن
+            نحن هنا لمساعدتك في جميع استفساراتك العقارية. تواصل معنا وسنرد عليك
+            في أقرب وقت ممكن
           </p>
           <div className="flex justify-center mt-6">
             <div className="w-24 h-1 bg-gradient-to-r from-[#53a1dd] via-[#4a8fc7] to-[#53a1dd] rounded-full"></div>
@@ -369,10 +370,18 @@ const ContactSection = () => {
                   <Phone className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1 text-right">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">اتصل بنا</h3>
-                  <p className="text-sm text-gray-600 mb-3">نحن متاحون للرد على استفساراتك</p>
-                  <a href="tel:+966566065406" className="text-[#53a1dd] hover:text-[#4a8fc7] font-semibold inline-flex items-center gap-2 transition-colors" dir="ltr">
-                    <span>+966 56 606 5406</span>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    اتصل بنا
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    نحن متاحون للرد على استفساراتك
+                  </p>
+                  <a
+                    href="tel:+966566065406"
+                    className="text-[#53a1dd] hover:text-[#4a8fc7] font-semibold inline-flex items-center gap-2 transition-colors"
+                    style={{ direction: "ltr", unicodeBidi: "bidi-override" }}
+                  >
+                    +966 56 606 5406
                   </a>
                 </div>
               </div>
@@ -385,9 +394,16 @@ const ContactSection = () => {
                   <Mail className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1 text-right">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">راسلنا</h3>
-                  <p className="text-sm text-gray-600 mb-3">أرسل لنا رسالة عبر البريد الإلكتروني</p>
-                  <a href="mailto:info@shaheenplus.sa" className="text-[#53a1dd] hover:text-[#4a8fc7] font-semibold inline-flex items-center gap-2 transition-colors">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    راسلنا
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    أرسل لنا رسالة عبر البريد الإلكتروني
+                  </p>
+                  <a
+                    href="mailto:info@shaheenplus.sa"
+                    className="text-[#53a1dd] hover:text-[#4a8fc7] font-semibold inline-flex items-center gap-2 transition-colors"
+                  >
                     <span>info@shaheenplus.sa</span>
                   </a>
                 </div>
@@ -401,26 +417,14 @@ const ContactSection = () => {
                   <MapPin className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1 text-right">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">موقعنا</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    موقعنا
+                  </h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    المملكة العربية السعودية<br />
+                    المملكة العربية السعودية
+                    <br />
                     نخدم جميع مناطق المملكة
                   </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Working Hours */}
-            <div className="bg-gradient-to-br from-[#53a1dd] to-[#4a8fc7] rounded-2xl p-6 shadow-lg text-white">
-              <h3 className="text-lg font-bold mb-4 text-right">أوقات العمل</h3>
-              <div className="space-y-3 text-right">
-                <div className="flex justify-between items-center pb-3 border-b border-white border-opacity-20">
-                  <span className="text-blue-100">9:00 ص - 6:00 م</span>
-                  <span className="font-semibold">السبت - الخميس</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-blue-100">مغلق</span>
-                  <span className="font-semibold">الجمعة</span>
                 </div>
               </div>
             </div>
@@ -440,16 +444,22 @@ const ContactSection = () => {
                   }`}
                   role="alert"
                 >
-                  <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                    submitStatus.type === "success" ? "bg-green-100" : "bg-red-100"
-                  }`}>
+                  <div
+                    className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+                      submitStatus.type === "success"
+                        ? "bg-green-100"
+                        : "bg-red-100"
+                    }`}
+                  >
                     {submitStatus.type === "success" ? (
                       <Check className="w-5 h-5" />
                     ) : (
                       <AlertCircle className="w-5 h-5" />
                     )}
                   </div>
-                  <span className="flex-1 font-semibold text-right">{submitStatus.message}</span>
+                  <span className="flex-1 font-semibold text-right">
+                    {submitStatus.message}
+                  </span>
                 </div>
               )}
 
@@ -472,26 +482,46 @@ const ContactSection = () => {
                       onBlur={() => setFocusedField(null)}
                       required
                       className={`w-full px-4 py-4 pr-12 border-2 rounded-xl focus:ring-4 focus:ring-[#e8f3fc] focus:border-[#53a1dd] transition-all duration-300 text-right bg-white appearance-none cursor-pointer font-medium ${
-                        errors.reason 
-                          ? "border-red-400 bg-red-50" 
+                        errors.reason
+                          ? "border-red-400 bg-red-50"
                           : focusedField === "reason"
                           ? "border-[#53a1dd] shadow-lg"
                           : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
-                      <option value="" className="text-gray-400">اختر سبب التواصل</option>
+                      <option value="" className="text-gray-400">
+                        اختر سبب التواصل
+                      </option>
                       {allowedReasons.map((reason, index) => (
-                        <option key={index} value={reason} className="text-gray-900">
+                        <option
+                          key={index}
+                          value={reason}
+                          className="text-gray-900"
+                        >
                           {reason}
                         </option>
                       ))}
                     </select>
-                    <MessageSquare className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none transition-colors ${
-                      focusedField === "reason" ? "text-[#53a1dd]" : "text-gray-400"
-                    }`} />
+                    <MessageSquare
+                      className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none transition-colors ${
+                        focusedField === "reason"
+                          ? "text-[#53a1dd]"
+                          : "text-gray-400"
+                      }`}
+                    />
                     <div className="absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      <svg
+                        className="w-4 h-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        />
                       </svg>
                     </div>
                   </div>
@@ -526,16 +556,20 @@ const ContactSection = () => {
                         maxLength="100"
                         required
                         className={`w-full px-4 py-4 pr-12 border-2 rounded-xl focus:ring-4 focus:ring-[#e8f3fc] focus:border-[#53a1dd] transition-all duration-300 text-right font-medium ${
-                          errors.full_name 
-                            ? "border-red-400 bg-red-50" 
+                          errors.full_name
+                            ? "border-red-400 bg-red-50"
                             : focusedField === "full_name"
                             ? "border-[#53a1dd] shadow-lg"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                       />
-                      <User className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors ${
-                        focusedField === "full_name" ? "text-[#53a1dd]" : "text-gray-400"
-                      }`} />
+                      <User
+                        className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors ${
+                          focusedField === "full_name"
+                            ? "text-[#53a1dd]"
+                            : "text-gray-400"
+                        }`}
+                      />
                     </div>
                     {errors.full_name && (
                       <p className="text-red-600 text-sm text-right mt-2 flex items-center justify-end gap-2 animate-in slide-in-from-top-2">
@@ -566,16 +600,20 @@ const ContactSection = () => {
                         maxLength="254"
                         required
                         className={`w-full px-4 py-4 pr-12 border-2 rounded-xl focus:ring-4 focus:ring-[#e8f3fc] focus:border-[#53a1dd] transition-all duration-300 text-right font-medium ${
-                          errors.email 
-                            ? "border-red-400 bg-red-50" 
+                          errors.email
+                            ? "border-red-400 bg-red-50"
                             : focusedField === "email"
                             ? "border-[#53a1dd] shadow-lg"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                       />
-                      <Mail className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors ${
-                        focusedField === "email" ? "text-[#53a1dd]" : "text-gray-400"
-                      }`} />
+                      <Mail
+                        className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors ${
+                          focusedField === "email"
+                            ? "text-[#53a1dd]"
+                            : "text-gray-400"
+                        }`}
+                      />
                     </div>
                     {errors.email && (
                       <p className="text-red-600 text-sm text-right mt-2 flex items-center justify-end gap-2 animate-in slide-in-from-top-2">
@@ -595,9 +633,13 @@ const ContactSection = () => {
                     رقم الجوال <span className="text-red-500">*</span>
                   </label>
                   <div className="flex rounded-xl overflow-hidden shadow-sm">
-                    <div className={`flex items-center px-5 bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-l-0 text-gray-700 font-bold transition-colors ${
-                      focusedField === "phone" ? "border-[#53a1dd]" : "border-gray-200"
-                    }`}>
+                    <div
+                      className={`flex items-center px-5 bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-l-0 text-gray-700 font-bold transition-colors ${
+                        focusedField === "phone"
+                          ? "border-[#53a1dd]"
+                          : "border-gray-200"
+                      }`}
+                    >
                       <Phone className="w-4 h-4 ml-2 text-gray-500" />
                       <span dir="ltr">966+</span>
                     </div>
@@ -615,8 +657,8 @@ const ContactSection = () => {
                       required
                       dir="ltr"
                       className={`flex-1 px-4 py-4 border-2 border-r-0 focus:ring-4 focus:ring-[#e8f3fc] focus:border-[#53a1dd] transition-all duration-300 text-left font-medium ${
-                        errors.phone 
-                          ? "border-red-400 bg-red-50" 
+                        errors.phone
+                          ? "border-red-400 bg-red-50"
                           : focusedField === "phone"
                           ? "border-[#53a1dd]"
                           : "border-gray-200 hover:border-gray-300"
@@ -651,19 +693,21 @@ const ContactSection = () => {
                     maxLength={MAX_MESSAGE_LENGTH}
                     required
                     className={`w-full px-4 py-4 border-2 rounded-xl focus:ring-4 focus:ring-[#e8f3fc] focus:border-[#53a1dd] transition-all duration-300 text-right resize-none font-medium leading-relaxed ${
-                      errors.message 
-                        ? "border-red-400 bg-red-50" 
+                      errors.message
+                        ? "border-red-400 bg-red-50"
                         : focusedField === "message"
                         ? "border-[#53a1dd] shadow-lg"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                   />
                   <div className="flex justify-between items-center mt-2 text-sm">
-                    <span className={`transition-colors ${
-                      formData.message.length > MAX_MESSAGE_LENGTH * 0.9 
-                        ? "text-orange-600 font-semibold" 
-                        : "text-gray-500"
-                    }`}>
+                    <span
+                      className={`transition-colors ${
+                        formData.message.length > MAX_MESSAGE_LENGTH * 0.9
+                          ? "text-orange-600 font-semibold"
+                          : "text-gray-500"
+                      }`}
+                    >
                       {formData.message.length} / {MAX_MESSAGE_LENGTH}
                     </span>
                     {errors.message && (
@@ -678,7 +722,10 @@ const ContactSection = () => {
                 {/* File Upload */}
                 <div className="group">
                   <label className="block text-right text-gray-800 font-bold mb-3 text-sm">
-                    مرفق <span className="text-gray-400 text-xs font-normal">(اختياري)</span>
+                    مرفق{" "}
+                    <span className="text-gray-400 text-xs font-normal">
+                      (اختياري)
+                    </span>
                   </label>
                   <div
                     className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 cursor-pointer overflow-hidden ${

@@ -67,7 +67,7 @@ const ClientsSlider = ({ clients, onClientClick }) => {
               <div className="block md:hidden">
                 {/* منطقة الشعار للجوال */}
                 <div className="flex items-center justify-center my-6 sm:my-8">
-                  <div className="bg-gray-20 rounded-xl p-6 w-full max-w-xs shadow-sm">
+                  <div className="bg-white rounded-xl p-6 w-full max-w-xs shadow-sm">
                     <div className="h-20 sm:h-24 flex items-center justify-center mb-3">
                       <img 
                         src={clients[activeIndex].logo} 
@@ -188,7 +188,7 @@ const ClientsSkeleton = () => (
         
         {/* محتوى Skeleton للجوال */}
         <div className="block md:hidden">
-          <div className="bg-gray-100 rounded-xl p-6 w-full max-w-xs mx-auto mb-6">
+          <div className="bg-white rounded-xl p-6 w-full max-w-xs mx-auto mb-6">
             <div className="h-20 sm:h-24 bg-gray-300 rounded-lg mb-3 animate-pulse"></div>
             <div className="h-4 bg-gray-300 rounded w-3/4 mx-auto animate-pulse"></div>
           </div>
