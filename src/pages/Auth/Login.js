@@ -136,13 +136,13 @@ function Login({ onClose, onSwitchToRegister }) {
           password: "البريد الإلكتروني أو كلمة المرور غير صحيحة"
         });
         
-        toast.error("البريد الإلكتروني أو كلمة المرور غير صحيحة", { 
-          position: "top-center" 
-        });
+        // toast.error("البريد الإلكتروني أو كلمة المرور غير صحيحة", { 
+        //   position: "top-center" 
+        // });
       } else {
-        toast.error(error.message || "حدث خطأ في الاتصال بالخادم", { 
-          position: "top-center" 
-        });
+        // toast.error(error.message || "حدث خطأ في الاتصال بالخادم", { 
+        //   position: "top-center" 
+        // });
       }
     } finally {
       setLoading(false);
@@ -175,13 +175,13 @@ function Login({ onClose, onSwitchToRegister }) {
         setFieldErrors({
           email: "البريد الإلكتروني غير مسجل في النظام"
         });
-        toast.error("البريد الإلكتروني غير مسجل في النظام", { 
-          position: "top-center" 
-        });
+        // toast.error("البريد الإلكتروني غير مسجل في النظام", { 
+        //   position: "top-center" 
+        // });
       } else {
-        toast.error(error.message || "حدث خطأ أثناء إرسال رابط إعادة التعيين", { 
-          position: "top-center" 
-        });
+        // toast.error(error.message || "حدث خطأ أثناء إرسال رابط إعادة التعيين", { 
+        //   position: "top-center" 
+        // });
       }
     } finally {
       setForgotPasswordLoading(false);

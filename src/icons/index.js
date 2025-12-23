@@ -65,7 +65,13 @@ import {
   FaCrown,         // إضافة هذا السطر
   FaBrain,         // إضافة هذا السطر
   FaNetworkWired,  // إضافة هذا السطر
-  FaCheckCircle
+  FaCheckCircle,
+  FaUpload, 
+  FaFileAlt,
+  FaBan,
+  FaRegClock,
+  FaRegFileAlt,
+  
 } from "react-icons/fa";
 
 // Feather Icons
@@ -79,7 +85,12 @@ import {
   FiMail,
   FiPhone,
   FiUser,
-  FiXCircle
+  FiArrowRight,
+  FiLogIn,
+  FiXCircle,
+  FiLock, FiEye, FiEyeOff, FiX, FiArrowLeft,
+  FiFile, FiBook,
+  FiCheck
 } from "react-icons/fi";
 
 // Material Design Icons
@@ -176,7 +187,17 @@ const Icons = {
   MdAssignment,
   MdBadge,
   MdBusiness,
-  MdPerson
+  MdPerson,
+  FaUpload, 
+  FaFileAlt,
+  FaBan,
+  FaRegClock,
+  FaRegFileAlt,
+  FiArrowRight,
+  FiLogIn,
+  FiLock, FiEye, FiEyeOff, FiX, FiArrowLeft,
+  FiFile, FiBook,
+  FiCheck
 };
 
 export default Icons;

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import '../../styles/PrivacyPolicy.css';
 
 const TermsOfService = () => {
   const [activeSection, setActiveSection] = useState(1);

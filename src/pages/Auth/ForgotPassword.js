@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../../api/authApi';
-import '../../styles/AuthModal.css';
 
 import toast from 'react-hot-toast';
-
-import { FiMail, FiArrowRight, FiHome, FiLogIn } from 'react-icons/fi';
+import Icons from '../../icons/index';
 
 function ForgotPassword() {
   const [formData, setFormData] = useState({
@@ -96,11 +94,11 @@ function ForgotPassword() {
           <div className="auth-page-card">
             {/* <div className="auth-page-header">
               <Link to="/" className="back-home-btn">
-                <FiHome />
+                <Icons.FiHome />
                 العودة للرئيسية
               </Link>
               <Link to="/login" className="auth-nav-btn">
-                <FiLogIn />
+                <Icons.FiLogIn />
                 تسجيل الدخول
               </Link>
             </div> */}
@@ -119,7 +117,7 @@ function ForgotPassword() {
 
             <div className="success-state">
               <div className="success-icon-large">
-                <FiMail />
+                <Icons.FiMail />
               </div>
               <h3 className="success-title">تم إرسال رابط التعيين!</h3>
               <p className="success-description">
@@ -131,7 +129,7 @@ function ForgotPassword() {
             {/* <div className="auth-page-actions">
               <Link to="/login" className="btn-auth-primary">
                 العودة إلى تسجيل الدخول
-                <FiArrowRight className="btn-icon" />
+                <Icons.FiArrowRight className="btn-icon" />
               </Link>
             </div> */}
           </div>
@@ -150,11 +148,11 @@ function ForgotPassword() {
         <div className="auth-page-card">
           {/* <div className="auth-page-header">
             <Link to="/" className="back-home-btn">
-              <FiHome />
+              <Icons.FiHome />
               العودة للرئيسية
             </Link>
             <Link to="/login" className="auth-nav-btn">
-              <FiLogIn />
+              <Icons.FiLogIn />
               تسجيل الدخول
             </Link>
           </div> */}
@@ -184,7 +182,7 @@ function ForgotPassword() {
             <div className="form-group">
               <label className="form-label">البريد الإلكتروني</label>
               <div className="input-with-icon">
-                <FiMail className="input-icon" />
+                <Icons.FiMail className="input-icon" />
                 <input
                   type="text"
                   name="email"

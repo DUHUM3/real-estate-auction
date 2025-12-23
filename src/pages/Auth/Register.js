@@ -337,10 +337,10 @@ const [formData, setFormData] = useState({
       setUserEmail(response.user.email);
       setVerificationStep(true);
       
-      toast.success(response.message || 'تم إنشاء الحساب بنجاح! يرجى التحقق من البريد الإلكتروني.', {
-        position: "top-center",
-        autoClose: 5000
-      });
+      // toast.success(response.message || 'تم إنشاء الحساب بنجاح! يرجى التحقق من البريد الإلكتروني.', {
+      //   position: "top-center",
+      //   autoClose: 5000
+      // });
       
     } catch (error) {
       console.error('Registration error:', error);
@@ -350,31 +350,31 @@ const [formData, setFormData] = useState({
       if (errorMsg.includes('email') || errorMsg.includes('بريد')) {
         setFieldErrors({ ...fieldErrors, email: "البريد الإلكتروني مستخدم بالفعل" });
         setCurrentStep(getMaxSteps());
-        toast.error("البريد الإلكتروني مستخدم بالفعل", { position: "top-center" });
+        // toast.error("البريد الإلكتروني مستخدم بالفعل", { position: "top-center" });
       } else if (errorMsg.includes('phone') || errorMsg.includes('جوال')) {
         setFieldErrors({ ...fieldErrors, phone: "رقم الجوال مستخدم بالفعل" });
         setCurrentStep(1);
-        toast.error("رقم الجوال مستخدم بالفعل", { position: "top-center" });
+        // toast.error("رقم الجوال مستخدم بالفعل", { position: "top-center" });
       } else if (errorMsg.includes('national_id') || errorMsg.includes('هوية')) {
         setFieldErrors({ ...fieldErrors, national_id: "رقم الهوية مستخدم بالفعل" });
         setCurrentStep(1);
         toast.error("رقم الهوية مستخدم بالفعل", { position: "top-center" });
-      } else if (errorMsg.includes('agency_number') || errorMsg.includes('وكالة')) {
+      // } else if (errorMsg.includes('agency_number') || errorMsg.includes('وكالة')) {
         setFieldErrors({ ...fieldErrors, agency_number: "رقم الوكالة مستخدم بالفعل" });
         setCurrentStep(1);
-        toast.error("رقم الوكالة مستخدم بالفعل", { position: "top-center" });
+        // toast.error("رقم الوكالة مستخدم بالفعل", { position: "top-center" });
       } else if (errorMsg.includes('commercial_register') || errorMsg.includes('سجل')) {
         setFieldErrors({ ...fieldErrors, commercial_register: "رقم السجل التجاري مستخدم بالفعل" });
         setCurrentStep(2);
-        toast.error("رقم السجل التجاري مستخدم بالفعل", { position: "top-center" });
+        // toast.error("رقم السجل التجاري مستخدم بالفعل", { position: "top-center" });
       } else if (errorMsg.includes('license_number') || errorMsg.includes('ترخيص')) {
         setFieldErrors({ ...fieldErrors, license_number: "رقم الترخيص مستخدم بالفعل" });
         setCurrentStep(2);
-        toast.error("رقم الترخيص مستخدم بالفعل", { position: "top-center" });
+        // toast.error("رقم الترخيص مستخدم بالفعل", { position: "top-center" });
       } else if (errorMsg.includes('full_name') || errorMsg.includes('اسم')) {
         setFieldErrors({ ...fieldErrors, full_name: "الرجاء إدخال الاسم الكامل" });
         setCurrentStep(1);
-        toast.error("الرجاء إدخال الاسم الكامل", { position: "top-center" });
+        // toast.error("الرجاء إدخال الاسم الكامل", { position: "top-center" });
       } else {
         toast.error(error.message || "حدث خطأ في الاتصال بالخادم", { position: "top-center" });
       }
@@ -418,16 +418,16 @@ const [formData, setFormData] = useState({
             // }, 2000);
           }
         } catch (loginError) {
-          toast.success('تم التحقق بنجاح! يمكنك الآن تسجيل الدخول', { position: "top-center" });
+          // toast.success('تم التحقق بنجاح! يمكنك الآن تسجيل الدخول', { position: "top-center" });
           setTimeout(() => onSwitchToLogin(), 3000);
         }
       } else {
         setVerificationError('رمز التحقق غير صحيح');
-        toast.error(response.message || 'رمز التحقق غير صحيح', { position: "top-center" });
+        // toast.error(response.message || 'رمز التحقق غير صحيح', { position: "top-center" });
       }
     } catch (error) {
       setVerificationError(error.message || 'حدث خطأ أثناء التحقق');
-      toast.error(error.message || 'حدث خطأ أثناء التحقق من البريد الإلكتروني', { position: "top-center" });
+      // toast.error(error.message || 'حدث خطأ أثناء التحقق من البريد الإلكتروني', { position: "top-center" });
     } finally {
       setVerifyLoading(false);
     }
@@ -512,7 +512,7 @@ const [formData, setFormData] = useState({
             <span className="font-medium text-gray-800">{userEmail}</span>
           </p>
           <p className="text-xs text-gray-500 mt-2">
-            سيتم تسجيل دخولك تلقائياً...
+يمكنك الآن إغلاق هذه النافذة والبدء في استخدام حسابك. شكراً لانضمامك إلينا!
           </p>
           <div className="mt-6">
             <button 
@@ -545,7 +545,7 @@ const [formData, setFormData] = useState({
             onClick={() => {
               setVerifyLoading(true);
               setTimeout(() => {
-                toast.success('تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني', { position: "top-center" });
+                // toast.success('تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني', { position: "top-center" });
                 setVerificationCode('');
                 setVerificationError('');
                 setVerifyLoading(false);

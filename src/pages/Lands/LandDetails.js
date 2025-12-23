@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ModalContext } from '../../App'; 
 import { useAuth } from '../../context/AuthContext';
 // استبدال react-hot-toast بـ react-toastify
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
   FaMapMarkerAlt,
@@ -396,16 +396,17 @@ const PropertyDetailsPage = () => {
     setShowInterestForm(true);
   };
   
-  const handleCloseInterestForm = () => {
-    setShowInterestForm(false);
-    setSubmitResult(null);
-    setFormData({
-      full_name: '',
-      phone: '',
-      email: '',
-      message: ''
-    });
-  };
+const handleCloseInterestForm = () => {
+  setShowInterestForm(false);
+  setFormData({
+    full_name: '',
+    phone: '',
+    email: '',
+    message: ''
+  });
+  setSubmitting(false);
+  // لا نحتاج لـ submitResult بعد الآن
+};
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -415,94 +416,99 @@ const PropertyDetailsPage = () => {
     }));
   };
   
-  const validateForm = () => {
-    if (formData.message.trim().length < 10) {
-      showToast('error', "الرسالة يجب أن تكون أكثر من 10 أحرف", 5000);
-      return false;
-    }
-    return true;
-  };
+const validateForm = () => {
+  const trimmedMessage = formData.message.trim();
+  
+  if (trimmedMessage.length < 10) {
+    showToast('error', "الرسالة يجب أن تكون أكثر من 10 أحرف", 5000);
+    return false; // الفورم يبقى مفتوحاً
+  }
+  
+  if (trimmedMessage.length > 2000) {
+    showToast('error', "الرسالة يجب أن تكون أقل من 2000 حرف", 5000);
+    return false; // الفورم يبقى مفتوحاً
+  }
+  
+  return true;
+};
 
-  const handleSubmitInterest = async (e) => {
-    e.preventDefault();
+const handleSubmitInterest = async (e) => {
+  e.preventDefault();
+  
+  // التحقق من طول الحروف - هنا يجب أن يبقى الفورم مفتوحاً
+  const trimmedMessage = formData.message.trim();
+  
+  if (trimmedMessage.length < 10) {
+    showToast('error', "الرسالة يجب أن تكون أكثر من 10 أحرف", 5000);
+    return; // لا تغلق الفورم هنا
+  }
+  
+  if (trimmedMessage.length > 2000) {
+    showToast('error', "الرسالة يجب أن تكون أقل من 2000 حرف", 5000);
+    return; // لا تغلق الفورم هنا
+  }
+
+  const userType = getCurrentUserType();
+  if (userType === 'شركة مزادات') {
+    showToast('error', 'عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات', 5000);
+    setShowInterestForm(false); // إغلاق فوري
+    return;
+  }
+
+  setSubmitting(true);
+  setSubmitResult(null);
+  
+  try {
+    const requestData = {
+      message: trimmedMessage
+    };
     
-    if (!validateForm()) {
-      return;
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const userType = getCurrentUserType();
-    if (userType === 'شركة مزادات') {
-      showToast('error', 'عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات', 5000);
-      return;
-    }
-
-    setSubmitting(true);
-    setSubmitResult(null);
+    const response = await fetch(`https://core-api-x41.shaheenplus.sa/api/properties/${id}/interest`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(requestData),
+    });
     
-    try {
-      const requestData = {
-        message: formData.message
-      };
+    const result = await response.json();
+    
+    if (response.ok && result.success) {
+      const successMessage = result.message || 'تم إرسال طلب الاهتمام بنجاح';
+      showToast('success', successMessage);
       
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-
-      const token = localStorage.getItem('token');
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      console.log('إرسال البيانات:', requestData);
-      console.log('الـ Token المستخدم:', token ? 'موجود' : 'غير موجود');
-
-      const response = await fetch(`https://core-api-x41.shaheenplus.sa/api/properties/${id}/interest`, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(requestData),
+      // إغلاق الفورم فوراً عند النجاح
+      setShowInterestForm(false);
+      setFormData({
+        full_name: '',
+        phone: '',
+        email: '',
+        message: ''
       });
       
-      const result = await response.json();
-      console.log('استجابة السيرفر:', result);
-      
-      if (response.ok && result.success) {
-        const successMessage = result.message || 'تم إرسال طلب الاهتمام بنجاح';
-        setSubmitResult({
-          success: true,
-          message: successMessage
-        });
-        showToast('success', successMessage);
-        
-        setFormData({
-          full_name: '',
-          phone: '',
-          email: '',
-          message: ''
-        });
-        
-        setTimeout(() => {
-          setShowInterestForm(false);
-        }, 3000);
-      } else {
-        const errorMessage = result.message || result.error || 'حدث خطأ أثناء إرسال الطلب';
-        setSubmitResult({
-          success: false,
-          message: errorMessage
-        });
-        showApiError(result);
-      }
-    } catch (error) {
-      console.error('خطأ في الاتصال:', error);
-      const errorMessage = 'حدث خطأ في الاتصال بالخادم';
-      setSubmitResult({
-        success: false,
-        message: errorMessage
-      });
+    } else {
+      const errorMessage = result.message || result.error || 'حدث خطأ أثناء إرسال الطلب';
       showToast('error', errorMessage, 5000);
-    } finally {
-      setSubmitting(false);
+      // إغلاق الفورم فوراً عند فشل API
+      setShowInterestForm(false);
     }
-  };
+  } catch (error) {
+    console.error('خطأ في الاتصال:', error);
+    const errorMessage = 'حدث خطأ في الاتصال بالخادم';
+    showToast('error', errorMessage, 5000);
+    // إغلاق الفورم فوراً عند خطأ الاتصال
+    setShowInterestForm(false);
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (loading) {
     return (
@@ -549,6 +555,37 @@ const PropertyDetailsPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 pb-6 pt-4" dir="rtl">
+      {/* Toast Container للمكون الحالي */}
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        closeOnClick
+        draggable
+        rtl
+        pauseOnHover
+        theme="light"
+        style={{
+          top: window.innerWidth < 768 ? "80px" : "80px",
+          right: "10px",
+          left: "auto",
+          width: "auto",
+          maxWidth: window.innerWidth < 768 ? "90%" : "400px",
+          fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+          fontSize: window.innerWidth < 768 ? "12px" : "14px",
+          zIndex: 999999
+        }}
+        toastStyle={{
+          borderRadius: "8px",
+          padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
+          marginBottom: "8px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          minHeight: window.innerWidth < 768 ? "40px" : "50px",
+          direction: "rtl",
+          textAlign: "right",
+          fontSize: window.innerWidth < 768 ? "12px" : "14px",
+        }}
+      />
+
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <button 
@@ -843,60 +880,58 @@ const PropertyDetailsPage = () => {
                 <button 
                   className="p-2 rounded-lg hover:bg-gray-100"
                   onClick={handleCloseInterestForm}
+                  disabled={submitting}
                 >
                   <FaTimes />
                 </button>
               </div>
               
-              {submitResult ? (
-                <div className={`p-6 rounded-lg text-center ${submitResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                  <p className={`mb-4 ${submitResult.success ? 'text-green-700' : 'text-red-700'}`}>
-                    {submitResult.message}
-                  </p>
-                  {submitResult.success ? (
-                    <button 
-                      onClick={handleCloseInterestForm} 
-                      className="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                    >
-                      إغلاق
-                    </button>
-                  ) : (
-                    <div className="flex gap-3 justify-center">
-                      {/* <button 
-                        onClick={() => setSubmitResult(null)} 
-                        className="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                      >
-                        حاول مرة أخرى
-                      </button> */}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <form onSubmit={handleSubmitInterest}>
-                  <div className="mb-6">
-                    <label className="block text-gray-700 font-medium mb-2">
+              {/* نعرض الفورم مباشرة بدون حالة submitResult */}
+              <form onSubmit={handleSubmitInterest}>
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-gray-700 font-medium">
                       <span>رسالة</span>
                     </label>
-                    <textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      placeholder="أدخل رسالتك أو استفسارك هنا (يجب أن يكون أكثر من 10 أحرف)"
-                      rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
-                      required
-                    />
+                    <div className={`text-xs font-medium ${
+                      formData.message.trim().length === 0 ? 'text-gray-500' :
+                      formData.message.trim().length < 10 ? 'text-red-500' : 
+                      'text-green-500'
+                    }`}>
+                      {formData.message.trim().length}/10 حرف
+                    </div>
                   </div>
-                  
-                  <button 
-                    type="submit" 
-                    className="w-full py-3.5 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={submitting}
-                  >
-                    {submitting ? 'جاري الإرسال...' : 'إرسال الطلب'}
-                  </button>
-                </form>
-              )}
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={(e) => {
+                      handleInputChange(e);
+                      // إزالة تأثير الخطأ عند البدء في الكتابة
+                      e.target.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+                    }}
+                    placeholder="أدخل رسالتك أو استفسارك هنا (يجب أن يكون أكثر من 10 أحرف)"
+                    rows={4}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
+                    required
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="text-xs text-gray-500">
+                      اكتب رسالة مفصلة عن اهتمامك
+                    </div>
+                    <div className="text-xs text-blue-500">
+                      {formData.message.trim().length >= 10 ? '✓ جاهز للإرسال' : 'اكتب 10 أحرف على الأقل'}
+                    </div>
+                  </div>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  className="w-full py-3.5 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={submitting}
+                >
+                  {submitting ? 'جاري الإرسال...' : 'إرسال الطلب'}
+                </button>
+              </form>
             </div>
           </div>
         </div>

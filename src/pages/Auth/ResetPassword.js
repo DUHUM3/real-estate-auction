@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { authApi } from '../../api/authApi';
-import '../../styles/AuthModal.css';
-
 import toast from 'react-hot-toast';
-
-import { FiLock, FiArrowRight, FiHome, FiLogIn, FiEye, FiEyeOff, FiCheck } from 'react-icons/fi';
+import Icons from '../../icons/index';
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -127,225 +124,269 @@ function ResetPassword() {
   };
 
   const getRequirementIcon = (isValid) => (
-    <span className={`requirement-icon ${isValid ? 'valid' : 'invalid'}`}>
-      {isValid ? <FiCheck /> : '•'}
+    <span className={`text-sm ${isValid ? 'text-green-600' : 'text-red-600'}`}>
+      {isValid ? <Icons.FiCheck
+ /> : '•'}
     </span>
   );
 
   if (success) {
     return (
-      <div className="auth-page-container">
-        <div className="auth-page-background">
-          <div className="background-pattern"></div>
+      <div className="min-h-screen flex items-center justify-center p-5 bg-gray-50 relative overflow-hidden rtl">
+        <div className="absolute inset-0 z-1">
+          <div className="absolute inset-0 bg-gradient-radial from-blue-100/30 via-transparent to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-radial from-yellow-100/30 via-transparent to-transparent"></div>
         </div>
 
-        <div className="auth-page-content">
-          <div className="auth-page-card">
-            {/* <div className="auth-page-header">
-              <Link to="/" className="back-home-btn">
-                <FiHome />
-                العودة للرئيسية
-              </Link>
-              <Link to="/login" className="auth-nav-btn">
-                <FiLogIn />
-                تسجيل الدخول
-              </Link>
-            </div> */}
-
-            <div className="auth-hero-section">
-              <div className="logo-container">
+        <div className="relative z-10 w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 animate-slide-up">
+            <div className="text-center mb-6">
+              <div className="mb-4">
                 <img
                   src="/images/logo2.webp"
                   alt="منصة الاراضي السعودية"
-                  className="auth-logo"
+                  className="max-w-40 h-auto max-h-16 mx-auto object-contain"
                 />
               </div>
-              <p className="auth-subtitle">تمت العملية بنجاح</p>
-              <div className="auth-divider"></div>
+              <p className="text-gray-600 font-light mb-3">تمت العملية بنجاح</p>
+              <div className="w-12 h-1 bg-yellow-500 rounded-full mx-auto"></div>
             </div>
 
-            <div className="success-state">
-              <div className="success-icon-large">
-                <FiCheck />
+            <div className="bg-gray-50 rounded-xl p-6 text-center mb-6">
+              <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-4 animate-bounce-in">
+                <Icons.FiCheck
+ />
               </div>
-              <h3 className="success-title">تم إعادة التعيين!</h3>
-              <p className="success-description">
+              <h3 className="text-blue-600 text-xl font-bold mb-3">تم إعادة التعيين!</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
                 تم إعادة تعيين كلمة المرور بنجاح. يمكنك الآن استخدام كلمة المرور الجديدة لتسجيل الدخول.
               </p>
             </div>
-
-            {/* <div className="auth-page-actions">
-              <Link to="/login" className="btn-auth-primary">
-                تسجيل الدخول
-                <FiArrowRight className="btn-icon" />
-              </Link>
-            </div> */}
           </div>
         </div>
       </div>
     );
   }
 
+  const getStrengthBarWidth = () => {
+    switch(passwordStrength.class) {
+      case 'weak': return '33%';
+      case 'medium': return '66%';
+      case 'strong': return '100%';
+      default: return '0%';
+    }
+  };
+
+  const getStrengthColor = () => {
+    switch(passwordStrength.class) {
+      case 'weak': return 'bg-red-500';
+      case 'medium': return 'bg-yellow-500';
+      case 'strong': return 'bg-green-500';
+      default: return 'bg-gray-300';
+    }
+  };
+
+  const getTextColor = () => {
+    switch(passwordStrength.class) {
+      case 'weak': return 'text-red-600';
+      case 'medium': return 'text-yellow-600';
+      case 'strong': return 'text-green-600';
+      default: return 'text-gray-600';
+    }
+  };
+
   return (
-    <div className="auth-page-container">
-      <div className="auth-page-background">
-        <div className="background-pattern"></div>
+    <div className="min-h-screen flex items-center justify-center p-5 bg-gray-50 relative overflow-hidden rtl">
+      <div className="absolute inset-0 z-1">
+        <div className="absolute inset-0 bg-gradient-radial from-blue-100/30 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-radial from-yellow-100/30 via-transparent to-transparent"></div>
       </div>
 
-      <div className="auth-page-content">
-        <div className="auth-page-card">
-          {/* <div className="auth-page-header">
-            <Link to="/" className="back-home-btn">
-              <FiHome />
-              العودة للرئيسية
-            </Link>
-            <Link to="/login" className="auth-nav-btn">
-              <FiLogIn />
-              تسجيل الدخول
-            </Link>
-          </div> */}
-
-          <div className="auth-hero-section">
-            <div className="logo-container">
+      <div className="relative z-10 w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 animate-slide-up">
+          <div className="text-center mb-6">
+            <div className="mb-4">
               <img
                 src="/images/logo2.webp"
                 alt="منصة الاراضي السعودية"
-                className="auth-logo"
+                className="max-w-40 h-auto max-h-16 mx-auto object-contain"
               />
             </div>
-            <p className="auth-subtitle">تعيين كلمة مرور جديدة</p>
-            <div className="auth-divider"></div>
+            <p className="text-gray-600 font-light mb-3">تعيين كلمة مرور جديدة</p>
+            <div className="w-12 h-1 bg-yellow-500 rounded-full mx-auto"></div>
           </div>
 
-          {/* <div className="auth-tabs">
-            <Link to="/login" className="auth-tab">
-              تسجيل الدخول
-            </Link>
-            <button className="auth-tab active">
-              إعادة التعيين
-            </button>
-          </div> */}
-
-          <form onSubmit={handleSubmit} className="auth-form">
-            <div className="form-group password-group">
-              <label className="form-label">كلمة المرور الجديدة</label>
-              <div className="password-input-container">
-                <FiLock className="input-icon" />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="block text-blue-600 font-semibold text-sm mb-2">
+                كلمة المرور الجديدة
+              </label>
+              <div className="relative">
+                <Icons.FiLock
+ className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="أدخل كلمة المرور الجديدة"
                   value={formData.password}
                   onChange={handlePasswordChange}
-                  className={`form-input password-input ${fieldErrors.password ? "input-error" : ""}`}
+                  className={`w-full px-4 py-3 pl-12 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 ${
+                    fieldErrors.password ? 'border-red-500' : 'border-gray-300'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   disabled={loading}
                 />
                 <button
                   type="button"
-                  className="password-toggle-btn"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 p-1 rounded transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={loading}
                 >
-                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                  {showPassword ? <Icons.FiEyeOff
+ className="text-lg" /> : <Icons.FiEye
+ className="text-lg" />}
                 </button>
               </div>
 
               {formData.password && (
-                <div className="password-strength">
-                  <div className="strength-bar">
-                    <div className={`strength-fill ${passwordStrength.class}`}></div>
+                <div className="mt-3">
+                  <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-300 ${getStrengthColor()}`}
+                      style={{ width: getStrengthBarWidth() }}
+                    ></div>
                   </div>
-                  <div className="strength-text">
-                    قوة كلمة المرور: <span className={passwordStrength.class}>{passwordStrength.text}</span>
+                  <div className="text-xs text-gray-600 mt-1 text-right">
+                    قوة كلمة المرور: <span className={`font-semibold ${getTextColor()}`}>
+                      {passwordStrength.text}
+                    </span>
                   </div>
                 </div>
               )}
 
               {formData.password && (
-                <ul className="requirements-list">
-                  <li className={`requirement-item ${formData.password.length >= 8 ? 'valid' : 'invalid'}`}>
-                    {getRequirementIcon(formData.password.length >= 8)}
-                    8 أحرف على الأقل
-                  </li>
-                  <li className={`requirement-item ${/[A-Z]/.test(formData.password) ? 'valid' : 'invalid'}`}>
-                    {getRequirementIcon(/[A-Z]/.test(formData.password))}
-                    حرف كبير (A-Z)
-                  </li>
-                  <li className={`requirement-item ${/[a-z]/.test(formData.password) ? 'valid' : 'invalid'}`}>
-                    {getRequirementIcon(/[a-z]/.test(formData.password))}
-                    حرف صغير (a-z)
-                  </li>
-                  <li className={`requirement-item ${/\d/.test(formData.password) ? 'valid' : 'invalid'}`}>
-                    {getRequirementIcon(/\d/.test(formData.password))}
-                    رقم واحد على الأقل
-                  </li>
+                <ul className="mt-3 space-y-1">
+                  {[
+                    { text: '8 أحرف على الأقل', isValid: formData.password.length >= 8 },
+                    { text: 'حرف كبير (A-Z)', isValid: /[A-Z]/.test(formData.password) },
+                    { text: 'حرف صغير (a-z)', isValid: /[a-z]/.test(formData.password) },
+                    { text: 'رقم واحد على الأقل', isValid: /\d/.test(formData.password) }
+                  ].map((req, index) => (
+                    <li 
+                      key={index}
+                      className={`flex items-center gap-2 text-xs ${
+                        req.isValid ? 'text-green-600' : 'text-red-600'
+                      }`}
+                    >
+                      {getRequirementIcon(req.isValid)}
+                      {req.text}
+                    </li>
+                  ))}
                 </ul>
               )}
 
               {fieldErrors.password && (
-                <p className="field-error-text">{fieldErrors.password}</p>
+                <p className="text-red-600 text-xs mt-1 mr-1">{fieldErrors.password}</p>
               )}
             </div>
 
-            <div className="form-group password-group">
-              <label className="form-label">تأكيد كلمة المرور</label>
-              <div className="password-input-container">
-                <FiLock className="input-icon" />
+            <div className="space-y-2">
+              <label className="block text-blue-600 font-semibold text-sm mb-2">
+                تأكيد كلمة المرور
+              </label>
+              <div className="relative">
+                <Icons.FiLock
+ className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
                   placeholder="أعد إدخال كلمة المرور الجديدة"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className={`form-input password-input ${fieldErrors.confirmPassword ? "input-error" : ""}`}
+                  className={`w-full px-4 py-3 pl-12 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 ${
+                    fieldErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   disabled={loading}
                 />
                 <button
                   type="button"
-                  className="password-toggle-btn"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 p-1 rounded transition-colors"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   disabled={loading}
                 >
-                  {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                  {showConfirmPassword ? <Icons.FiEyeOff
+ className="text-lg" /> : <Icons.FiEye
+ className="text-lg" />}
                 </button>
               </div>
 
               {fieldErrors.confirmPassword && (
-                <p className="field-error-text">{fieldErrors.confirmPassword}</p>
+                <p className="text-red-600 text-xs mt-1 mr-1">{fieldErrors.confirmPassword}</p>
               )}
             </div>
 
             {fieldErrors.submit && (
-              <div className="error-message">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm text-center">
                 {fieldErrors.submit}
               </div>
             )}
 
             <button
               type="submit"
-              className="btn-auth-primary"
+              className={`w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
               disabled={loading}
             >
-              {loading ? "جاري إعادة التعيين..." : "إعادة تعيين كلمة المرور"}
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  جاري إعادة التعيين...
+                </>
+              ) : (
+                'إعادة تعيين كلمة المرور'
+              )}
             </button>
           </form>
-
-          {/* <div className="auth-page-footer">
-            <p className="footer-text">
-              تذكرت كلمة المرور؟{' '}
-              <Link to="/login" className="footer-link">
-                تسجيل الدخول
-              </Link>
-            </p>
-            <p className="footer-text">
-              ليس لديك حساب؟{' '}
-              <Link to="/register" className="footer-link">
-                إنشاء حساب جديد
-              </Link>
-            </p>
-          </div> */}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes bounce-in {
+          0% {
+            opacity: 0;
+            transform: scale(0.3);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.05);
+          }
+          70% {
+            transform: scale(0.9);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+        
+        .animate-slide-up {
+          animation: slide-up 0.4s ease-out;
+        }
+        
+        .animate-bounce-in {
+          animation: bounce-in 0.6s ease-out;
+        }
+      `}</style>
     </div>
   );
 }

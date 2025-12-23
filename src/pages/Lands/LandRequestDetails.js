@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ModalContext } from '../../App';
 import { useAuth } from '../../context/AuthContext';
 // استبدال react-hot-toast بـ react-toastify
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
   FaMapMarkerAlt,
@@ -82,7 +82,6 @@ const LandRequestDetails = () => {
   const [offerMessage, setOfferMessage] = useState('');
   const [offerLoading, setOfferLoading] = useState(false);
   const [showOfferForm, setShowOfferForm] = useState(false);
-  const [submitResult, setSubmitResult] = useState(null);
 
   // دالة لعرض رسائل الخطأ من API
   const showApiError = (errorObj) => {
@@ -324,97 +323,125 @@ const LandRequestDetails = () => {
   const handleCloseOfferForm = () => {
     setShowOfferForm(false);
     setOfferMessage('');
-    setSubmitResult(null);
   };
 
-  const validateForm = () => {
-    if (offerMessage.trim().length < 10) {
-      showToast('error', "تفاصيل العرض يجب أن تكون أكثر من 10 أحرف", 5000);
-      return false;
-    }
-    return true;
-  };
-
-  const handleOfferSubmit = async (e) => {
-    e.preventDefault();
+const validateForm = () => {
+  const trimmedMessage = offerMessage.trim();
+  
+  if (trimmedMessage.length < 10) {
+    showToast('error', "تفاصيل العرض يجب أن تكون أكثر من 10 أحرف", 5000);
     
-    if (!offerMessage.trim()) {
-      showToast('error', 'يرجى إدخال تفاصيل العرض', 3000);
-      return;
+    // إضافة تأثير مرئي لحقل الإدخال
+    const textarea = document.querySelector('textarea[name="offerMessage"]');
+    if (textarea) {
+      textarea.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+      setTimeout(() => {
+        textarea.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+      }, 3000);
     }
+    
+    return false; // الفورم يبقى مفتوحاً
+  }
+  
+  if (trimmedMessage.length > 2000) {
+    showToast('error', "تفاصيل العرض يجب أن تكون أقل من 2000 حرف", 5000);
+    return false; // الفورم يبقى مفتوحاً
+  }
+  
+  return true;
+};
 
-    if (!validateForm()) {
-      return;
+ const handleOfferSubmit = async (e) => {
+  e.preventDefault();
+  
+  if (!offerMessage.trim()) {
+    showToast('error', 'يرجى إدخال تفاصيل العرض', 3000);
+    return;
+  }
+
+  // التحقق من طول الحروف - هنا يجب أن يبقى الفورم مفتوحاً
+  if (offerMessage.trim().length < 10) {
+    showToast('error', "تفاصيل العرض يجب أن تكون أكثر من 10 أحرف", 5000);
+    
+    // إضافة تأثير مرئي لحقل الإدخال
+    const textarea = document.querySelector('textarea[name="offerMessage"]');
+    if (textarea) {
+      textarea.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+      setTimeout(() => {
+        textarea.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+      }, 3000);
     }
+    
+    return; // لا تغلق الفورم هنا
+  }
+  
+  // التحقق من الحد الأقصى للحروف
+  if (offerMessage.trim().length > 2000) {
+    showToast('error', "تفاصيل العرض يجب أن تكون أقل من 2000 حرف", 5000);
+    return; // لا تغلق الفورم هنا أيضاً
+  }
 
-    try {
-      setOfferLoading(true);
-      setSubmitResult(null);
-      
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        showToast('error', 'يجب تسجيل الدخول أولاً', 3000);
-        setOfferLoading(false);
-        navigate('/login');
-        return;
-      }
-
-      const userType = getCurrentUserType();
-      if (userType === 'شركة مزادات') {
-        showToast('error', 'عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات', 5000);
-        setOfferLoading(false);
-        return;
-      }
-
-      const response = await fetch(
-        `https://core-api-x41.shaheenplus.sa/api/land-requests/${id}/offers`,
-        {
-          method: 'POST',
-          headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ 
-            message: offerMessage.trim()
-          })
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        setOfferMessage('');
-        setOfferLoading(false);
-        
-        const successMessage = result.message || 'تم تقديم العرض بنجاح!';
-        setSubmitResult({
-          success: true,
-          message: successMessage
-        });
-        showToast('success', successMessage);
-        
-        setTimeout(() => {
-          setShowOfferForm(false);
-          setSubmitResult(null);
-        }, 3000);
-        
-      } else {
-        throw new Error(result.message || 'حدث خطأ في تقديم العرض');
-      }
-      
-    } catch (err) {
-      console.error('❌ خطأ في تقديم العرض:', err);
+  try {
+    setOfferLoading(true);
+    
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      showToast('error', 'يجب تسجيل الدخول أولاً', 3000);
       setOfferLoading(false);
-      const errorMessage = err.message || 'حدث خطأ في تقديم العرض';
-      setSubmitResult({
-        success: false,
-        message: errorMessage
-      });
-      showApiError(err);
+      setShowOfferForm(false); // هنا نغلق الفورم
+      navigate('/login');
+      return;
     }
-  };
 
+    const userType = getCurrentUserType();
+    if (userType === 'شركة مزادات') {
+      showToast('error', 'عذراً، شركات المزادات غير مسموح لها بتقديم عروض على الطلبات', 5000);
+      setOfferLoading(false);
+      setShowOfferForm(false); // هنا نغلق الفورم
+      return;
+    }
+
+    const response = await fetch(
+      `https://core-api-x41.shaheenplus.sa/api/land-requests/${id}/offers`,
+      {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          message: offerMessage.trim()
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      const successMessage = result.message || 'تم تقديم العرض بنجاح!';
+      showToast('success', successMessage);
+      
+      // إغلاق الفورم عند النجاح
+      setShowOfferForm(false);
+      setOfferMessage('');
+      setOfferLoading(false);
+      
+    } else {
+      // في حالة فشل الـ API، نغلق الفورم أيضاً
+      const errorMessage = result.message || 'حدث خطأ في تقديم العرض';
+      showToast('error', errorMessage);
+      setShowOfferForm(false); // هنا نغلق الفورم
+      setOfferLoading(false);
+    }
+    
+  } catch (err) {
+    console.error('❌ خطأ في تقديم العرض:', err);
+    setOfferLoading(false);
+    showApiError(err);
+    setShowOfferForm(false); // هنا نغلق الفورم بعد خطأ الـ API
+  }
+};
   const getPurposeLabel = (purpose) => purpose === 'sale' ? 'بيع' : 'إيجار';
   
   const getTypeLabel = (type) => {
@@ -499,6 +526,37 @@ const LandRequestDetails = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 pb-6 pt-4" dir="rtl">
+      {/* Toast Container للمكون الحالي */}
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        closeOnClick
+        draggable
+        rtl
+        pauseOnHover
+        theme="light"
+        style={{
+          top: window.innerWidth < 768 ? "80px" : "80px",
+          right: "10px",
+          left: "auto",
+          width: "auto",
+          maxWidth: window.innerWidth < 768 ? "90%" : "400px",
+          fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+          fontSize: window.innerWidth < 768 ? "12px" : "14px",
+          zIndex: 999999
+        }}
+        toastStyle={{
+          borderRadius: "8px",
+          padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
+          marginBottom: "8px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          minHeight: window.innerWidth < 768 ? "40px" : "50px",
+          direction: "rtl",
+          textAlign: "right",
+          fontSize: window.innerWidth < 768 ? "12px" : "14px",
+        }}
+      />
+
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <button 
@@ -689,60 +747,52 @@ const LandRequestDetails = () => {
                 </button>
               </div>
               
-              {submitResult ? (
-                <div className={`p-6 rounded-lg text-center ${submitResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                  <p className={`mb-4 ${submitResult.success ? 'text-green-700' : 'text-red-700'}`}>
-                    {submitResult.message}
-                  </p>
-                  {submitResult.success ? (
-                    <button 
-                      onClick={handleCloseOfferForm} 
-                      className="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                    >
-                      إغلاق
-                    </button>
-                  ) : (
-                    <div className="flex gap-3 justify-center">
-                      <button 
-                        onClick={handleCloseOfferForm} 
-                        className="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50"
-                      >
-                        إلغاء
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <form onSubmit={handleOfferSubmit}>
-                  <div className="mb-6">
-                    <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
+              <form onSubmit={handleOfferSubmit}>
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="flex items-center gap-2 text-gray-700 font-medium">
                       <FaEdit />
                       <span>تفاصيل العرض</span>
                     </label>
-                    <textarea
-                      name="offerMessage"
-                      value={offerMessage}
-                      onChange={(e) => setOfferMessage(e.target.value)}
-                      placeholder="أدخل تفاصيل العرض هنا... مثلاً: لدي أرض تناسب متطلباتك في الموقع المطلوب مع توفر جميع الخدمات..."
-                      rows={5}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
-                      required
-                    />
-                    <div className="text-xs text-gray-500 mt-2">
-                      اكتب وصفاً واضحاً ومفصلاً لعرضك (يجب أن يكون أكثر من 10 أحرف)
+                    <div className={`text-xs font-medium ${
+                      offerMessage.trim().length === 0 ? 'text-gray-500' :
+                      offerMessage.trim().length < 10 ? 'text-red-500' : 
+                      'text-green-500'
+                    }`}>
+                      {offerMessage.trim().length}/10 حرف
                     </div>
                   </div>
-                  
-                  <button 
-                    type="submit" 
-                    className="w-full py-3.5 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={offerLoading}
-                  >
-                    <FaPaperPlane />
-                    {offerLoading ? 'جاري الإرسال...' : 'إرسال العرض'}
-                  </button>
-                </form>
-              )}
+                  <textarea
+                    name="offerMessage"
+                    value={offerMessage}
+                    onChange={(e) => {
+                      setOfferMessage(e.target.value);
+                      // إزالة تأثير الخطأ عند البدء في الكتابة
+                      e.target.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+                    }}
+                    placeholder="أدخل تفاصيل العرض هنا... مثلاً: لدي أرض تناسب متطلباتك في الموقع المطلوب مع توفر جميع الخدمات..."
+                    rows={5}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none transition-all"
+                    required
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="text-xs text-gray-500">
+                      اكتب وصفاً واضحاً ومفصلاً لعرضك
+                    </div>
+                    <div className="text-xs text-blue-500">
+                      {offerMessage.trim().length >= 10 ? '✓ جاهز للإرسال' : 'اكتب 10 أحرف على الأقل'}
+                    </div>
+                  </div>
+                </div>  
+                <button 
+                  type="submit" 
+                  className="w-full py-3.5 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={offerLoading}
+                >
+                  <FaPaperPlane />
+                  {offerLoading ? 'جاري الإرسال...' : 'إرسال العرض'}
+                </button>
+              </form>
             </div>
           </div>
         </div>

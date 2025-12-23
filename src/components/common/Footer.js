@@ -10,7 +10,6 @@ import {
   FaEnvelope,
   FaShieldAlt,
   FaFileContract,
-  FaChevronLeft,
   FaPaperPlane,
 } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";

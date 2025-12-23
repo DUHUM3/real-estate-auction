@@ -4,23 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ModalContext } from '../../App';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { 
-  FaArrowRight, 
-  FaCheck, 
-  FaExclamationTriangle, 
-  FaUpload, 
-  FaTimes,
-  FaEye,
-  FaPlus,
-  FaBan,
-  FaMapMarkerAlt,
-  FaFileAlt,
-  FaRulerCombined,
-  FaTag,
-  FaChevronRight,
-  FaRegClock,
-  FaRegFileAlt
-} from 'react-icons/fa';
+import Icons from '../../icons/index';
 import { landApi } from '../../api/landRequestApi';
 import { locationService } from '../../utils/LocationForFiltters';
 
@@ -445,7 +429,7 @@ function CreateLandRequest() {
                   onClick={() => navigate(-1)}
                   className="flex items-center gap-2 text-gray-600 hover:text-[#53a1dd] p-2 rounded-lg hover:bg-blue-50 transition-colors"
                 >
-                  <FaArrowRight className="text-lg" />
+                  <Icons.FaArrowRight className="text-lg" />
                   <span className="hidden sm:inline">رجوع</span>
                 </button>
               </div>
@@ -468,7 +452,7 @@ function CreateLandRequest() {
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="p-8 md:p-12 text-center">
               <div className="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FaBan className="text-3xl" />
+                <Icons.FaBan className="text-3xl" />
               </div>
               <h2 className="text-2xl font-bold text-gray-800 mb-4">غير مسموح</h2>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
@@ -540,7 +524,7 @@ function CreateLandRequest() {
                 disabled={loading}
                 className="flex items-center gap-2 text-gray-600 hover:text-[#53a1dd] p-2 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <FaArrowRight className="text-lg" />
+                <Icons.FaArrowRight className="text-lg" />
                 <span className="hidden sm:inline">رجوع</span>
               </button>
             </div>
@@ -570,7 +554,7 @@ function CreateLandRequest() {
           ) : success ? (
             <div className="p-8 md:p-12 text-center">
               <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FaCheck className="text-3xl" />
+                <Icons.FaCheck className="text-3xl" />
               </div>
               <h2 className="text-2xl font-bold text-gray-800 mb-4">تم إنشاء الطلب بنجاح</h2>
               <p className="text-gray-600 mb-8 max-w-lg mx-auto">
@@ -632,14 +616,14 @@ function CreateLandRequest() {
                   onClick={() => navigate('/my-requests')}
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2"
                 >
-                  <FaEye />
+                  <Icons.FaEye />
                   عرض طلباتي
                 </button>
                 <button 
                   onClick={handleCreateNew} 
                   className="px-6 py-3 bg-[#53a1dd] text-white rounded-lg hover:bg-[#478bc5] transition-colors font-medium flex items-center justify-center gap-2"
                 >
-                  <FaPlus />
+                  <Icons.FaPlus />
                   إنشاء طلب جديد
                 </button>
               </div>
@@ -658,7 +642,7 @@ function CreateLandRequest() {
                     <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
                       <div className="flex items-center gap-3 mb-6">
                         <div className="w-12 h-12 bg-[#53a1dd] text-white rounded-lg flex items-center justify-center">
-                          <FaMapMarkerAlt className="text-lg" />
+                          <Icons.FaMapMarkerAlt className="text-lg" />
                         </div>
                         <div>
                           <h3 className="text-xl font-bold text-gray-800">الموقع والمنطقة</h3>
@@ -710,7 +694,7 @@ function CreateLandRequest() {
                     <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
                       <div className="flex items-center gap-3 mb-6">
                         <div className="w-12 h-12 bg-[#53a1dd] text-white rounded-lg flex items-center justify-center">
-                          <FaFileAlt className="text-lg" />
+                          <Icons.FaFileAlt className="text-lg" />
                         </div>
                         <div>
                           <h3 className="text-xl font-bold text-gray-800">تفاصيل الأرض</h3>
@@ -790,7 +774,7 @@ function CreateLandRequest() {
                     <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
                       <div className="flex items-center gap-3 mb-6">
                         <div className="w-12 h-12 bg-[#53a1dd] text-white rounded-lg flex items-center justify-center">
-                          <FaTag className="text-lg" />
+                          <Icons.FaTag className="text-lg" />
                         </div>
                         <div>
                           <h3 className="text-xl font-bold text-gray-800">الوصف التفصيلي</h3>
@@ -822,7 +806,7 @@ function CreateLandRequest() {
                       <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-[#53a1dd] text-white rounded-lg flex items-center justify-center">
-                            <FaUpload className="text-lg" />
+                            <Icons.FaUpload className="text-lg" />
                           </div>
                           <div>
                             <h3 className="text-xl font-bold text-gray-800">المرفقات</h3>
@@ -853,7 +837,7 @@ function CreateLandRequest() {
                         
                         <div className="flex flex-col items-center gap-4">
                           <div className="w-20 h-20 bg-blue-100 text-[#53a1dd] rounded-full flex items-center justify-center">
-                            <FaUpload className="text-3xl" />
+                            <Icons.FaUpload className="text-3xl" />
                           </div>
                           <div>
                             <p className="text-gray-700 font-medium mb-2">
@@ -885,7 +869,7 @@ function CreateLandRequest() {
                                   onClick={() => removeImage(index)}
                                   className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-lg"
                                 >
-                                  <FaTimes />
+                                  <Icons.FaTimes />
                                 </button>
                                 <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-2 text-xs">
                                   <div className="truncate">
@@ -930,7 +914,7 @@ function CreateLandRequest() {
                     {error && (
                       <div className="bg-red-50 border-r-4 border-red-500 p-4 rounded-lg">
                         <div className="flex items-center gap-3">
-                          <FaExclamationTriangle className="text-red-500 flex-shrink-0" />
+                          <Icons.FaExclamationTriangle className="text-red-500 flex-shrink-0" />
                           <span className="text-red-700">{error}</span>
                         </div>
                       </div>
@@ -963,7 +947,7 @@ function CreateLandRequest() {
                           </span>
                         ) : (
                           <span className="flex items-center justify-center gap-2">
-                            <FaCheck />
+                            <Icons.FaCheck />
                             إنشاء طلب الأرض
                           </span>
                         )}
@@ -982,37 +966,37 @@ function CreateLandRequest() {
                   
                   <div className="relative z-10 flex flex-col items-center mb-8 md:mb-0 bg-white px-4">
                     <div className="w-12 h-12 rounded-full bg-[#53a1dd] text-white flex items-center justify-center mb-3 shadow-md">
-                      <FaRegFileAlt className="text-lg" />
+                      <Icons.FaRegFileAlt className="text-lg" />
                     </div>
                     <span className="text-sm font-medium text-gray-700">تعبئة النموذج</span>
                     <span className="text-xs text-gray-500 mt-1">الخطوة الأولى</span>
                   </div>
                   
                   <div className="hidden md:block">
-                    <FaChevronRight className="text-gray-400" />
+                    <Icons.FaChevronRight className="text-gray-400" />
                   </div>
                   <div className="block md:hidden my-4">
-                    <FaChevronRight className="text-gray-400 rotate-90" />
+                    <Icons.FaChevronRight className="text-gray-400 rotate-90" />
                   </div>
                   
                   <div className="relative z-10 flex flex-col items-center mb-8 md:mb-0 bg-white px-4">
                     <div className="w-12 h-12 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center mb-3">
-                      <FaRegClock className="text-lg" />
+                      <Icons.FaRegClock className="text-lg" />
                     </div>
                     <span className="text-sm font-medium text-gray-400">المراجعة</span>
                     <span className="text-xs text-gray-400 mt-1">الخطوة الثانية</span>
                   </div>
                   
                   <div className="hidden md:block">
-                    <FaChevronRight className="text-gray-400" />
+                    <Icons.FaChevronRight className="text-gray-400" />
                   </div>
                   <div className="block md:hidden my-4">
-                    <FaChevronRight className="text-gray-400 rotate-90" />
+                    <Icons.FaChevronRight className="text-gray-400 rotate-90" />
                   </div>
                   
                   <div className="relative z-10 flex flex-col items-center bg-white px-4">
                     <div className="w-12 h-12 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center mb-3">
-                      <FaCheck className="text-lg" />
+                      <Icons.FaCheck className="text-lg" />
                     </div>
                     <span className="text-sm font-medium text-gray-400">الإكمال</span>
                     <span className="text-xs text-gray-400 mt-1">الخطوة الثالثة</span>
@@ -1028,7 +1012,7 @@ function CreateLandRequest() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 bg-blue-50 text-[#53a1dd] rounded-lg flex items-center justify-center flex-shrink-0">
-                <FaRegClock />
+                <Icons.FaRegClock />
               </div>
               <div>
                 <h4 className="font-bold text-gray-800 mb-1">وقت المراجعة</h4>
@@ -1038,7 +1022,7 @@ function CreateLandRequest() {
             
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 bg-blue-50 text-[#53a1dd] rounded-lg flex items-center justify-center flex-shrink-0">
-                <FaExclamationTriangle />
+                <Icons.FaExclamationTriangle />
               </div>
               <div>
                 <h4 className="font-bold text-gray-800 mb-1">نقاط مهمة</h4>
@@ -1048,7 +1032,7 @@ function CreateLandRequest() {
             
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 bg-blue-50 text-[#53a1dd] rounded-lg flex items-center justify-center flex-shrink-0">
-                <FaCheck />
+                <Icons.FaCheck />
               </div>
               <div>
                 <h4 className="font-bold text-gray-800 mb-1">ضمان الجودة</h4>
