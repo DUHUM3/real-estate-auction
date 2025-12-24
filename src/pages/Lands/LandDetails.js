@@ -23,6 +23,51 @@ import {
   FaFileContract
 } from 'react-icons/fa';
 
+// مسار أيقونة الريال السعودي
+const riyalIconUrl = '/images/rail.svg';
+
+// مكون أيقونة الريال السعودي
+const SaudiRiyalIcon = ({ className = "w-4 h-4" }) => {
+  return (
+    <img 
+      src={riyalIconUrl}
+      alt="ريال سعودي"
+      className={`inline-block ${className}`}
+      style={{ 
+        verticalAlign: "middle"
+      }}
+      onError={(e) => {
+        console.error('فشل تحميل أيقونة الريال');
+        e.target.style.display = 'none';
+      }}
+    />
+  );
+};
+
+// دالة لعرض السعر مع أيقونة الريال
+const formatPriceWithIcon = (price) => {
+  if (!price) return (
+    <span className="inline-flex items-center gap-1">
+      <span>0</span>
+      <SaudiRiyalIcon className="w-4 h-4" />
+    </span>
+  );
+  
+  const formattedPrice = parseFloat(price).toLocaleString('ar-SA');
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span>{formattedPrice}</span>
+      <SaudiRiyalIcon className="w-4 h-4" />
+    </span>
+  );
+};
+
+// دالة لعرض السعر بدون أيقونة (للمساحة)
+const formatPrice = (price) => {
+  if (!price) return '0';
+  return parseFloat(price).toLocaleString('ar-SA');
+};
+
 // دالة مساعدة لعرض الرسائل
 const showToast = (type, message, duration = 3000) => {
   const isMobile = window.innerWidth < 768;
@@ -329,11 +374,6 @@ const PropertyDetailsPage = () => {
     return text || '';
   };
 
-  const formatPrice = (price) => {
-    if (!price) return '0';
-    return parseFloat(price).toLocaleString('ar-SA');
-  };
-
   const formatDate = (dateString) => {
     try {
       const date = new Date(dateString);
@@ -593,7 +633,7 @@ const handleSubmitInterest = async (e) => {
           className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
         >
           <FaArrowLeft />
-          <span>رجوع</span>
+          <span></span>
         </button>
         <div className="flex gap-2">
           <button 
@@ -751,7 +791,10 @@ const handleSubmitInterest = async (e) => {
                   <FaMoneyBillWave className="text-blue-500" />
                   <div>
                     <span className="block text-sm text-gray-500">سعر المتر</span>
-                    <span className="font-semibold text-gray-700">{formatPrice(data.price_per_sqm)} ر.س</span>
+                    <span className="font-semibold text-gray-700">
+                      {/* استبدال "ر.س" بأيقونة الريال */}
+                      {formatPriceWithIcon(data.price_per_sqm)}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -774,7 +817,8 @@ const handleSubmitInterest = async (e) => {
                     <div>
                       <span className="block text-sm text-gray-700">السعر الإجمالي</span>
                       <span className="font-bold text-blue-600 text-lg">
-                        {formatPrice(parseFloat(data.total_area) * parseFloat(data.price_per_sqm))} ر.س
+                        {/* استبدال "ر.س" بأيقونة الريال */}
+                        {formatPriceWithIcon(parseFloat(data.total_area) * parseFloat(data.price_per_sqm))}
                       </span>
                     </div>
                   </div>

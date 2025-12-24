@@ -226,16 +226,16 @@ function Interests() {
                           <div className="w-8 h-8 bg-purple-50 rounded flex items-center justify-center">
                             <FaPhone className="w-4 h-4 text-purple-600" />
                           </div>
-                          <div>
+                          {/* <div>
                             <p className="text-sm text-gray-600">الهاتف</p>
                             <p className="font-medium text-gray-900 text-sm">
                               {interest.phone}
                             </p>
-                          </div>
+                          </div> */}
                         </div>
 
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-orange-50 rounded flex items-center justify-center">
+                          {/* <div className="w-8 h-8 bg-orange-50 rounded flex items-center justify-center">
                             <FaEnvelope className="w-4 h-4 text-orange-600" />
                           </div>
                           <div>
@@ -243,7 +243,7 @@ function Interests() {
                             <p className="font-medium text-gray-900 text-sm">
                               {interest.email}
                             </p>
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     </div>

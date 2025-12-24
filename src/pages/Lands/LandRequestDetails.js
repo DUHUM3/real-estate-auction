@@ -564,7 +564,7 @@ const validateForm = () => {
           className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
         >
           <FaArrowLeft />
-          <span>العودة</span>
+          <span></span>
         </button>
         <div className="flex gap-2">
           <button 

@@ -326,37 +326,50 @@ const PropertiesPage = () => {
   };
 
   // Favorite Handlers
-  const toggleFavorite = async (type, id, e) => {
-    e?.stopPropagation();
-    const token = localStorage.getItem('token');
-    const api = type === 'properties' ? propertiesApi : auctionsApi;
-    const storageKey = type === 'properties' ? 'propertyFavorites' : 'auctionFavorites';
+ // Favorite Handlers
+const toggleFavorite = async (type, id, e) => {
+  e?.stopPropagation();
+  
+  // التحقق أولاً إذا كان المستخدم مسجل دخول
+  const token = localStorage.getItem('token');
+  
+  // إذا لم يكن مسجل دخول، افتح نافذة تسجيل الدخول
+  if (!token) {
+    openLogin(() => {
+      // بعد تسجيل الدخول الناجح، أعد تحميل الصفحة أو جدد بيانات المستخدم
+      window.location.reload();
+    });
+    return;
+  }
+  
+  // إذا كان مسجل دخول، تابع عملية الإضافة/الحذف من المفضلة
+  const api = type === 'properties' ? propertiesApi : auctionsApi;
+  const storageKey = type === 'properties' ? 'propertyFavorites' : 'auctionFavorites';
+  
+  try {
+    const data = await api.toggleFavorite(id, token);
     
-    try {
-      const data = await api.toggleFavorite(id, token);
-      
-      if (data.success) {
-        const action = data.action;
-        const currentFavorites = favorites[type] || [];
-        let newFavorites;
+    if (data.success) {
+      const action = data.action;
+      const currentFavorites = favorites[type] || [];
+      let newFavorites;
 
-        if (action === 'added') {
-          newFavorites = [...currentFavorites, id];
-          showToast('success', 'تمت الإضافة إلى المفضلة بنجاح');
-        } else {
-          newFavorites = currentFavorites.filter(favId => favId !== id);
-          showToast('info', 'تمت الإزالة من المفضلة');
-        }
-
-        setFavorites(prev => ({ ...prev, [type]: newFavorites }));
-        localStorage.setItem(storageKey, JSON.stringify(newFavorites));
+      if (action === 'added') {
+        newFavorites = [...currentFavorites, id];
+        showToast('success', 'تمت الإضافة إلى المفضلة بنجاح');
+      } else {
+        newFavorites = currentFavorites.filter(favId => favId !== id);
+        showToast('info', 'تمت الإزالة من المفضلة');
       }
-    } catch (error) {
-      console.error('خطأ في تحديث المفضلة:', error);
-      handleLocalFavorite(type, id);
-    }
-  };
 
+      setFavorites(prev => ({ ...prev, [type]: newFavorites }));
+      localStorage.setItem(storageKey, JSON.stringify(newFavorites));
+    }
+  } catch (error) {
+    console.error('خطأ في تحديث المفضلة:', error);
+    showToast('error', 'حدث خطأ في تحديث المفضلة');
+  }
+};
   const handleLocalFavorite = (type, id) => {
     const storageKey = type === 'properties' ? 'propertyFavorites' : 'auctionFavorites';
     const currentFavorites = favorites[type] || [];
@@ -528,14 +541,14 @@ const renderPropertyCard = (property) => (
         >
           {property.status}
         </div>
-        <button
-          className={`absolute top-3 left-3 bg-white bg-opacity-95 rounded-full w-9 h-9 flex justify-center items-center transition-all hover:scale-110 shadow-md z-10
-            ${favorites.properties?.includes(property.id) ? 'text-red-500' : 'text-gray-400'}`}
-          onClick={(e) => toggleFavorite('properties', property.id, e)}
-          aria-label="إضافة إلى المفضلة"
-        >
-          <Icons.FaHeart />
-        </button>
+       <button
+  className={`absolute top-3 left-3 bg-white bg-opacity-95 rounded-full w-9 h-9 flex justify-center items-center transition-all hover:scale-110 shadow-md z-10
+    ${favorites.properties?.includes(property.id) ? 'text-red-500' : 'text-gray-400'}`}
+  onClick={(e) => toggleFavorite('properties', property.id, e)}
+  aria-label="إضافة إلى المفضلة"
+>
+  <Icons.FaHeart />
+</button>
       </div>
 
       <div className="p-4 flex flex-col gap-2.5 flex-grow">
@@ -551,21 +564,69 @@ const renderPropertyCard = (property) => (
             <Icons.FaRulerCombined className="text-amber-500" />
             <span dir="ltr">{propertiesUtils.formatPrice(property.total_area)} م²</span>
           </div>
-          <div className="flex items-center gap-1.5 text-sm font-semibold text-blue-500">
-            <Icons.FaMoneyBillWave className="text-amber-500" />
-            <span dir="ltr">
-              {property.purpose === 'بيع'
-                ? `${propertiesUtils.formatPrice(property.price_per_sqm)} ر.س/م²`
-                : `${propertiesUtils.formatPrice(property.estimated_investment_value)} ر.س`}
-            </span>
-          </div>
+        <div className="flex items-center gap-1.5 text-sm font-semibold text-blue-500">
+  <Icons.FaMoneyBillWave className="text-amber-500" />
+  <span dir="ltr" className="inline-flex items-center gap-0.5">
+    {property.purpose === 'بيع'
+      ? (
+        <>
+          <span>{propertiesUtils.formatPrice(property.price_per_sqm)}</span>
+          <span>/م²</span>
+          <img 
+            src="/images/rail.svg"
+            alt="ريال سعودي"
+            className="w-3.5 h-3.5 inline-block ml-0.5"
+            style={{ verticalAlign: "middle" }}
+            onError={(e) => {
+              e.target.style.display = 'none';
+              // بديل نصي
+              e.target.insertAdjacentHTML('afterend', '<span class="mr-0.5 text-xs">ر.س</span>');
+            }}
+          />
+        </>
+      )
+      : (
+        <>
+          <span>{propertiesUtils.formatPrice(property.estimated_investment_value)}</span>
+          <img 
+            src="/images/rail.svg"
+            alt="ريال سعودي"
+            className="w-3.5 h-3.5 inline-block ml-0.5"
+            style={{ verticalAlign: "middle" }}
+            onError={(e) => {
+              e.target.style.display = 'none';
+              // بديل نصي
+              e.target.insertAdjacentHTML('afterend', '<span class="mr-0.5 text-xs">ر.س</span>');
+            }}
+          />
+        </>
+      )}
+  </span>
+</div>
         </div>
 
-        {property.purpose === 'بيع' && property.price_per_sqm && property.total_area && (
-          <div className="font-bold text-amber-600 text-center bg-amber-50 p-2 rounded-md border border-dashed border-amber-200">
-            السعر الإجمالي: {propertiesUtils.formatPrice(propertiesUtils.calculateTotalPrice(property))} ر.س
-          </div>
-        )}
+     {property.purpose === 'بيع' && property.price_per_sqm && property.total_area && (
+  <div className="font-bold text-amber-600 text-center bg-amber-50 p-2 rounded-md border border-dashed border-amber-200">
+    السعر الإجمالي: 
+    <span className="inline-flex items-center gap-1 mr-1">
+      <span>{propertiesUtils.formatPrice(propertiesUtils.calculateTotalPrice(property))}</span>
+      <img 
+        src="/images/rail.svg"
+        alt="ريال سعودي"
+        className="w-4 h-4 inline-block"
+        style={{ 
+          verticalAlign: "middle",
+          filter: "brightness(0) saturate(100%) invert(42%) sepia(99%) saturate(535%) hue-rotate(1deg) brightness(95%) contrast(94%)"
+        }}
+        onError={(e) => {
+          e.target.style.display = 'none';
+          // بديل نصي
+          e.target.insertAdjacentHTML('afterend', '<span class="mr-0.5">ر.س</span>');
+        }}
+      />
+    </span>
+  </div>
+)}
 
         <div className="flex gap-2 flex-wrap mt-1.5">
           <span className={`text-xs font-bold py-1 px-2.5 rounded-full 
@@ -629,14 +690,14 @@ const renderPropertyCard = (property) => (
         >
           {auction.status}
         </div>
-        <button
-          className={`absolute top-3 left-3 bg-white bg-opacity-95 rounded-full w-9 h-9 flex justify-center items-center transition-all hover:scale-110 shadow-md z-10
-            ${favorites.auctions?.includes(auction.id) ? 'text-red-500' : 'text-gray-400'}`}
-          onClick={(e) => toggleFavorite('auctions', auction.id, e)}
-          aria-label="إضافة إلى المفضلة"
-        >
-          <Icons.FaHeart />
-        </button>
+       <button
+  className={`absolute top-3 left-3 bg-white bg-opacity-95 rounded-full w-9 h-9 flex justify-center items-center transition-all hover:scale-110 shadow-md z-10
+    ${favorites.auctions?.includes(auction.id) ? 'text-red-500' : 'text-gray-400'}`}
+  onClick={(e) => toggleFavorite('auctions', auction.id, e)}
+  aria-label="إضافة إلى المفضلة"
+>
+  <Icons.FaHeart />
+</button>
       </div>
 
       <div className="p-4 flex flex-col gap-2.5 flex-grow">

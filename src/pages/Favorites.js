@@ -397,12 +397,29 @@ function Favorites() {
                           <div className="w-8 h-8 bg-purple-50 rounded flex items-center justify-center">
                             <FaTag className="w-4 h-4 text-purple-600" />
                           </div>
-                          <div>
-                            <p className="text-sm text-gray-600">السعر الإجمالي</p>
-                            <p className="font-medium text-gray-900">
-                              {formatPrice(calculateTotalPrice(favorite.favoritable))} ر.س
-                            </p>
-                          </div>
+                         <div>
+  <p className="text-sm text-gray-600">السعر الإجمالي</p>
+  <p className="font-medium text-gray-900 inline-flex items-center gap-1">
+    <span>{formatPrice(calculateTotalPrice(favorite.favoritable))}</span>
+    <img 
+      src="/images/rail.svg"
+      alt="ريال سعودي"
+      className="w-4 h-4 inline-block"
+      style={{ verticalAlign: "middle" }}
+      onError={(e) => {
+        e.target.style.display = 'none';
+        // بديل نصي في حالة فشل الصورة
+        const parent = e.target.parentNode;
+        if (parent && !parent.querySelector('.riyal-fallback')) {
+          const fallback = document.createElement('span');
+          fallback.className = 'riyal-fallback text-gray-900 font-medium mr-1';
+          fallback.textContent = 'ر.س';
+          parent.appendChild(fallback);
+        }
+      }}
+    />
+  </p>
+</div>
                         </div>
                       )}
 

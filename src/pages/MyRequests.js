@@ -12,14 +12,12 @@ import MyRequestsSkeleton from '../Skeleton/MyRequestsSkeleton';
 
 // استيراد الأيقونات
 import { 
-  FaPlus,
   FaHome,
   FaGavel,
   FaMapMarkerAlt,
   FaCalendarAlt,
   FaTag,
   FaFileAlt,
-  FaTrash,
   FaExclamationTriangle,
   FaClock,
   FaCheckCircle,
@@ -105,60 +103,94 @@ function MyRequests() {
   const currentRequests = activeTab === 'lands' ? landRequests : auctionRequests;
 
   // تنسيق التاريخ
-  const formatDate = (dateString) => {
-    try {
+// تنسيق التاريخ
+const formatDate = (dateString) => {
+  try {
+    // إذا كان التاريخ غير موجود
+    if (!dateString) return 'غير محدد';
+    
+    // معالجة تنسيق "2025-12-24 07:28"
+    if (dateString.includes('-') && dateString.includes(':')) {
+      const [datePart, timePart] = dateString.split(' ');
+      const [year, month, day] = datePart.split('-');
+      const [hour, minute] = timePart ? timePart.split(':') : ['00', '00'];
+      
+      const date = new Date(year, month - 1, day, hour, minute);
+      return date.toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } else {
       const date = new Date(dateString);
       return date.toLocaleDateString('ar-SA', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
       });
-    } catch (error) {
-      return dateString;
     }
-  };
+  } catch (error) {
+    return dateString || 'غير محدد';
+  }
+};
 
   // الحصول على أيقونة الحالة
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'open':
-      case 'under_review':
-      case 'pending':
-        return <FaClock className="w-4 h-4 text-yellow-500" />;
-      case 'approved':
-        return <FaCheckCircle className="w-4 h-4 text-green-500" />;
-      case 'rejected':
-        return <FaTimesCircle className="w-4 h-4 text-red-500" />;
-      default:
-        return <FaClock className="w-4 h-4 text-gray-500" />;
-    }
-  };
+ // الحصول على أيقونة الحالة
+const getStatusIcon = (status) => {
+  switch (status) {
+    case 'open':
+    case 'under_review':
+    case 'pending':
+    case 'reviewed':
+      return <FaClock className="w-4 h-4 text-yellow-500" />;
+    case 'approved':
+    case 'completed':
+    case 'auctioned':
+      return <FaCheckCircle className="w-4 h-4 text-green-500" />;
+    case 'rejected':
+    case 'close':
+      return <FaTimesCircle className="w-4 h-4 text-red-500" />;
+    default:
+      return <FaClock className="w-4 h-4 text-gray-500" />;
+  }
+};
 
   // الحصول على نص الحالة
-  const getStatusText = (status, statusAr = '') => {
-    if (statusAr) return statusAr;
-    
-    const statusMap = {
-      'open': 'مفتوح',
-      'under_review': 'قيد المراجعة',
-      'approved': 'مقبول',
-      'rejected': 'مرفوض',
-      'pending': 'قيد الانتظار'
-    };
-    return statusMap[status] || status;
+// الحصول على نص الحالة
+const getStatusText = (status, statusAr = '') => {
+  // استخدم النص العربي من API إذا كان موجودًا وصالحًا
+  if (statusAr && statusAr !== 'غير محدد') return statusAr;
+  
+  const statusMap = {
+    'open': 'مفتوح',
+    'under_review': 'قيد المراجعة',
+    'reviewed': 'تم المراجعة',
+    'auctioned': 'تم المزاد',
+    'approved': 'مقبول',
+    'rejected': 'مرفوض',
+    'pending': 'قيد الانتظار',
+    'completed': 'مكتمل',
+    'close': 'مغلق'
   };
+  return statusMap[status] || status;
+};
 
   // الحصول على كلاس الحالة
-  const getStatusClass = (status) => {
-    const statusConfig = {
-      'open': 'bg-blue-50 text-blue-700 border-blue-200',
-      'under_review': 'bg-yellow-50 text-yellow-700 border-yellow-200',
-      'pending': 'bg-yellow-50 text-yellow-700 border-yellow-200',
-      'approved': 'bg-green-50 text-green-700 border-green-200',
-      'rejected': 'bg-red-50 text-red-700 border-red-200'
-    };
-    return statusConfig[status] || 'bg-gray-50 text-gray-700 border-gray-200';
+// الحصول على كلاس الحالة
+const getStatusClass = (status) => {
+  const statusConfig = {
+    'open': 'bg-blue-50 text-blue-700 border-blue-200',
+    'under_review': 'bg-yellow-50 text-yellow-700 border-yellow-200',
+    'reviewed': 'bg-purple-50 text-purple-700 border-purple-200',
+    'pending': 'bg-yellow-50 text-yellow-700 border-yellow-200',
+    'approved': 'bg-green-50 text-green-700 border-green-200',
+    'completed': 'bg-green-50 text-green-700 border-green-200',
+    'auctioned': 'bg-green-50 text-green-700 border-green-200',
+    'rejected': 'bg-red-50 text-red-700 border-red-200',
+    'close': 'bg-gray-50 text-gray-700 border-gray-200'
   };
+  return statusConfig[status] || 'bg-gray-50 text-gray-700 border-gray-200';
+};
 
   // الحصول على نوع الأرض
   const getLandType = (type) => {

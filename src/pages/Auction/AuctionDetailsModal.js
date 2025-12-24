@@ -61,7 +61,7 @@ const AuctionDetailsModal = ({ auction, onClose, isFavorite, onToggleFavorite, o
             </button>
             <button className="elegantShare_action" onClick={handleShare}>
               <Icons.FaShare />
-              <span>مشاركة</span>
+              <span></span>
             </button>
           </div>
         </div>
