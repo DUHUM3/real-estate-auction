@@ -157,7 +157,7 @@ const FiltersComponent = memo(({
 
       <div className="flex justify-end pt-4 border-t border-gray-200">
         <button 
-          className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+          className="px-6 py-2 bg-[#53a1dd] text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
           onClick={handleApplyFilters}
         >
           تطبيق الفلتر
@@ -323,7 +323,7 @@ const FiltersComponent = memo(({
           إعادة تعيين
         </button>
         <button 
-          className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+          className="px-6 py-2 bg-[#53a1dd] text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
           onClick={handleApplyFilters}
         >
           تطبيق الفلتر
@@ -499,7 +499,7 @@ const FiltersComponent = memo(({
           إعادة تعيين
         </button>
         <button 
-          className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+          className="px-6 py-2 bg-[#53a1dd] text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
           onClick={handleApplyFilters}
         >
           تطبيق الفلتر

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { 
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import {
   FaArrowRight,
   FaArrowLeft,
   FaTimes,
@@ -16,10 +16,10 @@ import {
   FaExclamationTriangle,
   FaChevronRight,
   FaRegClock,
-} from 'react-icons/fa';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { locationService } from '../utils/LocationForFiltters';
+} from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { locationService } from "../utils/LocationForFiltters";
 
 function CreateAd() {
   const { currentUser } = useAuth();
@@ -30,39 +30,39 @@ function CreateAd() {
   const [regions, setRegions] = useState([]);
   const [cities, setCities] = useState([]);
   const [adFormData, setAdFormData] = useState({
-    announcement_number: '',
-    region: '',
-    city: '',
-    title: '',
-    land_type: 'سكني',
-    purpose: 'بيع',
-    geo_location_text: '',
-    total_area: '',
-    length_north: '',
-    length_south: '',
-    length_east: '',
-    length_west: '',
-    description: '',
-    deed_number: '',
-    price_per_sqm: '',
-    investment_duration: '',
-    estimated_investment_value: '',
-    agency_number: '',
+    announcement_number: "",
+    region: "",
+    city: "",
+    title: "",
+    land_type: "سكني",
+    purpose: "بيع",
+    geo_location_text: "",
+    total_area: "",
+    length_north: "",
+    length_south: "",
+    length_east: "",
+    length_west: "",
+    description: "",
+    deed_number: "",
+    price_per_sqm: "",
+    investment_duration: "",
+    estimated_investment_value: "",
+    agency_number: "",
     legal_declaration: false,
     cover_image: null,
-    images: []
+    images: [],
   });
 
   const getApiUrls = () => {
-    if (currentUser?.user_type === 'شركة مزادات') {
+    if (currentUser?.user_type === "شركة مزادات") {
       return {
-        base: 'https://core-api-x41.shaheenplus.sa/api/user/auctions',
-        create: 'https://core-api-x41.shaheenplus.sa/api/user/auctions'
+        base: "https://core-api-x41.shaheenplus.sa/api/user/auctions",
+        create: "https://core-api-x41.shaheenplus.sa/api/user/auctions",
       };
     } else {
       return {
-        base: 'https://core-api-x41.shaheenplus.sa/api/user/properties',
-        create: 'https://core-api-x41.shaheenplus.sa/api/user/properties'
+        base: "https://core-api-x41.shaheenplus.sa/api/user/properties",
+        create: "https://core-api-x41.shaheenplus.sa/api/user/properties",
       };
     }
   };
@@ -76,13 +76,13 @@ function CreateAd() {
     if (adFormData.region) {
       const citiesObject = locationService.getCitiesByRegion();
       const regionCities = citiesObject[adFormData.region] || [];
-      
+
       setCities(regionCities);
-      
+
       if (!regionCities.includes(adFormData.city)) {
-        setAdFormData(prev => ({
+        setAdFormData((prev) => ({
           ...prev,
-          city: ''
+          city: "",
         }));
       }
     } else {
@@ -92,57 +92,65 @@ function CreateAd() {
 
   const handleRegionChange = (e) => {
     const region = e.target.value;
-    setAdFormData(prev => ({
+    setAdFormData((prev) => ({
       ...prev,
       region: region,
-      city: ''
+      city: "",
     }));
   };
 
   const handleCityChange = (e) => {
     const city = e.target.value;
-    setAdFormData(prev => ({
+    setAdFormData((prev) => ({
       ...prev,
-      city: city
+      city: city,
     }));
   };
 
   const validateCurrentStep = () => {
-    if (currentUser?.user_type === 'شركة مزادات') {
+    if (currentUser?.user_type === "شركة مزادات") {
       if (currentStep === 1) {
         return Boolean(adFormData.title && adFormData.description);
       } else if (currentStep === 2) {
-        return Boolean(adFormData.start_time && adFormData.auction_date && adFormData.address);
+        return Boolean(
+          adFormData.start_time && adFormData.auction_date && adFormData.address
+        );
       } else if (currentStep === 3) {
         return Boolean(adFormData.cover_image);
       }
     } else {
       if (currentStep === 1) {
         return Boolean(
-          adFormData.announcement_number && 
-          adFormData.region && 
-          adFormData.city && 
-          adFormData.title
+          adFormData.announcement_number &&
+            adFormData.region &&
+            adFormData.city &&
+            adFormData.title
         );
       } else if (currentStep === 2) {
+        // التحقق من أن المساحة لا تقل عن 5000 متر مربع
+        const totalArea = parseFloat(adFormData.total_area) || 0;
+        if (totalArea < 5000) {
+          return false;
+        }
+        
         return Boolean(
-          adFormData.total_area && 
-          adFormData.geo_location_text && 
-          adFormData.deed_number
+          adFormData.total_area &&
+            adFormData.geo_location_text &&
+            adFormData.deed_number
         );
       } else if (currentStep === 3) {
-        if (adFormData.purpose === 'بيع') {
+        if (adFormData.purpose === "بيع") {
           return Boolean(adFormData.price_per_sqm);
-        } else if (adFormData.purpose === 'استثمار') {
+        } else if (adFormData.purpose === "استثمار") {
           const investmentFieldsValid = Boolean(
-            adFormData.investment_duration && 
-            adFormData.estimated_investment_value
+            adFormData.investment_duration &&
+              adFormData.estimated_investment_value
           );
-          
-          if (currentUser?.user_type === 'وكيل شرعي') {
+
+          if (currentUser?.user_type === "وكيل شرعي") {
             return investmentFieldsValid && Boolean(adFormData.agency_number);
           }
-          
+
           return investmentFieldsValid;
         }
         return true;
@@ -155,55 +163,68 @@ function CreateAd() {
 
   const handleNextStep = () => {
     if (validateCurrentStep()) {
-      const maxSteps = currentUser?.user_type === 'شركة مزادات' ? 3 : 4;
+      const maxSteps = currentUser?.user_type === "شركة مزادات" ? 3 : 4;
       if (currentStep < maxSteps) {
         setCurrentStep(currentStep + 1);
-        toast.success(`تم الانتقال إلى الخطوة ${currentStep + 1}`);
       } else {
         setFormComplete(true);
-        toast.success('تم استكمال جميع البيانات بنجاح!');
+        toast.success("تم استكمال جميع البيانات بنجاح!");
       }
     } else {
-      toast.error('يرجى إكمال جميع الحقول المطلوبة قبل الانتقال للخطوة التالية');
+      toast.error(
+        "يرجى إكمال جميع الحقول المطلوبة قبل الانتقال للخطوة التالية"
+      );
     }
   };
 
   const handlePrevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
-      toast.success(`تم الرجوع إلى الخطوة ${currentStep - 1}`);
     }
   };
 
   const handleAddAd = async () => {
+    // التحقق النهائي من المساحة قبل الإرسال
+    const totalArea = parseFloat(adFormData.total_area) || 0;
+    if (totalArea < 5000) {
+      setCurrentStep(2);
+      return;
+    }
+    
     setFormLoading(true);
-    const loadingToast = toast.loading('جاري إضافة الإعلان...');
+    const loadingToast = toast.loading("جاري إضافة الإعلان...");
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        toast.error('يرجى تسجيل الدخول أولاً');
-        navigate('/login');
+        toast.error("يرجى تسجيل الدخول أولاً");
+        navigate("/login");
         return;
       }
 
       const urls = getApiUrls();
       const formData = new FormData();
 
-      if (currentUser?.user_type === 'شركة مزادات') {
+      if (currentUser?.user_type === "شركة مزادات") {
         const auctionFields = [
-          'title', 'description', 'intro_link', 'start_time', 
-          'auction_date', 'address', 'latitude', 'longitude'
+          "title",
+          "description",
+          "intro_link",
+          "start_time",
+          "auction_date",
+          "address",
+          "latitude",
+          "longitude",
         ];
 
-        auctionFields.forEach(field => {
+        auctionFields.forEach((field) => {
           if (adFormData[field]) {
             formData.append(field, adFormData[field]);
           }
         });
 
         if (adFormData.cover_image) {
-          formData.append('cover_image', adFormData.cover_image);
+          formData.append("cover_image", adFormData.cover_image);
         }
 
         if (adFormData.images && adFormData.images.length > 0) {
@@ -219,32 +240,56 @@ function CreateAd() {
         }
       } else {
         const commonFields = [
-          'announcement_number', 'region', 'city', 'title', 'land_type', 'purpose',
-          'geo_location_text', 'total_area', 'length_north', 'length_south', 
-          'length_east', 'length_west', 'description', 'deed_number', 'legal_declaration'
+          "announcement_number",
+          "region",
+          "city",
+          "title",
+          "land_type",
+          "purpose",
+          "geo_location_text",
+          "total_area",
+          "length_north",
+          "length_south",
+          "length_east",
+          "length_west",
+          "description",
+          "deed_number",
+          "legal_declaration",
         ];
 
-        commonFields.forEach(field => {
-          if (typeof adFormData[field] === 'boolean') {
-            formData.append(field, adFormData[field] ? 'true' : 'false');
-          } else if (adFormData[field] !== null && adFormData[field] !== undefined) {
+        commonFields.forEach((field) => {
+          if (typeof adFormData[field] === "boolean") {
+            formData.append(field, adFormData[field] ? "true" : "false");
+          } else if (
+            adFormData[field] !== null &&
+            adFormData[field] !== undefined
+          ) {
             formData.append(field, adFormData[field]);
           }
         });
 
-        if (adFormData.purpose === 'بيع') {
-          formData.append('price_per_sqm', adFormData.price_per_sqm);
-        } else if (adFormData.purpose === 'استثمار') {
-          formData.append('investment_duration', adFormData.investment_duration);
-          formData.append('estimated_investment_value', adFormData.estimated_investment_value);
-          
-          if (currentUser?.user_type === 'وكيل شرعي' && adFormData.agency_number) {
-            formData.append('agency_number', adFormData.agency_number);
+        if (adFormData.purpose === "بيع") {
+          formData.append("price_per_sqm", adFormData.price_per_sqm);
+        } else if (adFormData.purpose === "استثمار") {
+          formData.append(
+            "investment_duration",
+            adFormData.investment_duration
+          );
+          formData.append(
+            "estimated_investment_value",
+            adFormData.estimated_investment_value
+          );
+
+          if (
+            currentUser?.user_type === "وكيل شرعي" &&
+            adFormData.agency_number
+          ) {
+            formData.append("agency_number", adFormData.agency_number);
           }
         }
 
         if (adFormData.cover_image) {
-          formData.append('cover_image', adFormData.cover_image);
+          formData.append("cover_image", adFormData.cover_image);
         }
 
         if (adFormData.images && adFormData.images.length > 0) {
@@ -254,37 +299,37 @@ function CreateAd() {
         }
       }
 
-      console.log('إرسال البيانات إلى:', urls.create);
-      
+      console.log("إرسال البيانات إلى:", urls.create);
+
       const response = await fetch(urls.create, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-        body: formData
+        body: formData,
       });
 
       const result = await response.json();
-      
-      console.log('نتيجة الاستجابة:', result);
-      
+
+      console.log("نتيجة الاستجابة:", result);
+
       if (response.ok && result.status) {
         toast.dismiss(loadingToast);
-        toast.success('تم إضافة الإعلان بنجاح');
+        toast.success("تم إضافة الإعلان بنجاح");
         resetForm();
         setTimeout(() => {
-          navigate('/my-ads');
+          navigate("/my-ads");
         }, 1500);
       } else {
         toast.dismiss(loadingToast);
-        const errorMessage = result.message || 'فشل في إضافة الإعلان';
+        const errorMessage = result.message || "فشل في إضافة الإعلان";
         toast.error(errorMessage);
-        console.error('خطأ في الإضافة:', errorMessage);
+        console.error("خطأ في الإضافة:", errorMessage);
       }
     } catch (error) {
       toast.dismiss(loadingToast);
-      console.error('خطأ في الإتصال:', error);
-      toast.error('حدث خطأ في الإتصال بالخادم. يرجى المحاولة مرة أخرى.');
+      console.error("خطأ في الإتصال:", error);
+      toast.error("حدث خطأ في الإتصال بالخادم. يرجى المحاولة مرة أخرى.");
     } finally {
       setFormLoading(false);
       setFormComplete(false);
@@ -292,43 +337,43 @@ function CreateAd() {
   };
 
   const resetForm = () => {
-    if (currentUser?.user_type === 'شركة مزادات') {
+    if (currentUser?.user_type === "شركة مزادات") {
       setAdFormData({
-        title: '',
-        description: '',
-        intro_link: '',
-        start_time: '',
-        auction_date: '',
-        address: '',
-        latitude: '',
-        longitude: '',
+        title: "",
+        description: "",
+        intro_link: "",
+        start_time: "",
+        auction_date: "",
+        address: "",
+        latitude: "",
+        longitude: "",
         cover_image: null,
         images: [],
-        videos: []
+        videos: [],
       });
     } else {
       setAdFormData({
-        announcement_number: '',
-        region: '',
-        city: '',
-        title: '',
-        land_type: 'سكني',
-        purpose: 'بيع',
-        geo_location_text: '',
-        total_area: '',
-        length_north: '',
-        length_south: '',
-        length_east: '',
-        length_west: '',
-        description: '',
-        deed_number: '',
-        price_per_sqm: '',
-        investment_duration: '',
-        estimated_investment_value: '',
-        agency_number: '',
+        announcement_number: "",
+        region: "",
+        city: "",
+        title: "",
+        land_type: "سكني",
+        purpose: "بيع",
+        geo_location_text: "",
+        total_area: "",
+        length_north: "",
+        length_south: "",
+        length_east: "",
+        length_west: "",
+        description: "",
+        deed_number: "",
+        price_per_sqm: "",
+        investment_duration: "",
+        estimated_investment_value: "",
+        agency_number: "",
         legal_declaration: false,
         cover_image: null,
-        images: []
+        images: [],
       });
     }
     setCurrentStep(1);
@@ -337,55 +382,61 @@ function CreateAd() {
 
   const handleAdChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    
-    if (type === 'file') {
-      if (name === 'cover_image') {
+
+    if (type === "file") {
+      if (name === "cover_image") {
         setAdFormData({
           ...adFormData,
-          cover_image: files[0]
+          cover_image: files[0],
         });
-        toast.success('تم رفع الصورة الرئيسية بنجاح');
-      } else if (name === 'images') {
+      } else if (name === "images") {
         setAdFormData({
           ...adFormData,
-          images: Array.from(files)
+          images: Array.from(files),
         });
         toast.success(`تم رفع ${files.length} صورة إضافية`);
-      } else if (name === 'videos') {
+      } else if (name === "videos") {
         setAdFormData({
           ...adFormData,
-          videos: Array.from(files)
+          videos: Array.from(files),
         });
         toast.success(`تم رفع ${files.length} فيديو`);
       }
-    } else if (type === 'checkbox') {
+    } else if (type === "checkbox") {
       setAdFormData({
         ...adFormData,
-        [name]: checked
+        [name]: checked,
       });
-      if (name === 'legal_declaration' && checked) {
-        toast.success('تم الموافقة على الإقرار القانوني');
+      if (name === "legal_declaration" && checked) {
+        toast.success("تم الموافقة على الإقرار القانوني");
       }
     } else {
+      // التحقق من حقل المساحة أثناء الكتابة
+      if (name === "total_area") {
+        const areaValue = parseFloat(value);
+        if (areaValue < 5000 && areaValue > 0) {
+        }
+      }
+      
       setAdFormData({
         ...adFormData,
-        [name]: value
+        [name]: value,
       });
     }
   };
 
   const handleBackToAds = () => {
-    navigate('/my-ads');
-    toast('تم العودة إلى قائمة الإعلانات', { icon: '🏠' });
+    navigate("/my-ads");
+    toast("تم العودة إلى قائمة الإعلانات", { icon: "🏠" });
   };
 
   const handleCancel = () => {
-    toast.error('تم إلغاء عملية الإضافة');
-    navigate('/my-ads');
+    toast.error("تم إلغاء عملية الإضافة");
+    navigate("/my-ads");
   };
 
   const renderAdForm = () => {
-    if (currentUser?.user_type === 'شركة مزادات') {
+    if (currentUser?.user_type === "شركة مزادات") {
       return renderAuctionForm();
     } else {
       return renderPropertyForm();
@@ -397,43 +448,43 @@ function CreateAd() {
 
     return (
       <div className="min-h-screen bg-gray-50">
-      <ToastContainer
-        position="top-right"
-        autoClose={4000}
-        closeOnClick
-        draggable
-        rtl
-        pauseOnHover
-        theme="light"
-        // إعدادات مخصصة للتحكم في الموقع - زيادة القيمة لتنزيل الرسائل
-        style={{
-          top: window.innerWidth < 768 ? "80px" : "80px", // زدناها من 60/20 إلى 80/80
-          right: "10px",
-          left: "auto",
-          width: "auto",
-          maxWidth: window.innerWidth < 768 ? "90%" : "400px",
-          fontFamily: "'Segoe UI', 'Cairo', sans-serif",
-          fontSize: window.innerWidth < 768 ? "12px" : "14px",
-          zIndex: 999999
-        }}
-        toastStyle={{
-          borderRadius: "8px",
-          padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
-          marginBottom: "8px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-          minHeight: window.innerWidth < 768 ? "40px" : "50px",
-          direction: "rtl",
-          textAlign: "right",
-          fontSize: window.innerWidth < 768 ? "12px" : "14px",
-        }}
-        className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
-      />
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          closeOnClick
+          draggable
+          rtl
+          pauseOnHover
+          theme="light"
+          // إعدادات مخصصة للتحكم في الموقع - زيادة القيمة لتنزيل الرسائل
+          style={{
+            top: window.innerWidth < 768 ? "80px" : "80px", // زدناها من 60/20 إلى 80/80
+            right: "10px",
+            left: "auto",
+            width: "auto",
+            maxWidth: window.innerWidth < 768 ? "90%" : "400px",
+            fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+            fontSize: window.innerWidth < 768 ? "12px" : "14px",
+            zIndex: 999999,
+          }}
+          toastStyle={{
+            borderRadius: "8px",
+            padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
+            marginBottom: "8px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            minHeight: window.innerWidth < 768 ? "40px" : "50px",
+            direction: "rtl",
+            textAlign: "right",
+            fontSize: window.innerWidth < 768 ? "12px" : "14px",
+          }}
+          className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
+        />
 
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <button 
+                <button
                   className="flex items-center gap-2 text-gray-600 hover:text-[#53a1dd] p-2 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleBackToAds}
                   disabled={formLoading}
@@ -442,11 +493,13 @@ function CreateAd() {
                   <span className="hidden sm:inline">العودة للإعلانات</span>
                 </button>
               </div>
-              
-              <h1 className="text-xl font-bold text-gray-800 text-center">إضافة مزاد جديد</h1>
-              
+
+              <h1 className="text-xl font-bold text-gray-800 text-center">
+                إضافة مزاد جديد
+              </h1>
+
               <div>
-                <button 
+                <button
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleCancel}
                   disabled={formLoading}
@@ -470,20 +523,22 @@ function CreateAd() {
                 <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <FaCheck className="text-3xl" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">تم استكمال جميع البيانات</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  تم استكمال جميع البيانات
+                </h2>
                 <p className="text-gray-600 mb-8 max-w-lg mx-auto">
                   يمكنك الآن إضافة المزاد الجديد أو العودة لتعديل البيانات
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2"
                     onClick={handlePrevStep}
                   >
                     <FaArrowRight /> العودة للتعديل
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="px-6 py-3 bg-[#53a1dd] text-white rounded-lg hover:bg-[#478bc5] transition-colors font-medium flex items-center justify-center gap-2"
                     onClick={handleAddAd}
                   >
@@ -495,10 +550,14 @@ function CreateAd() {
               <div>
                 <div className="p-8">
                   <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-2">إضافة مزاد جديد</h1>
-                    <p className="text-gray-600">املأ النموذج أدناه لإنشاء مزاد جديد</p>
+                    <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                      إضافة مزاد جديد
+                    </h1>
+                    <p className="text-gray-600">
+                      املأ النموذج أدناه لإنشاء مزاد جديد
+                    </p>
                   </div>
-                  
+
                   <form onSubmit={(e) => e.preventDefault()}>
                     <div className="space-y-8">
                       {/* الخطوة 1: المعلومات الأساسية */}
@@ -509,15 +568,20 @@ function CreateAd() {
                               <FaFileAlt className="text-lg" />
                             </div>
                             <div>
-                              <h3 className="text-xl font-bold text-gray-800">المعلومات الأساسية</h3>
-                              <p className="text-gray-500 text-sm">أدخل المعلومات الأساسية للمزاد</p>
+                              <h3 className="text-xl font-bold text-gray-800">
+                                المعلومات الأساسية
+                              </h3>
+                              <p className="text-gray-500 text-sm">
+                                أدخل المعلومات الأساسية للمزاد
+                              </p>
                             </div>
                           </div>
-                          
+
                           <div className="space-y-6">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                عنوان المزاد <span className="text-red-500">*</span>
+                                عنوان المزاد{" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <input
                                 type="text"
@@ -532,7 +596,8 @@ function CreateAd() {
 
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                وصف المزاد <span className="text-red-500">*</span>
+                                وصف المزاد{" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <textarea
                                 name="description"
@@ -570,15 +635,20 @@ function CreateAd() {
                               <FaMapMarkerAlt className="text-lg" />
                             </div>
                             <div>
-                              <h3 className="text-xl font-bold text-gray-800">الموقع والتاريخ</h3>
-                              <p className="text-gray-500 text-sm">حدد موقع وتاريخ المزاد</p>
+                              <h3 className="text-xl font-bold text-gray-800">
+                                الموقع والتاريخ
+                              </h3>
+                              <p className="text-gray-500 text-sm">
+                                حدد موقع وتاريخ المزاد
+                              </p>
                             </div>
                           </div>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                وقت البدء <span className="text-red-500">*</span>
+                                وقت البدء{" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <input
                                 type="time"
@@ -592,7 +662,8 @@ function CreateAd() {
 
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                تاريخ المزاد <span className="text-red-500">*</span>
+                                تاريخ المزاد{" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <input
                                 type="date"
@@ -658,15 +729,20 @@ function CreateAd() {
                               <FaImage className="text-lg" />
                             </div>
                             <div>
-                              <h3 className="text-xl font-bold text-gray-800">الصور والملفات</h3>
-                              <p className="text-gray-500 text-sm">قم برفع صور وملفات المزاد</p>
+                              <h3 className="text-xl font-bold text-gray-800">
+                                الصور والملفات
+                              </h3>
+                              <p className="text-gray-500 text-sm">
+                                قم برفع صور وملفات المزاد
+                              </p>
                             </div>
                           </div>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الصورة الرئيسية <span className="text-red-500">*</span>
+                                الصورة الرئيسية{" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <input
                                 type="file"
@@ -690,7 +766,9 @@ function CreateAd() {
                                 accept="image/*"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition"
                               />
-                              <p className="text-gray-500 text-sm mt-2">يمكنك رفع أكثر من صورة</p>
+                              <p className="text-gray-500 text-sm mt-2">
+                                يمكنك رفع أكثر من صورة
+                              </p>
                             </div>
 
                             <div>
@@ -705,7 +783,9 @@ function CreateAd() {
                                 accept="video/*"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition"
                               />
-                              <p className="text-gray-500 text-sm mt-2">يمكنك رفع فيديوهات عن المزاد</p>
+                              <p className="text-gray-500 text-sm mt-2">
+                                يمكنك رفع فيديوهات عن المزاد
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -714,21 +794,23 @@ function CreateAd() {
                       <div className="mt-10 pt-8 border-t border-gray-200">
                         <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
                           {currentStep > 1 && (
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium w-full sm:w-auto"
                               onClick={handlePrevStep}
                             >
                               رجوع
                             </button>
                           )}
-                          
-                          <button 
-                            type="button" 
+
+                          <button
+                            type="button"
                             className={`px-8 py-3 bg-[#53a1dd] text-white rounded-lg font-medium text-lg transition-colors w-full sm:w-auto
-                              ${!validateCurrentStep() 
-                                ? 'opacity-60 cursor-not-allowed' 
-                                : 'hover:bg-[#478bc5] shadow-md hover:shadow-lg'}`}
+                              ${
+                                !validateCurrentStep()
+                                  ? "opacity-60 cursor-not-allowed"
+                                  : "hover:bg-[#478bc5] shadow-md hover:shadow-lg"
+                              }`}
                             onClick={handleNextStep}
                             disabled={!validateCurrentStep()}
                           >
@@ -747,30 +829,45 @@ function CreateAd() {
                     </div>
                   </form>
                 </div>
-                
+
                 {/* خطوات التقدم */}
                 <div className="mt-12 pt-8 border-t border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-800 mb-6 text-center">خطوات إنشاء المزاد</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-6 text-center">
+                    خطوات إنشاء المزاد
+                  </h3>
                   <div className="flex flex-col md:flex-row items-center justify-between relative">
                     {/* خطوط الاتصال */}
                     <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
-                    
+
                     {[1, 2, 3].map((step) => (
                       <React.Fragment key={step}>
                         <div className="relative z-10 flex flex-col items-center mb-8 md:mb-0 bg-white px-4">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 shadow-md transition-all duration-300
-                            ${currentStep >= step 
-                              ? 'bg-[#53a1dd] text-white' 
-                              : 'bg-gray-200 text-gray-400'}`}>
+                          <div
+                            className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 shadow-md transition-all duration-300
+                            ${
+                              currentStep >= step
+                                ? "bg-[#53a1dd] text-white"
+                                : "bg-gray-200 text-gray-400"
+                            }`}
+                          >
                             {currentStep > step ? <FaCheck /> : step}
                           </div>
-                          <span className={`text-sm font-medium transition-colors
-                            ${currentStep >= step ? 'text-[#53a1dd]' : 'text-gray-400'}`}>
-                            {step === 1 ? 'المعلومات الأساسية' : 
-                             step === 2 ? 'الموقع والتاريخ' : 'الصور والملفات'}
+                          <span
+                            className={`text-sm font-medium transition-colors
+                            ${
+                              currentStep >= step
+                                ? "text-[#53a1dd]"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {step === 1
+                              ? "المعلومات الأساسية"
+                              : step === 2
+                              ? "الموقع والتاريخ"
+                              : "الصور والملفات"}
                           </span>
                         </div>
-                        
+
                         {step < 3 && (
                           <>
                             <div className="hidden md:block">
@@ -798,62 +895,42 @@ function CreateAd() {
 
     return (
       <div className="min-h-screen bg-gray-50">
-     <ToastContainer
-       position="top-right"
-       autoClose={4000}
-       closeOnClick
-       draggable
-       rtl
-       pauseOnHover
-       theme="light"
-       // إعدادات مخصصة للتحكم في الموقع - زيادة القيمة لتنزيل الرسائل
-       style={{
-         top: window.innerWidth < 768 ? "80px" : "80px", // زدناها من 60/20 إلى 80/80
-         right: "10px",
-         left: "auto",
-         width: "auto",
-         maxWidth: window.innerWidth < 768 ? "90%" : "400px",
-         fontFamily: "'Segoe UI', 'Cairo', sans-serif",
-         fontSize: window.innerWidth < 768 ? "12px" : "14px",
-         zIndex: 999999
-       }}
-       toastStyle={{
-         borderRadius: "8px",
-         padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
-         marginBottom: "8px",
-         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-         minHeight: window.innerWidth < 768 ? "40px" : "50px",
-         direction: "rtl",
-         textAlign: "right",
-         fontSize: window.innerWidth < 768 ? "12px" : "14px",
-       }}
-       className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
-     />
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          closeOnClick
+          draggable
+          rtl
+          pauseOnHover
+          theme="light"
+          // إعدادات مخصصة للتحكم في الموقع - زيادة القيمة لتنزيل الرسائل
+          style={{
+            top: window.innerWidth < 768 ? "80px" : "80px", // زدناها من 60/20 إلى 80/80
+            right: "10px",
+            left: "auto",
+            width: "auto",
+            maxWidth: window.innerWidth < 768 ? "90%" : "400px",
+            fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+            fontSize: window.innerWidth < 768 ? "12px" : "14px",
+            zIndex: 999999,
+          }}
+          toastStyle={{
+            borderRadius: "8px",
+            padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
+            marginBottom: "8px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            minHeight: window.innerWidth < 768 ? "40px" : "50px",
+            direction: "rtl",
+            textAlign: "right",
+            fontSize: window.innerWidth < 768 ? "12px" : "14px",
+          }}
+          className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
+        />
 
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <header className="bg-white border-b border-gray-200 sticky top-10 z-50 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <button 
-                  className="flex items-center gap-2 text-gray-600 hover:text-[#53a1dd] p-2 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleBackToAds}
-                  disabled={formLoading}
-                >
-                  <FaArrowRight className="text-lg" />
-                  <span className="hidden sm:inline">العودة للإعلانات</span>
-                </button>
-              </div>
-              
-              <h1 className="text-xl font-bold text-gray-800 text-center">إضافة أرض جديدة</h1>
-              
               <div>
-                <button 
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleCancel}
-                  disabled={formLoading}
-                >
-                  إلغاء
-                </button>
               </div>
             </div>
           </div>
@@ -871,20 +948,22 @@ function CreateAd() {
                 <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <FaCheck className="text-3xl" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">تم استكمال جميع البيانات</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  تم استكمال جميع البيانات
+                </h2>
                 <p className="text-gray-600 mb-8 max-w-lg mx-auto">
                   يمكنك الآن إضافة الإعلان الجديد أو العودة لتعديل البيانات
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center gap-2"
                     onClick={handlePrevStep}
                   >
                     <FaArrowRight /> العودة للتعديل
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="px-6 py-3 bg-[#53a1dd] text-white rounded-lg hover:bg-[#478bc5] transition-colors font-medium flex items-center justify-center gap-2"
                     onClick={handleAddAd}
                   >
@@ -896,10 +975,14 @@ function CreateAd() {
               <div>
                 <div className="p-8">
                   <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-2">إضافة أرض جديدة</h1>
-                    <p className="text-gray-600">املأ النموذج أدناه لإنشاء إعلان أرض جديد</p>
+                    <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                      إضافة أرض جديدة
+                    </h1>
+                    <p className="text-gray-600">
+                      املأ النموذج أدناه لإنشاء إعلان أرض جديد
+                    </p>
                   </div>
-                  
+
                   <form onSubmit={(e) => e.preventDefault()}>
                     <div className="space-y-8">
                       {/* الخطوة 1: المعلومات الأساسية */}
@@ -910,15 +993,20 @@ function CreateAd() {
                               <FaFileAlt className="text-lg" />
                             </div>
                             <div>
-                              <h3 className="text-xl font-bold text-gray-800">المعلومات الأساسية</h3>
-                              <p className="text-gray-500 text-sm">أدخل المعلومات الأساسية للأرض</p>
+                              <h3 className="text-xl font-bold text-gray-800">
+                                المعلومات الأساسية
+                              </h3>
+                              <p className="text-gray-500 text-sm">
+                                أدخل المعلومات الأساسية للأرض
+                              </p>
                             </div>
                           </div>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                رقم الإعلان <span className="text-red-500">*</span>
+                                رقم الإعلان{" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <input
                                 type="text"
@@ -943,8 +1031,10 @@ function CreateAd() {
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition"
                               >
                                 <option value="">اختر المنطقة</option>
-                                {regions.map(region => (
-                                  <option key={region} value={region}>{region}</option>
+                                {regions.map((region) => (
+                                  <option key={region} value={region}>
+                                    {region}
+                                  </option>
                                 ))}
                               </select>
                             </div>
@@ -962,15 +1052,18 @@ function CreateAd() {
                                 disabled={!adFormData.region}
                               >
                                 <option value="">اختر المدينة</option>
-                                {cities.map(city => (
-                                  <option key={city} value={city}>{city}</option>
+                                {cities.map((city) => (
+                                  <option key={city} value={city}>
+                                    {city}
+                                  </option>
                                 ))}
                               </select>
                             </div>
 
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                عنوان الإعلان <span className="text-red-500">*</span>
+                                عنوان الإعلان{" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <input
                                 type="text"
@@ -985,7 +1078,8 @@ function CreateAd() {
 
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                نوع الأرض <span className="text-red-500">*</span>
+                                نوع الأرض{" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <select
                                 name="land_type"
@@ -1042,15 +1136,20 @@ function CreateAd() {
                               <FaRulerCombined className="text-lg" />
                             </div>
                             <div>
-                              <h3 className="text-xl font-bold text-gray-800">المساحة والموقع</h3>
-                              <p className="text-gray-500 text-sm">أدخل تفاصيل المساحة والموقع</p>
+                              <h3 className="text-xl font-bold text-gray-800">
+                                المساحة والموقع
+                              </h3>
+                              <p className="text-gray-500 text-sm">
+                                أدخل تفاصيل المساحة والموقع
+                              </p>
                             </div>
                           </div>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                المساحة الإجمالية (م²) <span className="text-red-500">*</span>
+                                المساحة الإجمالية (م²){" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <input
                                 type="number"
@@ -1058,10 +1157,28 @@ function CreateAd() {
                                 value={adFormData.total_area}
                                 onChange={handleAdChange}
                                 required
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition"
-                                placeholder="أدخل المساحة الإجمالية"
+                                min="5000"
                                 step="0.01"
+                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition ${
+                                  adFormData.total_area && parseFloat(adFormData.total_area) < 5000
+                                    ? "border-red-500 bg-red-50"
+                                    : "border-gray-300"
+                                }`}
+                                placeholder="أدخل المساحة الإجمالية"
                               />
+                              {/* ملاحظة: لا يتم قبول أي أرضية أقل من 5000 متر مربع */}
+                              <div className="mt-2">
+                                {adFormData.total_area && parseFloat(adFormData.total_area) < 5000 ? (
+                                  <div className="flex items-center gap-2 text-red-600 text-sm">
+                                    <FaExclamationTriangle className="text-xs" />
+                                    <span className="font-medium">يجب أن تكون المساحة 5000 متر مربع على الأقل</span>
+                                  </div>
+                                ) : (
+                                  <p className="text-gray-500 text-sm">
+                                    <span className="font-medium">ملاحظة:</span> لا يتم قبول أي أرضية أقل من 5000 متر مربع
+                                  </p>
+                                )}
+                              </div>
                             </div>
 
                             <div>
@@ -1141,7 +1258,8 @@ function CreateAd() {
 
                             <div className="md:col-span-2">
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الموقع الجغرافي (وصف) <span className="text-red-500">*</span>
+                                الموقع الجغرافي (وصف){" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <input
                                 type="text"
@@ -1165,16 +1283,21 @@ function CreateAd() {
                               <FaMoneyBillWave className="text-lg" />
                             </div>
                             <div>
-                              <h3 className="text-xl font-bold text-gray-800">التفاصيل المالية</h3>
-                              <p className="text-gray-500 text-sm">أدخل التفاصيل المالية للإعلان</p>
+                              <h3 className="text-xl font-bold text-gray-800">
+                                التفاصيل المالية
+                              </h3>
+                              <p className="text-gray-500 text-sm">
+                                أدخل التفاصيل المالية للإعلان
+                              </p>
                             </div>
                           </div>
-                          
+
                           <div className="space-y-6">
-                            {adFormData.purpose === 'بيع' ? (
+                            {adFormData.purpose === "بيع" ? (
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  سعر المتر المربع (ريال) <span className="text-red-500">*</span>
+                                  سعر المتر المربع (ريال){" "}
+                                  <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                   type="number"
@@ -1185,19 +1308,31 @@ function CreateAd() {
                                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition"
                                   placeholder="أدخل سعر المتر المربع"
                                 />
-                                {adFormData.price_per_sqm && adFormData.total_area && (
-                                  <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-                                    <p className="text-blue-700 font-medium">
-                                      السعر الإجمالي: {parseFloat(adFormData.price_per_sqm) * parseFloat(adFormData.total_area).toLocaleString()} ريال
-                                    </p>
-                                  </div>
-                                )}
+                                {adFormData.price_per_sqm &&
+                                  adFormData.total_area && (
+                                    <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                                      <p className="text-blue-700 font-medium">
+                                        السعر الإجمالي:{" "}
+                                        {adFormData.price_per_sqm &&
+                                        adFormData.total_area
+                                          ? (
+                                              parseFloat(
+                                                adFormData.price_per_sqm
+                                              ) *
+                                              parseFloat(adFormData.total_area)
+                                            ).toLocaleString()
+                                          : 0}{" "}
+                                        ريال
+                                      </p>
+                                    </div>
+                                  )}
                               </div>
                             ) : (
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    مدة الاستثمار (شهر) <span className="text-red-500">*</span>
+                                    مدة الاستثمار (شهر){" "}
+                                    <span className="text-red-500">*</span>
                                   </label>
                                   <input
                                     type="number"
@@ -1211,22 +1346,26 @@ function CreateAd() {
                                 </div>
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    القيمة الاستثمارية المتوقعة (ريال) <span className="text-red-500">*</span>
+                                    القيمة الاستثمارية المتوقعة (ريال){" "}
+                                    <span className="text-red-500">*</span>
                                   </label>
                                   <input
                                     type="number"
                                     name="estimated_investment_value"
-                                    value={adFormData.estimated_investment_value}
+                                    value={
+                                      adFormData.estimated_investment_value
+                                    }
                                     onChange={handleAdChange}
                                     required
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition"
                                     placeholder="أدخل القيمة الاستثمارية المتوقعة"
                                   />
                                 </div>
-                                {currentUser?.user_type === 'وكيل شرعي' && (
+                                {currentUser?.user_type === "وكيل شرعي" && (
                                   <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                      رقم الوكالة <span className="text-red-500">*</span>
+                                      رقم الوكالة{" "}
+                                      <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                       type="text"
@@ -1253,15 +1392,20 @@ function CreateAd() {
                               <FaImage className="text-lg" />
                             </div>
                             <div>
-                              <h3 className="text-xl font-bold text-gray-800">الصور والإقرارات</h3>
-                              <p className="text-gray-500 text-sm">قم برفع صور وأقر بالموافقات</p>
+                              <h3 className="text-xl font-bold text-gray-800">
+                                الصور والإقرارات
+                              </h3>
+                              <p className="text-gray-500 text-sm">
+                                قم برفع صور وأقر بالموافقات
+                              </p>
                             </div>
                           </div>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-2">
-                                الصورة الرئيسية <span className="text-red-500">*</span>
+                                الصورة الرئيسية{" "}
+                                <span className="text-red-500">*</span>
                               </label>
                               <input
                                 type="file"
@@ -1285,7 +1429,9 @@ function CreateAd() {
                                 accept="image/*"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd] outline-none transition"
                               />
-                              <p className="text-gray-500 text-sm mt-2">يمكنك رفع أكثر من صورة</p>
+                              <p className="text-gray-500 text-sm mt-2">
+                                يمكنك رفع أكثر من صورة
+                              </p>
                             </div>
 
                             <div className="md:col-span-2">
@@ -1301,10 +1447,12 @@ function CreateAd() {
                                   />
                                   <div>
                                     <label className="text-gray-700 block mb-2">
-                                      أقر بأن جميع المعلومات المقدمة صحيحة وأتحمل المسؤولية القانونية
+                                      أقر بأن جميع المعلومات المقدمة صحيحة
+                                      وأتحمل المسؤولية القانونية
                                     </label>
                                     <p className="text-gray-500 text-sm">
-                                      قرأت وفهمت الشروط والأحكام وأوافق عليها بالكامل
+                                      قرأت وفهمت الشروط والأحكام وأوافق عليها
+                                      بالكامل
                                     </p>
                                   </div>
                                 </div>
@@ -1317,21 +1465,23 @@ function CreateAd() {
                       <div className="mt-10 pt-8 border-t border-gray-200">
                         <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
                           {currentStep > 1 && (
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium w-full sm:w-auto"
                               onClick={handlePrevStep}
                             >
                               رجوع
                             </button>
                           )}
-                          
-                          <button 
-                            type="button" 
+
+                          <button
+                            type="button"
                             className={`px-8 py-3 bg-[#53a1dd] text-white rounded-lg font-medium text-lg transition-colors w-full sm:w-auto
-                              ${!validateCurrentStep() 
-                                ? 'opacity-60 cursor-not-allowed' 
-                                : 'hover:bg-[#478bc5] shadow-md hover:shadow-lg'}`}
+                              ${
+                                !validateCurrentStep()
+                                  ? "opacity-60 cursor-not-allowed"
+                                  : "hover:bg-[#478bc5] shadow-md hover:shadow-lg"
+                              }`}
                             onClick={handleNextStep}
                             disabled={!validateCurrentStep()}
                           >
@@ -1350,82 +1500,8 @@ function CreateAd() {
                     </div>
                   </form>
                 </div>
-                
-                {/* خطوات التقدم */}
-                <div className="mt-12 pt-8 border-t border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-800 mb-6 text-center">خطوات إنشاء الإعلان</h3>
-                  <div className="flex flex-col md:flex-row items-center justify-between relative">
-                    {/* خطوط الاتصال */}
-                    <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
-                    
-                    {[1, 2, 3, 4].map((step) => (
-                      <React.Fragment key={step}>
-                        <div className="relative z-10 flex flex-col items-center mb-8 md:mb-0 bg-white px-4">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 shadow-md transition-all duration-300
-                            ${currentStep >= step 
-                              ? 'bg-[#53a1dd] text-white' 
-                              : 'bg-gray-200 text-gray-400'}`}>
-                            {currentStep > step ? <FaCheck /> : step}
-                          </div>
-                          <span className={`text-sm font-medium transition-colors
-                            ${currentStep >= step ? 'text-[#53a1dd]' : 'text-gray-400'}`}>
-                            {step === 1 ? 'معلومات أساسية' : 
-                             step === 2 ? 'المساحة والموقع' : 
-                             step === 3 ? 'تفاصيل مالية' : 'الصور والإقرارات'}
-                          </span>
-                        </div>
-                        
-                        {step < 4 && (
-                          <>
-                            <div className="hidden md:block">
-                              <FaChevronRight className="text-gray-400" />
-                            </div>
-                            <div className="block md:hidden my-4">
-                              <FaChevronRight className="text-gray-400 rotate-90" />
-                            </div>
-                          </>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </div>
               </div>
             )}
-          </div>
-          
-          {/* معلومات إضافية */}
-          <div className="mt-8 bg-white rounded-2xl shadow-lg p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-blue-50 text-[#53a1dd] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <FaRegClock />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-800 mb-1">وقت المعالجة</h4>
-                  <p className="text-gray-600 text-sm">يتم مراجعة الإعلانات خلال ٢٤-٤٨ ساعة عمل</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-blue-50 text-[#53a1dd] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <FaExclamationTriangle />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-800 mb-1">نقاط مهمة</h4>
-                  <p className="text-gray-600 text-sm">تأكد من صحة جميع المعلومات قبل الإرسال</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-blue-50 text-[#53a1dd] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <FaCheck />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-800 mb-1">ضمان الجودة</h4>
-                  <p className="text-gray-600 text-sm">جميع الإعلانات تخضع لمراجعة الجودة</p>
-                </div>
-              </div>
-            </div>
           </div>
         </main>
       </div>

@@ -276,7 +276,7 @@ function MyAds() {
                     <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
                       <div className="p-2">
                         <div className="text-xs font-medium text-gray-500 mb-2 px-2">الحالة</div>
-                        {['الكل', 'قيد المراجعة', 'مقبول', 'مرفوض', 'تم البيع'].map((status) => (
+                        {['الكل', 'قيد المراجعة', 'مفتوح', 'مرفوض', 'تم البيع'].map((status) => (
                           <button
                             key={status}
                             onClick={() => {

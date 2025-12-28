@@ -97,7 +97,7 @@ function App() {
 
               {/* Toast Container — بديل احترافي عن notifex */}
          <ToastContainer
-  position="top-right"
+  position="bottom-right"
   autoClose={4000}
   closeOnClick
   draggable

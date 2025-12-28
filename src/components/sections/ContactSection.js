@@ -263,7 +263,7 @@ const ContactSection = () => {
       submitData.append("message", formData.message);
       submitData.append("full_name", formData.full_name);
       submitData.append("email", formData.email);
-      submitData.append("phone", `+966${formData.phone}`);
+      submitData.append("phone", formData.phone);
 
       if (formData.file) {
         submitData.append("file", formData.file);

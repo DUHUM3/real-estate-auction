@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ModalContext } from '../../App'; 
 import { useAuth } from '../../context/AuthContext';
-// استبدال react-hot-toast بـ react-toastify
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
@@ -20,7 +19,13 @@ import {
   FaArrowLeft as FaLeft,
   FaTimes,
   FaCheckCircle,
-  FaFileContract
+  FaFileContract,
+  FaDollarSign,
+  FaChartLine,
+  FaCalendarDay,
+  FaInfoCircle,
+  FaTag,
+  FaIdCard
 } from 'react-icons/fa';
 
 // مسار أيقونة الريال السعودي
@@ -111,6 +116,34 @@ const showToast = (type, message, duration = 3000) => {
   }
 };
 
+// مكون بطاقة المعلومة
+const InfoCard = ({ icon: Icon, title, value, color = "blue", unit = "", className = "" }) => (
+  <div className={`flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow ${className}`}>
+    <div className={`p-2 rounded-lg ${color === 'blue' ? 'bg-blue-50 text-blue-500' : 
+                        color === 'green' ? 'bg-green-50 text-green-500' :
+                        color === 'amber' ? 'bg-amber-50 text-amber-500' :
+                        'bg-gray-50 text-gray-500'}`}>
+      <Icon className="text-lg" />
+    </div>
+    <div className="flex-1">
+      <span className="block text-sm text-gray-500 mb-1">{title}</span>
+      <span className="block font-semibold text-gray-800 text-lg">
+        {value} {unit && <span className="text-sm text-gray-500">{unit}</span>}
+      </span>
+    </div>
+  </div>
+);
+
+// مكون بطاقة الأبعاد
+const DimensionCard = ({ title, value, unit = "م" }) => (
+  <div className="p-3 bg-gray-50 rounded-lg text-center">
+    <span className="block text-sm text-gray-500 mb-1">{title}</span>
+    <span className="block font-bold text-gray-700">
+      {formatPrice(value)} {unit}
+    </span>
+  </div>
+);
+
 const PropertyDetailsPage = () => {
   const { id, type } = useParams();
   const navigate = useNavigate();
@@ -121,7 +154,6 @@ const PropertyDetailsPage = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
   const [showInterestForm, setShowInterestForm] = useState(false);
@@ -137,7 +169,6 @@ const PropertyDetailsPage = () => {
 
   useEffect(() => {
     fetchData();
-    checkFavoriteStatus();
     
     const token = localStorage.getItem('token');
     if (token) {
@@ -232,111 +263,6 @@ const PropertyDetailsPage = () => {
     }
   };
 
-  const checkFavoriteStatus = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-        setIsFavorite(favorites.includes(parseInt(id)));
-        return;
-      }
-
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      };
-
-      const response = await fetch(`https://core-api-x41.shaheenplus.sa/api/user/favorites/${type}/${id}`, {
-        method: 'GET',
-        headers: headers
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setIsFavorite(result.isFavorite || false);
-      } else {
-        const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-        setIsFavorite(favorites.includes(parseInt(id)));
-      }
-    } catch (error) {
-      console.error('خطأ في التحقق من المفضلة:', error);
-      const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-      setIsFavorite(favorites.includes(parseInt(id)));
-    }
-  };
-
-  const toggleFavorite = async () => {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-      let newFavorites;
-
-      if (isFavorite) {
-        newFavorites = favorites.filter(favId => favId !== parseInt(id));
-        showApiSuccess('تم إزالة العقار من المفضلة');
-      } else {
-        newFavorites = [...favorites, parseInt(id)];
-        showApiSuccess('تم إضافة العقار إلى المفضلة');
-      }
-
-      localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
-      setIsFavorite(!isFavorite);
-      return;
-    }
-
-    try {
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      };
-
-      const response = await fetch(`https://core-api-x41.shaheenplus.sa/api/user/favorites/${type}/${id}`, {
-        method: isFavorite ? 'DELETE' : 'POST',
-        headers: headers
-      });
-
-      if (response.ok) {
-        setIsFavorite(!isFavorite);
-        
-        if (isFavorite) {
-          showApiSuccess('تم إزالة العقار من المفضلة');
-        } else {
-          showApiSuccess('تم إضافة العقار إلى المفضلة');
-        }
-        
-        const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-        let newFavorites;
-
-        if (isFavorite) {
-          newFavorites = favorites.filter(favId => favId !== parseInt(id));
-        } else {
-          newFavorites = [...favorites, parseInt(id)];
-        }
-
-        localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
-      } else {
-        const errorData = await response.json();
-        throw errorData;
-      }
-    } catch (error) {
-      console.error('خطأ في تحديث المفضلة:', error);
-      showApiError(error);
-      
-      const favorites = JSON.parse(localStorage.getItem(`${type}Favorites`) || '[]');
-      let newFavorites;
-
-      if (isFavorite) {
-        newFavorites = favorites.filter(favId => favId !== parseInt(id));
-      } else {
-        newFavorites = [...favorites, parseInt(id)];
-      }
-
-      localStorage.setItem(`${type}Favorites`, JSON.stringify(newFavorites));
-      setIsFavorite(!isFavorite);
-    }
-  };
-
   // Share Function
   const shareItem = () => {
     const currentUrl = window.location.href;
@@ -380,7 +306,9 @@ const PropertyDetailsPage = () => {
       return new Intl.DateTimeFormat('ar-SA', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       }).format(date);
     } catch (e) {
       return dateString;
@@ -550,6 +478,29 @@ const handleSubmitInterest = async (e) => {
   }
 };
 
+  // دالة لحساب السعر الإجمالي للأراضي المعروضة للبيع
+  const calculateTotalPrice = () => {
+    if (!data || data.purpose !== 'بيع') return null;
+    if (!data.total_area || !data.price_per_sqm) return null;
+    
+    const totalArea = parseFloat(data.total_area);
+    const pricePerSqm = parseFloat(data.price_per_sqm);
+    
+    if (isNaN(totalArea) || isNaN(pricePerSqm)) return null;
+    
+    return totalArea * pricePerSqm;
+  };
+
+  // دالة للتحقق من وجود بيانات الأبعاد
+  const hasDimensions = () => {
+    return data && (
+      data.length_north || 
+      data.length_south || 
+      data.length_east || 
+      data.length_west
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] px-4">
@@ -592,9 +543,12 @@ const handleSubmitInterest = async (e) => {
   }
 
   const images = getAllImages();
+  const totalPrice = calculateTotalPrice();
+  const isForSale = data.purpose === 'بيع';
+  const isForInvestment = data.purpose === 'استثمار';
 
   return (
-    <div className="max-w-4xl mx-auto px-4 pb-6 pt-4" dir="rtl">
+    <div className="max-w-6xl mx-auto px-4 pb-6 pt-[80px]" dir="rtl">
       {/* Toast Container للمكون الحالي */}
       <ToastContainer
         position="top-right"
@@ -633,15 +587,9 @@ const handleSubmitInterest = async (e) => {
           className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
         >
           <FaArrowLeft />
-          <span></span>
+          <span>رجوع</span>
         </button>
         <div className="flex gap-2">
-          <button 
-            className={`p-2.5 rounded-lg border ${isFavorite ? 'border-red-300 bg-red-50 text-red-500' : 'border-gray-300 hover:bg-gray-50'}`}
-            onClick={toggleFavorite}
-          >
-            <FaHeart />
-          </button>
           <button 
             className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50"
             onClick={shareItem}
@@ -718,163 +666,222 @@ const handleSubmitInterest = async (e) => {
       </div>
 
       {/* Main Content */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
         {/* العنوان أولاً */}
-        <div className="flex justify-between items-start mb-4">
-          <h1 className="text-2xl font-bold text-gray-800">
-            {type === 'land' ? data.title : cleanText(data.title)}
-          </h1>
-          <div className="flex items-center gap-2">
-            <div className={`px-3 py-1 rounded-full text-sm font-bold ${
-              data.status === 'معروض' ? 'bg-green-100 text-green-800' :
-              data.status === 'مباع' || data.status === 'مغلق' ? 'bg-red-100 text-red-800' :
-              data.status === 'محجوز' ? 'bg-amber-100 text-amber-800' :
-              'bg-gray-100 text-gray-800'
+        <div className="flex flex-col md:flex-row justify-between items-start mb-6">
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">
+              {data.title}
+            </h1>
+            <div className="flex items-center gap-3 text-gray-600 mb-4">
+              <div className="flex items-center gap-1">
+                <FaMapMarkerAlt className="text-amber-500" />
+                <span>{data.region} - {data.city}</span>
+              </div>
+              {data.geo_location_text && (
+                <div className="text-sm bg-gray-100 px-2 py-1 rounded">
+                  {data.geo_location_text}
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-2 items-start">
+            <div className={`px-4 py-2 rounded-full text-sm font-bold ${
+              data.status === 'مفتوح' || data.status === 'معروض' ? 'bg-green-100 text-green-800 border border-green-200' :
+              data.status === 'مباع' || data.status === 'مغلق' ? 'bg-red-100 text-red-800 border border-red-200' :
+              data.status === 'محجوز' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+              'bg-gray-100 text-gray-800 border border-gray-200'
             }`}>
               {data.status}
             </div>
-            {/* إشارة التوثيق - تظهر فقط إذا كان هناك deed_number */}
-            {type === 'land' && data.deed_number && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-full text-xs" title="موثق برقم صك">
-                <FaCheckCircle className="text-xs" />
-                <span>موثق</span>
-              </div>
-            )}
+            
+            <div className={`px-4 py-2 rounded-full text-sm font-bold ${
+              isForSale ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+              isForInvestment ? 'bg-purple-100 text-purple-800 border border-purple-200' :
+              'bg-gray-100 text-gray-800 border border-gray-200'
+            }`}>
+              {data.purpose}
+            </div>
           </div>
         </div>
 
         {/* الوصف */}
-        <div className="mb-6">
-          <p className="text-gray-600 leading-relaxed">
-            {type === 'land' ? data.description : cleanText(data.description)}
+        <div className="mb-8 p-4 bg-gray-50 rounded-xl">
+          <div className="flex items-center gap-2 mb-3">
+            <FaInfoCircle className="text-blue-500" />
+            <h3 className="font-bold text-gray-700">الوصف</h3>
+          </div>
+          <p className="text-gray-600 leading-relaxed text-right">
+            {data.description || 'لا يوجد وصف'}
           </p>
         </div>
 
-        {/* التاريخ */}
-        <div className="text-sm text-gray-500 mb-6">
-          <span>
-            {type === 'land' 
-              ? `تاريخ الإنشاء: ${formatDate(data.created_at)}`
-              : `تاريخ المزاد: ${formatDate(data.auction_date)}`}
-          </span>
-        </div>
-
-        {/* الموقع */}
-        <div className="flex items-start gap-3 mb-6 p-4 bg-gray-50 rounded-lg">
-          <FaMapMarkerAlt className="text-amber-500 mt-1" />
-          <div>
-            <h3 className="font-bold text-gray-700 mb-1">الموقع</h3>
-            <p className="text-gray-600">
-              {type === 'land' 
-                ? `${data.region} - ${data.city}`
-                : cleanText(data.address)}
-            </p>
-          </div>
-        </div>
-
-        {/* المواصفات */}
+        {/* معلومات العقار الرئيسية */}
         <div className="mb-8">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">
-            {type === 'land' ? 'تفاصيل العقار' : 'تفاصيل المزاد'}
+          <h3 className="text-xl font-bold text-gray-800 mb-4 pb-3 border-b border-gray-200">
+            معلومات العقار الأساسية
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {type === 'land' ? (
-              <>
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <FaRulerCombined className="text-blue-500" />
-                  <div>
-                    <span className="block text-sm text-gray-500">المساحة الكلية</span>
-                    <span className="font-semibold text-gray-700">{formatPrice(data.total_area)} م²</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <FaMoneyBillWave className="text-blue-500" />
-                  <div>
-                    <span className="block text-sm text-gray-500">سعر المتر</span>
-                    <span className="font-semibold text-gray-700">
-                      {/* استبدال "ر.س" بأيقونة الريال */}
-                      {formatPriceWithIcon(data.price_per_sqm)}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <FaBuilding className="text-blue-500" />
-                  <div>
-                    <span className="block text-sm text-gray-500">نوع الأرض</span>
-                    <span className="font-semibold text-gray-700">{data.land_type}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <FaCalendarAlt className="text-blue-500" />
-                  <div>
-                    <span className="block text-sm text-gray-500">الغرض</span>
-                    <span className="font-semibold text-gray-700">{data.purpose}</span>
-                  </div>
-                </div>
-                {data.total_area && data.price_per_sqm && (
-                  <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg col-span-1 sm:col-span-2">
-                    <FaMoneyBillWave className="text-blue-600" />
-                    <div>
-                      <span className="block text-sm text-gray-700">السعر الإجمالي</span>
-                      <span className="font-bold text-blue-600 text-lg">
-                        {/* استبدال "ر.س" بأيقونة الريال */}
-                        {formatPriceWithIcon(parseFloat(data.total_area) * parseFloat(data.price_per_sqm))}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <FaBuilding className="text-blue-500" />
-                  <div>
-                    <span className="block text-sm text-gray-500">شركة المزاد</span>
-                    <span className="font-semibold text-gray-700">{data.company?.auction_name}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <FaClock className="text-blue-500" />
-                  <div>
-                    <span className="block text-sm text-gray-500">وقت البدء</span>
-                    <span className="font-semibold text-gray-700">{data.start_time}</span>
-                  </div>
-                </div>
-              </>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <InfoCard
+              icon={FaTag}
+              title="نوع العقار"
+              value={data.land_type}
+              color="blue"
+            />
+            
+            <InfoCard
+              icon={FaCalendarAlt}
+              title="رقم الإعلان"
+              value={data.announcement_number || 'غير محدد'}
+              color="amber"
+            />
+            
+            {data.legal_declaration && (
+              <InfoCard
+                icon={FaCheckCircle}
+                title="الإقرار القانوني"
+                value={data.legal_declaration}
+                color={data.legal_declaration === 'نعم' ? 'green' : 'amber'}
+              />
             )}
           </div>
         </div>
 
-        {/* تفاصيل إضافية للأراضي فقط */}
-        {type === 'land' && (
+        {/* تفاصيل حسب الغرض */}
+        {isForSale ? (
           <div className="mb-8">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">تفاصيل إضافية</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <span className="block text-sm text-gray-500 mb-1">رقم الإعلان</span>
-                <span className="font-semibold text-gray-700">{data.announcement_number || 'غير محدد'}</span>
-              </div>
-              {/* {data.deed_number && (
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <span className="block text-sm text-blue-600 mb-1">رقم الصك</span>
-                  <span className="font-semibold text-blue-700">{data.deed_number}</span>
-                </div>
-              )} */}
+            <h3 className="text-xl font-bold text-gray-800 mb-4 pb-3 border-b border-gray-200">
+              تفاصيل البيع
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <InfoCard
+                icon={FaRulerCombined}
+                title="المساحة الكلية"
+                value={formatPrice(data.total_area)}
+                unit="م²"
+                color="blue"
+              />
+              
+              <InfoCard
+                icon={FaMoneyBillWave}
+                title="سعر المتر المربع"
+                value={formatPriceWithIcon(data.price_per_sqm)}
+                color="green"
+              />
+              
+              {totalPrice && (
+                <InfoCard
+                  icon={FaDollarSign}
+                  title="السعر الإجمالي"
+                  value={formatPriceWithIcon(totalPrice)}
+                  color="green"
+                  className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200"
+                />
+              )}
+            </div>
+          </div>
+        ) : isForInvestment ? (
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 pb-3 border-b border-gray-200">
+              تفاصيل الاستثمار
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <InfoCard
+                icon={FaRulerCombined}
+                title="المساحة الكلية"
+                value={formatPrice(data.total_area)}
+                unit="م²"
+                color="blue"
+              />
+              
+              <InfoCard
+                icon={FaChartLine}
+                title="القيمة الاستثمارية المقدرة"
+                value={formatPriceWithIcon(data.estimated_investment_value)}
+                color="purple"
+              />
+              
+              <InfoCard
+                icon={FaCalendarDay}
+                title="مدة الاستثمار"
+                value={data.investment_duration}
+                unit="سنة"
+                color="amber"
+              />
+            </div>
+          </div>
+        ) : null}
+
+        {/* الأبعاد */}
+        {hasDimensions() && (
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 pb-3 border-b border-gray-200">
+              أبعاد الأرض
+            </h3>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {data.length_north && (
+                <DimensionCard title="الطول شمالاً" value={data.length_north} />
+              )}
+              {data.length_south && (
+                <DimensionCard title="الطول جنوباً" value={data.length_south} />
+              )}
+              {data.length_east && (
+                <DimensionCard title="الطول شرقاً" value={data.length_east} />
+              )}
+              {data.length_west && (
+                <DimensionCard title="الطول غرباً" value={data.length_west} />
+              )}
             </div>
           </div>
         )}
-        
-        {/* زر تقديم الاهتمام للأراضي فقط */}
-        {type === 'land' && (
-          <div className="mb-6">
-            <button 
-              className="w-full py-3.5 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-all text-lg"
-              onClick={handleShowInterestForm}
-            >
-              تقديم اهتمام
-            </button>
+
+        {/* معلومات إضافية */}
+        <div className="mb-8">
+          <h3 className="text-xl font-bold text-gray-800 mb-4 pb-3 border-b border-gray-200">
+            معلومات إضافية
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 bg-gray-50 rounded-xl">
+              <div className="flex items-center gap-2 mb-2">
+                <FaCalendarAlt className="text-gray-500" />
+                <span className="text-gray-700 font-medium">تاريخ الإنشاء</span>
+              </div>
+              <p className="text-gray-800 font-semibold">{formatDate(data.created_at)}</p>
+            </div>
+            
+            <div className="p-4 bg-gray-50 rounded-xl">
+              <div className="flex items-center gap-2 mb-2">
+                <FaCalendarAlt className="text-gray-500" />
+                <span className="text-gray-700 font-medium">تاريخ التحديث الأخير</span>
+              </div>
+              <p className="text-gray-800 font-semibold">{formatDate(data.updated_at)}</p>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* زر تقديم الاهتمام */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <button 
+            className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all text-lg shadow-md hover:shadow-lg"
+            onClick={handleShowInterestForm}
+          >
+            {isForSale ? 'تقديم عرض للشراء' : isForInvestment ? 'تقديم طلب للاستثمار' : 'تقديم اهتمام'}
+          </button>
+          
+          <p className="text-center text-gray-500 mt-3 text-sm">
+            {isForSale 
+              ? 'للتقديم على شراء هذا العقار، يرجى تعبئة النموذج'
+              : isForInvestment
+              ? 'للتقديم على الاستثمار في هذا العقار، يرجى تعبئة النموذج'
+              : 'لتقديم اهتمامك بهذا العقار، يرجى تعبئة النموذج'}
+          </p>
+        </div>
       </div>
 
       {/* Image Modal */}
@@ -920,7 +927,9 @@ const handleSubmitInterest = async (e) => {
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-800">تقديم اهتمام بالعقار</h3>
+                <h3 className="text-xl font-bold text-gray-800">
+                  {isForSale ? 'تقديم عرض للشراء' : isForInvestment ? 'تقديم طلب للاستثمار' : 'تقديم اهتمام'}
+                </h3>
                 <button 
                   className="p-2 rounded-lg hover:bg-gray-100"
                   onClick={handleCloseInterestForm}
@@ -935,7 +944,7 @@ const handleSubmitInterest = async (e) => {
                 <div className="mb-6">
                   <div className="flex justify-between items-center mb-2">
                     <label className="block text-gray-700 font-medium">
-                      <span>رسالة</span>
+                      <span>رسالتك</span>
                     </label>
                     <div className={`text-xs font-medium ${
                       formData.message.trim().length === 0 ? 'text-gray-500' :
@@ -950,17 +959,26 @@ const handleSubmitInterest = async (e) => {
                     value={formData.message}
                     onChange={(e) => {
                       handleInputChange(e);
-                      // إزالة تأثير الخطأ عند البدء في الكتابة
                       e.target.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
                     }}
-                    placeholder="أدخل رسالتك أو استفسارك هنا (يجب أن يكون أكثر من 10 أحرف)"
+                    placeholder={
+                      isForSale 
+                        ? "أدخل رسالتك وعرضك للشراء هنا (يجب أن يكون أكثر من 10 أحرف)"
+                        : isForInvestment
+                        ? "أدخل رسالتك وخطة الاستثمار المقترحة هنا (يجب أن يكون أكثر من 10 أحرف)"
+                        : "أدخل رسالتك أو استفسارك هنا (يجب أن يكون أكثر من 10 أحرف)"
+                    }
                     rows={4}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
                     required
                   />
                   <div className="flex justify-between items-center mt-2">
                     <div className="text-xs text-gray-500">
-                      اكتب رسالة مفصلة عن اهتمامك
+                      {isForSale 
+                        ? "اكتب تفاصيل عرض الشراء والسعر المقترح"
+                        : isForInvestment
+                        ? "اكتب خطة الاستثمار والمدة المقترحة"
+                        : "اكتب رسالة مفصلة عن اهتمامك"}
                     </div>
                     <div className="text-xs text-blue-500">
                       {formData.message.trim().length >= 10 ? '✓ جاهز للإرسال' : 'اكتب 10 أحرف على الأقل'}

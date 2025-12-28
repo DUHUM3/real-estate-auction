@@ -1,0 +1,153 @@
+/* styles/toast.css */
+
+/* استيراد خط Tajawal */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
+
+/* الرسائل نفسها */
+.Toastify__toast {
+  background-color: #ffffff !important; /* خلفية بيضاء */
+  color: #1a1a1a !important;            /* نص داكن أنعم */
+  border-radius: 18px !important;       /* حواف أكثر نعومة */
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 
+              0 4px 10px rgba(0, 0, 0, 0.06) !important; /* ظل متعدد الطبقات */
+  font-family: 'Tajawal', sans-serif !important; /* تطبيق خط Tajawal */
+  padding: 18px 22px !important;
+  text-align: center !important;
+  min-width: 300px !important;
+  max-width: 420px !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important; /* حدود خفيفة */
+  backdrop-filter: blur(10px) !important; /* تأثير زجاجي خفيف */
+  transition: transform 0.3s ease, opacity 0.3s ease !important;
+  margin: 12px auto !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* تأثير عند الظهور */
+.Toastify__toast--enter {
+  transform: translateY(20px) scale(0.95) !important;
+  opacity: 0 !important;
+}
+
+.Toastify__toast--enter-active {
+  transform: translateY(0) scale(1) !important;
+  opacity: 1 !important;
+}
+
+/* النص داخل الرسالة */
+.Toastify__toast-body {
+  margin: 0 auto !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+  padding: 4px 0 !important;
+  letter-spacing: -0.2px !important;
+}
+
+/* إخفاء زر الإغلاق (X) بالكامل */
+.Toastify__close-button {
+  display: none !important;
+}
+
+/* تصميم تلقائي للإغلاق (بدون زر X) */
+.Toastify__toast::after {
+  content: '';
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  height: 4px !important;
+  width: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.08), transparent) !important;
+  border-radius: 0 0 18px 18px !important;
+}
+
+/* شريط التقدم للإغلاق التلقائي */
+.Toastify__toast::before {
+  content: '';
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  height: 4px !important;
+  width: 100% !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-radius: 0 0 18px 18px !important;
+  transform-origin: left !important;
+  animation: progressBar 4s linear forwards !important;
+  display: none !important;
+}
+
+@keyframes progressBar {
+  0% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0);
+  }
+}
+
+/* أنواع الرسائل مع تصميم محسّن */
+.Toastify__toast--success {
+  border-left: 8px solid #10b981 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%) !important;
+}
+
+.Toastify__toast--success::before {
+  background: linear-gradient(90deg, #10b981, #34d399) !important;
+}
+
+.Toastify__toast--error {
+  border-left: 8px solid #ef4444 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%) !important;
+}
+
+.Toastify__toast--error::before {
+  background: linear-gradient(90deg, #ef4444, #f87171) !important;
+}
+
+.Toastify__toast--warning {
+  border-left: 8px solid #f59e0b !important;
+  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%) !important;
+}
+
+.Toastify__toast--warning::before {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24) !important;
+}
+
+.Toastify__toast--info {
+  border-left: 8px solid #3b82f6 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%) !important;
+}
+
+.Toastify__toast--info::before {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa) !important;
+}
+
+/* تأثير التمرير عند التحويم */
+.Toastify__toast:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15), 
+              0 6px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* تصميم للمحمول */
+@media (max-width: 480px) {
+  .Toastify__toast {
+    min-width: 280px !important;
+    max-width: 90vw !important;
+    margin: 8px auto !important;
+    border-radius: 16px !important;
+    padding: 16px 20px !important;
+  }
+  
+  .Toastify__toast-body {
+    font-size: 14px !important;
+  }
+}
+
+/* إخفاء أي عناصر إضافية قد تكون مرتبطة بزر التحميل */
+.Toastify__toast-download-button,
+.Toastify__toast .download-btn,
+[class*="download"],
+[class*="تحميل"] {
+  display: none !important;
+}

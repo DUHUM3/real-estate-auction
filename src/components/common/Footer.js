@@ -11,6 +11,7 @@ import {
   FaShieldAlt,
   FaFileContract,
   FaPaperPlane,
+  FaTiktok,
 } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
 
@@ -152,6 +153,14 @@ function Footer() {
           >
             <FaPaperPlane />
           </a>
+          <a
+            href="https://www.tiktok.com/@shaheenplus100"
+            style={styles.socialLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaTiktok />
+          </a>
         </div>
 
         {/* الروابط السفلية وحقوق النشر */}
@@ -165,7 +174,7 @@ function Footer() {
               <FaFileContract style={styles.bottomLinkIcon} />
               شروط الاستخدام
             </a>
-            <a href="/contact" style={styles.bottomLink}>
+            <a href="tel:+966566065406" style={styles.bottomLink}>
               <FiUser style={styles.bottomLinkIcon} />
               اتصل بنا
             </a>
@@ -181,7 +190,7 @@ const styles = {
   footer: {
     backgroundColor: "#ffffff",
     padding: "24px 16px",
-    fontFamily: "Arial, sans-serif",
+    fontFamily: "Tajawal, sans-serif",
     direction: "rtl",
   },
   container: {

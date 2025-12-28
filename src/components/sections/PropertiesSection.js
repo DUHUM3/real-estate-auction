@@ -410,7 +410,7 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
   // بيانات ثابتة للفلاتر
   const filterOptions = useMemo(
     () => ({
-      landTypes: ["سكني", "تجاري", "زراعي", "صناعي", "مختلط"],
+      landTypes: ["سكني", "تجاري", "زراعي"],
       purposes: ["بيع", "استثمار"],
     }),
     []
