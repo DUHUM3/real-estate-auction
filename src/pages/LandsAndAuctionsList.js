@@ -238,6 +238,8 @@ const PropertiesPage = () => {
         return "إنشاء أرض";
       case "وسيط عقاري":
         return "إنشاء أرض";
+      case "جهة تجارية":
+        return "إنشاء أرض";
       case "شركة مزادات":
         return "إنشاء مزاد";
       default:
@@ -273,23 +275,25 @@ const PropertiesPage = () => {
   };
 
   const proceedWithCreation = (userType) => {
-    if (!isUserAuthorized(userType)) {
-      showToast("error", "عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة", 5000);
-      return;
-    }
+  if (!isUserAuthorized(userType)) {
+    showToast("error", "عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة", 5000);
+    return;
+  }
 
-    switch (userType) {
-      case "مالك أرض":
-      case "وكيل شرعي":
-      case "وسيط عقاري":
-      case "شركة مزادات":
-        navigate("/create-ad");
-        break;
-      default:
-        navigate("/");
-        break;
-    }
-  };
+  switch (userType) {
+    case "شركة مزادات":
+      navigate("/create-auction"); // مسار منفصل للمزادات
+      break;
+    case "مالك أرض":
+    case "وكيل شرعي":
+    case "وسيط عقاري":
+      navigate("/create-ad");
+      break;
+    default:
+      navigate("/");
+      break;
+  }
+};
 
   // API Functions
   const fetchFavorites = async () => {

@@ -462,6 +462,8 @@ const LandDetailsPage = () => {
 
     try {
       const requestData = {
+        full_name: formData.full_name,
+        phone: formData.phone,
         message: trimmedMessage,
       };
 

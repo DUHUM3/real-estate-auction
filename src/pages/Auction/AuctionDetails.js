@@ -17,6 +17,7 @@ import {
   FaPlay,
   FaPause,
   FaLink,
+  FaDirections,
 } from "react-icons/fa";
 
 const showToast = (type, message, duration = 3000) => {
@@ -59,10 +60,87 @@ const AuctionDetailsPage = () => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     fetchAuctionData();
   }, [id]);
+
+  /* 
+  // تحميل Google Maps API - معطل مؤقتاً
+  useEffect(() => {
+    if (!window.google) {
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&language=ar`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => setMapLoaded(true);
+      document.head.appendChild(script);
+    } else {
+      setMapLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mapLoaded && data && data.latitude && data.longitude) {
+      initMap();
+    }
+  }, [mapLoaded, data]);
+
+  const initMap = () => {
+    const mapElement = document.getElementById("map");
+    if (!mapElement || !window.google) return;
+
+    const position = {
+      lat: parseFloat(data.latitude),
+      lng: parseFloat(data.longitude),
+    };
+
+    const map = new window.google.maps.Map(mapElement, {
+      center: position,
+      zoom: 15,
+      mapTypeControl: true,
+      streetViewControl: true,
+      fullscreenControl: true,
+      zoomControl: true,
+      styles: [
+        {
+          featureType: "poi",
+          elementType: "labels",
+          stylers: [{ visibility: "on" }],
+        },
+      ],
+    });
+
+    const marker = new window.google.maps.Marker({
+      position: position,
+      map: map,
+      title: data.title,
+      animation: window.google.maps.Animation.DROP,
+      icon: {
+        path: window.google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: "#3B82F6",
+        fillOpacity: 1,
+        strokeColor: "#ffffff",
+        strokeWeight: 3,
+      },
+    });
+
+    const infoWindow = new window.google.maps.InfoWindow({
+      content: `
+        <div style="font-family: 'Cairo', sans-serif; padding: 8px; text-align: right; direction: rtl;">
+          <h3 style="margin: 0 0 8px 0; color: #1f2937; font-size: 16px; font-weight: bold;">${data.title}</h3>
+          <p style="margin: 0; color: #6b7280; font-size: 14px;">${data.address}</p>
+        </div>
+      `,
+    });
+
+    marker.addListener("click", () => {
+      infoWindow.open(map, marker);
+    });
+  };
+  */
 
   const fetchAuctionData = async () => {
     try {
@@ -107,6 +185,11 @@ const AuctionDetailsPage = () => {
     }
   };
 
+  const openInGoogleMaps = () => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${data.latitude},${data.longitude}`;
+    window.open(url, "_blank");
+  };
+
   const handleBack = () => {
     navigate(-1);
   };
@@ -114,11 +197,11 @@ const AuctionDetailsPage = () => {
   const formatDate = (dateString) => {
     try {
       const date = new Date(dateString);
-      return new Intl.DateTimeFormat("ar-SA", {
+      return date.toLocaleDateString("ar-SA", {
+        day: "2-digit",
+        month: "2-digit",
         year: "numeric",
-        month: "long",
-        day: "numeric",
-      }).format(date);
+      });
     } catch (e) {
       return dateString;
     }
@@ -382,6 +465,67 @@ const AuctionDetailsPage = () => {
           </div>
         </div>
 
+        {/* موقع المزاد - معدل */}
+        {data.latitude && data.longitude && (
+          <div className="mb-6">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 pb-3 border-b border-gray-200">
+              موقع المزاد
+            </h3>
+
+            {/* 
+            <div className="relative rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg">
+              <div id="map" className="w-full h-64 sm:h-80 md:h-96"></div>
+
+              <div className="absolute bottom-4 right-4 left-4 sm:left-auto">
+                <button
+                  onClick={openInGoogleMaps}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-white shadow-lg rounded-lg hover:bg-gray-50 transition-all border border-gray-200"
+                >
+                  <FaDirections className="text-blue-500 text-lg" />
+                  <span className="font-semibold text-gray-800">
+                    فتح في خرائط جوجل
+                  </span>
+                </button>
+              </div>
+            </div>
+            */}
+
+            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-6 shadow-lg">
+              <button
+                onClick={openInGoogleMaps}
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white rounded-xl hover:bg-gray-50 transition-all shadow-md hover:shadow-xl transform hover:scale-[1.02] duration-200"
+              >
+                <FaDirections className="text-blue-500 text-2xl" />
+                <span className="font-bold text-gray-800 text-lg">
+                  فتح الموقع في خرائط جوجل
+                </span>
+              </button>
+            </div>
+
+            <div className="mt-4 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-200">
+              <div className="flex items-start gap-3">
+                <FaMapMarkerAlt className="text-emerald-500 text-xl mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <h4 className="font-bold text-gray-800 mb-2">
+                    العنوان الكامل
+                  </h4>
+                  <p className="text-gray-700 leading-relaxed">
+                    {data.address}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2 text-sm text-gray-600">
+                    <span className="px-2 py-1 bg-white rounded-md">
+                      خط الطول: {data.longitude}
+                    </span>
+                    <span className="px-2 py-1 bg-white rounded-md">
+                      خط العرض: {data.latitude}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* رابط التعريف */}
         {data.intro_link && (
           <div className="mb-6">
@@ -435,9 +579,7 @@ const AuctionDetailsPage = () => {
             <div className="p-4 bg-gray-50 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
                 <FaCalendarAlt className="text-gray-500" />
-                <span className="text-gray-700 font-medium">
-                  تاريخ الإنشاء
-                </span>
+                <span className="text-gray-700 font-medium">تاريخ الإنشاء</span>
               </div>
               <p className="text-gray-800 font-semibold">
                 {formatDate(data.created_at)}
@@ -445,15 +587,6 @@ const AuctionDetailsPage = () => {
             </div>
 
             <div className="p-4 bg-gray-50 rounded-xl">
-              <div className="flex items-center gap-2 mb-2">
-                <FaCalendarAlt className="text-gray-500" />
-                <span className="text-gray-700 font-medium">
-                  آخر تحديث
-                </span>
-              </div>
-              <p className="text-gray-800 font-semibold">
-                {formatDate(data.updated_at)}
-              </p>
             </div>
           </div>
         </div>
