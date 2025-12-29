@@ -27,6 +27,7 @@ import LandRequestDetails from './pages/Lands/LandRequestDetails';
 import CreateLandRequest from './pages/Lands/CreateLandRequest';
 import CreateAuctionRequest from './pages/Auction/CreateAuctionRequest';
 import LandDetails from './pages/Lands/LandDetails';
+import AuctionDetails from './pages/Auction/AuctionDetails';
 import CreateAd from './pages/CreateAd';
 
 import Login from './pages/Auth/Login';
@@ -135,6 +136,7 @@ function App() {
 
                   <Route path="/lands-and-auctions-list" element={<LandsAndAuctionsList />} />
                   <Route path="/lands/:id/:type" element={<LandDetails />} />
+                  <Route path="/auctions/:id/:type" element={<AuctionDetails />} />
                   <Route path="/create-lands" element={<Createland />} />
 
                   <Route path="/purchase-requests" element={<LandRequestsList />} />

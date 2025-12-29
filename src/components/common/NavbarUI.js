@@ -289,7 +289,7 @@ const renderUserDropdown = () => (
         }}
       >
         <Icons.FaUser className="register-icon" />
-        <span className="register-text">تسجيل جديد</span>
+        <span className="register-text">إنشاء حساب جديد</span>
       </button>
       
       <button 
@@ -385,7 +385,7 @@ const renderUserDropdown = () => (
         }}
       >
         <Icons.FaUser className="link-icon" />
-        تسجيل جديد
+        إنشاءحساب جديد
       </button>
     </div>
   );

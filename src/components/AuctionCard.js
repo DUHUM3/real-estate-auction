@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Icons from '../icons/index';
+import { useNavigate } from 'react-router-dom'; // أضف هذا الاستيراد
 
 const AuctionCard = ({
   id,
@@ -19,6 +20,7 @@ const AuctionCard = ({
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate(); // أضف هذا السطر
 
   useEffect(() => {
     setFavorite(isFavorite);
@@ -42,17 +44,21 @@ const AuctionCard = ({
     }
   };
 
+  // دالة جديدة للتعامل مع النقر على البطاقة أو الزر
+  const handleCardClick = (e, fromButton = false) => {
+    if (fromButton) {
+      e.stopPropagation();
+    }
+    // استخدم navigate للانتقال إلى صفحة تفاصيل المزاد
+    navigate(`/auctions/${id}/auction`);
+  };
+  
+
   return (
     <div 
       className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-2 border border-gray-100"
-      onClick={() => onClick && onClick(id, 'auction')}
+      onClick={handleCardClick} // استبدل هنا
     >
-      {/* هيدر الشركة */}
-      <div className="bg-blue-400 px-5 py-3">
-        <span className="text-white text-sm font-semibold">
-          {auctionCompany}
-        </span>
-      </div>
       
       {/* الصورة */}
       <div className="relative overflow-hidden">
@@ -63,11 +69,13 @@ const AuctionCard = ({
         />
         
         {/* العداد */}
-        <div className="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center">
+        {/* <div className="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center">
           <Icons.FaCalendarAlt className="ml-2" />
           {daysLeft} يوم متبقي
-        </div>
+        </div> */}
+        
       </div>
+      
       
       {/* المحتوى */}
       <div className="p-6">
@@ -97,10 +105,7 @@ const AuctionCard = ({
         {/* الزر */}
         <button
           className="w-full bg-gray-100 text-blue-400 py-3 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-semibold text-base"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick && onClick(id, 'auction');
-          }}
+          onClick={(e) => handleCardClick(e, true)} // استبدل هنا
         >
           تفاصيل المزاد
         </button>

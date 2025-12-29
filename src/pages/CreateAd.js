@@ -1091,7 +1091,6 @@ function CreateAd() {
                                 <option value="سكني">سكني</option>
                                 <option value="تجاري">تجاري</option>
                                 <option value="زراعي">زراعي</option>
-                                <option value="صناعي">صناعي</option>
                               </select>
                             </div>
 

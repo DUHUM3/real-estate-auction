@@ -1,4 +1,3 @@
-// src/pages/LandRequestDetails.js
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ModalContext } from "../../App";
@@ -110,11 +109,10 @@ const LandRequestDetails = () => {
  const formatDate = (dateString) => {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // الشهور تبدأ من 0
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
 };
-
 
   /**
    * دالة الحصول على نوع المستخدم الحالي
@@ -328,52 +326,52 @@ const LandRequestDetails = () => {
   const images = getAllImages();
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pb-6 pt-[80px]" dir="rtl">
-      {/* Header مع زر العودة والأيقونات */}
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 pb-6 pt-[80px]" dir="rtl">
+      {/* Header مع زر العودة والأيقونات - محسن للشاشات الصغيرة */}
+      <div className="flex justify-between items-center mb-4 sm:mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all hover:shadow-sm"
+          className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all hover:shadow-sm text-sm sm:text-base"
         >
-          <FaArrowLeft />
+          <FaArrowLeft className="text-sm" />
           <span className="font-medium">العودة</span>
         </button>
         <div className="flex gap-2">
           <button
-            className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-sm transition-all"
+            className="p-2 sm:p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-sm transition-all"
             onClick={shareItem}
             title="مشاركة"
           >
-            <FaShare />
+            <FaShare className="text-sm sm:text-base" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* القسم الأيسر: الصور والمعلومات الرئيسية */}
         <div className="lg:col-span-2">
           {/* Image Gallery */}
           {images.length > 0 && (
-            <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="mb-4 sm:mb-6 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="relative"></div>
             </div>
           )}
 
           {/* Main Content */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-            {/* العنوان بدل "طلب أرض #{request.id}" */}
-            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+            {/* العنوان - محسن للشاشات الصغيرة */}
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div className="flex-1">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-2">
                   {request.title || `طلب أرض ${getTypeLabel(request.type)}`}
                 </h1>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <FaTag className="text-gray-400" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+                  <FaTag className="text-gray-400 text-xs" />
                   <span>طلب #{request.id}</span>
                 </div>
               </div>
               <div
-                className={`px-4 py-2 rounded-full text-sm font-bold ${getStatusClass(
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold ${getStatusClass(
                   request.status
                 )} ${
                   request.status === "open"
@@ -387,99 +385,99 @@ const LandRequestDetails = () => {
               </div>
             </div>
 
-            {/* الوصف */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <span className="w-1 h-5 bg-blue-500 rounded-full"></span>
+            {/* الوصف - محسن للشاشات الصغيرة */}
+            <div className="mb-6 sm:mb-8">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center gap-2">
+                <span className="w-1 h-4 sm:h-5 bg-blue-500 rounded-full"></span>
                 الوصف
               </h3>
-              <p className="text-gray-600 leading-relaxed text-lg bg-gray-50 p-4 rounded-lg border border-gray-100">
+              <p className="text-gray-600 leading-relaxed text-sm sm:text-base bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-100">
                 {request.description}
               </p>
             </div>
 
-            {/* معلومات الموقع */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                <FaMapMarkerAlt className="text-amber-500" />
+            {/* معلومات الموقع - محسن للشاشات الصغيرة */}
+            <div className="mb-6 sm:mb-8">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4 flex items-center gap-2">
+                <FaMapMarkerAlt className="text-amber-500 text-sm sm:text-base" />
                 الموقع
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-amber-100 rounded-lg">
-                      <FaMapMarkerAlt className="text-amber-600 text-xl" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div className="bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-3 sm:p-4 md:p-5">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <div className="p-1.5 sm:p-2 bg-amber-100 rounded-lg">
+                      <FaMapMarkerAlt className="text-amber-600 text-lg sm:text-xl" />
                     </div>
                     <div>
-                      <p className="text-amber-800 font-semibold mb-1">
+                      <p className="text-amber-800 font-semibold mb-1 text-sm sm:text-base">
                         المنطقة
                       </p>
-                      <p className="text-gray-700 text-lg">{request.region}</p>
+                      <p className="text-gray-700 text-sm sm:text-base md:text-lg">{request.region}</p>
                     </div>
                   </div>
                 </div>
-                <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <FaCity className="text-blue-600 text-xl" />
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-3 sm:p-4 md:p-5">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
+                      <FaCity className="text-blue-600 text-lg sm:text-xl" />
                     </div>
                     <div>
-                      <p className="text-blue-800 font-semibold mb-1">
+                      <p className="text-blue-800 font-semibold mb-1 text-sm sm:text-base">
                         المدينة
                       </p>
-                      <p className="text-gray-700 text-lg">{request.city}</p>
+                      <p className="text-gray-700 text-sm sm:text-base md:text-lg">{request.city}</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* تفاصيل الطلب */}
-            <div className="mb-8">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 pb-3 border-b border-gray-200">
+            {/* تفاصيل الطلب - محسن للشاشات الصغيرة */}
+            <div className="mb-6 sm:mb-8">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 pb-2 sm:pb-3 border-b border-gray-200">
                 تفاصيل الطلب
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <FaHandshake className="text-blue-600" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-3 sm:p-4 md:p-5 hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
+                      <FaHandshake className="text-blue-600 text-sm sm:text-base" />
                     </div>
                     <div>
-                      <span className="block text-sm text-gray-500 mb-1">
+                      <span className="block text-xs sm:text-sm text-gray-500 mb-1">
                         الغرض
                       </span>
-                      <span className="font-bold text-gray-800 text-lg">
+                      <span className="font-bold text-gray-800 text-sm sm:text-base md:text-lg">
                         {getPurposeLabel(request.purpose)}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <FaBuilding className="text-purple-600" />
+                <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-3 sm:p-4 md:p-5 hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
+                      <FaBuilding className="text-purple-600 text-sm sm:text-base" />
                     </div>
                     <div>
-                      <span className="block text-sm text-gray-500 mb-1">
+                      <span className="block text-xs sm:text-sm text-gray-500 mb-1">
                         النوع
                       </span>
-                      <span className="font-bold text-gray-800 text-lg">
+                      <span className="font-bold text-gray-800 text-sm sm:text-base md:text-lg">
                         {getTypeLabel(request.type)}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <FaRulerCombined className="text-green-600" />
+                <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-3 sm:p-4 md:p-5 hover:shadow-md transition-shadow">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg">
+                      <FaRulerCombined className="text-green-600 text-sm sm:text-base" />
                     </div>
                     <div>
-                      <span className="block text-sm text-gray-500 mb-1">
+                      <span className="block text-xs sm:text-sm text-gray-500 mb-1">
                         المساحة المطلوبة
                       </span>
-                      <span className="font-bold text-gray-800 text-lg">
+                      <span className="font-bold text-gray-800 text-sm sm:text-base md:text-lg">
                         {formatPrice(request.area)} م²
                       </span>
                     </div>
@@ -492,48 +490,42 @@ const LandRequestDetails = () => {
 
         {/* القسم الأيمن: معلومات إضافية وزر العرض */}
         <div className="lg:col-span-1">
-          {/* معلومات إضافية */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">
+          {/* معلومات إضافية - محسنة للشاشات الصغيرة */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4">
               معلومات إضافية
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">تاريخ الإنشاء</span>
-                <span className="font-semibold text-gray-800">
+                <span className="text-gray-600 text-sm sm:text-base">تاريخ الإنشاء</span>
+                <span className="font-semibold text-gray-800 text-sm sm:text-base">
                   {formatDate(request.created_at)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">آخر تحديث</span>
-                <span className="font-semibold text-gray-800">
-                  {formatDate(request.updated_at || request.created_at)}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Offer Button */}
+          {/* Offer Button - محسن للشاشات الصغيرة */}
           {request.status === "open" ? (
-            <div className="sticky top-6" id="offer">
+            <div className="sticky top-4 sm:top-6" id="offer">
               <button
-                className="w-full py-4 px-4 bg-gradient-to-r from-[#53a1dd] to-[#53a1dd] text-white font-bold rounded-xl hover:from-[#53a1dd] hover:to-[#53a1dd] transition-all text-lg shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                className="w-full py-3 sm:py-4 px-3 sm:px-4 bg-gradient-to-r from-[#53a1dd] to-[#53a1dd] text-white font-bold rounded-xl hover:from-[#53a1dd] hover:to-[#53a1dd] transition-all text-base sm:text-lg shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                 onClick={handleShowOfferForm}
               >
-                <FaHandshake className="text-xl" />
+                <FaHandshake className="text-lg sm:text-xl" />
                 تقديم عرض
               </button>
-              <p className="text-center text-gray-500 text-sm mt-3">
+              <p className="text-center text-gray-500 text-xs sm:text-sm mt-2 sm:mt-3">
                 هذا الطلب مفتوح لتلقي العروض حتى تاريخ الإغلاق
               </p>
             </div>
           ) : (
-            <div className="text-center py-6 border border-gray-200 rounded-xl bg-gray-50">
-              <div className="text-4xl mb-3">🔒</div>
-              <h4 className="font-bold text-gray-700 mb-2">
+            <div className="text-center py-4 sm:py-6 border border-gray-200 rounded-xl bg-gray-50">
+              <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">🔒</div>
+              <h4 className="font-bold text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base">
                 هذا الطلب {request.status === "closed" ? "مغلق" : "مكتمل"}
               </h4>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-xs sm:text-sm">
                 لا يمكن تقديم عروض جديدة على هذا الطلب
               </p>
             </div>
@@ -541,33 +533,33 @@ const LandRequestDetails = () => {
         </div>
       </div>
 
-      {/* Offer Form Modal */}
+      {/* Offer Form Modal - محسن للشاشات الصغيرة */}
       {showOfferForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-                <h3 className="text-xl font-bold text-gray-800">
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-gray-200">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
                   تقديم عرض على الطلب
                 </h3>
                 <button
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 transition-colors"
                   onClick={handleCloseOfferForm}
                   title="إغلاق"
                 >
-                  <FaTimes className="text-lg" />
+                  <FaTimes className="text-base sm:text-lg" />
                 </button>
               </div>
 
               <form onSubmit={handleOfferSubmit}>
-                <div className="mb-6">
-                  <div className="flex justify-between items-center mb-3">
-                    <label className="flex items-center gap-2 text-gray-700 font-medium">
-                      <FaEdit className="text-blue-500" />
+                <div className="mb-4 sm:mb-6">
+                  <div className="flex justify-between items-center mb-2 sm:mb-3">
+                    <label className="flex items-center gap-2 text-gray-700 font-medium text-sm sm:text-base">
+                      <FaEdit className="text-blue-500 text-sm sm:text-base" />
                       <span>تفاصيل العرض</span>
                     </label>
                     <div
-                      className={`text-sm font-medium px-2 py-1 rounded-full ${
+                      className={`text-xs sm:text-sm font-medium px-2 py-1 rounded-full ${
                         offerMessage.trim().length === 0
                           ? "bg-gray-100 text-gray-500"
                           : offerMessage.trim().length < 10
@@ -585,12 +577,12 @@ const LandRequestDetails = () => {
                       setOfferMessage(e.target.value);
                     }}
                     placeholder="أدخل تفاصيل العرض هنا... مثلاً: لدي أرض تناسب متطلباتك في الموقع المطلوب مع توفر جميع الخدمات..."
-                    rows={5}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none transition-all"
+                    rows={4}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none transition-all text-sm sm:text-base"
                     required
                     maxLength={2000}
                   />
-                  <div className="flex justify-between items-center mt-3">
+                  <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mt-2 sm:mt-3 gap-1 sm:gap-0">
                     <div className="text-xs text-gray-500">
                       اكتب وصفاً واضحاً ومفصلاً لعرضك
                     </div>
@@ -609,10 +601,10 @@ const LandRequestDetails = () => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-4 px-4 bg-gradient-to-r from-[#53a1dd] to-[#53a1dd] text-white font-bold rounded-xl hover:from-[#53a1dd] hover:to-[#53a1dd] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                  className="w-full py-3 sm:py-4 px-3 sm:px-4 bg-gradient-to-r from-[#53a1dd] to-[#53a1dd] text-white font-bold rounded-xl hover:from-[#53a1dd] hover:to-[#53a1dd] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl text-sm sm:text-base"
                   disabled={offerLoading}
                 >
-                  <FaPaperPlane />
+                  <FaPaperPlane className="text-sm sm:text-base" />
                   {offerLoading ? "جاري الإرسال..." : "إرسال العرض"}
                 </button>
               </form>
@@ -621,16 +613,16 @@ const LandRequestDetails = () => {
         </div>
       )}
 
-      {/* Image Modal */}
+      {/* Image Modal - محسن للشاشات الصغيرة */}
       {showImageModal && images.length > 0 && (
-        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-3 sm:p-4">
           <div className="relative w-full max-w-5xl">
             <button
-              className="absolute top-4 left-4 p-3 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 z-10 shadow-lg hover:shadow-xl transition-all"
+              className="absolute top-2 sm:top-4 left-2 sm:left-4 p-2 sm:p-3 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 z-10 shadow-lg hover:shadow-xl transition-all"
               onClick={() => setShowImageModal(false)}
               title="إغلاق"
             >
-              <FaTimes className="text-xl" />
+              <FaTimes className="text-lg sm:text-xl" />
             </button>
           </div>
         </div>

@@ -488,7 +488,7 @@ const PropertiesPage = () => {
     if (itemType === "land") {
       navigate(`/lands/${item.id}/land`);
     } else if (itemType === "auction") {
-      navigate(`/lands/${item.id}/auction`);
+      navigate(`/auctions/${item.id}/auction`);
     }
   };
 
@@ -610,57 +610,62 @@ const PropertiesPage = () => {
             </span>
           </div>
 
-         {/* Price and Area */}
-<div className="mt-auto flex items-center gap-3 text-lg font-bold text-black" dir="ltr">
-  {property.purpose === "بيع" ? (
-    <span className="inline-flex items-center gap-1">
-      {propertiesUtils.formatPrice(property.price_per_sqm)}
-      <img
-        src="/images/rail.svg"
-        alt="ريال سعودي"
-        className="w-3.5 h-3.5 inline-block"
-        style={{ verticalAlign: "middle" }}
-        onError={(e) => {
-          e.target.style.display = "none";
-          e.target.insertAdjacentHTML(
-            "afterend",
-            '<span class="text-xs font-normal text-gray-600">ر.س/م²</span>'
-          );
-        }}
-      />
-    </span>
-  ) : (
-    <span className="inline-flex items-center gap-1">
-      {propertiesUtils.formatPrice(property.estimated_investment_value)}
-      <img
-        src="/images/rail.svg"
-        alt="ريال سعودي"
-        className="w-3.5 h-3.5 inline-block"
-        style={{ verticalAlign: "middle" }}
-        onError={(e) => {
-          e.target.style.display = "none";
-          e.target.insertAdjacentHTML(
-            "afterend",
-            '<span class="text-xs font-normal text-gray-600">ر.س</span>'
-          );
-        }}
-      />
-    </span>
-  )}
+          {/* Price and Area */}
+          <div
+            className="mt-auto flex items-center gap-3 text-lg font-bold text-black"
+            dir="ltr"
+          >
+            {property.purpose === "بيع" ? (
+              <span className="inline-flex items-center gap-1">
+                {propertiesUtils.formatPrice(property.price_per_sqm)}
+                <img
+                  src="/images/rail.svg"
+                  alt="ريال سعودي"
+                  className="w-3.5 h-3.5 inline-block"
+                  style={{ verticalAlign: "middle" }}
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.insertAdjacentHTML(
+                      "afterend",
+                      '<span class="text-xs font-normal text-gray-600">ر.س/م²</span>'
+                    );
+                  }}
+                />
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1">
+                {propertiesUtils.formatPrice(
+                  property.estimated_investment_value
+                )}
+                <img
+                  src="/images/rail.svg"
+                  alt="ريال سعودي"
+                  className="w-3.5 h-3.5 inline-block"
+                  style={{ verticalAlign: "middle" }}
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.insertAdjacentHTML(
+                      "afterend",
+                      '<span class="text-xs font-normal text-gray-600">ر.س</span>'
+                    );
+                  }}
+                />
+              </span>
+            )}
 
-  {/* Area */}
-  <span className="text-sm font-medium text-black-700">
-    {propertiesUtils.formatPrice(property.total_area)} م²
-  </span>
-</div>
+            {/* Area */}
+            <span className="text-sm font-medium text-black-700">
+              {propertiesUtils.formatPrice(property.total_area)} م²
+            </span>
+          </div>
 
           {/* Tags and Actions Row */}
           <div className="flex items-center justify-between gap-2 mt-1">
-           {/* Tags */}
-<div className="flex gap-1.5">
-  {/* نوع العقار */}
-  <span
-    className={`px-2 py-0.5 text-xs rounded-full font-medium
+            {/* Tags */}
+            <div className="flex gap-1.5">
+              {/* نوع العقار */}
+              <span
+                className={`px-2 py-0.5 text-xs rounded-full font-medium
       ${
         property.land_type === "سكني"
           ? "bg-blue-100 text-blue-800"
@@ -672,15 +677,15 @@ const PropertiesPage = () => {
           ? "bg-green-100 text-green-800"
           : "bg-gray-100 text-gray-800"
       }`}
-  >
-    {property.land_type}
-  </span>
+              >
+                {property.land_type}
+              </span>
 
-  {/* الغرض */}
-  <span className="px-2 py-0.5 text-xs bg-[#53a1dd]/10 text-[#53a1dd] rounded-full font-medium">
-    {property.purpose}
-  </span>
-</div>
+              {/* الغرض */}
+              <span className="px-2 py-0.5 text-xs bg-[#53a1dd]/10 text-[#53a1dd] rounded-full font-medium">
+                {property.purpose}
+              </span>
+            </div>
 
             {/* Action Buttons */}
             <div className="flex gap-1">
@@ -780,11 +785,6 @@ const PropertiesPage = () => {
             <span>
               {property.region} - {property.city}
             </span>
-            {property.geo_location_text && (
-              <span className="text-xs text-gray-500 opacity-85 block w-full mr-6">
-                ({property.geo_location_text})
-              </span>
-            )}
           </div>
 
           <div className="space-y-2 mb-4">
@@ -981,8 +981,8 @@ const PropertiesPage = () => {
                 className="w-3.5 h-3.5"
                 fill={
                   favorites.auctions?.includes(auction.id)
-                    ? "currentColor"
-                    : "none"
+                    ? "text-red-500"
+                    : "text-gray-400"
                 }
               />
             </button>
@@ -1038,8 +1038,8 @@ const PropertiesPage = () => {
             className={`absolute top-3 left-3 p-2 rounded-full bg-white shadow-md transition-all hover:scale-110 z-10
               ${
                 favorites.auctions?.includes(auction.id)
-                  ? "text-red-500"
-                  : "text-gray-400"
+                  ? "text-red-500 bg-red-50"
+          : "text-gray-400 bg-gray-50"
               }`}
             onClick={(e) => toggleFavorite("auctions", auction.id, e)}
             aria-label="إضافة إلى المفضلة"
@@ -1049,7 +1049,7 @@ const PropertiesPage = () => {
               fill={
                 favorites.auctions?.includes(auction.id)
                   ? "currentColor"
-                  : "none"
+                  : "#6b7280"
               }
             />
           </button>

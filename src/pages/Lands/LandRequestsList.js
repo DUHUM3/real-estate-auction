@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-// Skeleton Component
+// Skeleton Components
 const RequestListSkeleton = ({ count = 6 }) => {
   return (
     <div className="space-y-3">
@@ -28,10 +28,7 @@ const RequestListSkeleton = ({ count = 6 }) => {
           className="bg-white rounded-xl border border-gray-200 overflow-hidden animate-pulse"
         >
           <div className="flex gap-4 p-4">
-            {/* صورة وهمية للموبايل */}
             <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-lg flex-shrink-0"></div>
-            
-            {/* المحتوى */}
             <div className="flex-1 space-y-3">
               <div className="h-5 bg-gray-200 rounded w-3/4"></div>
               <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -52,6 +49,31 @@ const RequestListSkeleton = ({ count = 6 }) => {
   );
 };
 
+const RequestCardSkeleton = ({ count = 6 }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+      {Array.from({ length: count }).map((_, index) => (
+        <div
+          key={index}
+          className="bg-white rounded-xl border border-gray-200 overflow-hidden animate-pulse p-5"
+        >
+          <div className="space-y-3">
+            <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="h-20 bg-gray-200 rounded-lg"></div>
+              <div className="h-20 bg-gray-200 rounded-lg"></div>
+              <div className="h-20 bg-gray-200 rounded-lg"></div>
+              <div className="h-20 bg-gray-200 rounded-lg"></div>
+            </div>
+            <div className="h-12 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 function LandRequestsList() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,8 +87,8 @@ function LandRequestsList() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [hideFilterBar, setHideFilterBar] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [favorites, setFavorites] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [pagination, setPagination] = useState({
     current_page: 1,
     last_page: 1,
@@ -157,10 +179,10 @@ function LandRequestsList() {
 
   const getStatusBadgeClass = (status) => {
     const statusClasses = {
-      open: "bg-green-100 text-green-700",
-      completed: "bg-blue-100 text-blue-700",
+      open: "bg-green-100 text-green-700 border border-green-200",
+      completed: "bg-blue-100 text-blue-700 border border-blue-200",
     };
-    return statusClasses[status] || "bg-gray-100 text-gray-700";
+    return statusClasses[status] || "bg-gray-100 text-gray-700 border border-gray-200";
   };
 
   const formatPrice = (price) => {
@@ -178,6 +200,16 @@ function LandRequestsList() {
     button: "bg-gradient-to-r from-[#53a1dd] via-[#4a96d4] to-[#3a8ed0]",
     buttonHover: "bg-gradient-to-r from-[#3a8ed0] via-[#3284c8] to-[#2a7ec0]",
   };
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (location.state?.page) {
@@ -390,15 +422,6 @@ function LandRequestsList() {
     fetchRequests(1, filters);
   };
 
-  const toggleFavorite = (requestId, e) => {
-    e?.stopPropagation();
-    const newFavorites = favorites.includes(requestId)
-      ? favorites.filter((id) => id !== requestId)
-      : [...favorites, requestId];
-
-    setFavorites(newFavorites);
-  };
-
   const shareRequest = async (request, e) => {
     e?.stopPropagation();
 
@@ -502,15 +525,15 @@ function LandRequestsList() {
     );
   };
 
-  // تصميم البطاقة الأفقية بأسلوب حراج
-  const renderRequestCard = (request) => (
+  // تصميم البطاقة الأفقية للشاشات الصغيرة (ListView)
+  const renderMobileRequestCard = (request) => (
     <div
       key={request.id}
       className="bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-[#53a1dd] cursor-pointer"
       onClick={() => openDetails(request.id)}
     >
       <div className="flex gap-3 sm:gap-4 p-3 sm:p-4">
-        {/* صورة بديلة بأيقونة */}
+        {/* أيقونة الطلب */}
         <div className="w-20 h-20 sm:w-28 sm:h-28 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex-shrink-0 flex items-center justify-center border border-blue-200">
           <Home className="text-[#53a1dd] w-8 h-8 sm:w-12 sm:h-12" />
         </div>
@@ -543,15 +566,15 @@ function LandRequestsList() {
 
             {/* المواصفات */}
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <div className="flex items-center gap-1 bg-blue-50 px-2 py-1 rounded">
+              <div className="flex items-center gap-1 bg-blue-50 px-2 py-1 rounded border border-blue-100">
                 <Ruler className="w-3 h-3 text-[#53a1dd]" />
                 <span className="font-semibold text-gray-700">{formatPrice(request.area)} م²</span>
               </div>
-              <div className="flex items-center gap-1 bg-green-50 px-2 py-1 rounded">
+              <div className="flex items-center gap-1 bg-green-50 px-2 py-1 rounded border border-green-100">
                 <Target className="w-3 h-3 text-green-600" />
                 <span className="font-semibold text-gray-700">{getPurposeLabel(request.purpose)}</span>
               </div>
-              <div className="flex items-center gap-1 bg-purple-50 px-2 py-1 rounded">
+              <div className="flex items-center gap-1 bg-purple-50 px-2 py-1 rounded border border-purple-100">
                 <Building className="w-3 h-3 text-purple-600" />
                 <span className="font-semibold text-gray-700">{getTypeLabel(request.type)}</span>
               </div>
@@ -589,9 +612,126 @@ function LandRequestsList() {
     </div>
   );
 
+  // تصميم البطاقة العمودية للشاشات الكبيرة (Card View) - بدون صورة
+  const renderDesktopRequestCard = (request) => (
+    <div
+      key={request.id}
+      className="bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-[#53a1dd] cursor-pointer group"
+      onClick={() => openDetails(request.id)}
+    >
+      {/* الهيدر مع العنوان والحالة */}
+      <div className="p-5 border-b border-gray-100 bg-gradient-to-l from-blue-50/50 to-white">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-lg text-gray-900 line-clamp-2 group-hover:text-[#53a1dd] transition-colors">
+              {request.title}
+            </h3>
+          </div>
+          <span
+            className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap flex-shrink-0 ${getStatusBadgeClass(
+              request.status
+            )}`}
+          >
+            {getStatusLabel(request.status)}
+          </span>
+        </div>
+
+        {/* الموقع */}
+        <div className="flex items-center gap-2 text-gray-600 mb-2">
+          <div className="p-1.5 bg-blue-50 rounded-lg border border-blue-100">
+            <MapPin className="w-3.5 h-3.5 text-[#53a1dd]" />
+          </div>
+          <span className="text-sm font-medium">
+            {request.region} - {request.city}
+          </span>
+        </div>
+      </div>
+
+      {/* محتوى البطاقة */}
+      <div className="p-5">
+        {/* المواصفات */}
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="bg-gradient-to-br from-blue-50 to-blue-25 border border-blue-100 rounded-xl p-3 group/item hover:bg-blue-50 transition-colors">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white rounded-lg border border-blue-200 shadow-sm">
+                <Ruler className="w-4 h-4 text-[#53a1dd]" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 font-medium">المساحة</div>
+                <div className="text-base font-bold text-gray-800">{formatPrice(request.area)} م²</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-br from-green-50 to-green-25 border border-green-100 rounded-xl p-3 group/item hover:bg-green-50 transition-colors">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white rounded-lg border border-green-200 shadow-sm">
+                <Target className="w-4 h-4 text-green-600" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 font-medium">الغرض</div>
+                <div className="text-base font-bold text-gray-800">{getPurposeLabel(request.purpose)}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-br from-purple-50 to-purple-25 border border-purple-100 rounded-xl p-3 group/item hover:bg-purple-50 transition-colors">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white rounded-lg border border-purple-200 shadow-sm">
+                <Building className="w-4 h-4 text-purple-600" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 font-medium">النوع</div>
+                <div className="text-base font-bold text-gray-800">{getTypeLabel(request.type)}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-br from-amber-50 to-amber-25 border border-amber-100 rounded-xl p-3 group/item hover:bg-amber-50 transition-colors">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-white rounded-lg border border-amber-200 shadow-sm">
+                <Calendar className="w-4 h-4 text-amber-600" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 font-medium">التاريخ</div>
+                <div className="text-base font-bold text-gray-800">{formatDate(request.created_at)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* الأزرار */}
+        <div className="flex gap-3">
+          <button
+            className={`flex-1 py-3 text-white font-bold text-sm rounded-lg transition-all flex items-center justify-center gap-2 ${blueGradients.button} hover:${blueGradients.buttonHover} shadow-sm hover:shadow`}
+            onClick={(e) => {
+              e.stopPropagation();
+              openDetails(request.id);
+            }}
+          >
+            <Eye size={16} />
+            عرض التفاصيل
+          </button>
+          
+          <button
+            className="py-3 px-4 border border-gray-300 bg-white text-gray-700 rounded-lg transition-all hover:bg-gray-50 hover:border-[#53a1dd] hover:text-[#53a1dd] flex items-center justify-center gap-2 shadow-sm hover:shadow"
+            onClick={(e) => shareRequest(request, e)}
+          >
+            <Share2 size={16} />
+            <span className="text-sm font-medium">مشاركة</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     if (isLoading) {
-      return <RequestListSkeleton count={6} />;
+      return isMobile ? (
+        <RequestListSkeleton count={6} />
+      ) : (
+        <RequestCardSkeleton count={6} />
+      );
     }
 
     if (requests.length === 0) {
@@ -654,9 +794,16 @@ function LandRequestsList() {
           )}
         </div>
 
-        <div className="space-y-3">
-          {requests.map(renderRequestCard)}
-        </div>
+        {/* عرض متجاوب بناءً على حجم الشاشة */}
+        {isMobile ? (
+          <div className="space-y-3">
+            {requests.map(renderMobileRequestCard)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            {requests.map(renderDesktopRequestCard)}
+          </div>
+        )}
 
         {renderPagination()}
       </>
