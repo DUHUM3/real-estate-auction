@@ -18,7 +18,6 @@ const blueGradients = {
   buttonHover: "hover:from-[#53a1dd] hover:to-[#4285c7]",
 };
 
-
 // دالة مساعدة لعرض الرسائل
 const showToast = (type, message, duration = 3000) => {
   const isMobile = window.innerWidth < 768;
@@ -416,7 +415,6 @@ const PropertiesPage = () => {
     }
   };
 
-
   // Share Handlers
   const shareItem = async (item, type, e) => {
     e?.stopPropagation();
@@ -559,177 +557,333 @@ const PropertiesPage = () => {
   const renderPropertyCard = (property) => (
     <div
       key={property.id}
-      className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer flex flex-col h-full"
+      className="bg-white rounded-lg overflow-hidden border border-gray-200 transition-all duration-200 hover:shadow-md cursor-pointer
+                 md:flex md:flex-col md:shadow-md md:hover:shadow-lg md:hover:-translate-y-1"
       onClick={() => openDetails(property, "land")}
     >
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-gray-100">
-        {propertiesUtils.getPropertyImageUrl(property) ? (
-          <img
-            src={propertiesUtils.getPropertyImageUrl(property)}
-            alt={property.title || "صورة العقار"}
-            loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col justify-center items-center text-blue-400">
-            <Icons.FaHome className="text-6xl mb-2 opacity-70" />
-            <span className="text-sm text-gray-400 font-medium">
-              لا توجد صورة
-            </span>
-          </div>
-        )}
+      {/* Mobile Layout - Horizontal */}
+      <div className="md:hidden flex gap-3 p-3">
+        {/* Image - Left Side on Mobile */}
+        <div className="relative w-28 h-28 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-gray-100">
+          {propertiesUtils.getPropertyImageUrl(property) ? (
+            <img
+              src={propertiesUtils.getPropertyImageUrl(property)}
+              alt={property.title || "صورة العقار"}
+              loading="lazy"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-blue-300">
+              <Icons.FaHome className="text-3xl opacity-70" />
+            </div>
+          )}
 
-        {/* Status Badge */}
-        <div
-          className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold shadow-md
-          ${
-            property.status === "مفتوح" || property.status === "متاح"
-              ? "bg-green-500 text-white"
-              : property.status === "مباع"
-              ? "bg-red-500 text-white"
-              : property.status === "محجوز"
-              ? "bg-yellow-500 text-white"
-              : "bg-gray-500 text-white"
-          }`}
-        >
-          {property.status}
+          {/* Status Badge - Mobile */}
+          <div
+            className={`absolute top-1 right-1 px-1.5 py-0.5 rounded text-xs font-semibold
+              ${
+                property.status === "مفتوح" || property.status === "متاح"
+                  ? "bg-green-500 text-white"
+                  : property.status === "مباع"
+                  ? "bg-red-500 text-white"
+                  : property.status === "محجوز"
+                  ? "bg-yellow-500 text-white"
+                  : "bg-gray-500 text-white"
+              }`}
+          >
+            {property.status}
+          </div>
         </div>
 
-        {/* Favorite Button */}
-        <button
-          className={`absolute top-3 left-3 p-2 rounded-full bg-white shadow-md transition-all hover:scale-110 z-10
-    ${
-      favorites.properties?.includes(property.id)
-        ? "text-red-500"
-        : "text-black"
-    }`}
-          onClick={(e) => toggleFavorite("properties", property.id, e)}
-          aria-label="إضافة إلى المفضلة"
-        >
-          <Icons.FaHeart
-            className="w-4 h-4"
-            fill={
-              favorites.properties?.includes(property.id)
-                ? "currentColor"
-                : "#6b7280"
-            }
-          />
-        </button>
+        {/* Content - Right Side on Mobile */}
+        <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+          {/* Title */}
+          <h3 className="font-bold text-base text-gray-900 line-clamp-2 leading-snug">
+            {property.title}
+          </h3>
+
+          {/* Location */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-600">
+            <Icons.FaMapMarkerAlt className="text-gray-400 w-3 h-3 flex-shrink-0" />
+            <span className="truncate">
+              {property.region} - {property.city}
+            </span>
+          </div>
+
+         {/* Price and Area */}
+<div className="mt-auto flex items-center gap-3 text-lg font-bold text-black" dir="ltr">
+  {property.purpose === "بيع" ? (
+    <span className="inline-flex items-center gap-1">
+      {propertiesUtils.formatPrice(property.price_per_sqm)}
+      <img
+        src="/images/rail.svg"
+        alt="ريال سعودي"
+        className="w-3.5 h-3.5 inline-block"
+        style={{ verticalAlign: "middle" }}
+        onError={(e) => {
+          e.target.style.display = "none";
+          e.target.insertAdjacentHTML(
+            "afterend",
+            '<span class="text-xs font-normal text-gray-600">ر.س/م²</span>'
+          );
+        }}
+      />
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1">
+      {propertiesUtils.formatPrice(property.estimated_investment_value)}
+      <img
+        src="/images/rail.svg"
+        alt="ريال سعودي"
+        className="w-3.5 h-3.5 inline-block"
+        style={{ verticalAlign: "middle" }}
+        onError={(e) => {
+          e.target.style.display = "none";
+          e.target.insertAdjacentHTML(
+            "afterend",
+            '<span class="text-xs font-normal text-gray-600">ر.س</span>'
+          );
+        }}
+      />
+    </span>
+  )}
+
+  {/* Area */}
+  <span className="text-sm font-medium text-black-700">
+    {propertiesUtils.formatPrice(property.total_area)} م²
+  </span>
+</div>
+
+          {/* Tags and Actions Row */}
+          <div className="flex items-center justify-between gap-2 mt-1">
+           {/* Tags */}
+<div className="flex gap-1.5">
+  {/* نوع العقار */}
+  <span
+    className={`px-2 py-0.5 text-xs rounded-full font-medium
+      ${
+        property.land_type === "سكني"
+          ? "bg-blue-100 text-blue-800"
+          : property.land_type === "تجاري"
+          ? "bg-amber-100 text-amber-800"
+          : property.land_type === "صناعي"
+          ? "bg-orange-100 text-orange-800"
+          : property.land_type === "زراعي"
+          ? "bg-green-100 text-green-800"
+          : "bg-gray-100 text-gray-800"
+      }`}
+  >
+    {property.land_type}
+  </span>
+
+  {/* الغرض */}
+  <span className="px-2 py-0.5 text-xs bg-[#53a1dd]/10 text-[#53a1dd] rounded-full font-medium">
+    {property.purpose}
+  </span>
+</div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-1">
+              <button
+                className={`p-1.5 rounded-full transition-all
+      ${
+        favorites.properties?.includes(property.id)
+          ? "text-red-500 bg-red-50"
+          : "text-gray-400 bg-gray-50"
+      }`}
+                onClick={(e) => toggleFavorite("properties", property.id, e)}
+                aria-label="إضافة إلى المفضلة"
+              >
+                <Icons.FaHeart
+                  className="w-3.5 h-3.5"
+                  fill="currentColor" // هنا الحل، دائمًا currentColor
+                />
+              </button>
+              <button
+                className="p-1.5 rounded-full bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all"
+                onClick={(e) => shareItem(property, "properties", e)}
+                aria-label="مشاركة"
+              >
+                <Icons.FaShare className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="p-4 flex flex-col gap-3 flex-grow">
-        <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 leading-tight">
-          {property.title}
-        </h3>
-
-        <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-          <Icons.FaMapMarkerAlt className="text-[#53a1dd] w-4 h-4" />
-          <span>
-            {property.region} - {property.city}
-          </span>
-          {property.geo_location_text && (
-            <span className="text-xs text-gray-500 opacity-85 block w-full mr-6">
-              ({property.geo_location_text})
-            </span>
+      {/* Desktop/Tablet Layout - Vertical (Grid) */}
+      <div className="hidden md:flex md:flex-col md:h-full">
+        {/* Image */}
+        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-gray-100">
+          {propertiesUtils.getPropertyImageUrl(property) ? (
+            <img
+              src={propertiesUtils.getPropertyImageUrl(property)}
+              alt={property.title || "صورة العقار"}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col justify-center items-center text-blue-400">
+              <Icons.FaHome className="text-6xl mb-2 opacity-70" />
+              <span className="text-sm text-gray-400 font-medium">
+                لا توجد صورة
+              </span>
+            </div>
           )}
-        </div>
 
-        <div className="space-y-2 mb-4">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">المساحة:</span>
-            <span className="font-semibold text-black" dir="ltr">
-              {propertiesUtils.formatPrice(property.total_area)} م²
-            </span>
-          </div>
-
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">
-              {property.purpose === "بيع" ? "السعر/م²:" : "قيمة الاستثمار:"}
-            </span>
-            <span
-              className="font-semibold text-black inline-flex items-center gap-1"
-              dir="ltr"
-            >
-              {property.purpose === "بيع" ? (
-                <>
-                  <span>
-                    {propertiesUtils.formatPrice(property.price_per_sqm)}
-                  </span>
-                  <img
-                    src="/images/rail.svg"
-                    alt="ريال سعودي"
-                    className="w-3.5 h-3.5 inline-block"
-                    style={{ verticalAlign: "middle" }}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      e.target.insertAdjacentHTML(
-                        "afterend",
-                        '<span class="text-xs">ر.س</span>'
-                      );
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <span>
-                    {propertiesUtils.formatPrice(
-                      property.estimated_investment_value
-                    )}
-                  </span>
-                  <img
-                    src="/images/rail.svg"
-                    alt="ريال سعودي"
-                    className="w-3.5 h-3.5 inline-block"
-                    style={{ verticalAlign: "middle" }}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      e.target.insertAdjacentHTML(
-                        "afterend",
-                        '<span class="text-xs">ر.س</span>'
-                      );
-                    }}
-                  />
-                </>
-              )}
-            </span>
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          <span
-            className={`px-2 py-1 text-xs rounded-full font-medium
-            ${
-              property.land_type === "سكني"
-                ? "bg-blue-100 text-blue-800"
-                : property.land_type === "تجاري"
-                ? "bg-amber-100 text-amber-800"
-                : property.land_type === "صناعي"
-                ? "bg-orange-100 text-orange-800"
-                : property.land_type === "زراعي"
-                ? "bg-green-100 text-green-800"
-                : "bg-gray-100 text-gray-800"
-            }`}
+          {/* Status Badge */}
+          <div
+            className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold shadow-md
+              ${
+                property.status === "مفتوح" || property.status === "متاح"
+                  ? "bg-green-500 text-white"
+                  : property.status === "مباع"
+                  ? "bg-red-500 text-white"
+                  : property.status === "محجوز"
+                  ? "bg-yellow-500 text-white"
+                  : "bg-gray-500 text-white"
+              }`}
           >
-            {property.land_type}
-          </span>
-          <span className="px-2 py-1 text-xs bg-[#53a1dd]/10 text-[#53a1dd] rounded-full font-medium">
-            {property.purpose}
-          </span>
-        </div>
+            {property.status}
+          </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2 mt-auto">
-          <button className="flex-1 bg-[#53a1dd] text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-[#4285c7] transition-colors">
-            عرض التفاصيل
-          </button>
+          {/* Favorite Button */}
           <button
-            className="p-2.5 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-            onClick={(e) => shareItem(property, "properties", e)}
-            aria-label="مشاركة"
+            className={`absolute top-3 left-3 p-2 rounded-full bg-white shadow-md transition-all hover:scale-110 z-10
+              ${
+                favorites.properties?.includes(property.id)
+                  ? "text-red-500"
+                  : "text-black"
+              }`}
+            onClick={(e) => toggleFavorite("properties", property.id, e)}
+            aria-label="إضافة إلى المفضلة"
           >
-            <Icons.FaShare className="w-4 h-4 text-gray-600" />
+            <Icons.FaHeart
+              className="w-4 h-4"
+              fill={
+                favorites.properties?.includes(property.id)
+                  ? "currentColor"
+                  : "#6b7280"
+              }
+            />
           </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 flex flex-col gap-3 flex-grow">
+          <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 leading-tight">
+            {property.title}
+          </h3>
+
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+            <Icons.FaMapMarkerAlt className="text-[#53a1dd] w-4 h-4" />
+            <span>
+              {property.region} - {property.city}
+            </span>
+            {property.geo_location_text && (
+              <span className="text-xs text-gray-500 opacity-85 block w-full mr-6">
+                ({property.geo_location_text})
+              </span>
+            )}
+          </div>
+
+          <div className="space-y-2 mb-4">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">المساحة:</span>
+              <span className="font-semibold text-black" dir="ltr">
+                {propertiesUtils.formatPrice(property.total_area)} م²
+              </span>
+            </div>
+
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">
+                {property.purpose === "بيع" ? "السعر/م²:" : "قيمة الاستثمار:"}
+              </span>
+              <span
+                className="font-semibold text-black inline-flex items-center gap-1"
+                dir="ltr"
+              >
+                {property.purpose === "بيع" ? (
+                  <>
+                    <span>
+                      {propertiesUtils.formatPrice(property.price_per_sqm)}
+                    </span>
+                    <img
+                      src="/images/rail.svg"
+                      alt="ريال سعودي"
+                      className="w-3.5 h-3.5 inline-block"
+                      style={{ verticalAlign: "middle" }}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.insertAdjacentHTML(
+                          "afterend",
+                          '<span class="text-xs">ر.س</span>'
+                        );
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {propertiesUtils.formatPrice(
+                        property.estimated_investment_value
+                      )}
+                    </span>
+                    <img
+                      src="/images/rail.svg"
+                      alt="ريال سعودي"
+                      className="w-3.5 h-3.5 inline-block"
+                      style={{ verticalAlign: "middle" }}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.insertAdjacentHTML(
+                          "afterend",
+                          '<span class="text-xs">ر.س</span>'
+                        );
+                      }}
+                    />
+                  </>
+                )}
+              </span>
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span
+              className={`px-2 py-1 text-xs rounded-full font-medium
+                ${
+                  property.land_type === "سكني"
+                    ? "bg-blue-100 text-blue-800"
+                    : property.land_type === "تجاري"
+                    ? "bg-amber-100 text-amber-800"
+                    : property.land_type === "صناعي"
+                    ? "bg-orange-100 text-orange-800"
+                    : property.land_type === "زراعي"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+            >
+              {property.land_type}
+            </span>
+            <span className="px-2 py-1 text-xs bg-[#53a1dd]/10 text-[#53a1dd] rounded-full font-medium">
+              {property.purpose}
+            </span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2 mt-auto">
+            <button className="flex-1 bg-[#53a1dd] text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-[#4285c7] transition-colors">
+              عرض التفاصيل
+            </button>
+            <button
+              className="p-2.5 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              onClick={(e) => shareItem(property, "properties", e)}
+              aria-label="مشاركة"
+            >
+              <Icons.FaShare className="w-4 h-4 text-gray-600" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -738,106 +892,215 @@ const PropertiesPage = () => {
   const renderAuctionCard = (auction) => (
     <div
       key={auction.id}
-      className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer flex flex-col h-full"
+      className="bg-white rounded-lg overflow-hidden border border-gray-200 transition-all duration-200 hover:shadow-md cursor-pointer
+                 md:flex md:flex-col md:shadow-md md:hover:shadow-lg md:hover:-translate-y-1"
       onClick={() => openDetails(auction, "auction")}
     >
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-gray-100">
-        {auctionsUtils.getAuctionImageUrl(auction) ? (
-          <img
-            src={auctionsUtils.getAuctionImageUrl(auction)}
-            alt={auctionsUtils.cleanText(auction.title) || "صورة المزاد"}
-            loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col justify-center items-center text-blue-400">
-            <Icons.FaGavel className="text-6xl mb-2 opacity-70" />
-            <span className="text-sm text-gray-400 font-medium">
-              لا توجد صورة
+      {/* Mobile Layout - Horizontal */}
+      <div className="md:hidden flex gap-3 p-3">
+        {/* Image - Left Side on Mobile */}
+        <div className="relative w-28 h-28 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-gray-100">
+          {auctionsUtils.getAuctionImageUrl(auction) ? (
+            <img
+              src={auctionsUtils.getAuctionImageUrl(auction)}
+              alt={auctionsUtils.cleanText(auction.title) || "صورة المزاد"}
+              loading="lazy"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-blue-300">
+              <Icons.FaGavel className="text-3xl opacity-70" />
+            </div>
+          )}
+
+          {/* Status Badge - Mobile */}
+          <div
+            className={`absolute top-1 right-1 px-1.5 py-0.5 rounded text-xs font-semibold
+              ${
+                auction.status === "مفتوح"
+                  ? "bg-green-500 text-white"
+                  : auction.status === "مغلق"
+                  ? "bg-gray-500 text-white"
+                  : auction.status === "معلق"
+                  ? "bg-yellow-500 text-white"
+                  : "bg-gray-500 text-white"
+              }`}
+          >
+            {auction.status}
+          </div>
+        </div>
+
+        {/* Content - Right Side on Mobile */}
+        <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+          {/* Title */}
+          <h3 className="font-bold text-base text-gray-900 line-clamp-2 leading-snug">
+            {auctionsUtils.cleanText(auction.title)}
+          </h3>
+
+          {/* Company */}
+          {auction.company && (
+            <div className="flex items-center gap-1.5 text-xs bg-blue-50 text-blue-800 px-2 py-1 rounded font-medium">
+              <Icons.FaBuilding className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{auction.company.auction_name}</span>
+            </div>
+          )}
+
+          {/* Location */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-600">
+            <Icons.FaMapMarkerAlt className="text-gray-400 w-3 h-3 flex-shrink-0" />
+            <span className="truncate">
+              {auctionsUtils.cleanText(auction.address)}
             </span>
           </div>
-        )}
 
-        {/* Status Badge */}
-        <div
-          className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold shadow-md
-          ${
-            auction.status === "مفتوح"
-              ? "bg-green-500 text-white"
-              : auction.status === "مغلق"
-              ? "bg-gray-500 text-white"
-              : auction.status === "معلق"
-              ? "bg-yellow-500 text-white"
-              : "bg-gray-500 text-white"
-          }`}
-        >
-          {auction.status}
+          {/* Date & Time */}
+          <div className="flex items-center gap-3 text-xs text-gray-600 mt-auto">
+            <div className="flex items-center gap-1">
+              <Icons.FaCalendarDay className="text-gray-400 w-3 h-3" />
+              <span>{auctionsUtils.formatDate(auction.auction_date)}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Icons.FaClock className="text-gray-400 w-3 h-3" />
+              <span>{auctionsUtils.formatTime(auction.start_time)}</span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-1 mt-1">
+            <button
+              className={`p-1.5 rounded-full transition-all
+                ${
+                  favorites.auctions?.includes(auction.id)
+                    ? "text-red-500 bg-red-50"
+                    : "text-gray-400 bg-gray-50"
+                }`}
+              onClick={(e) => toggleFavorite("auctions", auction.id, e)}
+              aria-label="إضافة إلى المفضلة"
+            >
+              <Icons.FaHeart
+                className="w-3.5 h-3.5"
+                fill={
+                  favorites.auctions?.includes(auction.id)
+                    ? "currentColor"
+                    : "none"
+                }
+              />
+            </button>
+            <button
+              className="p-1.5 rounded-full bg-gray-50 text-gray-600 hover:bg-gray-100 transition-all"
+              onClick={(e) => shareItem(auction, "auctions", e)}
+              aria-label="مشاركة"
+            >
+              <Icons.FaShare className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
-
-        {/* Favorite Button */}
-        <button
-          className={`absolute top-3 left-3 p-2 rounded-full bg-white shadow-md transition-all hover:scale-110 z-10
-            ${
-              favorites.auctions?.includes(auction.id)
-                ? "text-red-500"
-                : "text-gray-400"
-            }`}
-          onClick={(e) => toggleFavorite("auctions", auction.id, e)}
-          aria-label="إضافة إلى المفضلة"
-        >
-          <Icons.FaHeart
-            className="w-4 h-4"
-            fill={
-              favorites.auctions?.includes(auction.id) ? "currentColor" : "none"
-            }
-          />
-        </button>
       </div>
 
-      <div className="p-4 flex flex-col gap-3 flex-grow">
-        <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 leading-tight">
-          {auctionsUtils.cleanText(auction.title)}
-        </h3>
+      {/* Desktop/Tablet Layout - Vertical (Grid) */}
+      <div className="hidden md:flex md:flex-col md:h-full">
+        {/* Image */}
+        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-gray-100">
+          {auctionsUtils.getAuctionImageUrl(auction) ? (
+            <img
+              src={auctionsUtils.getAuctionImageUrl(auction)}
+              alt={auctionsUtils.cleanText(auction.title) || "صورة المزاد"}
+              loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col justify-center items-center text-blue-400">
+              <Icons.FaGavel className="text-6xl mb-2 opacity-70" />
+              <span className="text-sm text-gray-400 font-medium">
+                لا توجد صورة
+              </span>
+            </div>
+          )}
 
-        {auction.company && (
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 bg-[#53a1dd]/10 p-2 rounded-md">
-            <Icons.FaBuilding className="text-[#53a1dd] w-4 h-4" />
-            <span>{auction.company.auction_name}</span>
-          </div>
-        )}
-
-        <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-          <Icons.FaMapMarkerAlt className="text-[#53a1dd] w-4 h-4" />
-          <span>{auctionsUtils.cleanText(auction.address)}</span>
-        </div>
-
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Icons.FaCalendarDay className="text-[#53a1dd] w-4 h-4" />
-            <span>{auctionsUtils.formatDate(auction.auction_date)}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Icons.FaClock className="text-[#53a1dd] w-4 h-4" />
-            <span>{auctionsUtils.formatTime(auction.start_time)}</span>
-          </div>
-        </div>
-
-        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">
-          {auctionsUtils.cleanText(auction.description)}
-        </p>
-
-        {/* Action Buttons */}
-        <div className="flex gap-2 mt-auto">
-          <button className="flex-1 bg-[#53a1dd] text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-[#4285c7] transition-colors">
-            عرض التفاصيل
-          </button>
-          <button
-            className="p-2.5 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-            onClick={(e) => shareItem(auction, "auctions", e)}
-            aria-label="مشاركة"
+          {/* Status Badge */}
+          <div
+            className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold shadow-md
+              ${
+                auction.status === "مفتوح"
+                  ? "bg-green-500 text-white"
+                  : auction.status === "مغلق"
+                  ? "bg-gray-500 text-white"
+                  : auction.status === "معلق"
+                  ? "bg-yellow-500 text-white"
+                  : "bg-gray-500 text-white"
+              }`}
           >
-            <Icons.FaShare className="w-4 h-4 text-gray-600" />
+            {auction.status}
+          </div>
+
+          {/* Favorite Button */}
+          <button
+            className={`absolute top-3 left-3 p-2 rounded-full bg-white shadow-md transition-all hover:scale-110 z-10
+              ${
+                favorites.auctions?.includes(auction.id)
+                  ? "text-red-500"
+                  : "text-gray-400"
+              }`}
+            onClick={(e) => toggleFavorite("auctions", auction.id, e)}
+            aria-label="إضافة إلى المفضلة"
+          >
+            <Icons.FaHeart
+              className="w-4 h-4"
+              fill={
+                favorites.auctions?.includes(auction.id)
+                  ? "currentColor"
+                  : "none"
+              }
+            />
           </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 flex flex-col gap-3 flex-grow">
+          <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 leading-tight">
+            {auctionsUtils.cleanText(auction.title)}
+          </h3>
+
+          {auction.company && (
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 bg-[#53a1dd]/10 p-2 rounded-md">
+              <Icons.FaBuilding className="text-[#53a1dd] w-4 h-4" />
+              <span>{auction.company.auction_name}</span>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+            <Icons.FaMapMarkerAlt className="text-[#53a1dd] w-4 h-4" />
+            <span>{auctionsUtils.cleanText(auction.address)}</span>
+          </div>
+
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Icons.FaCalendarDay className="text-[#53a1dd] w-4 h-4" />
+              <span>{auctionsUtils.formatDate(auction.auction_date)}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Icons.FaClock className="text-[#53a1dd] w-4 h-4" />
+              <span>{auctionsUtils.formatTime(auction.start_time)}</span>
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">
+            {auctionsUtils.cleanText(auction.description)}
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2 mt-auto">
+            <button className="flex-1 bg-[#53a1dd] text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-[#4285c7] transition-colors">
+              عرض التفاصيل
+            </button>
+            <button
+              className="p-2.5 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              onClick={(e) => shareItem(auction, "auctions", e)}
+              aria-label="مشاركة"
+            >
+              <Icons.FaShare className="w-4 h-4 text-gray-600" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -922,46 +1185,18 @@ const PropertiesPage = () => {
 
     return (
       <div className="property-list-container">
-        {/* Desktop and Tablet View - Grid */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Mobile View - List (Vertical) */}
+        <div className="md:hidden flex flex-col gap-3">
           {activeTab === "lands"
             ? currentItems.map(renderPropertyCard)
             : currentItems.map(renderAuctionCard)}
         </div>
 
-        {/* Mobile View - Horizontal Scroll */}
-        <div className="md:hidden">
-          <div className="overflow-x-auto pb-4 -mx-4 px-4">
-            <div className="flex space-x-4 space-x-reverse min-w-max">
-              {activeTab === "lands"
-                ? currentItems.map((property) => (
-                    <div key={property.id} className="w-80 flex-shrink-0">
-                      {renderPropertyCard(property)}
-                    </div>
-                  ))
-                : currentItems.map((auction) => (
-                    <div key={auction.id} className="w-80 flex-shrink-0">
-                      {renderAuctionCard(auction)}
-                    </div>
-                  ))}
-            </div>
-          </div>
-
-          {/* Scroll Indicator for Mobile */}
-          <div className="flex justify-center mt-4">
-            <div className="flex space-x-2 space-x-reverse">
-              {currentItems
-                .slice(0, Math.min(5, currentItems.length))
-                .map((_, index) => (
-                  <div
-                    key={index}
-                    className={`w-2 h-2 rounded-full ${
-                      index === 0 ? "bg-[#53a1dd]" : "bg-gray-300"
-                    }`}
-                  />
-                ))}
-            </div>
-          </div>
+        {/* Desktop and Tablet View - Grid */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {activeTab === "lands"
+            ? currentItems.map(renderPropertyCard)
+            : currentItems.map(renderAuctionCard)}
         </div>
       </div>
     );
@@ -973,7 +1208,7 @@ const PropertiesPage = () => {
 
     return (
       <div className="mb-4">
-        <p className="text-gray-600">
+        <p className="text-gray-600 text-sm">
           عرض {currentItems.length} من أصل{" "}
           {activeTab === "lands"
             ? propertiesData?.properties?.length || 0
@@ -985,282 +1220,290 @@ const PropertiesPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pb-6 pt-[80px]" dir="rtl">
+    <div className="max-w-6xl mx-auto px-4 pb-6 pt-20" dir="rtl">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
-       {/* Search and Controls */}
-<div
-  className={`bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm sticky z-30 my-4 sm:my-6 transition-all duration-300 border border-gray-100
-    ${hideFilterBar ? "-translate-y-full" : "translate-y-0"}`}
-  style={{ top: "1rem" }}
-  ref={filterBarRef}
->
-  {/* Mobile Header with Tabs */}
-  <div className="sm:hidden flex items-center justify-between mb-3">
-    <div className="flex gap-2">
-      <button
-        onClick={() => setActiveTab("lands")}
-        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all shadow-sm hover:shadow-md ${
-          activeTab === "lands"
-            ? `${blueGradients.button} text-white`
-            : "border border-gray-200 text-gray-600 hover:bg-gradient-to-b hover:from-white hover:to-gray-50"
-        }`}
-      >
-        الأراضي
-      </button>
-      <button
-        onClick={() => setActiveTab("auctions")}
-        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all shadow-sm hover:shadow-md ${
-          activeTab === "auctions"
-            ? `${blueGradients.button} text-white`
-            : "border border-gray-200 text-gray-600 hover:bg-gradient-to-b hover:from-white hover:to-gray-50"
-        }`}
-      >
-        المزادات
-      </button>
-    </div>
-    
-    <button
-      onClick={() => setShowMobileFilters(true)}
-      className="flex items-center justify-center gap-1 py-2 px-3 border border-[#53a1dd] text-[#53a1dd] rounded-lg font-bold text-xs transition-all hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 shadow-sm hover:shadow-md"
-      aria-label="فلترة"
-    >
-      <Icons.FaFilter className="w-3 h-3" />
-      <span>فلترة</span>
-    </button>
-  </div>
+        {/* Search and Controls */}
+        <div
+          className={`bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm sticky z-30 my-4 sm:my-6 transition-all duration-300 border border-gray-100
+            ${hideFilterBar ? "-translate-y-full" : "translate-y-0"}`}
+          style={{ top: "1rem" }}
+          ref={filterBarRef}
+        >
+          {/* Mobile Header with Tabs */}
+          <div className="sm:hidden flex items-center justify-between mb-3">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab("lands")}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all shadow-sm hover:shadow-md ${
+                  activeTab === "lands"
+                    ? `${blueGradients.button} text-white`
+                    : "border border-gray-200 text-gray-600 hover:bg-gradient-to-b hover:from-white hover:to-gray-50"
+                }`}
+              >
+                الأراضي
+              </button>
+              <button
+                onClick={() => setActiveTab("auctions")}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all shadow-sm hover:shadow-md ${
+                  activeTab === "auctions"
+                    ? `${blueGradients.button} text-white`
+                    : "border border-gray-200 text-gray-600 hover:bg-gradient-to-b hover:from-white hover:to-gray-50"
+                }`}
+              >
+                المزادات
+              </button>
+            </div>
 
-  {/* Desktop Controls */}
-  <div className="hidden sm:flex flex-col gap-4">
-    <div className="flex gap-2 sm:gap-3 w-full items-stretch">
-      {/* Search input */}
-      <div className="relative flex-grow">
-        <Icons.FaSearch className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
-        <input
-          type="text"
-          placeholder={
-            activeTab === "lands"
-              ? "البحث في الأراضي..."
-              : "البحث في المزادات..."
-          }
-          name="search"
-          value={getCurrentFilters().search}
-          onChange={getCurrentFilterHandler()}
-          onKeyPress={(e) => e.key === 'Enter' && applyFilters()}
-          className="w-full py-2.5 sm:py-4 px-9 sm:px-12 rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50/70 text-gray-700 text-xs sm:text-sm transition-all focus:outline-none focus:border-[#53a1dd] focus:ring-2 focus:ring-blue-100 focus:bg-white hover:bg-gradient-to-b hover:from-white hover:to-blue-50/20"
-        />
-        {getCurrentFilters().search && (
-          <button
-            onClick={() => {
-              getCurrentFilterHandler()({ target: { name: 'search', value: '' } });
-              applyFilters();
-            }}
-            className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-          >
-            <Icons.FaTimes className="w-3 h-3 sm:w-4 sm:h-4" />
-          </button>
+            <button
+              onClick={() => setShowMobileFilters(true)}
+              className="flex items-center justify-center gap-1 py-2 px-3 border border-[#53a1dd] text-[#53a1dd] rounded-lg font-bold text-xs transition-all hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 shadow-sm hover:shadow-md"
+              aria-label="فلترة"
+            >
+              <Icons.FaFilter className="w-3 h-3" />
+              <span>فلترة</span>
+            </button>
+          </div>
+
+          {/* Desktop Controls */}
+          <div className="hidden sm:flex flex-col gap-4">
+            <div className="flex gap-2 sm:gap-3 w-full items-stretch">
+              {/* Search input */}
+              <div className="relative flex-grow">
+                <Icons.FaSearch className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                <input
+                  type="text"
+                  placeholder={
+                    activeTab === "lands"
+                      ? "البحث في الأراضي..."
+                      : "البحث في المزادات..."
+                  }
+                  name="search"
+                  value={getCurrentFilters().search}
+                  onChange={getCurrentFilterHandler()}
+                  onKeyPress={(e) => e.key === "Enter" && applyFilters()}
+                  className="w-full py-2.5 sm:py-4 px-9 sm:px-12 rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50/70 text-gray-700 text-xs sm:text-sm transition-all focus:outline-none focus:border-[#53a1dd] focus:ring-2 focus:ring-blue-100 focus:bg-white hover:bg-gradient-to-b hover:from-white hover:to-blue-50/20"
+                />
+                {getCurrentFilters().search && (
+                  <button
+                    onClick={() => {
+                      getCurrentFilterHandler()({
+                        target: { name: "search", value: "" },
+                      });
+                      applyFilters();
+                    }}
+                    className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <Icons.FaTimes className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Create button */}
+              <button
+                className={`flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-3 px-3 sm:px-6 text-white rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all min-w-fit shadow-sm hover:shadow-md ${blueGradients.button} hover:${blueGradients.buttonHover}`}
+                onClick={handleCreateNew}
+                title={getCreateButtonText()}
+              >
+                <Icons.FaPlus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">
+                  {getCreateButtonText()}
+                </span>
+                <span className="sm:hidden">جديد</span>
+              </button>
+
+              {/* Filter toggle */}
+              <button
+                className="flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-3 px-3 sm:px-6 border border-[#53a1dd] text-[#53a1dd] rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 min-w-fit shadow-sm hover:shadow-md"
+                onClick={() =>
+                  window.innerWidth < 768
+                    ? setShowMobileFilters(true)
+                    : setShowFilters(!showFilters)
+                }
+                aria-label="فلترة"
+              >
+                {showFilters ? (
+                  <Icons.FaTimes className="w-3 h-3 sm:w-4 sm:h-4" />
+                ) : (
+                  <Icons.FaFilter className="w-3 h-3 sm:w-4 sm:h-4" />
+                )}
+                <span className="hidden sm:inline">
+                  {showFilters ? "إغلاق" : "فلترة"}
+                </span>
+              </button>
+            </div>
+
+            {/* Desktop Tabs */}
+            <div className="flex gap-1 bg-gray-100/50 p-1 rounded-lg">
+              <button
+                onClick={() => setActiveTab("lands")}
+                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow-md ${
+                  activeTab === "lands"
+                    ? `${blueGradients.button} text-white`
+                    : "text-gray-600 hover:bg-gradient-to-b hover:from-white hover:to-gray-50"
+                }`}
+              >
+                الأراضي
+              </button>
+              <button
+                onClick={() => setActiveTab("auctions")}
+                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow-md ${
+                  activeTab === "auctions"
+                    ? `${blueGradients.button} text-white`
+                    : "text-gray-600 hover:bg-gradient-to-b hover:from-white hover:to-gray-50"
+                }`}
+              >
+                المزادات
+              </button>
+            </div>
+          </div>
+
+          {/* Active filters indicator */}
+          {(getCurrentFilters().search ||
+            Object.keys(getCurrentFilters()).some(
+              (key) =>
+                key !== "search" && key !== "page" && getCurrentFilters()[key]
+            )) && (
+            <div className="flex flex-wrap gap-2 pt-3 mt-3 border-t border-gray-100">
+              {getCurrentFilters().search && (
+                <span className="text-xs bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                  البحث: {getCurrentFilters().search}
+                </span>
+              )}
+              <button
+                onClick={resetFilters}
+                className="text-xs text-red-600 hover:text-red-800 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 px-2 py-1 rounded-full transition-all flex items-center gap-1"
+              >
+                <Icons.FaRedo className="w-3 h-3" />
+                مسح الكل
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Filters */}
+        {showFilters && window.innerWidth >= 768 && (
+          <div className="hidden sm:block bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm mb-6 border border-gray-100 overflow-hidden">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-l from-[#53a1dd] to-blue-500 bg-clip-text text-transparent">
+                🔍 فلاتر البحث
+              </h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={resetFilters}
+                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 rounded-lg sm:rounded-xl transition-all"
+                >
+                  <Icons.FaRedo className="w-3 h-3 sm:w-4 sm:h-4" />
+                  إعادة تعيين
+                </button>
+                <button
+                  onClick={() => setShowFilters(false)}
+                  className="p-1.5 sm:p-2 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg sm:rounded-xl transition-all"
+                >
+                  <Icons.FaTimes className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            <FiltersComponent
+              activeTab={activeTab}
+              filters={getCurrentFilters()}
+              onFilterChange={getCurrentFilterHandler()}
+              onResetFilters={resetFilters}
+              onApplyFilters={applyFilters}
+              {...getFilterOptions()}
+            />
+          </div>
         )}
-      </div>
 
-      {/* Create button */}
-      <button
-        className={`flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-3 px-3 sm:px-6 text-white rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all min-w-fit shadow-sm hover:shadow-md ${blueGradients.button} hover:${blueGradients.buttonHover}`}
-        onClick={handleCreateNew}
-        title={getCreateButtonText()}
-      >
-        <Icons.FaPlus className="w-3 h-3 sm:w-4 sm:h-4" />
-        <span className="hidden sm:inline">{getCreateButtonText()}</span>
-        <span className="sm:hidden">جديد</span>
-      </button>
+        {/* Mobile Search Bar */}
+        <div className="sm:hidden mb-4">
+          <div className="relative">
+            <Icons.FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder={
+                activeTab === "lands"
+                  ? "البحث في الأراضي..."
+                  : "البحث في المزادات..."
+              }
+              name="search"
+              value={getCurrentFilters().search}
+              onChange={getCurrentFilterHandler()}
+              onKeyPress={(e) => e.key === "Enter" && applyFilters()}
+              className="w-full py-2.5 px-10 border border-gray-200 rounded-lg bg-gray-50/70 text-gray-700 text-sm transition-all focus:outline-none focus:border-[#53a1dd] focus:ring-2 focus:ring-blue-100 focus:bg-white hover:bg-gradient-to-b hover:from-white hover:to-blue-50/20"
+            />
+            {getCurrentFilters().search && (
+              <button
+                onClick={() => {
+                  getCurrentFilterHandler()({
+                    target: { name: "search", value: "" },
+                  });
+                  applyFilters();
+                }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <Icons.FaTimes className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        </div>
 
-      {/* Filter toggle */}
-      <button
-        className="flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-3 px-3 sm:px-6 border border-[#53a1dd] text-[#53a1dd] rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 min-w-fit shadow-sm hover:shadow-md"
-        onClick={() =>
-          window.innerWidth < 768
-            ? setShowMobileFilters(true)
-            : setShowFilters(!showFilters)
-        }
-        aria-label="فلترة"
-      >
-        {showFilters ? <Icons.FaTimes className="w-3 h-3 sm:w-4 sm:h-4" /> : <Icons.FaFilter className="w-3 h-3 sm:w-4 sm:h-4" />}
-        <span className="hidden sm:inline">
-          {showFilters ? "إغلاق" : "فلترة"}
-        </span>
-      </button>
-    </div>
+        {/* Mobile Filter Sidebar */}
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300
+            ${
+              showMobileFilters ? "opacity-100 visible" : "opacity-0 invisible"
+            }`}
+          onClick={() => setShowMobileFilters(false)}
+        ></div>
 
-    {/* Desktop Tabs */}
-    <div className="flex gap-1 bg-gray-100/50 p-1 rounded-lg">
-      <button
-        onClick={() => setActiveTab("lands")}
-        className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow-md ${
-          activeTab === "lands"
-            ? `${blueGradients.button} text-white`
-            : "text-gray-600 hover:bg-gradient-to-b hover:from-white hover:to-gray-50"
-        }`}
-      >
-        الأراضي
-      </button>
-      <button
-        onClick={() => setActiveTab("auctions")}
-        className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow-md ${
-          activeTab === "auctions"
-            ? `${blueGradients.button} text-white`
-            : "text-gray-600 hover:bg-gradient-to-b hover:from-white hover:to-gray-50"
-        }`}
-      >
-        المزادات
-      </button>
-    </div>
-  </div>
-
-  {/* Active filters indicator */}
-  {(getCurrentFilters().search || Object.keys(getCurrentFilters()).some(key => 
-    key !== 'search' && key !== 'page' && getCurrentFilters()[key]
-  )) && (
-    <div className="flex flex-wrap gap-2 pt-3 mt-3 border-t border-gray-100">
-      {getCurrentFilters().search && (
-        <span className="text-xs bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 px-2 py-1 rounded-full">
-          البحث: {getCurrentFilters().search}
-        </span>
-      )}
-      {/* يمكنك إضافة فلاتر نشطة أخرى هنا حسب الحاجة */}
-      <button
-        onClick={resetFilters}
-        className="text-xs text-red-600 hover:text-red-800 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 px-2 py-1 rounded-full transition-all flex items-center gap-1"
-      >
-        <Icons.FaRedo className="w-3 h-3" />
-        مسح الكل
-      </button>
-    </div>
-  )}
-</div>
-
-{/* Desktop Filters */}
-{showFilters && window.innerWidth >= 768 && (
-  <div className="hidden sm:block bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-sm mb-6 border border-gray-100 overflow-hidden">
-    <div className="flex justify-between items-center mb-4 sm:mb-6">
-      <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-l from-[#53a1dd] to-blue-500 bg-clip-text text-transparent">
-        🔍 فلاتر البحث
-      </h3>
-      <div className="flex gap-2">
-        <button
-          onClick={resetFilters}
-          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 rounded-lg sm:rounded-xl transition-all"
+        {/* Mobile Filters Panel */}
+        <div
+          className={`fixed top-13 bottom-0 right-0 w-full max-w-md bg-white z-50 overflow-y-auto transition-all duration-300 shadow-2xl flex flex-col rounded-l-2xl
+            ${showMobileFilters ? "translate-x-0" : "translate-x-full"}`}
         >
-          <Icons.FaRedo className="w-3 h-3 sm:w-4 sm:h-4" />
-          إعادة تعيين
-        </button>
-        <button
-          onClick={() => setShowFilters(false)}
-          className="p-1.5 sm:p-2 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 rounded-lg sm:rounded-xl transition-all"
-        >
-          <Icons.FaTimes className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-        </button>
-      </div>
-    </div>
+          {/* Header */}
+          <div className="sticky top-0 z-10 flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-l from-[#53a1dd] to-blue-500 text-white">
+            <h3 className="text-lg font-bold">🔍 فلاتر البحث</h3>
+            <button
+              className="p-2 rounded-xl hover:bg-blue-600/50 transition-colors"
+              onClick={() => setShowMobileFilters(false)}
+              aria-label="إغلاق"
+            >
+              <Icons.FaTimes className="w-5 h-5" />
+            </button>
+          </div>
 
-    <FiltersComponent
-      activeTab={activeTab}
-      filters={getCurrentFilters()}
-      onFilterChange={getCurrentFilterHandler()}
-      onResetFilters={resetFilters}
-      onApplyFilters={applyFilters}
-      {...getFilterOptions()}
-    />
-  </div>
-)}
+          {/* Filters Content */}
+          <div className="p-6 flex-grow">
+            <FiltersComponent
+              activeTab={activeTab}
+              filters={getCurrentFilters()}
+              onFilterChange={getCurrentFilterHandler()}
+              onResetFilters={resetFilters}
+              onApplyFilters={applyFilters}
+              {...getFilterOptions()}
+            />
+          </div>
 
-{/* Mobile Search Bar - Shown when tabs are active */}
-<div className="sm:hidden mb-4">
-  <div className="relative">
-    <Icons.FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-    <input
-      type="text"
-      placeholder={
-        activeTab === "lands"
-          ? "البحث في الأراضي..."
-          : "البحث في المزادات..."
-      }
-      name="search"
-      value={getCurrentFilters().search}
-      onChange={getCurrentFilterHandler()}
-      onKeyPress={(e) => e.key === 'Enter' && applyFilters()}
-      className="w-full py-2.5 px-10 border border-gray-200 rounded-lg bg-gray-50/70 text-gray-700 text-sm transition-all focus:outline-none focus:border-[#53a1dd] focus:ring-2 focus:ring-blue-100 focus:bg-white hover:bg-gradient-to-b hover:from-white hover:to-blue-50/20"
-    />
-    {getCurrentFilters().search && (
-      <button
-        onClick={() => {
-          getCurrentFilterHandler()({ target: { name: 'search', value: '' } });
-          applyFilters();
-        }}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-      >
-        <Icons.FaTimes className="w-3 h-3" />
-      </button>
-    )}
-  </div>
-</div>
+          {/* Bottom Actions */}
+          <div className="sticky bottom-0 p-4 border-t border-gray-200 bg-white"></div>
+        </div>
 
-{/* Mobile Filter Sidebar */}
-<div
-  className={`fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-opacity duration-300
-    ${showMobileFilters ? "opacity-100 visible" : "opacity-0 invisible"}`}
-  onClick={() => setShowMobileFilters(false)}
-></div>
+        {/* Results Summary */}
+        <div className="mb-4 sm:mb-6">{renderResultsSummary()}</div>
 
-{/* Mobile Filters Panel */}
-<div
-  className={`fixed top-13 bottom-0 right-0 w-[90%] max-w-md bg-white z-50 overflow-y-auto transition-all duration-300 shadow-2xl flex flex-col rounded-l-2xl
-    ${showMobileFilters ? "translate-x-0" : "translate-x-full"}`}
->
-  {/* Header */}
-  <div className="sticky top-0 z-10 flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-l from-[#53a1dd] to-blue-500 text-white">
-    <h3 className="text-lg font-bold">🔍 فلاتر البحث</h3>
-    <button
-      className="p-2 rounded-xl hover:bg-blue-600/50 transition-colors"
-      onClick={() => setShowMobileFilters(false)}
-      aria-label="إغلاق"
-    >
-      <Icons.FaTimes className="w-5 h-5" />
-    </button>
-  </div>
+        {/* Main Content */}
+        <div className="py-2">
+          {renderContent()}
+          {renderPagination()}
+        </div>
 
-  {/* Filters Content */}
-  <div className="p-6 flex-grow">
-    <FiltersComponent
-      activeTab={activeTab}
-      filters={getCurrentFilters()}
-      onFilterChange={getCurrentFilterHandler()}
-      onResetFilters={resetFilters}
-      onApplyFilters={applyFilters}
-      {...getFilterOptions()}
-    />
-  </div>
-
-  {/* Bottom Actions */}
-  <div className="sticky bottom-0 p-4 border-t border-gray-200 bg-white">
-  </div>
-</div>
-
-{/* Results Summary */}
-<div className="mb-4 sm:mb-6">
-  {renderResultsSummary()}
-</div>
-
-{/* Main Content */}
-<div className="py-2">
-  {renderContent()}
-  {renderPagination()}
-</div>
-
-{/* Floating Create Button - للهواتف فقط */}
-<div className="sm:hidden">
-  {renderFloatingCreateButton()}
-</div>
+        {/* Floating Create Button - للهواتف فقط */}
+        <div className="sm:hidden">{renderFloatingCreateButton()}</div>
       </div>
     </div>
   );
-}
+};
 
 export default PropertiesPage;
