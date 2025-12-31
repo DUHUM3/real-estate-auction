@@ -90,7 +90,7 @@ function MyAds() {
 
   // الانتقال إلى صفحة إنشاء الإعلان
   const navigateToCreateAd = () => {
-    navigate('/create-ad');
+    navigate('/create-auction');
   };
 
   // الانتقال إلى صفحة تعديل الإعلان

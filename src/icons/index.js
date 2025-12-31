@@ -18,7 +18,7 @@ import {
   FaClipboardList,
   FaClock,
   FaEdit,
-  FaEnvelope,          // ✉️ أيقونة الرسالة
+  FaEnvelope,
   FaExclamationCircle,
   FaExclamationTriangle,
   FaEye,
@@ -38,7 +38,7 @@ import {
   FaMapMarked,
   FaMapMarkerAlt,
   FaMoneyBillWave,
-  FaPaperPlane,        // 📨 أيقونة إرسال / Mission
+  FaPaperPlane,
   FaPhone,
   FaPlus,
   FaReact,
@@ -61,17 +61,24 @@ import {
   FaYoutube,
   FaTiktok,
   FaFileContract,
-  FaGem,           // إضافة هذا السطر
-  FaCrown,         // إضافة هذا السطر
-  FaBrain,         // إضافة هذا السطر
-  FaNetworkWired,  // إضافة هذا السطر
+  FaGem,
+  FaCrown,
+  FaBrain,
+  FaNetworkWired,
   FaCheckCircle,
-  FaUpload, 
+  FaUpload,
   FaFileAlt,
   FaBan,
   FaRegClock,
   FaRegFileAlt,
-  
+  // 🔹 الأيقونات الجديدة التي تحتاجها
+  FaSpinner,        // أيقونة التحميل
+  FaRegHeart,       // أيقونة القلب الفارغ
+  FaCalendarCheck,  // أيقونة التقويم مع علامة صح
+  FaLock,           // أيقونة القفل
+  FaFire,           // أيقونة النار
+  FaQuestionCircle, // أيقونة علامة الاستفهام
+  // 🔹 إضافة أيقونات إضافية موجودة في LandCard       // (مكرر للتأكد) - القلب الفارغ
 } from "react-icons/fa";
 
 // Feather Icons
@@ -105,10 +112,10 @@ import {
 const Icons = {
   // FA
   FaCheckCircle,
-  FaGem,           // إضافة هذا السطر
-  FaCrown,         // إضافة هذا السطر
-  FaBrain,         // إضافة هذا السطر
-  FaNetworkWired,  // إضافة هذا السطر
+  FaGem,
+  FaCrown,
+  FaBrain,
+  FaNetworkWired,
   FaArrowLeft,
   FaArrowRight,
   FaAward,
@@ -170,6 +177,19 @@ const Icons = {
   FaYoutube,
   FaTiktok,
   FaFileContract,
+  FaUpload,
+  FaFileAlt,
+  FaBan,
+  FaRegClock,
+  FaRegFileAlt,
+  
+  // 🔹 الأيقونات الجديدة المضافة
+  FaSpinner,         // ✅ جديد
+  FaRegHeart,        // ✅ جديد
+  FaCalendarCheck,   // ✅ جديد
+  FaLock,            // ✅ جديد
+  FaFire,            // ✅ جديد
+  FaQuestionCircle,  // ✅ جديد
 
   // FI
   FiBriefcase,
@@ -182,22 +202,17 @@ const Icons = {
   FiPhone,
   FiUser,
   FiXCircle,
+  FiArrowRight,
+  FiLogIn,
+  FiLock, FiEye, FiEyeOff, FiX, FiArrowLeft,
+  FiFile, FiBook,
+  FiCheck,
 
   // MD
   MdAssignment,
   MdBadge,
   MdBusiness,
   MdPerson,
-  FaUpload, 
-  FaFileAlt,
-  FaBan,
-  FaRegClock,
-  FaRegFileAlt,
-  FiArrowRight,
-  FiLogIn,
-  FiLock, FiEye, FiEyeOff, FiX, FiArrowLeft,
-  FiFile, FiBook,
-  FiCheck
 };
 
 export default Icons;

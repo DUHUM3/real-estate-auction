@@ -198,7 +198,7 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
 
           // معالجة الصور لتتضمن معلومات الحجم الثابت
           const img = processImageUrl(auction.cover_image);
-          
+
           return {
             id: auction.id,
             img,
@@ -547,10 +547,15 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
                         />
                       ) : (
                         <AuctionCard
-                          {...item}
-                          onClick={onPropertyClick}
-                          onToggleFavorite={onToggleFavorite}
-                          isFavorite={item.isFavorite}
+                          id={item.id}
+                          img={item.img} // أو item.cover_image حسب معالج البيانات
+                          title={item.title}
+                          location={item.location || item.address}
+                          auction_date={item.auctionDate || item.auction_date} // حسب ما عالجت البيانات
+                          status={item.status}
+                          currentBid={item.currentBid || item.current_bid}
+                          startPrice={item.startPrice || item.start_price}
+                          bidders={item.bidders || 0}
                         />
                       )}
                     </div>
