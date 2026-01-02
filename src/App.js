@@ -1,45 +1,46 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 // استبدال notifex بـ React-Toastify
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // استيراد المكونات
-import Navbar from './components/common/Navbar';
-import Footer from './components/common/Footer';
+import Navbar from "./components/common/Navbar";
+import Footer from "./components/common/Footer";
 
-import Home from './pages/Home';
-import LandsAndAuctionsList from './pages/LandsAndAuctionsList';
-import LandRequestsList from './pages/Lands/LandRequestsList';
+import Home from "./pages/Home";
+import LandsAndAuctionsList from "./pages/LandsAndAuctionsList";
+import LandRequestsList from "./pages/Lands/LandRequestsList";
 
-import Profile from './pages/Profile';
-import MyAds from './pages/MyAds';
-import Favorites from './pages/Favorites';
-import Interests from './pages/Interests';
-import Notifications from './pages/Notifications';
-import MyRequests from './pages/MyRequests';
+import Profile from "./pages/Profile";
+import MyAds from "./pages/MyAds";
+import Favorites from "./pages/Favorites";
+import Interests from "./pages/Interests";
+import Notifications from "./pages/Notifications";
+import MyRequests from "./pages/MyRequests";
 
-import Createland from './pages/Lands/CreateLand';
-import LandRequestDetails from './pages/Lands/LandRequestDetails';
-import CreateLandRequest from './pages/Lands/CreateLandRequest';
-import CreateAuctionRequest from './pages/Auction/CreateAuctionRequest';
-import LandDetails from './pages/Lands/LandDetails';
-import AuctionDetails from './pages/Auction/AuctionDetails';
-import CreateAd from './pages/CreateAd';
-import CreateAuctionAd from './pages/Auction/CreateAuctionAd';
+import Createland from "./pages/Lands/CreateLand";
+import LandRequestDetails from "./pages/Lands/LandRequestDetails";
+import CreateLandRequest from "./pages/Lands/CreateLandRequest";
+import CreateAuctionRequest from "./pages/Auction/CreateAuctionRequest";
+import LandDetails from "./pages/Lands/LandDetails";
+import AuctionDetails from "./pages/Auction/AuctionDetails";
+import CreateAd from "./pages/CreateAd";
+import CreateAuctionAd from "./pages/Auction/CreateAuctionAd";
 
-import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
-import ForgotPassword from './pages/Auth/ForgotPassword';
-import ResetPassword from './pages/Auth/ResetPassword';
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import ResetPassword from "./pages/Auth/ResetPassword";
 
-import TermsOfService from './pages/Privacy/TermsOfService';
-import PrivacyPolicy from './pages/Privacy/PrivacyPolicy';
+import TermsOfService from "./pages/Privacy/TermsOfService";
+import PrivacyPolicy from "./pages/Privacy/PrivacyPolicy";
 
-import './styles/App.css';
+import "./styles/App.css";
 
 // Query Client
 const queryClient = new QueryClient({
@@ -95,56 +96,73 @@ function App() {
       <AuthProvider>
         <ModalContext.Provider value={modalContextValue}>
           <Router>
-            <div className="App">
 
+            {/* ✅ Scroll To Top عند تغيير المسار */}
+            <ScrollToTop />
+
+            <div className="App">
               {/* Toast Container — بديل احترافي عن notifex */}
-         <ToastContainer
-  position="bottom-right"
-  autoClose={4000}
-  closeOnClick
-  draggable
-  rtl
-  pauseOnHover
-  theme="light"
-  // إعدادات مخصصة للتحكم في الموقع - زيادة القيمة لتنزيل الرسائل
-  style={{
-    top: window.innerWidth < 768 ? "80px" : "80px", // زدناها من 60/20 إلى 80/80
-    right: "10px",
-    left: "auto",
-    width: "auto",
-    maxWidth: window.innerWidth < 768 ? "90%" : "400px",
-    fontFamily: "'Segoe UI', 'Cairo', sans-serif",
-    fontSize: window.innerWidth < 768 ? "12px" : "14px",
-    zIndex: 999999
-  }}
-  toastStyle={{
-    borderRadius: "8px",
-    padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
-    marginBottom: "8px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-    minHeight: window.innerWidth < 768 ? "40px" : "50px",
-    direction: "rtl",
-    textAlign: "right",
-    fontSize: window.innerWidth < 768 ? "12px" : "14px",
-  }}
-  className={window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"}
-/>
+              <ToastContainer
+                position="bottom-right"
+                autoClose={4000}
+                closeOnClick
+                draggable
+                rtl
+                pauseOnHover
+                theme="light"
+                style={{
+                  top: window.innerWidth < 768 ? "80px" : "80px",
+                  right: "10px",
+                  left: "auto",
+                  width: "auto",
+                  maxWidth: window.innerWidth < 768 ? "90%" : "400px",
+                  fontFamily: "'Segoe UI', 'Cairo', sans-serif",
+                  fontSize: window.innerWidth < 768 ? "12px" : "14px",
+                  zIndex: 999999,
+                }}
+                toastStyle={{
+                  borderRadius: "8px",
+                  padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
+                  marginBottom: "8px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                  minHeight: window.innerWidth < 768 ? "40px" : "50px",
+                  direction: "rtl",
+                  textAlign: "right",
+                  fontSize: window.innerWidth < 768 ? "12px" : "14px",
+                }}
+                className={
+                  window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"
+                }
+              />
+
               <Navbar onLoginClick={openLogin} onRegisterClick={openRegister} />
 
               <main>
                 <Routes>
                   <Route path="/" element={<Home />} />
-
-                  <Route path="/lands-and-auctions-list" element={<LandsAndAuctionsList />} />
+                  <Route
+                    path="/lands-and-auctions-list"
+                    element={<LandsAndAuctionsList />}
+                  />
                   <Route path="/lands/:id/:type" element={<LandDetails />} />
-                  <Route path="/auctions/:id/:type" element={<AuctionDetails />} />
+                  <Route
+                    path="/auctions/:id/:type"
+                    element={<AuctionDetails />}
+                  />
                   <Route path="/create-lands" element={<Createland />} />
                   <Route path="/create-auction" element={<CreateAuctionAd />} />
-
-                  <Route path="/purchase-requests" element={<LandRequestsList />} />
-                  <Route path="/requests/:id" element={<LandRequestDetails />} />
-                  <Route path="/create-request" element={<CreateLandRequest />} />
-
+                  <Route
+                    path="/purchase-requests"
+                    element={<LandRequestsList />}
+                  />
+                  <Route
+                    path="/requests/:id"
+                    element={<LandRequestDetails />}
+                  />
+                  <Route
+                    path="/create-request"
+                    element={<CreateLandRequest />}
+                  />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/my-ads" element={<MyAds />} />
                   <Route path="/my-lands" element={<Favorites />} />
@@ -152,11 +170,15 @@ function App() {
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/my-requests" element={<MyRequests />} />
                   <Route path="/create-ad" element={<CreateAd />} />
-
-                  <Route path="/create-marketing-request" element={<CreateAuctionRequest />} />
-                  <Route path="/terms-of-service" element={<TermsOfService />} />
+                  <Route
+                    path="/create-marketing-request"
+                    element={<CreateAuctionRequest />}
+                  />
+                  <Route
+                    path="/terms-of-service"
+                    element={<TermsOfService />}
+                  />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                 </Routes>

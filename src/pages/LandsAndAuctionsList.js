@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../context/AuthContext";
 import PropertyListSkeleton from "../Skeleton/PropertyListSkeleton";
+import { useSearchParams } from "react-router-dom";
 
 // ====== Theme Gradients (Global for this file) ======
 const blueGradients = {
@@ -71,7 +72,10 @@ const PropertiesPage = () => {
   const queryClient = useQueryClient();
 
   // States
-  const [activeTab, setActiveTab] = useState("lands");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => {
+    return searchParams.get("tab") || "lands";
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -100,7 +104,6 @@ const PropertiesPage = () => {
     company: "",
     address: "",
   });
-
   // Constants
   const regions = [];
   const landTypes = ["سكني", "تجاري", "صناعي", "زراعي"];
@@ -195,15 +198,33 @@ const PropertiesPage = () => {
 
   useEffect(() => {
     if (location.state?.activeTab) {
-      setActiveTab(location.state.activeTab);
+      const tabFromState = location.state.activeTab;
+      setActiveTab(tabFromState);
+      setSearchParams({ tab: tabFromState });
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
+
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab");
+    if (tabFromUrl && (tabFromUrl === "lands" || tabFromUrl === "auctions")) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   // Reset page when tab or filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [activeTab, landFilters, auctionFilters]);
+
+  useEffect(() => {
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: "smooth",
+  });
+}, [currentPage, activeTab]);
+
 
   // Helper Functions
   const getCurrentFilters = () =>
@@ -215,19 +236,60 @@ const PropertiesPage = () => {
       ? { regions, landTypes, purposes }
       : { auctionStatuses };
 
-  const getCurrentUserType = () => {
-    return currentUser?.user_type || localStorage.getItem("user_type");
-  };
+      const proceedWithCreation = (userType) => {
+  if (!userType || !isUserAuthorized(userType)) {
+    showToast(
+      "error",
+      "عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة",
+      5000
+    );
+    return;
+  }
+
+  switch (userType) {
+    case "شركة مزادات":
+      navigate("/create-auction");
+      break;
+    case "مالك أرض":
+    case "وكيل شرعي":
+    case "وسيط عقاري":
+    case "جهة تجارية":
+      navigate("/create-ad");
+      break;
+    default:
+      navigate("/");
+      break;
+  }
+};
+
+ const getCurrentUserType = () => {
+  // أولوية لـ currentUser من context
+  if (currentUser?.user_type) {
+    return currentUser.user_type;
+  }
+  
+  // ثم localStorage
+  const storedType = localStorage.getItem("user_type");
+  if (storedType) {
+    return storedType;
+  }
+  
+  return null;
+};
 
   const isUserAuthorized = (userType) => {
-    const authorizedTypes = [
-      "مالك أرض",
-      "وكيل شرعي",
-      "وسيط عقاري",
-      "شركة مزادات",
-    ];
-    return authorizedTypes.includes(userType);
-  };
+  if (!userType) return false;
+  
+  const authorizedTypes = [
+    "مالك أرض",
+    "وكيل شرعي",
+    "وسيط عقاري",
+    "جهة تجارية",
+    "شركة مزادات",
+  ];
+  
+  return authorizedTypes.includes(userType.trim());
+};
 
   const getCreateButtonText = () => {
     const userType = getCurrentUserType();
@@ -243,7 +305,7 @@ const PropertiesPage = () => {
       case "شركة مزادات":
         return "إنشاء مزاد";
       default:
-        return "إنشاء الآن";
+        return "إنشاء أرض";
     }
   };
 
@@ -251,50 +313,45 @@ const PropertiesPage = () => {
     return !!currentUser || !!localStorage.getItem("token");
   };
 
-  const handleCreateNew = () => {
-    const userType = getCurrentUserType();
-
-    if (!isUserLoggedIn()) {
-      openLogin(() => {
-        const newUserType = getCurrentUserType();
-        proceedWithCreation(newUserType);
-      });
-      return;
-    }
-
-    if (!isUserAuthorized(userType)) {
-      showToast(
-        "error",
-        "عذراً، هذه الخدمة متاحة فقط لأصحاب الأراضي ووكلاء العقارات وشركات المزادات",
-        5000
-      );
-      return;
-    }
-
-    proceedWithCreation(userType);
-  };
-
-  const proceedWithCreation = (userType) => {
-  if (!isUserAuthorized(userType)) {
-    showToast("error", "عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة", 5000);
+ const handleCreateNew = () => {
+  // إذا لم يكن مسجل الدخول، افتح نافذة التسجيل
+  if (!isUserLoggedIn()) {
+    openLogin(() => {
+      // بعد تسجيل الدخول بنجاح
+      setTimeout(() => {
+        const userType = getCurrentUserType();
+        console.log("User type after login:", userType);
+        
+        if (!isUserAuthorized(userType)) {
+          showToast(
+            "error",
+            "عذراً، هذه الخدمة متاحة فقط لأصحاب الأراضي ووكلاء العقارات والجهات التجارية والوكلاء الشرعيين",
+            5000
+          );
+        } else {
+          proceedWithCreation(userType);
+        }
+      }, 500); // تأخير بسيط لضمان تحديث البيانات
+    });
     return;
   }
 
-  switch (userType) {
-    case "شركة مزادات":
-      navigate("/create-auction"); // مسار منفصل للمزادات
-      break;
-    case "مالك أرض":
-    case "وكيل شرعي":
-    case "وسيط عقاري":
-      navigate("/create-ad");
-      break;
-    default:
-      navigate("/");
-      break;
+  // إذا كان مسجل الدخول
+  const userType = getCurrentUserType();
+  console.log("Current user type:", userType);
+  console.log("Is authorized:", isUserAuthorized(userType));
+  
+  if (!isUserAuthorized(userType)) {
+    showToast(
+      "error",
+      "عذراً، هذه الخدمة متاحة فقط لأصحاب الأراضي ووكلاء العقارات والجهات التجارية والوكلاء الشرعيين",
+      5000
+    );
+    return;
   }
-};
 
+  proceedWithCreation(userType);
+};
   // API Functions
   const fetchFavorites = async () => {
     try {
@@ -501,6 +558,11 @@ const PropertiesPage = () => {
   const nextPage = () =>
     currentPage < totalPages && setCurrentPage(currentPage + 1);
   const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
+
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+    setSearchParams({ tab: newTab });
+  };
 
   // Render Functions
   const renderPagination = () => {
@@ -1237,7 +1299,7 @@ const PropertiesPage = () => {
           <div className="sm:hidden flex items-center justify-between mb-3">
             <div className="flex gap-2">
               <button
-                onClick={() => setActiveTab("lands")}
+                onClick={() => handleTabChange("lands")}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all shadow-sm hover:shadow-md ${
                   activeTab === "lands"
                     ? `${blueGradients.button} text-white`
@@ -1247,7 +1309,7 @@ const PropertiesPage = () => {
                 الأراضي
               </button>
               <button
-                onClick={() => setActiveTab("auctions")}
+                onClick={() => handleTabChange("auctions")}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all shadow-sm hover:shadow-md ${
                   activeTab === "auctions"
                     ? `${blueGradients.button} text-white`
@@ -1339,7 +1401,7 @@ const PropertiesPage = () => {
             {/* Desktop Tabs */}
             <div className="flex gap-1 bg-gray-100/50 p-1 rounded-lg">
               <button
-                onClick={() => setActiveTab("lands")}
+                onClick={() => handleTabChange("lands")}
                 className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow-md ${
                   activeTab === "lands"
                     ? `${blueGradients.button} text-white`
@@ -1349,7 +1411,7 @@ const PropertiesPage = () => {
                 الأراضي
               </button>
               <button
-                onClick={() => setActiveTab("auctions")}
+                onClick={() => handleTabChange("auctions")}
                 className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all shadow-sm hover:shadow-md ${
                   activeTab === "auctions"
                     ? `${blueGradients.button} text-white`

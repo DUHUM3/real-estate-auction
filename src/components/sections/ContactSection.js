@@ -62,13 +62,13 @@ const ContactSection = () => {
   const MAX_MESSAGE_LENGTH = 1000;
   const MIN_MESSAGE_LENGTH = 10;
 
-  const sanitizeInput = useCallback((input) => {
-    return input
-      .replace(/[<>]/g, "")
-      .replace(/javascript:/gi, "")
-      .replace(/on\w+=/gi, "")
-      .trim();
-  }, []);
+  const sanitizeInput = (value) => {
+  return value
+    .replace(/<script.*?>.*?<\/script>/gi, '') // منع سكربت
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+};
+
 
   const validateField = useCallback(
     (name, value) => {
