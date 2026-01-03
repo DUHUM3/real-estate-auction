@@ -1,21 +1,65 @@
 // pages/Profile.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 
 // استيراد الأيقونات مباشرة
-import { FiUser, FiMail, FiPhone, FiEdit2, FiSave, FiX, FiHome, FiClock, FiCheckCircle, FiXCircle, FiDollarSign, FiBriefcase, FiFileText } from 'react-icons/fi';
-import { MdBusiness, MdPerson, MdAssignment, MdBadge } from 'react-icons/md';
+import { 
+  FiUser, 
+  FiMail, 
+  FiPhone, 
+  FiEdit2, 
+  FiSave, 
+  FiX, 
+  FiHome, 
+  FiClock, 
+  FiCheckCircle, 
+  FiXCircle, 
+  FiDollarSign, 
+  FiBriefcase, 
+  FiFileText,
+  FiTrendingUp,
+  FiPackage,
+  FiShoppingBag,
+  FiAlertCircle,
+  FiPercent
+} from 'react-icons/fi';
+import { MdBusiness, MdPerson, MdAssignment, MdBadge, MdGavel } from 'react-icons/md';
 
 // استيراد API functions
 import { 
   fetchProfileData, 
   fetchUserStats, 
+  fetchAuctionStats,
   updateProfileData, 
   shouldShowStats 
 } from '../api/profileApi';
 
 import ProfileSkeleton from '../Skeleton/ProfileSkeleton';
+
+// تعريف الدوال المساعدة في الأعلى - FIX
+const shouldShowLandStats = (userType) => {
+  if (!userType) return false;
+  
+  const cleanUserType = userType.trim();
+  const allowedTypes = [
+    'مالك أرض',
+    'مالك ارض',
+    'وكيل شرعي',
+    'وسيط عقاري',
+    'جهة تجارية',
+  ];
+  
+  return allowedTypes.includes(cleanUserType);
+};
+
+// تعريف الدوال المساعدة في الأعلى - FIX
+const shouldShowAuctionStats = (userType) => {
+  if (!userType) return false;
+  
+  const cleanUserType = userType.trim();
+  return cleanUserType === 'شركة مزادات';
+};
 
 function Profile() {
   const { updateUser } = useAuth();
@@ -36,15 +80,30 @@ function Profile() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // React Query for stats
+  // Get user type from API data
+  const userType = apiData?.user?.user_type;
+
+  // React Query for land stats (for land owners, brokers, etc.)
   const {
-    data: statsData,
-    isLoading: statsLoading,
-    error: statsError
+    data: landStatsData,
+    isLoading: landStatsLoading,
+    error: landStatsError
   } = useQuery({
-    queryKey: ['userStats'],
+    queryKey: ['landStats'],
     queryFn: fetchUserStats,
-    enabled: !!apiData && shouldShowStats(apiData),
+    enabled: !!userType && shouldShowLandStats(userType), // الآن الدالة معرفة
+    retry: 2,
+  });
+
+  // React Query for auction stats (for auction companies)
+  const {
+    data: auctionStatsData,
+    isLoading: auctionStatsLoading,
+    error: auctionStatsError
+  } = useQuery({
+    queryKey: ['auctionStats'],
+    queryFn: fetchAuctionStats,
+    enabled: !!userType && shouldShowAuctionStats(userType), // الآن الدالة معرفة
     retry: 2,
   });
 
@@ -62,7 +121,7 @@ function Profile() {
   });
 
   // Initialize form data when apiData is available
-  React.useEffect(() => {
+  useEffect(() => {
     if (apiData && !isEditing) {
       const initialFormData = {
         full_name: apiData.user.full_name || '',
@@ -147,6 +206,8 @@ function Profile() {
       return 'شركة';
     } else if (userType === 'جهة تجارية') {
       return 'جهة تجارية';
+    } else if (userType === 'شركة مزادات') {
+      return 'شركة مزادات';
     } else {
       return userType || 'مستخدم';
     }
@@ -155,6 +216,38 @@ function Profile() {
   const getUserInitial = () => {
     const name = apiData?.user?.full_name || 'م';
     return name.charAt(0);
+  };
+
+  // Format numbers with Arabic locale
+  const formatNumber = (num) => {
+    return num?.toLocaleString('ar-SA') || '0';
+  };
+
+  // Parse land stats data
+  const parseLandStats = () => {
+    const stats = landStatsData?.data;
+    if (!stats) return null;
+
+    return {
+      total: stats.total || 0,
+      under_review: stats.under_review || 0,
+      approved: stats.approved || 0,
+      rejected: stats.rejected || 0,
+      sold: stats.sold || 0,
+    };
+  };
+
+  // Parse auction stats data
+  const parseAuctionStats = () => {
+    const stats = auctionStatsData?.data;
+    if (!stats) return null;
+
+   return {
+  total: stats.total || 0,
+  approved: stats.approved || 0,       // بدل stats.open
+  under_review: stats.under_review || 0, // جديد
+  rejected: stats.rejected || 0,       // بدل stats.suspended
+};
   };
 
   // Show skeleton while loading
@@ -181,7 +274,8 @@ function Profile() {
     );
   }
 
-  const stats = statsData?.data;
+  const landStats = parseLandStats();
+  const auctionStats = parseAuctionStats();
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
@@ -189,7 +283,7 @@ function Profile() {
         {/* Header Card */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            {/* Avatar Section - تم التعديل هنا */}
+            {/* Avatar Section */}
             <div className="relative">
               <div className="w-20 h-20 bg-[#53a1dd] rounded-full flex items-center justify-center">
                 <span className="text-white text-2xl font-bold">{getUserInitial()}</span>
@@ -215,104 +309,73 @@ function Profile() {
                 </div>
                 <div className="flex items-center gap-2">
                   <FiPhone className="w-4 h-4" />
-                  <span className="text-sm">{apiData?.user?.phone || 'لم يتم إضافة رقم الجوال'}</span>
+                  <span className="text-sm">{apiData?.user?.phone || 'تمت إضافة رقم الهاتف ✅'}</span>
                 </div>
               </div>
             </div>
-
-            {/* Action Buttons */}
-            {/* <div className="flex gap-3">
-              {!isEditing ? (
-                <button 
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 bg-[#53a1dd] hover:bg-[#4689c0] text-white font-medium py-2 px-4 rounded-lg transition duration-200"
-                >
-                  <FiEdit2 className="w-4 h-4" />
-                  <span>تعديل</span>
-                </button>
-              ) : (
-                <div className="flex gap-2">
-                  <button 
-                    onClick={handleSubmit}
-                    disabled={updateProfileMutation.isLoading}
-                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 disabled:opacity-50"
-                  >
-                    <FiSave className="w-4 h-4" />
-                    <span>{updateProfileMutation.isLoading ? 'جاري الحفظ...' : 'حفظ'}</span>
-                  </button>
-                  <button 
-                    onClick={handleCancel}
-                    className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
-                  >
-                    <FiX className="w-4 h-4" />
-                    <span>إلغاء</span>
-                  </button>
-                </div>
-              )}
-            </div> */}
           </div>
         </div>
 
-        {/* Statistics Section - تم التعديل هنا */}
-        {shouldShowStats(apiData) && (
+        {/* Land Statistics Section */}
+        {shouldShowLandStats(userType) && (
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
             <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
               <FiHome className="w-5 h-5 text-[#53a1dd]" />
-              إحصائيات الاراضي
+              إحصائيات الأراضي
             </h3>
             
-            {statsLoading ? (
-              <div className="grid grid-cols-5 gap-2">
+            {landStatsLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="animate-pulse">
-                    <div className="bg-gray-200 rounded-lg h-16"></div>
+                    <div className="bg-gray-200 rounded-lg h-24"></div>
                   </div>
                 ))}
               </div>
-            ) : statsError ? (
+            ) : landStatsError ? (
               <div className="text-center py-8 text-gray-500">
                 <FiXCircle className="w-12 h-12 mx-auto mb-2 text-red-400" />
-                <span>تعذر تحميل الإحصائيات</span>
+                <span>تعذر تحميل إحصائيات الأراضي</span>
               </div>
-            ) : stats ? (
-              <div className="grid grid-cols-5 gap-2">
-                <div className="bg-blue-50 rounded-lg p-3 text-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                    <FiHome className="w-5 h-5 text-blue-600" />
+            ) : landStats ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                <div className="bg-blue-50 rounded-lg p-4 text-center border border-blue-100">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <FiHome className="w-6 h-6 text-blue-600" />
                   </div>
-                  <div className="text-lg font-bold text-gray-900">{stats.total}</div>
+                  <div className="text-xl font-bold text-gray-900">{formatNumber(landStats.total)}</div>
                   <div className="text-xs text-gray-600">الإجمالي</div>
                 </div>
                 
-                <div className="bg-yellow-50 rounded-lg p-3 text-center">
-                  <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                    <FiClock className="w-5 h-5 text-yellow-600" />
+                <div className="bg-yellow-50 rounded-lg p-4 text-center border border-yellow-100">
+                  <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <FiClock className="w-6 h-6 text-yellow-600" />
                   </div>
-                  <div className="text-lg font-bold text-gray-900">{stats.under_review}</div>
+                  <div className="text-xl font-bold text-gray-900">{formatNumber(landStats.under_review)}</div>
                   <div className="text-xs text-gray-600">قيد المراجعة</div>
                 </div>
                 
-                <div className="bg-green-50 rounded-lg p-3 text-center">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                    <FiCheckCircle className="w-5 h-5 text-green-600" />
+                <div className="bg-green-50 rounded-lg p-4 text-center border border-green-100">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <FiCheckCircle className="w-6 h-6 text-green-600" />
                   </div>
-                  <div className="text-lg font-bold text-gray-900">{stats.approved}</div>
-                  <div className="text-xs text-gray-600">معتمدة</div>
+                  <div className="text-xl font-bold text-gray-900">{formatNumber(landStats.approved)}</div>
+                  <div className="text-xs text-gray-600">مقبولة</div>
                 </div>
                 
-                <div className="bg-red-50 rounded-lg p-3 text-center">
-                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                    <FiXCircle className="w-5 h-5 text-red-600" />
+                <div className="bg-red-50 rounded-lg p-4 text-center border border-red-100">
+                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <FiXCircle className="w-6 h-6 text-red-600" />
                   </div>
-                  <div className="text-lg font-bold text-gray-900">{stats.rejected}</div>
+                  <div className="text-xl font-bold text-gray-900">{formatNumber(landStats.rejected)}</div>
                   <div className="text-xs text-gray-600">مرفوضة</div>
                 </div>
                 
-                <div className="bg-purple-50 rounded-lg p-3 text-center">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                    <FiDollarSign className="w-5 h-5 text-purple-600" />
+                <div className="bg-purple-50 rounded-lg p-4 text-center border border-purple-100">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <FiDollarSign className="w-6 h-6 text-purple-600" />
                   </div>
-                  <div className="text-lg font-bold text-gray-900">{stats.sold}</div>
+                  <div className="text-xl font-bold text-gray-900">{formatNumber(landStats.sold)}</div>
                   <div className="text-xs text-gray-600">تم بيعها</div>
                 </div>
               </div>
@@ -320,91 +383,49 @@ function Profile() {
           </div>
         )}
 
-        {/* Personal Information */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
-            <FiUser className="w-5 h-5 text-[#53a1dd]" />
-            المعلومات الشخصية
-          </h3>
-          
-          <div className="space-y-4">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <FiUser className="w-4 h-4 text-gray-500" />
-                <span className="font-medium text-gray-700">الاسم الثلاثي</span>
-              </div>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="full_name"
-                  value={formData.full_name || ''}
-                  onChange={handleChange}
-                  className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
-                  placeholder="أدخل اسمك الثلاثي"
-                />
-              ) : (
-                <span className="text-gray-900">{apiData?.user?.full_name || 'غير محدد'}</span>
-              )}
-            </div>
+      {/* Auction Statistics Section */}
+{shouldShowAuctionStats(userType) && (
+  <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+    <h3 className="flex items-center gap-2 text-xl font-semibold text-gray-900 mb-6">
+      <MdGavel className="w-6 h-6 text-[#53a1dd]" />
+      إحصائيات المزادات
+    </h3>
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <FiMail className="w-4 h-4 text-gray-500" />
-                <span className="font-medium text-gray-700">البريد الإلكتروني</span>
-              </div>
-              {isEditing ? (
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email || ''}
-                  onChange={handleChange}
-                  className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
-                  placeholder="أدخل بريدك الإلكتروني"
-                />
-              ) : (
-                <span className="text-gray-900">{apiData?.user?.email || 'غير محدد'}</span>
-              )}
+    {auctionStatsLoading ? (
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="animate-pulse h-32 bg-gray-200 rounded-xl"></div>
+        ))}
+      </div>
+    ) : auctionStatsError ? (
+      <div className="text-center py-8 text-gray-500">
+        <FiXCircle className="w-14 h-14 mx-auto mb-3 text-red-400" />
+        <span className="text-lg">تعذر تحميل إحصائيات المزادات</span>
+      </div>
+    ) : auctionStats ? (
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {[
+          { label: "إجمالي المزادات", value: auctionStats.total, bg: "blue", icon: <MdGavel className="w-6 h-6 text-blue-600" /> },
+          { label: "مفتوحة", value: auctionStats.approved, bg: "green", icon: <FiCheckCircle className="w-6 h-6 text-green-600" /> },
+          { label: "مرفوضة", value: auctionStats.rejected, bg: "red", icon: <FiPackage className="w-6 h-6 text-red-600" /> },
+          { label: "قيد المراجعة", value: auctionStats.under_review, bg: "amber", icon: <FiAlertCircle className="w-6 h-6 text-amber-600" /> },
+        ].map((stat, i) => (
+          <div
+            key={i}
+            className={`bg-${stat.bg}-50 rounded-xl border border-${stat.bg}-100 p-5 flex flex-col items-center justify-center hover:shadow-lg transition-shadow`}
+          >
+            <div className={`w-16 h-16 bg-${stat.bg}-100 rounded-full flex items-center justify-center mb-3`}>
+              {stat.icon}
             </div>
-
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <FiPhone className="w-4 h-4 text-gray-500" />
-                <span className="font-medium text-gray-700">رقم الجوال</span>
-              </div>
-              {isEditing ? (
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone || ''}
-                  onChange={handleChange}
-                  className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
-                  placeholder="أدخل رقم جوالك"
-                />
-              ) : (
-                <span className="text-gray-900">{apiData?.user?.phone || 'غير محدد'}</span>
-              )}
-            </div>
-
-            {isEditing && (
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <MdAssignment className="w-4 h-4 text-gray-500" />
-                  <span className="font-medium text-gray-700">نوع الحساب</span>
-                </div>
-                <select 
-                  name="user_type"
-                  value={formData.user_type || 'individual'}
-                  onChange={handleChange}
-                  className="flex-1 max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#53a1dd] focus:border-[#53a1dd]"
-                >
-                  <option value="individual">فرد</option>
-                  <option value="company">شركة</option>
-                  <option value="جهة تجارية">جهة تجارية</option>
-                </select>
-              </div>
-            )}
+            <div className="text-2xl font-bold text-gray-900 mb-1">{formatNumber(stat.value)}</div>
+            <div className="text-sm text-gray-600">{stat.label}</div>
           </div>
-        </div>
+        ))}
+      </div>
+    ) : null}
+  </div>
+)}
+
 
         {/* Business Information */}
         {(hasDetails() || (isEditing && isCommercialEntity())) && (

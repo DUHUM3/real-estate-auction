@@ -8,6 +8,16 @@ import { landApi } from "../../api/landRequestApi";
 import { locationService } from "../../utils/LocationForFiltters";
 import { motion, AnimatePresence } from "framer-motion";
 
+const convertArabicNumbersToEnglish = (value) => {
+  const arabicNumbers = "٠١٢٣٤٥٦٧٨٩";
+  const englishNumbers = "0123456789";
+
+  return value.replace(
+    /[٠-٩]/g,
+    (char) => englishNumbers[arabicNumbers.indexOf(char)]
+  );
+};
+
 function CreateLandRequest() {
   const navigate = useNavigate();
   const { openLogin } = useContext(ModalContext);
@@ -137,10 +147,19 @@ function CreateLandRequest() {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    let newValue = value;
+
+    // ✅ تحويل الأرقام العربية إلى إنجليزية تلقائيًا
+    if (name === "area") {
+      newValue = convertArabicNumbersToEnglish(value);
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : newValue,
     }));
+
     setFormTouched(true);
   };
 
@@ -193,11 +212,7 @@ function CreateLandRequest() {
       submitData.append("terms_accepted", "true");
 
       const response = await landApi.submitLandRequest(submitData);
-
-      console.log("✅ تم إنشاء طلب الأرض:", response);
       setResponseData(response);
-      setSuccess(true);
-
       showApiSuccess("تم إنشاء طلب الأرض بنجاح!");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
@@ -281,20 +296,20 @@ function CreateLandRequest() {
 
   if (checkingUserType) {
     return (
-     <div className="min-h-screen bg-gradient-to-br from-[#f0f4ff] via-white to-[#e6f0ff] font-sans">
-  <ToastContainer
-    position="top-right"
-    autoClose={2000}
-    closeOnClick
-    draggable
-    rtl
-    pauseOnHover
-    theme="light"
-    toastClassName="bg-white text-gray-800 rounded-xl shadow-lg px-6 py-4 border border-gray-200"
-    bodyClassName="text-sm font-medium text-center"
-    closeButton={true}
-    className="mt-20 sm:mt-24"
-  />
+      <div className="min-h-screen bg-gradient-to-br from-[#f0f4ff] via-white to-[#e6f0ff] font-sans">
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          closeOnClick
+          draggable
+          rtl
+          pauseOnHover
+          theme="light"
+          toastClassName="bg-white text-gray-800 rounded-xl shadow-lg px-6 py-4 border border-gray-200"
+          bodyClassName="text-sm font-medium text-center"
+          closeButton={true}
+          className="mt-20 sm:mt-24"
+        />
 
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -316,43 +331,20 @@ function CreateLandRequest() {
 
   if (!isUserAllowed()) {
     return (
-     <div className="min-h-screen bg-gradient-to-br from-[#f0f4ff] via-white to-[#e6f0ff] font-sans">
-  <ToastContainer
-    position="top-right"
-    autoClose={4000}
-    closeOnClick
-    draggable
-    rtl
-    pauseOnHover
-    theme="light"
-    toastClassName="bg-white text-gray-800 rounded-xl shadow-lg px-6 py-4 border border-gray-200"
-    bodyClassName="text-sm font-medium text-center"
-    closeButton={true}
-    className="mt-20 sm:mt-24"
-  />
-
-        {/* Header */}
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="sticky top-0 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm z-50"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16 sm:h-20">
-              <button
-                onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-gray-700 hover:text-[#53a1dd] transition-colors font-medium"
-              >
-                <Icons.FaArrowRight className="text-xl" />
-                <span className="hidden sm:inline">رجوع</span>
-              </button>
-              <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-[#53a1dd] to-[#2d8bcc] bg-clip-text text-transparent">
-                طلب تسويق أرض
-              </h1>
-              <div className="w-16"></div>
-            </div>
-          </div>
-        </motion.div>
+      <div className="min-h-screen bg-gradient-to-br from-[#f0f4ff] via-white to-[#e6f0ff] font-sans">
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          closeOnClick
+          draggable
+          rtl
+          pauseOnHover
+          theme="light"
+          toastClassName="bg-white text-gray-800 rounded-xl shadow-lg px-6 py-4 border border-gray-200"
+          bodyClassName="text-sm font-medium text-center"
+          closeButton={true}
+          className="mt-20 sm:mt-24"
+        />
 
         {/* Content */}
         <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8 pt-8 sm:pt-12">
@@ -417,40 +409,12 @@ function CreateLandRequest() {
         className="mt-20 sm:mt-24"
       />
 
-      {/* Header */}
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="sticky top-0 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm z-50"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-20">
-            <button
-              onClick={handleBack}
-              disabled={loading}
-              className="flex items-center gap-2 text-gray-700 hover:text-[#53a1dd] transition-colors font-medium disabled:opacity-50"
-            >
-              <Icons.FaArrowRight className="text-xl" />
-              <span className="hidden sm:inline">رجوع</span>
-            </button>
-
-            <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-[#53a1dd] to-[#2d8bcc] bg-clip-text text-transparent">
-              طلب تسويق أرض
-            </h1>
-
-            <button
-              onClick={handleBack}
-              disabled={loading}
-              className="text-gray-600 hover:text-red-600 transition-colors font-medium disabled:opacity-50"
-            >
-              إلغاء
-            </button>
-          </div>
-        </div>
-      </motion.div>
-
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+      <div
+        className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 
+                pt-24 sm:pt-28 lg:pt-32
+                pb-6 sm:pb-8 lg:pb-12"
+      >
         <AnimatePresence mode="wait">
           {loading ? (
             <motion.div

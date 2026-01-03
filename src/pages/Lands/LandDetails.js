@@ -26,6 +26,13 @@ import {
   FaInfoCircle,
   FaTag,
   FaIdCard,
+  FaCheck,
+  FaExclamationTriangle,
+  FaPaperPlane,
+  FaSpinner,
+  FaUser,
+  FaPhone,
+  FaEnvelope,
 } from "react-icons/fa";
 
 // مسار أيقونة الريال السعودي
@@ -170,6 +177,243 @@ const DimensionCard = ({ title, value, unit = "م" }) => (
   </div>
 );
 
+// مكون نتيجة تقديم الاهتمام - نفس حجم وتصميم الفورم الأصلي
+const InterestResultCard = ({
+  type,
+  message,
+  details,
+  onClose,
+  isForSale,
+  isForInvestment,
+}) => {
+  const isSuccess = type === "success";
+  const title = isForSale
+    ? "تقديم عرض للشراء"
+    : isForInvestment
+    ? "تقديم طلب للاستثمار"
+    : "تقديم اهتمام";
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6">
+          {/* الرأس - نفس تصميم الفورم الأصلي */}
+          <div className="flex justify-between items-center mb-4 sm:mb-6">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
+              {title}
+            </h3>
+            <button
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={onClose}
+            >
+              <FaTimes className="text-gray-500" />
+            </button>
+          </div>
+
+          {/* المحتوى */}
+          <div className="text-center">
+            {/* أيقونة النتيجة */}
+            <div
+              className={`mb-4 sm:mb-6 mx-auto w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center ${
+                isSuccess
+                  ? "bg-green-100 text-green-600"
+                  : "bg-red-100 text-red-600"
+              }`}
+            >
+              {isSuccess ? (
+                <FaCheck className="text-2xl sm:text-3xl" />
+              ) : (
+                <FaExclamationTriangle className="text-2xl sm:text-3xl" />
+              )}
+            </div>
+
+            {/* الرسالة الرئيسية */}
+            <h4 className="text-lg sm:text-xl font-bold text-gray-800 mb-3">
+              {message}
+            </h4>
+
+            {/* التفاصيل */}
+            {details && (
+              <div
+                className={`p-3 sm:p-4 rounded-lg mb-4 text-right ${
+                  isSuccess
+                    ? "bg-green-50 border border-green-200"
+                    : "bg-red-50 border border-red-200"
+                }`}
+              >
+                <p
+                  className={`text-sm sm:text-base ${
+                    isSuccess ? "text-green-700" : "text-red-700"
+                  }`}
+                >
+                  {details}
+                </p>
+              </div>
+            )}
+
+            {/* معلومات إضافية */}
+            {/* الأزرار */}
+            <div className="flex flex-col gap-3">
+              {isSuccess ? (
+                <>
+                  <button
+                    className="w-full py-3 px-4 bg-gradient-to-r from-[#53a1dd] to-[#4285c7] text-white font-bold rounded-lg hover:opacity-90 transition-all text-sm sm:text-base"
+                    onClick={onClose}
+                  >
+                    حسناً، فهمت ✓
+                  </button>
+                  <button
+                    className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-all text-sm sm:text-base"
+                    onClick={() => {
+                      onClose();
+                      window.location.reload();
+                    }}
+                  >
+                    عرض المزيد من الأراضي
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    className="w-full py-3 px-4 bg-gradient-to-r from-[#53a1dd] to-[#4285c7] text-white font-bold rounded-lg hover:opacity-90 transition-all text-sm sm:text-base"
+                    onClick={onClose}
+                  >
+                    إعادة المحاولة
+                  </button>
+                  <button
+                    className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-all text-sm sm:text-base"
+                    onClick={onClose}
+                  >
+                    العودة
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// مكون فورم تقديم الاهتمام - نفس التصميم السابق
+const InterestForm = ({
+  onSubmit,
+  onClose,
+  formData,
+  onChange,
+  submitting,
+  isForSale,
+  isForInvestment,
+}) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6">
+          <div className="flex justify-between items-center mb-4 sm:mb-6">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
+              {isForSale
+                ? "تقديم عرض للشراء"
+                : isForInvestment
+                ? "تقديم طلب للاستثمار"
+                : "تقديم اهتمام"}
+            </h3>
+            <button
+              className="p-2 rounded-lg hover:bg-gray-100"
+              onClick={onClose}
+              disabled={submitting}
+            >
+              <FaTimes />
+            </button>
+          </div>
+
+          <form onSubmit={onSubmit}>
+            {/* حقل الرسالة */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-gray-700 font-medium text-sm sm:text-base">
+                  <span>رسالتك</span>
+                </label>
+                <div
+                  className={`text-xs font-medium ${
+                    formData.message.trim().length === 0
+                      ? "text-gray-500"
+                      : formData.message.trim().length < 10
+                      ? "text-red-500"
+                      : "text-green-500"
+                  }`}
+                >
+                  {formData.message.trim().length}/10 حرف
+                </div>
+              </div>
+              <textarea
+                name="message"
+                value={formData.message}
+                onChange={(e) => {
+                  onChange(e);
+                  e.target.classList.remove(
+                    "border-red-500",
+                    "ring-2",
+                    "ring-red-200"
+                  );
+                }}
+                placeholder={
+                  isForSale
+                    ? "أدخل رسالتك وعرضك للشراء هنا (يجب أن يكون أكثر من 10 أحرف)"
+                    : isForInvestment
+                    ? "أدخل رسالتك وخطة الاستثمار المقترحة هنا (يجب أن يكون أكثر من 10 أحرف)"
+                    : "أدخل رسالتك أو استفسارك هنا (يجب أن يكون أكثر من 10 أحرف)"
+                }
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none text-sm sm:text-base"
+                required
+                disabled={submitting}
+              />
+              <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mt-2 gap-1 sm:gap-0">
+                <div className="text-xs text-gray-500">
+                  {isForSale
+                    ? "اكتب تفاصيل عرض الشراء والسعر المقترح"
+                    : isForInvestment
+                    ? "اكتب خطة الاستثمار والمدة المقترحة"
+                    : "اكتب رسالة مفصلة عن اهتمامك"}
+                </div>
+                <div className="text-xs text-blue-500">
+                  {formData.message.trim().length >= 10
+                    ? "✓ جاهز للإرسال"
+                    : "اكتب 10 أحرف على الأقل"}
+                </div>
+              </div>
+            </div>
+
+            {/* زر الإرسال */}
+            <button
+              type="submit"
+              className={`w-full py-3 px-4 font-bold rounded-lg transition-all text-sm sm:text-base flex items-center justify-center gap-2 ${
+                submitting
+                  ? "bg-gray-400 text-white"
+                  : "bg-gradient-to-r from-[#53a1dd] to-[#4285c7] text-white hover:opacity-90"
+              }`}
+              disabled={submitting}
+            >
+              {submitting ? (
+                <>
+                  <FaSpinner className="animate-spin" />
+                  جاري الإرسال...
+                </>
+              ) : (
+                <>
+                  <FaPaperPlane />
+                  إرسال الطلب
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const LandDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -190,7 +434,9 @@ const LandDetailsPage = () => {
     message: "",
   });
   const [submitting, setSubmitting] = useState(false);
-  const [submitResult, setSubmitResult] = useState(null);
+  const [submitResult, setSubmitResult] = useState(null); // null, 'success', or 'error'
+  const [resultMessage, setResultMessage] = useState("");
+  const [resultDetails, setResultDetails] = useState("");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -219,39 +465,11 @@ const LandDetailsPage = () => {
     }
   };
 
-  // دالة لعرض رسائل النجاح
-  const showApiSuccess = (message) => {
-    showToast("success", message);
-  };
-
   /**
    * دالة الحصول على نوع المستخدم الحالي
    */
   const getCurrentUserType = () => {
     return currentUser?.user_type || localStorage.getItem("user_type");
-  };
-
-  /**
-   * دالة التحقق من صلاحية المستخدم لتقديم الاهتمام
-   */
-  const isUserAllowedToShowInterest = () => {
-    const userType = getCurrentUserType();
-    console.log("نوع المستخدم الحالي:", userType);
-
-    const allowedTypes = [
-      "مالك أرض",
-      "وكيل عقارات",
-      "مستثمر",
-      "فرد",
-      "مالك ارض",
-      "وكيل عقاري",
-    ];
-
-    if (!userType) {
-      return true;
-    }
-
-    return allowedTypes.includes(userType);
   };
 
   const fetchData = async () => {
@@ -289,9 +507,22 @@ const LandDetailsPage = () => {
       setLoading(false);
     } catch (error) {
       setError(error.message || "فشل في جلب البيانات");
-      showApiError(error);
       setLoading(false);
     }
+  };
+
+  // دالة لإغلاق نافذة النتيجة
+  const handleCloseResult = () => {
+    setSubmitResult(null);
+    setResultMessage("");
+    setResultDetails("");
+    setShowInterestForm(false);
+    setFormData({
+      full_name: "",
+      phone: "",
+      email: "",
+      message: "",
+    });
   };
 
   // Share Function
@@ -307,7 +538,7 @@ const LandDetailsPage = () => {
       navigator.share(shareData).catch(console.error);
     } else {
       navigator.clipboard.writeText(currentUrl);
-      showApiSuccess("تم نسخ الرابط للمشاركة!");
+      // تم إزالة showToast
     }
   };
 
@@ -369,13 +600,23 @@ const LandDetailsPage = () => {
         const userType = getCurrentUserType();
 
         if (userType === "شركة مزادات") {
-          showToast(
-            "error",
-            "عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات",
-            5000
+          setSubmitResult("error");
+          setResultMessage("غير مسموح لشركات المزادات");
+          setResultDetails(
+            "عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات"
           );
           return;
         }
+
+        // تلقائيًا تعبئة البيانات من localStorage إذا كانت متاحة
+        const userData =
+          currentUser || JSON.parse(localStorage.getItem("userData") || "{}");
+        setFormData((prev) => ({
+          ...prev,
+          full_name: userData.name || userData.full_name || "",
+          phone: userData.phone || "",
+          email: userData.email || "",
+        }));
 
         setShowInterestForm(true);
       });
@@ -385,13 +626,23 @@ const LandDetailsPage = () => {
     const userType = getCurrentUserType();
 
     if (userType === "شركة مزادات") {
-      showToast(
-        "error",
-        "عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات",
-        5000
+      setSubmitResult("error");
+      setResultMessage("غير مسموح لشركات المزادات");
+      setResultDetails(
+        "عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات"
       );
       return;
     }
+
+    // تلقائيًا تعبئة البيانات من localStorage إذا كانت متاحة
+    const userData =
+      currentUser || JSON.parse(localStorage.getItem("userData") || "{}");
+    setFormData((prev) => ({
+      ...prev,
+      full_name: userData.name || userData.full_name || "",
+      phone: userData.phone || "",
+      email: userData.email || "",
+    }));
 
     setShowInterestForm(true);
   };
@@ -419,12 +670,37 @@ const LandDetailsPage = () => {
     const trimmedMessage = formData.message.trim();
 
     if (trimmedMessage.length < 10) {
-      showToast("error", "الرسالة يجب أن تكون أكثر من 10 أحرف", 5000);
+      setSubmitResult("error");
+      setResultMessage("رسالة قصيرة جداً");
+      setResultDetails("الرسالة يجب أن تكون أكثر من 10 أحرف");
       return false;
     }
 
     if (trimmedMessage.length > 2000) {
-      showToast("error", "الرسالة يجب أن تكون أقل من 2000 حرف", 5000);
+      setSubmitResult("error");
+      setResultMessage("رسالة طويلة جداً");
+      setResultDetails("الرسالة يجب أن تكون أقل من 2000 حرف");
+      return false;
+    }
+
+    if (!formData.full_name.trim()) {
+      setSubmitResult("error");
+      setResultMessage("الاسم مطلوب");
+      setResultDetails("يرجى إدخال الاسم الكامل");
+      return false;
+    }
+
+    if (!formData.phone.trim()) {
+      setSubmitResult("error");
+      setResultMessage("رقم الهاتف مطلوب");
+      setResultDetails("يرجى إدخال رقم الهاتف");
+      return false;
+    }
+
+    if (!formData.email.trim()) {
+      setSubmitResult("error");
+      setResultMessage("البريد الإلكتروني مطلوب");
+      setResultDetails("يرجى إدخال البريد الإلكتروني");
       return false;
     }
 
@@ -434,26 +710,17 @@ const LandDetailsPage = () => {
   const handleSubmitInterest = async (e) => {
     e.preventDefault();
 
-    const trimmedMessage = formData.message.trim();
-
-    if (trimmedMessage.length < 10) {
-      showToast("error", "الرسالة يجب أن تكون أكثر من 10 أحرف", 5000);
-      return;
-    }
-
-    if (trimmedMessage.length > 2000) {
-      showToast("error", "الرسالة يجب أن تكون أقل من 2000 حرف", 5000);
+    if (!validateForm()) {
       return;
     }
 
     const userType = getCurrentUserType();
     if (userType === "شركة مزادات") {
-      showToast(
-        "error",
-        "عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات",
-        5000
+      setSubmitResult("error");
+      setResultMessage("غير مسموح لشركات المزادات");
+      setResultDetails(
+        "عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات"
       );
-      setShowInterestForm(false);
       return;
     }
 
@@ -462,9 +729,10 @@ const LandDetailsPage = () => {
 
     try {
       const requestData = {
-        full_name: formData.full_name,
-        phone: formData.phone,
-        message: trimmedMessage,
+        full_name: formData.full_name.trim(),
+        phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        message: formData.message.trim(),
       };
 
       const headers = {
@@ -489,26 +757,32 @@ const LandDetailsPage = () => {
 
       if (response.ok && result.success) {
         const successMessage = result.message || "تم إرسال طلب الاهتمام بنجاح";
-        showToast("success", successMessage);
 
-        setShowInterestForm(false);
-        setFormData({
-          full_name: "",
-          phone: "",
-          email: "",
-          message: "",
-        });
+        setSubmitResult("success");
+        setResultMessage("تم تقديم اهتمامك بنجاح ✓");
+        setResultDetails("تم تسجيل اهتمامك وسيتم التواصل معك قريباً");
+
+        // إغلاق الفورم بعد 3 ثواني إذا لم يتم الإغلاق يدوياً
+        setTimeout(() => {
+          if (submitResult === "success") {
+            handleCloseResult();
+          }
+        }, 3000);
       } else {
         const errorMessage =
           result.message || result.error || "حدث خطأ أثناء إرسال الطلب";
-        showToast("error", errorMessage, 5000);
-        setShowInterestForm(false);
+
+        setSubmitResult("error");
+        setResultMessage("فشل في التقديم ❌");
+        setResultDetails(errorMessage);
       }
     } catch (error) {
       console.error("خطأ في الاتصال:", error);
       const errorMessage = "حدث خطأ في الاتصال بالخادم";
-      showToast("error", errorMessage, 5000);
-      setShowInterestForm(false);
+
+      setSubmitResult("error");
+      setResultMessage("خطأ في الاتصال");
+      setResultDetails(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -586,35 +860,7 @@ const LandDetailsPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-4 pb-6 pt-[80px]" dir="rtl">
-      <ToastContainer
-        position="top-center"
-        autoClose={4000}
-        closeOnClick
-        draggable
-        rtl
-        pauseOnHover
-        theme="light"
-        style={{
-          top: "80px",
-          right: "10px",
-          left: "10px",
-          width: "auto",
-          maxWidth: "100%",
-          fontFamily: "'Segoe UI', 'Cairo', sans-serif",
-          fontSize: "14px",
-          zIndex: 999999,
-        }}
-        toastStyle={{
-          borderRadius: "8px",
-          padding: "12px 16px",
-          marginBottom: "8px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-          minHeight: "50px",
-          direction: "rtl",
-          textAlign: "right",
-          fontSize: "14px",
-        }}
-      />
+      {/* تم إزالة ToastContainer تماماً لأننا لا نحتاجه الآن */}
 
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <button
@@ -924,9 +1170,9 @@ shadow-md hover:shadow-lg"
             onClick={handleShowInterestForm}
           >
             {isForSale
-              ? "تقديم عرض للشراء"
+              ? "تقديم اهتمام بالشراء"
               : isForInvestment
-              ? "تقديم طلب للاستثمار"
+              ? "تقديم اهتمام بالاستثمار"
               : "تقديم اهتمام"}
           </button>
 
@@ -982,94 +1228,29 @@ shadow-md hover:shadow-lg"
         </div>
       )}
 
-      {showInterestForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="p-4 sm:p-6">
-              <div className="flex justify-between items-center mb-4 sm:mb-6">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
-                  {isForSale
-                    ? "تقديم عرض للشراء"
-                    : isForInvestment
-                    ? "تقديم طلب للاستثمار"
-                    : "تقديم اهتمام"}
-                </h3>
-                <button
-                  className="p-2 rounded-lg hover:bg-gray-100"
-                  onClick={handleCloseInterestForm}
-                  disabled={submitting}
-                >
-                  <FaTimes />
-                </button>
-              </div>
+      {/* فورم تقديم الاهتمام */}
+      {showInterestForm && !submitResult && (
+        <InterestForm
+          onSubmit={handleSubmitInterest}
+          onClose={handleCloseInterestForm}
+          formData={formData}
+          onChange={handleInputChange}
+          submitting={submitting}
+          isForSale={isForSale}
+          isForInvestment={isForInvestment}
+        />
+      )}
 
-              <form onSubmit={handleSubmitInterest}>
-                <div className="mb-4 sm:mb-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-gray-700 font-medium text-sm sm:text-base">
-                      <span>رسالتك</span>
-                    </label>
-                    <div
-                      className={`text-xs font-medium ${
-                        formData.message.trim().length === 0
-                          ? "text-gray-500"
-                          : formData.message.trim().length < 10
-                          ? "text-red-500"
-                          : "text-green-500"
-                      }`}
-                    >
-                      {formData.message.trim().length}/10 حرف
-                    </div>
-                  </div>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={(e) => {
-                      handleInputChange(e);
-                      e.target.classList.remove(
-                        "border-red-500",
-                        "ring-2",
-                        "ring-red-200"
-                      );
-                    }}
-                    placeholder={
-                      isForSale
-                        ? "أدخل رسالتك وعرضك للشراء هنا (يجب أن يكون أكثر من 10 أحرف)"
-                        : isForInvestment
-                        ? "أدخل رسالتك وخطة الاستثمار المقترحة هنا (يجب أن يكون أكثر من 10 أحرف)"
-                        : "أدخل رسالتك أو استفسارك هنا (يجب أن يكون أكثر من 10 أحرف)"
-                    }
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none text-sm sm:text-base"
-                    required
-                  />
-                  <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mt-2 gap-1 sm:gap-0">
-                    <div className="text-xs text-gray-500">
-                      {isForSale
-                        ? "اكتب تفاصيل عرض الشراء والسعر المقترح"
-                        : isForInvestment
-                        ? "اكتب خطة الاستثمار والمدة المقترحة"
-                        : "اكتب رسالة مفصلة عن اهتمامك"}
-                    </div>
-                    <div className="text-xs text-blue-500">
-                      {formData.message.trim().length >= 10
-                        ? "✓ جاهز للإرسال"
-                        : "اكتب 10 أحرف على الأقل"}
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-                  disabled={submitting}
-                >
-                  {submitting ? "جاري الإرسال..." : "إرسال الطلب"}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
+      {/* نافذة عرض نتيجة التقديم - نفس حجم وتصميم الفورم */}
+      {submitResult && (
+        <InterestResultCard
+          type={submitResult}
+          message={resultMessage}
+          details={resultDetails}
+          onClose={handleCloseResult}
+          isForSale={isForSale}
+          isForInvestment={isForInvestment}
+        />
       )}
     </div>
   );

@@ -1,5 +1,3 @@
-// services/profileApi.js
-
 const API_BASE_URL = 'https://core-api-x41.shaheenplus.sa/api';
 
 // دالة مساعدة للطلبات
@@ -29,9 +27,14 @@ export const fetchProfileData = async () => {
   return fetchWithAuth('/profile');
 };
 
-// جلب إحصائيات المستخدم
+// جلب إحصائيات الأراضي
 export const fetchUserStats = async () => {
   return fetchWithAuth('/user/properties/stats');
+};
+
+// جلب إحصائيات المزادات
+export const fetchAuctionStats = async () => {
+  return fetchWithAuth('/user/auctions/stats');
 };
 
 // تحديث بيانات الملف الشخصي

@@ -454,7 +454,7 @@ function CreateAuctionRequest() {
                   onClick={() => navigate("/auction-requests")}
                   className="px-6 py-3 bg-[#53a1dd] text-white rounded-lg hover:bg-[#478bc5] transition-colors font-medium"
                 >
-                  تصفح الطلبات المتاحة
+                  إضافة طلب جديد
                 </button>
                 <button
                   onClick={() => navigate("/")}
@@ -581,13 +581,22 @@ function CreateAuctionRequest() {
                 </div>
               )}
 
-              <div className="flex justify-center">
+              <div className="flex justify-center gap-4">
+                {/* زر إضافة طلب جديد */}
                 <button
                   onClick={handleCreateNew}
                   className="px-6 py-3 bg-[#53a1dd] text-white rounded-lg hover:bg-[#478bc5] transition-colors font-medium flex items-center gap-2"
                 >
                   <Icons.FaPlus />
-                 عرض قائمة طلباتي
+                  إضافة طلب جديد
+                </button>
+
+                {/* زر العودة إلى الرئيسية */}
+                <button
+                  onClick={() => (window.location.href = "/")} // أو تستدعي دالة handleGoHome
+                  className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                >
+                  العودة إلى الرئيسية
                 </button>
               </div>
             </div>

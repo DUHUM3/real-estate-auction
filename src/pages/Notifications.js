@@ -144,65 +144,11 @@ function Notifications() {
   const unreadCount = notificationsData?.data?.filter(n => !n.read_at).length || 0;
 
   return (
+
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header ثابت مع padding مناسب */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-36">
+      <header className="fixed top-12 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm h-20">
         <div className="h-full flex flex-col justify-between px-4 pt-5 pb-3">
-          {/* الصف العلوي: العنوان والأيقونات */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              {viewMode === 'detail' && window.innerWidth < 1024 ? (
-                <button 
-                  onClick={() => setViewMode('list')}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors mr-2"
-                >
-                  <FaChevronRight className="text-gray-600" />
-                </button>
-              ) : (
-                <button 
-                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors mr-2 lg:hidden"
-                >
-                  <FaBars className="text-gray-600" />
-                </button>
-              )}
-              
-              <div className="flex items-center">
-                <div className="relative">
-                  <div className="w-10 h-10 bg-gradient-to-br from-[#53a1dd] to-[#6ab0e5] rounded-full flex items-center justify-center">
-                    <FaBell className="text-white text-lg" />
-                  </div>
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                      {unreadCount}
-                    </span>
-                  )}
-                </div>
-                {/* <h1 className="text-xl font-bold text-gray-800 mr-3">الإشعارات</h1> */}
-              </div>
-            </div>
-            
-            {/* <div className="flex items-center gap-2">
-              <button 
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden"
-                onClick={() => {
-                  const tabs = document.querySelector('.tabs-container');
-                  tabs?.classList.toggle('hidden');
-                }}
-              >
-                <FaFilter className="text-gray-600" />
-              </button>
-              
-              <button 
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                onClick={handleRefresh}
-                disabled={isLoading}
-              >
-                <FaSync className={`text-gray-600 ${isLoading ? 'animate-spin' : ''}`} />
-              </button>
-            </div> */}
-          </div>
-          
           {/* التبويبات */}
           <div className="tabs-container">
             <div className="flex gap-2 overflow-x-auto pb-1">
@@ -326,78 +272,6 @@ function Notifications() {
           </div>
         </div>
       </main>
-
-      {/* Sidebar للهواتف */}
-      {isSidebarOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-2xl animate-slide-in-right">
-            <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-gray-800">خيارات الإشعارات</h2>
-                <button 
-                  onClick={() => setIsSidebarOpen(false)}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <FaTimes className="text-gray-600" />
-                </button>
-              </div>
-            </div>
-            
-            <div className="p-4 space-y-4">
-              <button 
-                className="w-full px-4 py-3 bg-gradient-to-r from-[#53a1dd] to-[#6ab0e5] text-white rounded-xl flex items-center justify-center hover:shadow-md transition-all duration-200"
-                onClick={() => {
-                  handleMarkAllAsRead();
-                  setIsSidebarOpen(false);
-                }}
-              >
-                <FaCheckCircle className="ml-2" />
-                تحديد الكل كمقروء
-              </button>
-              
-              <div className="space-y-2">
-                <h3 className="font-medium text-gray-700 mb-2">تصنيف الإشعارات</h3>
-                {[
-                  { id: 'all', label: 'جميع الإشعارات', icon: '👁️', count: notificationsData?.data?.length },
-                  { id: 'unread', label: 'غير المقروءة', icon: '🔴', count: unreadCount },
-                  { id: 'read', label: 'المقروءة', icon: '✅', count: notificationsData?.data?.filter(n => n.read_at).length }
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    className={`w-full p-3 rounded-xl flex items-center justify-between transition-all duration-200 ${
-                      activeTab === tab.id 
-                        ? 'bg-blue-50 border border-[#53a1dd] text-[#53a1dd]' 
-                        : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
-                    }`}
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                      setIsSidebarOpen(false);
-                    }}
-                  >
-                    <div className="flex items-center">
-                      <span className="ml-2 text-lg">{tab.icon}</span>
-                      <span>{tab.label}</span>
-                    </div>
-                    {tab.count > 0 && (
-                      <span className={`px-2.5 py-1 text-xs rounded-full font-medium ${
-                        activeTab === tab.id 
-                          ? 'bg-[#53a1dd] text-white' 
-                          : 'bg-gray-200 text-gray-700'
-                      }`}>
-                        {tab.count}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 
