@@ -79,11 +79,6 @@ const HeroSection = ({ onSellLandClick, onBrowseInvestments }) => {
             img.src = src;
           });
         });
-
-        await Promise.race([
-          imagePromises[0],
-          new Promise((resolve) => setTimeout(resolve, 3000)),
-        ]);
         setFirstImageLoaded(true);
 
         // تحميل باقي الصور في الخلفية
