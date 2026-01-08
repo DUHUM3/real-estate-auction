@@ -17,8 +17,7 @@ function ResetPassword() {
   });
 
   const toast = useToast();
-  toast.success("تم إعادة تعيين كلمة المرور بنجاح");
-
+  
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
