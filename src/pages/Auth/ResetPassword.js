@@ -89,42 +89,41 @@ function ResetPassword() {
     setPasswordStrength(strength);
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!validateFields()) return;
+    if (!validateFields()) return;
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    await authApi.resetPassword({
-      token,
-      email,
-      password: formData.password,
-      password_confirmation: formData.confirmPassword,
-    });
-
-    setSuccess(true);
-    toast.success("تم إعادة تعيين كلمة المرور بنجاح");
-  } catch (error) {
-    const message = error.message || "";
-
-    if (
-      message.includes("token") ||
-      message.includes("الرابط") ||
-      message.includes("البريد")
-    ) {
-      setFieldErrors({
-        submit: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية",
+    try {
+      await authApi.resetPassword({
+        token: decodeURIComponent(token),
+        email: decodeURIComponent(email),
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
       });
-    } else {
-      toast.error(message || "حدث خطأ أثناء الاتصال بالخادم");
-    }
-  } finally {
-    setLoading(false);
-  }
-};
 
+      setSuccess(true);
+      toast.success("تم إعادة تعيين كلمة المرور بنجاح");
+    } catch (error) {
+      const message = error.message || "";
+
+      if (
+        message.includes("token") ||
+        message.includes("الرابط") ||
+        message.includes("البريد")
+      ) {
+        setFieldErrors({
+          submit: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية",
+        });
+      } else {
+        toast.error(message || "حدث خطأ أثناء الاتصال بالخادم");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getRequirementIcon = (isValid) => (
     <span className={`text-sm ${isValid ? "text-green-600" : "text-red-600"}`}>
