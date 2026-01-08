@@ -133,6 +133,33 @@ export const authApi = {
 
     return data;
   },
+
+  // إعادة تعيين كلمة المرور
+resetPassword: async ({ token, email, password, password_confirmation }) => {
+  const response = await fetch(`${API_BASE_URL}/reset-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({
+      token,
+      email,
+      password,
+      password_confirmation,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.status === 'error') {
+    throw new Error(
+      data.message || 'فشل في إعادة تعيين كلمة المرور'
+    );
+  }
+
+  return data;
+},
 };
 
 export default authApi;

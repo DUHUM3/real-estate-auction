@@ -204,14 +204,14 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
             img,
             title: auction.title || "عنوان غير متوفر",
             location: auction.address || "عنوان غير متوفر",
-            area: "غير محدد",
             endDate: auction.auction_date,
             auctionCompany: auction.company?.auction_name || "شركة المزاد",
             daysLeft,
             startTime: auction.start_time,
             auctionDate: auction.auction_date,
             isFavorite: Boolean(auction.is_favorite),
-            // معلومات إضافية للعرض الثابت
+            city: auction.city || "غير محدد",
+            region: auction.region || "غير محدد",
             hasImage: !!img,
             imageUrl: img,
           };
@@ -550,8 +550,10 @@ const PropertiesSection = memo(({ onToggleFavorite, onPropertyClick }) => {
                           id={item.id}
                           img={item.img} // أو item.cover_image حسب معالج البيانات
                           title={item.title}
+                          city={item.city}
+                          region={item.region}
                           location={item.location || item.address}
-                          auction_date={item.auctionDate || item.auction_date} // حسب ما عالجت البيانات
+                          auction_date={item.auctionDate || item.auction_date}
                           status={item.status}
                           currentBid={item.currentBid || item.current_bid}
                           startPrice={item.startPrice || item.start_price}

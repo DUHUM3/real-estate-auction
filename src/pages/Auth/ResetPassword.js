@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { authApi } from '../../api/authApi';
-import toast from 'react-hot-toast';
-import Icons from '../../icons/index';
+import React, { useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { authApi } from "../../api/authApi";
+import toast from "react-hot-toast";
+import Icons from "../../icons/index";
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    password: '',
-    confirmPassword: ''
+    password: "",
+    confirmPassword: "",
   });
 
   const [fieldErrors, setFieldErrors] = useState({
-    password: '',
-    confirmPassword: ''
+    password: "",
+    confirmPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -23,12 +22,12 @@ function ResetPassword() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
-    text: 'ضعيفة',
-    class: 'weak'
+    text: "ضعيفة",
+    class: "weak",
   });
 
-  const token = searchParams.get('token');
-  const email = searchParams.get('email');
+  const token = searchParams.get("token");
+  const email = searchParams.get("email");
 
   const checkPasswordStrength = (password) => {
     let score = 0;
@@ -37,20 +36,20 @@ function ResetPassword() {
       hasUpperCase: /[A-Z]/.test(password),
       hasLowerCase: /[a-z]/.test(password),
       hasNumbers: /\d/.test(password),
-      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
     };
 
     score = Object.values(requirements).filter(Boolean).length;
 
-    let text = 'ضعيفة';
-    let strengthClass = 'weak';
+    let text = "ضعيفة";
+    let strengthClass = "weak";
 
     if (score >= 4) {
-      text = 'قوية';
-      strengthClass = 'strong';
+      text = "قوية";
+      strengthClass = "strong";
     } else if (score >= 3) {
-      text = 'متوسطة';
-      strengthClass = 'medium';
+      text = "متوسطة";
+      strengthClass = "medium";
     }
 
     return { score, text, class: strengthClass, requirements };
@@ -84,49 +83,52 @@ function ResetPassword() {
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
-    setFormData(prev => ({ ...prev, password: newPassword }));
-    
+    setFormData((prev) => ({ ...prev, password: newPassword }));
+
     const strength = checkPasswordStrength(newPassword);
     setPasswordStrength(strength);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateFields()) return;
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    setLoading(true);
-    
-    try {
-      // محاكاة إرسال الطلب إلى API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // في الواقع، هنا ستقوم بالاتصال بالـ API الحقيقي
-      // const data = await authApi.resetPassword({
-      //   token,
-      //   email,
-      //   password: formData.password,
-      //   password_confirmation: formData.confirmPassword
-      // });
-      
-      setSuccess(true);
-      toast.success('تم إعادة تعيين كلمة المرور بنجاح');
-      
-    } catch (error) {
-      if (error.message?.includes("token") || error.message?.includes("expired")) {
-        setFieldErrors({ submit: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية" });
-      } else {
-        toast.error(error.message || "حدث خطأ في الاتصال بالخادم");
-      }
-    } finally {
-      setLoading(false);
+  if (!validateFields()) return;
+
+  setLoading(true);
+
+  try {
+    await authApi.resetPassword({
+      token,
+      email,
+      password: formData.password,
+      password_confirmation: formData.confirmPassword,
+    });
+
+    setSuccess(true);
+    toast.success("تم إعادة تعيين كلمة المرور بنجاح");
+  } catch (error) {
+    const message = error.message || "";
+
+    if (
+      message.includes("token") ||
+      message.includes("الرابط") ||
+      message.includes("البريد")
+    ) {
+      setFieldErrors({
+        submit: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية",
+      });
+    } else {
+      toast.error(message || "حدث خطأ أثناء الاتصال بالخادم");
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const getRequirementIcon = (isValid) => (
-    <span className={`text-sm ${isValid ? 'text-green-600' : 'text-red-600'}`}>
-      {isValid ? <Icons.FiCheck
- /> : '•'}
+    <span className={`text-sm ${isValid ? "text-green-600" : "text-red-600"}`}>
+      {isValid ? <Icons.FiCheck /> : "•"}
     </span>
   );
 
@@ -154,12 +156,14 @@ function ResetPassword() {
 
             <div className="bg-gray-50 rounded-xl p-6 text-center mb-6">
               <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-4 animate-bounce-in">
-                <Icons.FiCheck
- />
+                <Icons.FiCheck />
               </div>
-              <h3 className="text-blue-600 text-xl font-bold mb-3">تم إعادة التعيين!</h3>
+              <h3 className="text-blue-600 text-xl font-bold mb-3">
+                تم إعادة التعيين!
+              </h3>
               <p className="text-gray-600 text-sm leading-relaxed">
-                تم إعادة تعيين كلمة المرور بنجاح. يمكنك الآن استخدام كلمة المرور الجديدة لتسجيل الدخول.
+                تم إعادة تعيين كلمة المرور بنجاح. يمكنك الآن استخدام كلمة المرور
+                الجديدة لتسجيل الدخول.
               </p>
             </div>
           </div>
@@ -169,29 +173,41 @@ function ResetPassword() {
   }
 
   const getStrengthBarWidth = () => {
-    switch(passwordStrength.class) {
-      case 'weak': return '33%';
-      case 'medium': return '66%';
-      case 'strong': return '100%';
-      default: return '0%';
+    switch (passwordStrength.class) {
+      case "weak":
+        return "33%";
+      case "medium":
+        return "66%";
+      case "strong":
+        return "100%";
+      default:
+        return "0%";
     }
   };
 
   const getStrengthColor = () => {
-    switch(passwordStrength.class) {
-      case 'weak': return 'bg-red-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'strong': return 'bg-green-500';
-      default: return 'bg-gray-300';
+    switch (passwordStrength.class) {
+      case "weak":
+        return "bg-red-500";
+      case "medium":
+        return "bg-yellow-500";
+      case "strong":
+        return "bg-green-500";
+      default:
+        return "bg-gray-300";
     }
   };
 
   const getTextColor = () => {
-    switch(passwordStrength.class) {
-      case 'weak': return 'text-red-600';
-      case 'medium': return 'text-yellow-600';
-      case 'strong': return 'text-green-600';
-      default: return 'text-gray-600';
+    switch (passwordStrength.class) {
+      case "weak":
+        return "text-red-600";
+      case "medium":
+        return "text-yellow-600";
+      case "strong":
+        return "text-green-600";
+      default:
+        return "text-gray-600";
     }
   };
 
@@ -212,7 +228,9 @@ function ResetPassword() {
                 className="max-w-40 h-auto max-h-16 mx-auto object-contain"
               />
             </div>
-            <p className="text-gray-600 font-light mb-3">تعيين كلمة مرور جديدة</p>
+            <p className="text-gray-600 font-light mb-3">
+              تعيين كلمة مرور جديدة
+            </p>
             <div className="w-12 h-1 bg-yellow-500 rounded-full mx-auto"></div>
           </div>
 
@@ -222,8 +240,7 @@ function ResetPassword() {
                 كلمة المرور الجديدة
               </label>
               <div className="relative">
-                <Icons.FiLock
- className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+                <Icons.FiLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -231,8 +248,8 @@ function ResetPassword() {
                   value={formData.password}
                   onChange={handlePasswordChange}
                   className={`w-full px-4 py-3 pl-12 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 ${
-                    fieldErrors.password ? 'border-red-500' : 'border-gray-300'
-                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    fieldErrors.password ? "border-red-500" : "border-gray-300"
+                  } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                   disabled={loading}
                 />
                 <button
@@ -241,22 +258,25 @@ function ResetPassword() {
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={loading}
                 >
-                  {showPassword ? <Icons.FiEyeOff
- className="text-lg" /> : <Icons.FiEye
- className="text-lg" />}
+                  {showPassword ? (
+                    <Icons.FiEyeOff className="text-lg" />
+                  ) : (
+                    <Icons.FiEye className="text-lg" />
+                  )}
                 </button>
               </div>
 
               {formData.password && (
                 <div className="mt-3">
                   <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className={`h-full transition-all duration-300 ${getStrengthColor()}`}
                       style={{ width: getStrengthBarWidth() }}
                     ></div>
                   </div>
                   <div className="text-xs text-gray-600 mt-1 text-right">
-                    قوة كلمة المرور: <span className={`font-semibold ${getTextColor()}`}>
+                    قوة كلمة المرور:{" "}
+                    <span className={`font-semibold ${getTextColor()}`}>
                       {passwordStrength.text}
                     </span>
                   </div>
@@ -266,15 +286,27 @@ function ResetPassword() {
               {formData.password && (
                 <ul className="mt-3 space-y-1">
                   {[
-                    { text: '8 أحرف على الأقل', isValid: formData.password.length >= 8 },
-                    { text: 'حرف كبير (A-Z)', isValid: /[A-Z]/.test(formData.password) },
-                    { text: 'حرف صغير (a-z)', isValid: /[a-z]/.test(formData.password) },
-                    { text: 'رقم واحد على الأقل', isValid: /\d/.test(formData.password) }
+                    {
+                      text: "8 أحرف على الأقل",
+                      isValid: formData.password.length >= 8,
+                    },
+                    {
+                      text: "حرف كبير (A-Z)",
+                      isValid: /[A-Z]/.test(formData.password),
+                    },
+                    {
+                      text: "حرف صغير (a-z)",
+                      isValid: /[a-z]/.test(formData.password),
+                    },
+                    {
+                      text: "رقم واحد على الأقل",
+                      isValid: /\d/.test(formData.password),
+                    },
                   ].map((req, index) => (
-                    <li 
+                    <li
                       key={index}
                       className={`flex items-center gap-2 text-xs ${
-                        req.isValid ? 'text-green-600' : 'text-red-600'
+                        req.isValid ? "text-green-600" : "text-red-600"
                       }`}
                     >
                       {getRequirementIcon(req.isValid)}
@@ -285,7 +317,9 @@ function ResetPassword() {
               )}
 
               {fieldErrors.password && (
-                <p className="text-red-600 text-xs mt-1 mr-1">{fieldErrors.password}</p>
+                <p className="text-red-600 text-xs mt-1 mr-1">
+                  {fieldErrors.password}
+                </p>
               )}
             </div>
 
@@ -294,17 +328,23 @@ function ResetPassword() {
                 تأكيد كلمة المرور
               </label>
               <div className="relative">
-                <Icons.FiLock
- className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+                <Icons.FiLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
                   placeholder="أعد إدخال كلمة المرور الجديدة"
                   value={formData.confirmPassword}
-                  onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      confirmPassword: e.target.value,
+                    }))
+                  }
                   className={`w-full px-4 py-3 pl-12 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 ${
-                    fieldErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    fieldErrors.confirmPassword
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                   disabled={loading}
                 />
                 <button
@@ -313,14 +353,18 @@ function ResetPassword() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   disabled={loading}
                 >
-                  {showConfirmPassword ? <Icons.FiEyeOff
- className="text-lg" /> : <Icons.FiEye
- className="text-lg" />}
+                  {showConfirmPassword ? (
+                    <Icons.FiEyeOff className="text-lg" />
+                  ) : (
+                    <Icons.FiEye className="text-lg" />
+                  )}
                 </button>
               </div>
 
               {fieldErrors.confirmPassword && (
-                <p className="text-red-600 text-xs mt-1 mr-1">{fieldErrors.confirmPassword}</p>
+                <p className="text-red-600 text-xs mt-1 mr-1">
+                  {fieldErrors.confirmPassword}
+                </p>
               )}
             </div>
 
@@ -333,7 +377,7 @@ function ResetPassword() {
             <button
               type="submit"
               className={`w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
+                loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
               disabled={loading}
             >
@@ -343,7 +387,7 @@ function ResetPassword() {
                   جاري إعادة التعيين...
                 </>
               ) : (
-                'إعادة تعيين كلمة المرور'
+                "إعادة تعيين كلمة المرور"
               )}
             </button>
           </form>
@@ -361,7 +405,7 @@ function ResetPassword() {
             transform: translateY(0);
           }
         }
-        
+
         @keyframes bounce-in {
           0% {
             opacity: 0;
@@ -378,11 +422,11 @@ function ResetPassword() {
             transform: scale(1);
           }
         }
-        
+
         .animate-slide-up {
           animation: slide-up 0.4s ease-out;
         }
-        
+
         .animate-bounce-in {
           animation: bounce-in 0.6s ease-out;
         }

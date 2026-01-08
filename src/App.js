@@ -1,12 +1,12 @@
+// src/App.js
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ScrollToTop from "./components/common/ScrollToTop";
 
-// استبدال notifex بـ React-Toastify
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// ✅ استيراد ToastProvider الجديد بدلاً من react-toastify
+import { ToastProvider } from "./components/common/ToastProvider";
 
 // استيراد المكونات
 import Navbar from "./components/common/Navbar";
@@ -94,112 +94,82 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ModalContext.Provider value={modalContextValue}>
-          <Router>
+        {/* ✅ إضافة ToastProvider هنا لتغطية جميع المكونات */}
+        <ToastProvider>
+          <ModalContext.Provider value={modalContextValue}>
+            <Router>
+              {/* ✅ Scroll To Top عند تغيير المسار */}
+              <ScrollToTop />
 
-            {/* ✅ Scroll To Top عند تغيير المسار */}
-            <ScrollToTop />
+              <div className="App">
+                {/* ✅ تمت إزالة ToastContainer القديم */}
+                
+                <Navbar onLoginClick={openLogin} onRegisterClick={openRegister} />
 
-            <div className="App">
-              {/* Toast Container — بديل احترافي عن notifex */}
-              <ToastContainer
-                position="bottom-right"
-                autoClose={4000}
-                closeOnClick
-                draggable
-                rtl
-                pauseOnHover
-                theme="light"
-                style={{
-                  top: window.innerWidth < 768 ? "80px" : "80px",
-                  right: "10px",
-                  left: "auto",
-                  width: "auto",
-                  maxWidth: window.innerWidth < 768 ? "90%" : "400px",
-                  fontFamily: "'Segoe UI', 'Cairo', sans-serif",
-                  fontSize: window.innerWidth < 768 ? "12px" : "14px",
-                  zIndex: 999999,
-                }}
-                toastStyle={{
-                  borderRadius: "8px",
-                  padding: window.innerWidth < 768 ? "8px 12px" : "12px 16px",
-                  marginBottom: "8px",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                  minHeight: window.innerWidth < 768 ? "40px" : "50px",
-                  direction: "rtl",
-                  textAlign: "right",
-                  fontSize: window.innerWidth < 768 ? "12px" : "14px",
-                }}
-                className={
-                  window.innerWidth < 768 ? "mobile-toast" : "desktop-toast"
-                }
-              />
+                <main>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route
+                      path="/lands-and-auctions-list"
+                      element={<LandsAndAuctionsList />}
+                    />
+                    <Route path="/lands/:id/:type" element={<LandDetails />} />
+                    <Route
+                      path="/auctions/:id/:type"
+                      element={<AuctionDetails />}
+                    />
+                    <Route path="/create-lands" element={<Createland />} />
+                    <Route path="/create-auction" element={<CreateAuctionAd />} />
+                    <Route
+                      path="/purchase-requests"
+                      element={<LandRequestsList />}
+                    />
+                    <Route
+                      path="/requests/:id"
+                      element={<LandRequestDetails />}
+                    />
+                    <Route
+                      path="/create-request"
+                      element={<CreateLandRequest />}
+                    />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/my-ads" element={<MyAds />} />
+                    <Route path="/my-lands" element={<Favorites />} />
+                    <Route path="/interests" element={<Interests />} />
+                    <Route path="/notifications" element={<Notifications />} />
+                    <Route path="/my-requests" element={<MyRequests />} />
+                    <Route path="/create-ad" element={<CreateAd />} />
+                    <Route
+                      path="/create-marketing-request"
+                      element={<CreateAuctionRequest />}
+                    />
+                    <Route
+                      path="/terms-of-service"
+                      element={<TermsOfService />}
+                    />
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                  </Routes>
+                </main>
 
-              <Navbar onLoginClick={openLogin} onRegisterClick={openRegister} />
+                <Footer />
 
-              <main>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route
-                    path="/lands-and-auctions-list"
-                    element={<LandsAndAuctionsList />}
+                {showLogin && (
+                  <Login
+                    onClose={closeModals}
+                    onSwitchToRegister={openRegister}
+                    onLoginSuccess={handleLoginSuccess}
                   />
-                  <Route path="/lands/:id/:type" element={<LandDetails />} />
-                  <Route
-                    path="/auctions/:id/:type"
-                    element={<AuctionDetails />}
-                  />
-                  <Route path="/create-lands" element={<Createland />} />
-                  <Route path="/create-auction" element={<CreateAuctionAd />} />
-                  <Route
-                    path="/purchase-requests"
-                    element={<LandRequestsList />}
-                  />
-                  <Route
-                    path="/requests/:id"
-                    element={<LandRequestDetails />}
-                  />
-                  <Route
-                    path="/create-request"
-                    element={<CreateLandRequest />}
-                  />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/my-ads" element={<MyAds />} />
-                  <Route path="/my-lands" element={<Favorites />} />
-                  <Route path="/interests" element={<Interests />} />
-                  <Route path="/notifications" element={<Notifications />} />
-                  <Route path="/my-requests" element={<MyRequests />} />
-                  <Route path="/create-ad" element={<CreateAd />} />
-                  <Route
-                    path="/create-marketing-request"
-                    element={<CreateAuctionRequest />}
-                  />
-                  <Route
-                    path="/terms-of-service"
-                    element={<TermsOfService />}
-                  />
-                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                </Routes>
-              </main>
+                )}
 
-              <Footer />
-
-              {showLogin && (
-                <Login
-                  onClose={closeModals}
-                  onSwitchToRegister={openRegister}
-                  onLoginSuccess={handleLoginSuccess}
-                />
-              )}
-
-              {showRegister && (
-                <Register onClose={closeModals} onSwitchToLogin={openLogin} />
-              )}
-            </div>
-          </Router>
-        </ModalContext.Provider>
+                {showRegister && (
+                  <Register onClose={closeModals} onSwitchToLogin={openLogin} />
+                )}
+              </div>
+            </Router>
+          </ModalContext.Provider>
+        </ToastProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

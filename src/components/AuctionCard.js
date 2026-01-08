@@ -10,17 +10,12 @@ const AuctionCard = ({
   startPrice,
   currentBid,
   auction_date,
-  bidders,
   onClick,
   onToggleFavorite,
   isFavorite = false,
-  area,
-  landType,
-  purpose,
   auctionTitle,
-  status,
-  onShare,
-  shareUrl
+  city,
+  region
 }) => {
   const [favorite, setFavorite] = useState(isFavorite);
   const [isLoading, setIsLoading] = useState(false);
@@ -208,21 +203,47 @@ const AuctionCard = ({
         {/* التفاصيل */}
         <div className="space-y-1 pt-1">
           <div className="flex justify-between text-xs">
-            <span className="text-gray-600">المساحة:</span>
-            <span className="font-bold text-black-600" dir="ltr">
-              {area ? `${area} م²` : 'غير محدد'}
-            </span>
-          </div>
-
-          <div className="flex justify-between text-xs">
             <span className="text-gray-600">تاريخ المزاد:</span>
             <span className="font-bold text-black-600">
               {formatAuctionDate(auction_date)}
             </span>
           </div>
 
+          {/* المدينة والمنطقة مع أيقونات صفراء */}
+          <div className="space-y-1 mt-2">
+            <div className="flex items-center gap-2 text-xs">
+              {/* استخدام أيقونات بديلة إذا كانت FaCity غير متوفرة */}
+              {Icons.FaCity ? (
+                <Icons.FaCity className="text-yellow-500 w-3.5 h-3.5 flex-shrink-0" />
+              ) : Icons.FaBuilding ? (
+                <Icons.FaBuilding className="text-yellow-500 w-3.5 h-3.5 flex-shrink-0" />
+              ) : (
+                <Icons.FaMapMarkerAlt className="text-yellow-500 w-3.5 h-3.5 flex-shrink-0" />
+              )}
+              <span className="text-gray-600">المدينة:</span>
+              <span className="font-bold text-black-600 line-clamp-1 flex-1 text-left">
+                {city || "غير محدد"}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2 text-xs">
+              {/* استخدام أيقونات بديلة إذا كانت FaGlobeAsia غير متوفرة */}
+              {Icons.FaGlobeAsia ? (
+                <Icons.FaGlobeAsia className="text-yellow-500 w-3.5 h-3.5 flex-shrink-0" />
+              ) : Icons.FaGlobe ? (
+                <Icons.FaGlobe className="text-yellow-500 w-3.5 h-3.5 flex-shrink-0" />
+              ) : (
+                <Icons.FaMap className="text-yellow-500 w-3.5 h-3.5 flex-shrink-0" />
+              )}
+              <span className="text-gray-600">المنطقة:</span>
+              <span className="font-bold text-black-600 line-clamp-1 flex-1 text-left">
+                {region || "غير محدد"}
+              </span>
+            </div>
+          </div>
+
           {(startPrice || currentBid) && (
-            <div className="flex justify-between text-xs">
+            <div className="flex justify-between text-xs mt-2">
               <span className="text-gray-600">
                 {auctionStatus === 'مفتوح' || auctionStatus === 'اليوم' ? 'السعر الحالي:' : 'السعر الابتدائي:'}
               </span>
