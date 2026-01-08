@@ -4,7 +4,7 @@
 
 import React from "react";
 
-const UserTypeSelector = ({ value, onChange, disabled }) => {
+const UserType = ({ value, onChange, disabled }) => {
   return (
     <div className="mb-3 sm:mb-4">
       <label className="block text-xs font-medium text-gray-700 mb-1">نوع الحساب</label>
@@ -25,4 +25,4 @@ const UserTypeSelector = ({ value, onChange, disabled }) => {
   );
 };
 
-export default UserTypeSelector;
+export default UserType;
