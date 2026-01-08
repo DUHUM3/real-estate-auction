@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { authApi } from "../../api/authApi";
-import toast from "react-hot-toast";
+import { useToast } from "../../components/common/ToastProvider";
 import Icons from "../../icons/index";
 
 function ResetPassword() {
@@ -16,6 +16,9 @@ function ResetPassword() {
     confirmPassword: "",
   });
 
+  const toast = useToast();
+  toast.success("تم إعادة تعيين كلمة المرور بنجاح");
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -26,8 +29,17 @@ function ResetPassword() {
     class: "weak",
   });
 
-  const token = searchParams.get("token");
-  const email = searchParams.get("email");
+  // قراءة الـ query string وتصحيح أي &amp;، وفك الترميز
+  const params = new URLSearchParams(
+    window.location.search.replace(/&amp;/g, "&")
+  );
+
+  const token = params.get("token")
+    ? decodeURIComponent(params.get("token"))
+    : "";
+  const email = params.get("email")
+    ? decodeURIComponent(params.get("email"))
+    : "";
 
   const checkPasswordStrength = (password) => {
     let score = 0;
@@ -92,14 +104,15 @@ function ResetPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // تحقق من الحقول
     if (!validateFields()) return;
 
     setLoading(true);
 
     try {
       await authApi.resetPassword({
-        token: decodeURIComponent(token),
-        email: decodeURIComponent(email),
+        token, // تم فك الترميز مسبقًا
+        email,
         password: formData.password,
         password_confirmation: formData.confirmPassword,
       });
@@ -107,7 +120,7 @@ function ResetPassword() {
       setSuccess(true);
       toast.success("تم إعادة تعيين كلمة المرور بنجاح");
     } catch (error) {
-      const message = error.message || "";
+      const message = error.response?.data?.message || error.message || "";
 
       if (
         message.includes("token") ||
