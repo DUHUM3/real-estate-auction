@@ -14,7 +14,7 @@ import { useRegisterForm } from "../../features/auth/hooks/useRegisterForm";
 import { useEmailVerification } from "../../features/auth/hooks/useEmailVerification";
 
 // Import components
-import UserTypeSelector from "../../features/auth/components/UserTypeSelector.jsx";
+import UserTypeSelector from "../../features/auth/components/usertypeselector.jsx";
 import ProgressIndicator from "../../features/auth/components/ProgressIndicator.jsx";
 import EmailVerificationForm from "../../features/auth/components/EmailVerificationForm.jsx";
 import Step1PersonalInfo from "../../features/auth/components/Step1PersonalInfo";
