@@ -5,21 +5,21 @@
 
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext.js";
-import { authApi } from "../../api/authApi.js";
+import { authApi } from "../../features/auth/services/authApi.js";
 import { toast } from "react-toastify";
 import { FiX, FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
 // Import hooks
-import { useRegisterForm } from "../../features/auth/hooks/useRegisterForm";
-import { useEmailVerification } from "../../features/auth/hooks/useEmailVerification";
+import { useRegisterForm } from "../../features/auth/register/hooks/useRegisterForm.js";
+import { useEmailVerification } from "../../features/auth/register/hooks/useEmailVerification.js";
 
 // Import components
-import UserType from "../../features/auth/components/UserType.jsx";
-import ProgressIndicator from "../../features/auth/components/ProgressIndicator.jsx";
-import EmailVerificationForm from "../../features/auth/components/EmailVerificationForm.jsx";
-import Step1PersonalInfo from "../../features/auth/components/Step1PersonalInfo";
-import Step2BusinessInfo from "../../features/auth/components/Step2BusinessInfo";
-import Step3LoginCredentials from "../../features/auth/components/Step3LoginCredentials";
+import UserType from "../../features/auth/register/components/UserType.jsx";
+import ProgressIndicator from "../../features/auth/register/components/ProgressIndicator.jsx";
+import EmailVerificationForm from "../../features/auth/register/components/EmailVerificationForm.jsx";
+import Step1PersonalInfo from "../../features/auth/register/components/Step1PersonalInfo.jsx";
+import Step2BusinessInfo from "../../features/auth/register/components/Step2BusinessInfo.jsx";
+import Step3LoginCredentials from "../../features/auth/register/components/Step3LoginCredentials.jsx";
 
 function Register({ onClose, onSwitchToLogin }) {
   const [loading, setLoading] = useState(false);

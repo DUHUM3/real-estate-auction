@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async'; 
+
 
 const PrivacyPolicy = () => {
   const [activeSection, setActiveSection] = useState(1);
@@ -160,6 +162,10 @@ const PrivacyPolicy = () => {
   };
  return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-tajawal rtl">
+       <Helmet>
+        <title>سياسة الخصوصية - شاهين بلس</title>
+        <meta name="description" content="تعرف على سياسة الخصوصية الخاصة بموقع وتطبيق شاهين بلس لحماية بياناتك الشخصية." />
+      </Helmet>
       {/* العنوان الرئيسي */}
       <div className="bg-white text-black text-center py-10 px-6 rounded-xl shadow-lg mb-8 mx-4 md:mx-auto mt-20 max-w-6xl">
         <h1 className="text-3xl md:text-4xl font-semibold mb-4">سياسة الخصوصية</h1>

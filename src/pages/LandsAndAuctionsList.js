@@ -12,6 +12,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../context/AuthContext";
 import PropertyListSkeleton from "../Skeleton/PropertyListSkeleton";
 import { useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+
 
 // ====== Theme Gradients (Global for this file) ======
 const blueGradients = {
@@ -1287,6 +1289,26 @@ const PropertiesPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 pb-6 pt-20" dir="rtl">
+       {/* SEO */}
+      <Helmet>
+        <title> شاهين بلس | عقارات وأراضي للبيع والاستثمار </title>
+        <meta
+          name="description"
+          content="تصفح أحدث العقارات والأراضي والمزادات المتاحة للبيع والاستثمار. منصة شاهين بلس تقدم لك أفضل الفرص العقارية في السعودية بأسعار تنافسية."
+        />
+        <meta
+          name="keywords"
+          content="عقارات للبيع, أراضي, مزادات, استثمار عقاري, منصة عقارية, السعودية"
+        />
+        <meta property="og:title" content="عقارات وأراضي للبيع والاستثمار | منصة شاهين بلس" />
+        <meta
+          property="og:description"
+          content="تصفح أحدث العقارات والأراضي والمزادات المتاحة للبيع والاستثمار على منصة شاهين بلس"
+        />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://shaheenplus.sa/lands-and-auctions-list" />
+      </Helmet>
+
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* Search and Controls */}
         <div

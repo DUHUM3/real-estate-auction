@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authApi } from '../../api/authApi';
+import { authApi } from '../../features/auth/services/authApi';
 
 import toast from 'react-hot-toast';
 import Icons from '../../icons/index';

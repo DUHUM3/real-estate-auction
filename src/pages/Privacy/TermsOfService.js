@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async'; // ✅ إضافة Helmet
+
 
 const TermsOfService = () => {
   const [activeSection, setActiveSection] = useState(1);
@@ -321,7 +323,17 @@ const TermsOfService = () => {
   };
 
      return (
+      
     <div className="min-h-screen bg-gray-50 text-gray-800 font-tajawal rtl">
+       {/* SEO */}
+      <Helmet>
+        <title>شروط الاستخدام - شاهين بلس</title>
+        <meta name="description" content="تعرف على شروط الاستخدام لموقع وتطبيق شاهين بلس لضمان حقوقك والتزاماتك عند استخدام الموقع والخدمات العقارية." />
+        <meta name="keywords" content="شروط الاستخدام, شاهين بلس, الموقع العقاري, سياسة الخصوصية, الخدمات العقارية" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://www.shaheenplus.com/terms-of-service" />
+      </Helmet>
+
       {/* العنوان الرئيسي */}
       <div className="bg-white text-black text-center py-10 px-6 rounded-xl shadow-lg mb-8 mx-4 md:mx-auto mt-20 max-w-6xl">
         <h1 className="text-3xl md:text-4xl font-semibold mb-4">شروط الاستخدام</h1>

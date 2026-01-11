@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { authApi } from "../../api/authApi";
+import { authApi } from "../../features/auth/services/authApi";
 import { useToast } from "../../components/common/ToastProvider";
 import Icons from "../../icons/index";
 
@@ -17,7 +17,7 @@ function ResetPassword() {
   });
 
   const toast = useToast();
-  
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

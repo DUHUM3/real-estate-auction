@@ -5,7 +5,7 @@
 
 import React from "react";
 import { FiCheck, FiAlertCircle } from "react-icons/fi";
-import { PASSWORD_REQUIREMENTS } from "../constants/validation";
+import { PASSWORD_REQUIREMENTS } from "../../register/constants/validation";
 
 const PasswordStrengthMeter = ({ password, passwordStrength }) => {
   if (!password) return null;

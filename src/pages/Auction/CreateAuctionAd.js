@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { Check, Plus, ArrowLeft, ArrowRight } from "lucide-react";
 import { useToast } from "../../components/common/ToastProvider"; // ✅ استيراد من جديد
 

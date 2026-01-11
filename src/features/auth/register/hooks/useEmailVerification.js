@@ -3,7 +3,7 @@
  */
 
 import { useState, useCallback } from "react";
-import { authApi } from "../../../api/authApi";
+import { authApi } from "../../services/authApi";
 import { toast } from "react-toastify";
 import { VALIDATION_RULES } from "../constants/validation";
 

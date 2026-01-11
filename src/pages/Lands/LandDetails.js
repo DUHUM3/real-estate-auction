@@ -1,62 +1,36 @@
-import React, { useState, useEffect, useContext } from "react";
+import React from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { ModalContext } from "../../App";
-import { useAuth } from "../../context/AuthContext";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
   FaMapMarkerAlt,
   FaRulerCombined,
   FaMoneyBillWave,
-  FaHeart,
   FaShare,
   FaArrowLeft,
   FaCalendarAlt,
-  FaBuilding,
-  FaClock,
-  FaExpand,
-  FaArrowRight,
-  FaArrowLeft as FaLeft,
-  FaTimes,
+  FaInfoCircle,
+  FaTag,
   FaCheckCircle,
-  FaFileContract,
   FaDollarSign,
   FaChartLine,
   FaCalendarDay,
-  FaInfoCircle,
-  FaTag,
-  FaIdCard,
-  FaCheck,
-  FaExclamationTriangle,
-  FaPaperPlane,
-  FaSpinner,
-  FaUser,
-  FaPhone,
-  FaEnvelope,
 } from "react-icons/fa";
 
-// مسار أيقونة الريال السعودي
-const riyalIconUrl = "/images/rail.svg";
+// Components
+import InfoCard from "../../features/lands/landsdetail/components/InfoCard";
+import DimensionCard from "../../features/lands/landsdetail/components/DimensionCard";
+import ImageGallery from "../../features/lands/landsdetail/components/ImageGallery";
+import InterestForm from "../../features/lands/landsdetail/components/InterestForm";
+import InterestResultCard from "../../features/lands/landsdetail/components/InterestResultCard";
+import SaudiRiyalIcon from "../../features/lands/landsdetail/components/SaudiRiyalIcon";
 
-// مكون أيقونة الريال السعودي
-const SaudiRiyalIcon = ({ className = "w-4 h-4" }) => {
-  return (
-    <img
-      src={riyalIconUrl}
-      alt="ريال سعودي"
-      className={`inline-block ${className}`}
-      style={{
-        verticalAlign: "middle",
-      }}
-      onError={(e) => {
-        console.error("فشل تحميل أيقونة الريال");
-        e.target.style.display = "none";
-      }}
-    />
-  );
-};
+// Hooks
+import { useLandDetails } from "../../features/lands/landsdetail/hooks/useLandDetails";
+import { useInterestForm } from "../../features/lands/landsdetail/hooks/useInterestForm";
 
-// دالة لعرض السعر مع أيقونة الريال
+// Constants
+import { PROPERTY_PURPOSES } from "../../features/lands/landsdetail/constants/landDetailsConstants";
+
+// Utility functions for price formatting
 const formatPriceWithIcon = (price) => {
   if (!price)
     return (
@@ -75,457 +49,51 @@ const formatPriceWithIcon = (price) => {
   );
 };
 
-// دالة لعرض السعر بدون أيقونة (للمساحة)
-const formatPrice = (price) => {
-  if (!price) return "0";
-  return parseFloat(price).toLocaleString("ar-SA");
-};
-
-// دالة مساعدة لعرض الرسائل
-const showToast = (type, message, duration = 3000) => {
-  const isMobile = window.innerWidth < 768;
-
-  const options = {
-    position: isMobile ? "top-center" : "top-right",
-    autoClose: duration,
-    rtl: true,
-    theme: "light",
-    style: {
-      fontSize: isMobile ? "12px" : "14px",
-      fontFamily: "'Segoe UI', 'Cairo', sans-serif",
-      borderRadius: isMobile ? "6px" : "8px",
-      minHeight: isMobile ? "40px" : "50px",
-      padding: isMobile ? "8px 10px" : "12px 14px",
-      marginTop: isMobile ? "60px" : "0",
-    },
-    bodyStyle: {
-      fontFamily: "'Segoe UI', 'Cairo', sans-serif",
-      fontSize: isMobile ? "12px" : "14px",
-      textAlign: "right",
-      direction: "rtl",
-    },
-  };
-
-  switch (type) {
-    case "success":
-      toast.success(message, options);
-      break;
-    case "error":
-      toast.error(message, options);
-      break;
-    case "info":
-      toast.info(message, options);
-      break;
-    case "warning":
-      toast.warning(message, options);
-      break;
-    default:
-      toast(message, options);
+const formatDate = (dateString) => {
+  try {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-GB", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(date);
+  } catch (e) {
+    return dateString;
   }
 };
 
-// مكون بطاقة المعلومة المحسن للشاشات الصغيرة
-const InfoCard = ({
-  icon: Icon,
-  title,
-  value,
-  color = "blue",
-  unit = "",
-  className = "",
-}) => (
-  <div
-    className={`flex items-start gap-3 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg sm:rounded-xl hover:shadow-sm transition-shadow ${className}`}
-  >
-    <div
-      className={`p-2 rounded-lg ${
-        color === "blue"
-          ? "bg-blue-50 text-blue-500"
-          : color === "green"
-          ? "bg-green-50 text-green-500"
-          : color === "amber"
-          ? "bg-amber-50 text-amber-500"
-          : color === "purple"
-          ? "bg-purple-50 text-purple-500"
-          : "bg-gray-50 text-gray-500"
-      }`}
-    >
-      <Icon className="text-base sm:text-lg" />
-    </div>
-    <div className="flex-1 min-w-0">
-      <span className="block text-xs sm:text-sm text-gray-500 mb-1 truncate">
-        {title}
-      </span>
-      <span className="block font-semibold text-gray-800 text-sm sm:text-lg truncate">
-        {value}{" "}
-        {unit && (
-          <span className="text-xs sm:text-sm text-gray-500">{unit}</span>
-        )}
-      </span>
-    </div>
-  </div>
-);
-
-// مكون بطاقة الأبعاد المحسن للشاشات الصغيرة
-const DimensionCard = ({ title, value, unit = "م" }) => (
-  <div className="p-2 sm:p-3 bg-gray-50 rounded-lg text-center">
-    <span className="block text-xs sm:text-sm text-gray-500 mb-1 truncate">
-      {title}
-    </span>
-    <span className="block font-bold text-gray-700 text-sm sm:text-base">
-      {formatPrice(value)} {unit}
-    </span>
-  </div>
-);
-
-// مكون نتيجة تقديم الاهتمام - نفس حجم وتصميم الفورم الأصلي
-const InterestResultCard = ({
-  type,
-  message,
-  details,
-  onClose,
-  isForSale,
-  isForInvestment,
-}) => {
-  const isSuccess = type === "success";
-  const title = isForSale
-    ? "تقديم عرض للشراء"
-    : isForInvestment
-    ? "تقديم طلب للاستثمار"
-    : "تقديم اهتمام";
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-4 sm:p-6">
-          {/* الرأس - نفس تصميم الفورم الأصلي */}
-          <div className="flex justify-between items-center mb-4 sm:mb-6">
-            <h3 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
-              {title}
-            </h3>
-            <button
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              onClick={onClose}
-            >
-              <FaTimes className="text-gray-500" />
-            </button>
-          </div>
-
-          {/* المحتوى */}
-          <div className="text-center">
-            {/* أيقونة النتيجة */}
-            <div
-              className={`mb-4 sm:mb-6 mx-auto w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center ${
-                isSuccess
-                  ? "bg-green-100 text-green-600"
-                  : "bg-red-100 text-red-600"
-              }`}
-            >
-              {isSuccess ? (
-                <FaCheck className="text-2xl sm:text-3xl" />
-              ) : (
-                <FaExclamationTriangle className="text-2xl sm:text-3xl" />
-              )}
-            </div>
-
-            {/* الرسالة الرئيسية */}
-            <h4 className="text-lg sm:text-xl font-bold text-gray-800 mb-3">
-              {message}
-            </h4>
-
-            {/* التفاصيل */}
-            {details && (
-              <div
-                className={`p-3 sm:p-4 rounded-lg mb-4 text-right ${
-                  isSuccess
-                    ? "bg-green-50 border border-green-200"
-                    : "bg-red-50 border border-red-200"
-                }`}
-              >
-                <p
-                  className={`text-sm sm:text-base ${
-                    isSuccess ? "text-green-700" : "text-red-700"
-                  }`}
-                >
-                  {details}
-                </p>
-              </div>
-            )}
-
-            {/* معلومات إضافية */}
-            {/* الأزرار */}
-            <div className="flex flex-col gap-3">
-              {isSuccess ? (
-                <>
-                  <button
-                    className="w-full py-3 px-4 bg-gradient-to-r from-[#53a1dd] to-[#4285c7] text-white font-bold rounded-lg hover:opacity-90 transition-all text-sm sm:text-base"
-                    onClick={onClose}
-                  >
-                    حسناً، فهمت ✓
-                  </button>
-                  <button
-                    className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-all text-sm sm:text-base"
-                    onClick={() => {
-                      onClose();
-                      window.location.reload();
-                    }}
-                  >
-                    عرض المزيد من الأراضي
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    className="w-full py-3 px-4 bg-gradient-to-r from-[#53a1dd] to-[#4285c7] text-white font-bold rounded-lg hover:opacity-90 transition-all text-sm sm:text-base"
-                    onClick={onClose}
-                  >
-                    إعادة المحاولة
-                  </button>
-                  <button
-                    className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-all text-sm sm:text-base"
-                    onClick={onClose}
-                  >
-                    العودة
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// مكون فورم تقديم الاهتمام - نفس التصميم السابق
-const InterestForm = ({
-  onSubmit,
-  onClose,
-  formData,
-  onChange,
-  submitting,
-  isForSale,
-  isForInvestment,
-}) => {
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-4 sm:p-6">
-          <div className="flex justify-between items-center mb-4 sm:mb-6">
-            <h3 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
-              {isForSale
-                ? "تقديم عرض للشراء"
-                : isForInvestment
-                ? "تقديم طلب للاستثمار"
-                : "تقديم اهتمام"}
-            </h3>
-            <button
-              className="p-2 rounded-lg hover:bg-gray-100"
-              onClick={onClose}
-              disabled={submitting}
-            >
-              <FaTimes />
-            </button>
-          </div>
-
-          <form onSubmit={onSubmit}>
-            {/* حقل الرسالة */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-gray-700 font-medium text-sm sm:text-base">
-                  <span>رسالتك</span>
-                </label>
-                <div
-                  className={`text-xs font-medium ${
-                    formData.message.trim().length === 0
-                      ? "text-gray-500"
-                      : formData.message.trim().length < 10
-                      ? "text-red-500"
-                      : "text-green-500"
-                  }`}
-                >
-                  {formData.message.trim().length}/10 حرف
-                </div>
-              </div>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={(e) => {
-                  onChange(e);
-                  e.target.classList.remove(
-                    "border-red-500",
-                    "ring-2",
-                    "ring-red-200"
-                  );
-                }}
-                placeholder={
-                  isForSale
-                    ? "أدخل رسالتك وعرضك للشراء هنا (يجب أن يكون أكثر من 10 أحرف)"
-                    : isForInvestment
-                    ? "أدخل رسالتك وخطة الاستثمار المقترحة هنا (يجب أن يكون أكثر من 10 أحرف)"
-                    : "أدخل رسالتك أو استفسارك هنا (يجب أن يكون أكثر من 10 أحرف)"
-                }
-                rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none text-sm sm:text-base"
-                required
-                disabled={submitting}
-              />
-              <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mt-2 gap-1 sm:gap-0">
-                <div className="text-xs text-gray-500">
-                  {isForSale
-                    ? "اكتب تفاصيل عرض الشراء والسعر المقترح"
-                    : isForInvestment
-                    ? "اكتب خطة الاستثمار والمدة المقترحة"
-                    : "اكتب رسالة مفصلة عن اهتمامك"}
-                </div>
-                <div className="text-xs text-blue-500">
-                  {formData.message.trim().length >= 10
-                    ? "✓ جاهز للإرسال"
-                    : "اكتب 10 أحرف على الأقل"}
-                </div>
-              </div>
-            </div>
-
-            {/* زر الإرسال */}
-            <button
-              type="submit"
-              className={`w-full py-3 px-4 font-bold rounded-lg transition-all text-sm sm:text-base flex items-center justify-center gap-2 ${
-                submitting
-                  ? "bg-gray-400 text-white"
-                  : "bg-gradient-to-r from-[#53a1dd] to-[#4285c7] text-white hover:opacity-90"
-              }`}
-              disabled={submitting}
-            >
-              {submitting ? (
-                <>
-                  <FaSpinner className="animate-spin" />
-                  جاري الإرسال...
-                </>
-              ) : (
-                <>
-                  <FaPaperPlane />
-                  إرسال الطلب
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
-
+// Main Land Details Page Component
 const LandDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { openLogin } = useContext(ModalContext);
-  const { currentUser } = useAuth();
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [showImageModal, setShowImageModal] = useState(false);
-  const [showInterestForm, setShowInterestForm] = useState(false);
-  const [formData, setFormData] = useState({
-    full_name: "",
-    phone: "",
-    email: "",
-    message: "",
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [submitResult, setSubmitResult] = useState(null); // null, 'success', or 'error'
-  const [resultMessage, setResultMessage] = useState("");
-  const [resultDetails, setResultDetails] = useState("");
-  const token = localStorage.getItem("token");
+  // Custom hooks for data and form management
+  const {
+    data,
+    loading,
+    error,
+    getAllImages,
+    getImageUrl,
+    hasDimensions,
+    calculateTotalPrice,
+  } = useLandDetails(id);
 
-  useEffect(() => {
-    fetchData();
+  const {
+    showInterestForm,
+    formData,
+    submitting,
+    submitResult,
+    resultMessage,
+    resultDetails,
+    handleShowInterestForm,
+    handleInputChange,
+    handleSubmitInterest,
+    handleCloseInterestForm,
+    handleCloseResult,
+  } = useInterestForm(id);
 
-    const token = localStorage.getItem("token");
-    if (token) {
-      console.log("تم العثور على token:", token.substring(0, 20) + "...");
-    } else {
-      console.log("لا يوجد token - المستخدم غير مسجل الدخول");
-    }
-  }, [id]);
-
-  // دالة لعرض رسائل الخطأ من API
-  const showApiError = (errorObj) => {
-    if (typeof errorObj === "string") {
-      showToast("error", errorObj);
-    } else if (errorObj.message) {
-      showToast("error", errorObj.message);
-    } else if (errorObj.details) {
-      showToast("error", errorObj.details);
-    } else if (errorObj.error) {
-      showToast("error", errorObj.error);
-    } else {
-      showToast("error", "حدث خطأ غير متوقع");
-    }
-  };
-
-  /**
-   * دالة الحصول على نوع المستخدم الحالي
-   */
-  const getCurrentUserType = () => {
-    return currentUser?.user_type || localStorage.getItem("user_type");
-  };
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const url = `https://core-api-x41.shaheenplus.sa/api/properties/${id}`;
-
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      const token = localStorage.getItem("token");
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: headers,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw errorData;
-      }
-
-      const result = await response.json();
-
-      if (result.status) {
-        setData(result.data);
-      } else {
-        throw new Error("البيانات غير متوفرة");
-      }
-
-      setLoading(false);
-    } catch (error) {
-      setError(error.message || "فشل في جلب البيانات");
-      setLoading(false);
-    }
-  };
-
-  // دالة لإغلاق نافذة النتيجة
-  const handleCloseResult = () => {
-    setSubmitResult(null);
-    setResultMessage("");
-    setResultDetails("");
-    setShowInterestForm(false);
-    setFormData({
-      full_name: "",
-      phone: "",
-      email: "",
-      message: "",
-    });
-  };
-
-  // Share Function
+  // Share functionality
   const shareItem = () => {
     const currentUrl = window.location.href;
     const shareData = {
@@ -538,11 +106,10 @@ const LandDetailsPage = () => {
       navigator.share(shareData).catch(console.error);
     } else {
       navigator.clipboard.writeText(currentUrl);
-      // تم إزالة showToast
     }
   };
 
-  // Back Function
+  // Back navigation functionality
   const handleBack = () => {
     const lastActiveTab =
       localStorage.getItem("lastActiveTab") || location.state?.fromTab;
@@ -554,264 +121,7 @@ const LandDetailsPage = () => {
     }
   };
 
-  const cleanText = (text) => {
-    if (typeof text === "string") {
-      return text.replace(/"/g, "");
-    }
-    return text || "";
-  };
-
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-
-      return new Intl.DateTimeFormat("en-GB", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }).format(date);
-    } catch (e) {
-      return dateString;
-    }
-  };
-
-  const getImageUrl = (imagePath) => {
-    return imagePath
-      ? `https://core-api-x41.shaheenplus.sa/storage/${imagePath}`
-      : null;
-  };
-
-  const getAllImages = () => {
-    if (!data) return [];
-
-    const images = [];
-    if (data.cover_image) images.push(data.cover_image);
-    if (data.images && data.images.length > 0) {
-      images.push(...data.images.map((img) => img.image_path));
-    }
-    return images;
-  };
-
-  const handleShowInterestForm = () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      openLogin(() => {
-        const userType = getCurrentUserType();
-
-        if (userType === "شركة مزادات") {
-          setSubmitResult("error");
-          setResultMessage("غير مسموح لشركات المزادات");
-          setResultDetails(
-            "عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات"
-          );
-          return;
-        }
-
-        // تلقائيًا تعبئة البيانات من localStorage إذا كانت متاحة
-        const userData =
-          currentUser || JSON.parse(localStorage.getItem("userData") || "{}");
-        setFormData((prev) => ({
-          ...prev,
-          full_name: userData.name || userData.full_name || "",
-          phone: userData.phone || "",
-          email: userData.email || "",
-        }));
-
-        setShowInterestForm(true);
-      });
-      return;
-    }
-
-    const userType = getCurrentUserType();
-
-    if (userType === "شركة مزادات") {
-      setSubmitResult("error");
-      setResultMessage("غير مسموح لشركات المزادات");
-      setResultDetails(
-        "عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات"
-      );
-      return;
-    }
-
-    // تلقائيًا تعبئة البيانات من localStorage إذا كانت متاحة
-    const userData =
-      currentUser || JSON.parse(localStorage.getItem("userData") || "{}");
-    setFormData((prev) => ({
-      ...prev,
-      full_name: userData.name || userData.full_name || "",
-      phone: userData.phone || "",
-      email: userData.email || "",
-    }));
-
-    setShowInterestForm(true);
-  };
-
-  const handleCloseInterestForm = () => {
-    setShowInterestForm(false);
-    setFormData({
-      full_name: "",
-      phone: "",
-      email: "",
-      message: "",
-    });
-    setSubmitting(false);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const validateForm = () => {
-    const trimmedMessage = formData.message.trim();
-
-    if (trimmedMessage.length < 10) {
-      setSubmitResult("error");
-      setResultMessage("رسالة قصيرة جداً");
-      setResultDetails("الرسالة يجب أن تكون أكثر من 10 أحرف");
-      return false;
-    }
-
-    if (trimmedMessage.length > 2000) {
-      setSubmitResult("error");
-      setResultMessage("رسالة طويلة جداً");
-      setResultDetails("الرسالة يجب أن تكون أقل من 2000 حرف");
-      return false;
-    }
-
-    if (!formData.full_name.trim()) {
-      setSubmitResult("error");
-      setResultMessage("الاسم مطلوب");
-      setResultDetails("يرجى إدخال الاسم الكامل");
-      return false;
-    }
-
-    if (!formData.phone.trim()) {
-      setSubmitResult("error");
-      setResultMessage("رقم الهاتف مطلوب");
-      setResultDetails("يرجى إدخال رقم الهاتف");
-      return false;
-    }
-
-    if (!formData.email.trim()) {
-      setSubmitResult("error");
-      setResultMessage("البريد الإلكتروني مطلوب");
-      setResultDetails("يرجى إدخال البريد الإلكتروني");
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSubmitInterest = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    const userType = getCurrentUserType();
-    if (userType === "شركة مزادات") {
-      setSubmitResult("error");
-      setResultMessage("غير مسموح لشركات المزادات");
-      setResultDetails(
-        "عذراً، شركات المزادات غير مسموح لها بتقديم اهتمام على العقارات"
-      );
-      return;
-    }
-
-    setSubmitting(true);
-    setSubmitResult(null);
-
-    try {
-      const requestData = {
-        full_name: formData.full_name.trim(),
-        phone: formData.phone.trim(),
-        email: formData.email.trim(),
-        message: formData.message.trim(),
-      };
-
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      const token = localStorage.getItem("token");
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      const response = await fetch(
-        `https://core-api-x41.shaheenplus.sa/api/properties/${id}/interest`,
-        {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(requestData),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        const successMessage = result.message || "تم إرسال طلب الاهتمام بنجاح";
-
-        setSubmitResult("success");
-        setResultMessage("تم تقديم اهتمامك بنجاح ✓");
-        setResultDetails("تم تسجيل اهتمامك وسيتم التواصل معك قريباً");
-
-        // إغلاق الفورم بعد 3 ثواني إذا لم يتم الإغلاق يدوياً
-        setTimeout(() => {
-          if (submitResult === "success") {
-            handleCloseResult();
-          }
-        }, 3000);
-      } else {
-        const errorMessage =
-          result.message || result.error || "حدث خطأ أثناء إرسال الطلب";
-
-        setSubmitResult("error");
-        setResultMessage("فشل في التقديم ❌");
-        setResultDetails(errorMessage);
-      }
-    } catch (error) {
-      console.error("خطأ في الاتصال:", error);
-      const errorMessage = "حدث خطأ في الاتصال بالخادم";
-
-      setSubmitResult("error");
-      setResultMessage("خطأ في الاتصال");
-      setResultDetails(errorMessage);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // دالة لحساب السعر الإجمالي للأراضي المعروضة للبيع
-  const calculateTotalPrice = () => {
-    if (!data || data.purpose !== "بيع") return null;
-    if (!data.total_area || !data.price_per_sqm) return null;
-
-    const totalArea = parseFloat(data.total_area);
-    const pricePerSqm = parseFloat(data.price_per_sqm);
-
-    if (isNaN(totalArea) || isNaN(pricePerSqm)) return null;
-
-    return totalArea * pricePerSqm;
-  };
-
-  // دالة للتحقق من وجود بيانات الأبعاد
-  const hasDimensions = () => {
-    return (
-      data &&
-      (data.length_north ||
-        data.length_south ||
-        data.length_east ||
-        data.length_west)
-    );
-  };
-
+  // Loading state
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] px-4">
@@ -821,6 +131,7 @@ const LandDetailsPage = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 text-center">
@@ -837,6 +148,7 @@ const LandDetailsPage = () => {
     );
   }
 
+  // No data state
   if (!data) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 text-center">
@@ -855,13 +167,12 @@ const LandDetailsPage = () => {
 
   const images = getAllImages();
   const totalPrice = calculateTotalPrice();
-  const isForSale = data.purpose === "بيع";
-  const isForInvestment = data.purpose === "استثمار";
+  const isForSale = data.purpose === PROPERTY_PURPOSES.SALE;
+  const isForInvestment = data.purpose === PROPERTY_PURPOSES.INVESTMENT;
 
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-4 pb-6 pt-[80px]" dir="rtl">
-      {/* تم إزالة ToastContainer تماماً لأننا لا نحتاجه الآن */}
-
+      {/* Header with back button and share */}
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <button
           onClick={handleBack}
@@ -880,84 +191,14 @@ const LandDetailsPage = () => {
         </div>
       </div>
 
+      {/* Image Gallery */}
       <div className="mb-6 sm:mb-8">
-        {images.length > 0 ? (
-          <>
-            <div className="relative rounded-xl overflow-hidden mb-3 sm:mb-4">
-              <img
-                src={getImageUrl(images[selectedImage])}
-                alt="Main"
-                className="w-full h-48 sm:h-64 md:h-80 object-cover cursor-pointer"
-                onClick={() => setShowImageModal(true)}
-              />
-              <button
-                className="absolute top-2 left-2 sm:top-3 sm:left-3 p-1.5 sm:p-2 bg-white bg-opacity-90 rounded-lg hover:bg-opacity-100"
-                onClick={() => setShowImageModal(true)}
-              >
-                <FaExpand className="text-sm sm:text-base" />
-              </button>
-
-              {images.length > 1 && (
-                <>
-                  <button
-                    className="absolute top-1/2 right-2 sm:right-3 transform -translate-y-1/2 p-1.5 sm:p-2 bg-white bg-opacity-90 rounded-lg hover:bg-opacity-100"
-                    onClick={() =>
-                      setSelectedImage((prev) =>
-                        prev === 0 ? images.length - 1 : prev - 1
-                      )
-                    }
-                  >
-                    <FaArrowRight className="text-sm sm:text-base" />
-                  </button>
-                  <button
-                    className="absolute top-1/2 left-2 sm:left-3 transform -translate-y-1/2 p-1.5 sm:p-2 bg-white bg-opacity-90 rounded-lg hover:bg-opacity-100"
-                    onClick={() =>
-                      setSelectedImage((prev) => (prev + 1) % images.length)
-                    }
-                  >
-                    <FaLeft className="text-sm sm:text-base" />
-                  </button>
-
-                  <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 px-2 py-1 bg-black bg-opacity-60 text-white text-xs rounded">
-                    {selectedImage + 1} / {images.length}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {images.map((image, index) => (
-                  <div
-                    key={index}
-                    className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden cursor-pointer border-2 ${
-                      selectedImage === index
-                        ? "border-blue-500"
-                        : "border-transparent"
-                    }`}
-                    onClick={() => setSelectedImage(index)}
-                  >
-                    <img
-                      src={getImageUrl(image)}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="w-full h-48 sm:h-60 bg-gray-100 rounded-xl flex flex-col items-center justify-center">
-            <FaBuilding className="text-3xl sm:text-4xl text-gray-400 mb-3" />
-            <p className="text-gray-500 text-sm sm:text-base">
-              لا توجد صور متاحة
-            </p>
-          </div>
-        )}
+        <ImageGallery images={images} getImageUrl={getImageUrl} />
       </div>
 
+      {/* Main Content */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+        {/* Property Header */}
         <div className="flex flex-col items-start mb-4 sm:mb-6">
           <div className="w-full mb-3">
             <div className="flex flex-wrap gap-2 mb-2">
@@ -1007,6 +248,7 @@ const LandDetailsPage = () => {
           </div>
         </div>
 
+        {/* Description */}
         <div className="mb-6 sm:mb-8 p-3 sm:p-4 bg-gray-50 rounded-xl">
           <div className="flex items-center gap-2 mb-2 sm:mb-3">
             <FaInfoCircle className="text-blue-500 text-sm" />
@@ -1019,6 +261,7 @@ const LandDetailsPage = () => {
           </p>
         </div>
 
+        {/* Basic Property Information */}
         <div className="mb-6 sm:mb-8">
           <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-gray-200">
             معلومات العقار الأساسية
@@ -1050,7 +293,8 @@ const LandDetailsPage = () => {
           </div>
         </div>
 
-        {isForSale ? (
+        {/* Sale Details */}
+        {isForSale && (
           <div className="mb-6 sm:mb-8">
             <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-gray-200">
               تفاصيل البيع
@@ -1060,7 +304,7 @@ const LandDetailsPage = () => {
               <InfoCard
                 icon={FaRulerCombined}
                 title="المساحة الكلية"
-                value={formatPrice(data.total_area)}
+                value={data.total_area}
                 unit="م²"
                 color="blue"
               />
@@ -1083,7 +327,10 @@ const LandDetailsPage = () => {
               )}
             </div>
           </div>
-        ) : isForInvestment ? (
+        )}
+
+        {/* Investment Details */}
+        {isForInvestment && (
           <div className="mb-6 sm:mb-8">
             <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-gray-200">
               تفاصيل الاستثمار
@@ -1093,7 +340,7 @@ const LandDetailsPage = () => {
               <InfoCard
                 icon={FaRulerCombined}
                 title="المساحة الكلية"
-                value={formatPrice(data.total_area)}
+                value={data.total_area}
                 unit="م²"
                 color="blue"
               />
@@ -1114,8 +361,9 @@ const LandDetailsPage = () => {
               />
             </div>
           </div>
-        ) : null}
+        )}
 
+        {/* Dimensions */}
         {hasDimensions() && (
           <div className="mb-6 sm:mb-8">
             <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-gray-200">
@@ -1139,6 +387,7 @@ const LandDetailsPage = () => {
           </div>
         )}
 
+        {/* Additional Information */}
         <div className="mb-6 sm:mb-8">
           <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-gray-200">
             معلومات إضافية
@@ -1159,6 +408,7 @@ const LandDetailsPage = () => {
           </div>
         </div>
 
+        {/* Interest Button */}
         <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
           <button
             className="w-full py-3.5 sm:py-4 px-4 sm:px-6 
@@ -1186,49 +436,7 @@ shadow-md hover:shadow-lg"
         </div>
       </div>
 
-      {showImageModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 sm:p-4"
-          onClick={() => setShowImageModal(false)}
-        >
-          <div
-            className="relative w-full max-w-4xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={getImageUrl(images[selectedImage])}
-              alt="Modal"
-              className="w-full h-auto rounded-lg"
-            />
-            <button
-              className="absolute top-2 right-2 sm:top-4 sm:right-4 p-1.5 sm:p-2 bg-white bg-opacity-90 rounded-lg hover:bg-opacity-100"
-              onClick={() =>
-                setSelectedImage((prev) =>
-                  prev === 0 ? images.length - 1 : prev - 1
-                )
-              }
-            >
-              <FaArrowRight className="text-sm sm:text-base" />
-            </button>
-            <button
-              className="absolute top-2 left-2 sm:top-4 sm:left-4 p-1.5 sm:p-2 bg-white bg-opacity-90 rounded-lg hover:bg-opacity-100"
-              onClick={() =>
-                setSelectedImage((prev) => (prev + 1) % images.length)
-              }
-            >
-              <FaLeft className="text-sm sm:text-base" />
-            </button>
-            <button
-              className="absolute top-2 right-10 sm:top-4 sm:right-16 p-1.5 sm:p-2 bg-white bg-opacity-90 rounded-lg hover:bg-opacity-100"
-              onClick={() => setShowImageModal(false)}
-            >
-              <FaTimes className="text-lg sm:text-xl" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* فورم تقديم الاهتمام */}
+      {/* Interest Form Modal */}
       {showInterestForm && !submitResult && (
         <InterestForm
           onSubmit={handleSubmitInterest}
@@ -1241,7 +449,7 @@ shadow-md hover:shadow-lg"
         />
       )}
 
-      {/* نافذة عرض نتيجة التقديم - نفس حجم وتصميم الفورم */}
+      {/* Interest Result Modal */}
       {submitResult && (
         <InterestResultCard
           type={submitResult}
