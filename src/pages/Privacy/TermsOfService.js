@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet-async'; // ✅ إضافة Helmet
+import { Helmet, HelmetProvider } from '@vuer-ai/react-helmet-async';
 
 
 const TermsOfService = () => {

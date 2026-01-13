@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../context/AuthContext";
 import PropertyListSkeleton from "../Skeleton/PropertyListSkeleton";
 import { useSearchParams } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Helmet, HelmetProvider } from '@vuer-ai/react-helmet-async';
 
 
 // ====== Theme Gradients (Global for this file) ======

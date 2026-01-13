@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Helmet } from 'react-helmet-async'; // ✅ إضافة Helmet
+import { Helmet, HelmetProvider } from '@vuer-ai/react-helmet-async';
 
 
 // استيراد المكونات المنفصلة

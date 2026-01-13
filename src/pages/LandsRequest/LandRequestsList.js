@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useRequests } from "../../features/landrequest/landlist/hooks/useRequests";
 import { useFilters } from "../../features/landrequest/landlist/hooks/useFilters";
-import { Helmet } from "react-helmet-async"; // ✅ إضافة Helmet
+import { Helmet, HelmetProvider } from '@vuer-ai/react-helmet-async';
 
 import FilterBar from "../../features/landrequest/landlist/components/FilterBar";
 import FiltersPanel from "../../features/landrequest/landlist/components/FiltersPanel";
