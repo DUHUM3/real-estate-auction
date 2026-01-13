@@ -109,26 +109,43 @@ const ContactSection = () => {
   );
 
   const validateFile = useCallback(
-    (file) => {
-      if (!file) return "";
+  (file) => {
+    if (!file) return "";
 
-      if (file.size > MAX_FILE_SIZE) {
-        return "حجم الملف يجب ألا يتجاوز 5MB";
-      }
+    // الحد الأقصى لحجم الملف 5 ميغابايت
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-      if (!allowedFileTypes.includes(file.type)) {
-        return "نوع الملف غير مدعوم";
-      }
+    if (file.size > MAX_FILE_SIZE) {
+      return "حجم الملف يجب ألا يتجاوز 5MB";
+    }
 
-      const fileName = file.name;
-      if (fileName.length > 255) return "اسم الملف طويل جداً";
-      if (!/^[\w\-. ]+$/.test(fileName.replace(/\.[^.]+$/, "")))
-        return "اسم الملف يحتوي على أحرف غير صالحة";
+    // السماح بأنواع الملفات الشائعة فقط
+    const allowedFileTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ];
 
-      return "";
-    },
-    [allowedFileTypes]
-  );
+    // إذا نوع الملف غير موجود في القائمة، نرجع رسالة خطأ
+    if (!allowedFileTypes.includes(file.type)) {
+      return "نوع الملف غير مدعوم";
+    }
+
+    // اسم الملف: فقط نتحقق أنه ليس فارغًا وطوله معقول
+    if (!file.name || file.name.length > 255) {
+      return "اسم الملف غير صالح أو طويل جداً";
+    }
+
+    // كل شيء تمام
+    return "";
+  },
+  []
+);
 
   const handleInputChange = useCallback(
     (e) => {

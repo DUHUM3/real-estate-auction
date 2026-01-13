@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { useToast } from '../../../../components/common/ToastProvider';
 import { landRequestService } from '../services/landRequestService';
 
 /**
  * Custom hook to fetch and manage land request details
  */
-export const useRequestDetails = (requestId) => {
+export const useRequestDetails = (requestId, toast) => {
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,16 +21,10 @@ export const useRequestDetails = (requestId) => {
         console.error('❌ خطأ في تحميل التفاصيل:', err);
 
         if (err.response?.status === 404) {
-          toast.error('لم يتم العثور على الطلب', {
-            position: 'top-right',
-            rtl: true,
-          });
+          toast?.error('لم يتم العثور على الطلب');
           setError('لم يتم العثور على الطلب');
         } else {
-          toast.error('حدث خطأ أثناء تحميل تفاصيل الطلب', {
-            position: 'top-right',
-            rtl: true,
-          });
+          toast?.error('حدث خطأ أثناء تحميل تفاصيل الطلب');
           setError('حدث خطأ أثناء تحميل تفاصيل الطلب');
         }
         setLoading(false);
@@ -38,7 +32,7 @@ export const useRequestDetails = (requestId) => {
     };
 
     fetchDetails();
-  }, [requestId]);
+  }, [requestId, toast]);
 
   return { request, loading, error };
 };

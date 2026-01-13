@@ -27,28 +27,30 @@ export const landRequestService = {
   /**
    * Submit an offer for a land request
    */
-  async submitOffer(requestId, message) {
-    const token = localStorage.getItem('token');
+ async submitOffer(requestId, message) {
+  const token = localStorage.getItem('token');
 
-    if (!token) {
-      throw new Error('No authentication token');
-    }
+  if (!token) {
+    throw new Error('No authentication token');
+  }
 
-    const response = await fetch(`${API_BASE_URL}/land-requests/${requestId}/offers`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message: message.trim() }),
-    });
+  const response = await fetch(`${API_BASE_URL}/land-requests/${requestId}/offers`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ message: message.trim() }),
+  });
 
-    const result = await response.json();
+  const result = await response.json();
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || 'حدث خطأ في تقديم العرض');
-    }
+  // إذا status 200-299 → نجاح
+  if (response.ok) {
+    return result; // رسالة النجاح تأتي من result.message
+  }
 
-    return result;
-  },
+  // خلاف ذلك → خطأ
+  throw new Error(result.message || 'حدث خطأ في تقديم العرض');
+},
 };

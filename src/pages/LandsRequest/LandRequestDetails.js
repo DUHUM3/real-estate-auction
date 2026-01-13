@@ -1,18 +1,17 @@
-import React, { useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ModalContext } from '../../App';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useEffect, useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ModalContext } from "../../App";
+import { useToast } from "../../components/common/ToastProvider";
 
-import { useRequestDetails } from '../../features/landrequest/landrequestdetails/hooks/useRequestDetails';
-import { useOfferSubmission } from '../../features/landrequest/landrequestdetails/hooks/useOfferSubmission';
-import { getTypeLabel } from '../../features/landrequest/landrequestdetails/utils/formatters';
+import { useRequestDetails } from "../../features/landrequest/landrequestdetails/hooks/useRequestDetails";
+import { useOfferSubmission } from "../../features/landrequest/landrequestdetails/hooks/useOfferSubmission";
+import { getTypeLabel } from "../../features/landrequest/landrequestdetails/utils/formatters";
 
-import RequestHeader from '../../features/landrequest/landrequestdetails/components/RequestHeader';
-import RequestMainInfo from '../../features/landrequest/landrequestdetails/components/RequestMainInfo';
-import RequestDetailsGrid from '../../features/landrequest/landrequestdetails/components/RequestDetailsGrid';
-import RequestSidebar from '../../features/landrequest/landrequestdetails/components/RequestSidebar';
-import OfferFormModal from '../../features/landrequest/landrequestdetails/components/OfferFormModal';
+import RequestHeader from "../../features/landrequest/landrequestdetails/components/RequestHeader";
+import RequestMainInfo from "../../features/landrequest/landrequestdetails/components/RequestMainInfo";
+import RequestDetailsGrid from "../../features/landrequest/landrequestdetails/components/RequestDetailsGrid";
+import RequestSidebar from "../../features/landrequest/landrequestdetails/components/RequestSidebar";
+import OfferFormModal from "../../features/landrequest/landrequestdetails/components/OfferFormModal";
 
 /**
  * Main page component for land request details
@@ -22,6 +21,7 @@ const LandRequestDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { openLogin } = useContext(ModalContext);
+  const toast = useToast(); // تعريف toast هنا لاستخدامه في shareItem
 
   // Fetch request details
   const { request, loading, error } = useRequestDetails(id);
@@ -35,14 +35,14 @@ const LandRequestDetailsPage = () => {
     handleShowOfferForm,
     handleCloseOfferForm,
     handleOfferSubmit,
-  } = useOfferSubmission(id);
+  } = useOfferSubmission(id); // بدون تمرير toast كمعامل
 
   // Scroll to offer section if hash is present
   useEffect(() => {
-    if (window.location.hash === '#offer') {
+    if (window.location.hash === "#offer") {
       setTimeout(() => {
-        const offerSection = document.getElementById('offer');
-        if (offerSection) offerSection.scrollIntoView({ behavior: 'smooth' });
+        const offerSection = document.getElementById("offer");
+        if (offerSection) offerSection.scrollIntoView({ behavior: "smooth" });
       }, 500);
     }
   }, []);
@@ -50,10 +50,13 @@ const LandRequestDetailsPage = () => {
   // Share functionality
   const shareItem = () => {
     const shareData = {
-      title: request?.title || `طلب أرض - ${request?.region} - ${request?.city}`,
+      title:
+        request?.title || `طلب أرض - ${request?.region} - ${request?.city}`,
       text:
         request?.title ||
-        `طلب أرض ${getTypeLabel(request?.type)} في ${request?.region} - ${request?.city}`,
+        `طلب أرض ${getTypeLabel(request?.type)} في ${request?.region} - ${
+          request?.city
+        }`,
       url: window.location.href,
     };
 
@@ -61,11 +64,7 @@ const LandRequestDetailsPage = () => {
       navigator.share(shareData).catch(console.error);
     } else {
       navigator.clipboard.writeText(window.location.href);
-      toast.success('تم نسخ رابط الطلب', {
-        position: 'top-right',
-        rtl: true,
-        autoClose: 2000,
-      });
+      toast.success("تم نسخ رابط الطلب"); // بدون الكائن الفارغ {}
     }
   };
 
@@ -115,19 +114,6 @@ const LandRequestDetailsPage = () => {
 
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={true}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
-
       <div className="max-w-6xl mx-auto px-3 sm:px-4 pb-6 pt-[80px]" dir="rtl">
         <RequestHeader onBack={() => navigate(-1)} onShare={shareItem} />
 

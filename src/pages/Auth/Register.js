@@ -6,7 +6,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext.js";
 import { authApi } from "../../features/auth/services/authApi.js";
-import { toast } from "react-toastify";
+import { useToast } from "../../components/common/ToastProvider";
 import { FiX, FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
 // Import hooks
@@ -24,6 +24,7 @@ import Step3LoginCredentials from "../../features/auth/register/components/Step3
 function Register({ onClose, onSwitchToLogin }) {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const toast = useToast();
 
   // Use custom hooks
   const {

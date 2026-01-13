@@ -1,19 +1,20 @@
-import { useState } from 'react';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import { landRequestService } from '../services/landRequestService';
+import { useState } from "react";
+import { useToast } from "../../../../components/common/ToastProvider"; // تأكد من المسار
+import { useNavigate } from "react-router-dom";
+import { landRequestService } from "../services/landRequestService";
 
 /**
  * Custom hook to handle offer submission logic
  */
 export const useOfferSubmission = (requestId) => {
-  const [offerMessage, setOfferMessage] = useState('');
+  const [offerMessage, setOfferMessage] = useState("");
   const [offerLoading, setOfferLoading] = useState(false);
   const [showOfferForm, setShowOfferForm] = useState(false);
   const navigate = useNavigate();
+  const toast = useToast(); // احصل على toast هنا بدلاً من تمريره كمعامل
 
   const handleShowOfferForm = (openLogin) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     if (!token) {
       openLogin(() => {
@@ -33,43 +34,34 @@ export const useOfferSubmission = (requestId) => {
     e.preventDefault();
 
     if (!offerMessage.trim()) {
-      toast.warning('الرجاء كتابة تفاصيل العرض', {
-        position: 'top-right',
-        rtl: true,
-      });
+      toast.info("الرجاء كتابة تفاصيل العرض");
       return;
     }
 
     try {
       setOfferLoading(true);
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
       if (!token) {
         setOfferLoading(false);
         setShowOfferForm(false);
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
-      await landRequestService.submitOffer(requestId, offerMessage);
+      const result = await landRequestService.submitOffer(
+        requestId,
+        offerMessage
+      );
 
       setShowOfferForm(false);
-      setOfferMessage('');
+      setOfferMessage("");
       setOfferLoading(false);
-
-      toast.success('تم تقديم العرض بنجاح!', {
-        position: 'top-right',
-        rtl: true,
-        autoClose: 3000,
-      });
+      toast.success(result.message || "تم تقديم العرض بنجاح!"); // <-- الآن سيظهر باللون الأخضر
     } catch (err) {
-      console.error('❌ خطأ في تقديم العرض:', err);
-      toast.error(err.message || 'حدث خطأ في تقديم العرض', {
-        position: 'top-right',
-        rtl: true,
-        autoClose: 4000,
-      });
+      toast.error(err.message || "حدث خطأ في تقديم العرض"); // <-- رسائل الخطأ من السيرفر
+      toast.error(err.message || "حدث خطأ في تقديم العرض");
       setOfferLoading(false);
       setShowOfferForm(false);
     }
