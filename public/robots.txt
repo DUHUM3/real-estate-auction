@@ -1,4 +1,40 @@
-User-agent: *
-Allow: /
+# ===========================
+# روبوتس تيكست لموقع شاهين بلس
+# أفضل إعداد لمحركات البحث والـ SEO
+# ===========================
 
+# جميع محركات البحث
+User-agent: *
+
+# ========================================
+# منع أرشفة صفحات المستخدم أو صفحات حساسة
+# ========================================
+Disallow: /login
+Disallow: /register
+Disallow: /profile
+Disallow: /my-ads
+Disallow: /my-lands
+Disallow: /my-requests
+Disallow: /create-ad
+Disallow: /create-request
+Disallow: /create-auction
+Disallow: /requests/
+Disallow: /forgot-password
+Disallow: /reset-password
+
+# ========================================
+# السماح بفهرسة الصفحات العامة
+# ========================================
+Allow: /
+Allow: /purchase-requests
+Allow: /requests/*
+Allow: /lands-and-auctions-list
+Allow: /lands/*
+Allow: /auctions/*
+Allow: /terms-of-service
+Allow: /privacy-policy
+
+# ========================================
+# رابط خريطة الموقع
+# ========================================
 Sitemap: https://shaheenplus.sa/sitemap.xml

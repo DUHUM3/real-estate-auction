@@ -1,85 +1,249 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
   <head>
-    <link rel="preload" as="image" href="%PUBLIC_URL%/images/slide1.webp" />
-    
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta name="theme-color" content="#0B3B5A" />
+    <meta name="msapplication-TileColor" content="#0B3B5A" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- =======================
-       1️⃣ معلومات الـ SEO الأساسية
-  ========================== -->
-    <title>شاهين بلس | منصة بيع وتسويق الأراضي الكبرى</title>
-
-    <meta
-      name="description"
-      content="شاهين بلس — منصة احترافية متخصصة في بيع وتسويق الأراضي الكبيرة، العقارات الاستثمارية، والمزادات العقارية. اكتشف أفضل الفرص العقارية، وتابع الطلبات، واحصل على عروض حصرية بكل سهولة."
-    />
-
-    <meta
-      name="keywords"
-      content="بيع أراضي, شراء أراضي, تسويق أراضي, عقارات, مزادات عقارية, أراضي كبيرة, استثمار عقاري, منصة عقارات, شاهين بلس"
-    />
+       1️⃣ SEO أساسي
+    ========================== -->
+    <title>شاهين بلس | منصة بيع وتسويق الأراضي الكبرى في السعودية</title>
+    <meta name="description" content="شاهين بلس — المنصة الرائدة في السعودية لبيع وتسويق الأراضي الكبيرة والمزادات العقارية. اكتشف أفضل الفرص العقارية في الرياض، جدة، الدمام وجميع مناطق المملكة." />
+    <meta name="keywords" content="شاهين بلس، بيع أراضي، شراء أراضي، تسويق أراضي، عقارات السعودية، مزادات عقارية، أراضي كبيرة، استثمار عقاري، منصة عقارات، أراضي الرياض، أراضي جدة، أراضي الدمام، عقارات استثمارية" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow" />
+    <link rel="canonical" href="https://shaheenplus.sa/" />
 
     <!-- =======================
-       2️⃣ أيقونة الموقع
-  ========================== -->
-    <link rel="icon" href="%PUBLIC_URL%/images/logo3.webp" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/images/logo3.webp" />
+       2️⃣ Favicons
+    ========================== -->
+    <link rel="icon" type="image/webp" href="https://shaheenplus.sa/images/logo3.webp" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://shaheenplus.sa/images/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://shaheenplus.sa/images/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://shaheenplus.sa/images/apple-touch-icon.png" />
+    <link rel="mask-icon" href="https://shaheenplus.sa/images/safari-pinned-tab.svg" color="#0B3B5A" />
 
     <!-- =======================
-       3️⃣ OG - Meta Tags
-       لظهور الصورة عند مشاركة الموقع
-  ========================== -->
-    <meta
-      property="og:title"
-      content="شاهين بلس | بيع وتسويق الأراضي والعقارات"
-    />
-    <meta
-      property="og:description"
-      content="منصة متخصصة في بيع وتسويق الأراضي الكبيرة والمزادات العقارية. اعثر على أفضل الفرص العقارية واستثمر بسهولة."
-    />
-    <meta property="og:image" content="%PUBLIC_URL%/images/logo3.webp" />
+       3️⃣ OG / Twitter Cards
+    ========================== -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://shaheenplus.sa" />
+    <meta property="og:site_name" content="شاهين بلس" />
+    <meta property="og:title" content="شاهين بلس | منصة بيع وتسويق الأراضي الكبرى" />
+    <meta property="og:description" content="المنصة الرائدة في السعودية لبيع وتسويق الأراضي الكبيرة والمزادات العقارية. اكتشف أفضل الفرص الاستثمارية." />
+    <meta property="og:url" content="https://shaheenplus.sa/" />
+    <meta property="og:image" content="https://shaheenplus.sa/images/logo3.webp" />
+    <meta property="og:image:secure_url" content="https://shaheenplus.sa/images/logo3.webp" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="شاهين بلس - منصة بيع وتسويق الأراضي" />
+    <meta property="og:locale" content="ar_SA" />
 
-    <!-- =======================
-       4️⃣ Twitter Card
-  ========================== -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="شاهين بلس | تسويق وبيع الأراضي" />
-    <meta
-      name="twitter:description"
-      content="بيع وتسويق الأراضي الكبيرة عبر منصة شاهين بلس. عروض ومزادات وفرص استثمارية."
-    />
-    <meta name="twitter:image" content="%PUBLIC_URL%/images/logo3.webp" />
+    <meta name="twitter:site" content="@shaheenplus" />
+    <meta name="twitter:creator" content="@shaheenplus" />
+    <meta name="twitter:title" content="شاهين بلس | منصة بيع وتسويق الأراضي الكبرى" />
+    <meta name="twitter:description" content="بيع وتسويق الأراضي الكبيرة عبر منصة شاهين بلس. مزادات عقارية وفرص استثمارية مميزة في السعودية." />
+    <meta name="twitter:image" content="https://shaheenplus.sa/images/logo3.webp" />
+    <meta name="twitter:image:alt" content="شاهين بلس - منصة بيع وتسويق الأراضي" />
 
     <!-- =======================
-       5️⃣ خطوط
-  ========================== -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap"
-      rel="stylesheet"
-    />
+       4️⃣ Web Fonts
+    ========================== -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
 
     <!-- =======================
-       6️⃣ Manifest
-  ========================== -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+       5️⃣ Manifest / PWA
+    ========================== -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- =======================
+       6️⃣ Structured Data (JSON-LD)
+    ========================== -->
+    <!-- WebSite Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://shaheenplus.sa/#website",
+      "name": "شاهين بلس",
+      "alternateName": "Shaheen Plus",
+      "url": "https://shaheenplus.sa",
+      "description": "المنصة المتخصصة في السعودية لبيع وتسويق الأراضي الكبيرة والمزادات العقارية",
+      "inLanguage": "ar-SA",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://shaheenplus.sa/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://shaheenplus.sa/#organization",
+      "name": "شاهين بلس",
+      "alternateName": "Shaheen Plus",
+      "url": "https://shaheenplus.sa",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://shaheenplus.sa/images/logo3.webp",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://shaheenplus.sa/images/og-image.jpg",
+      "description": "منصة احترافية لبيع وتسويق الأراضي الكبيرة والمزادات العقارية في المملكة العربية السعودية",
+      "foundingDate": "2025",
+      "areaServed": {
+        "@type": "Country",
+        "name": "المملكة العربية السعودية"
+      },
+      "sameAs": [
+        "https://www.tiktok.com/@shaheenplus100",
+        "https://www.snapchat.com/@shaheenplus100",
+        "https://www.instagram.com/shaheenplus100",
+        "https://x.com/shaheenplus100"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+966 56 606 5406",
+        "contactType": "customer service",
+        "availableLanguage": ["Arabic"],
+        "areaServed": "SA"
+      }
+    }
+    </script>
+
+    <!-- RealEstateAgent Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "RealEstateAgent",
+      "@id": "https://shaheenplus.sa/#realestate",
+      "name": "شاهين بلس",
+      "url": "https://shaheenplus.sa",
+      "image": "https://shaheenplus.sa/images/logo3.webp",
+      "description": "منصة متخصصة في بيع وتسويق الأراضي الكبيرة والمزادات العقارية",
+      "priceRange": "$$$$",
+      "areaServed": {
+        "@type": "Country",
+        "name": "المملكة العربية السعودية"
+      },
+      "makesOffer": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "تسويق الأراضي الكبيرة"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "المزادات العقارية"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "الاستشارات العقارية"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- WebPage Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "@id": "https://shaheenplus.sa/#webpage",
+      "url": "https://shaheenplus.sa",
+      "name": "شاهين بلس | منصة بيع وتسويق الأراضي الكبرى في السعودية",
+      "description": "المنصة الرائدة في السعودية لبيع وتسويق الأراضي الكبيرة والمزادات العقارية",
+      "isPartOf": {
+        "@id": "https://shaheenplus.sa/#website"
+      },
+      "about": {
+        "@id": "https://shaheenplus.sa/#organization"
+      },
+      "inLanguage": "ar-SA",
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://shaheenplus.sa/images/og-image.jpg"
+      },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "الرئيسية",
+            "item": "https://shaheenplus.sa"
+          }
+        ]
+      }
+    }
+    </script>
+
+    <!-- FAQ Schema (اختياري لكن يقوي SEO) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "ما هي منصة شاهين بلس؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "شاهين بلس هي منصة رائدة في المملكة العربية السعودية متخصصة في بيع وتسويق الأراضي الكبيرة والمزادات العقارية."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "كيف يمكنني عرض أرضي للبيع على شاهين بلس؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "يمكنك تسجيل حساب في المنصة ثم إضافة تفاصيل أرضك من خلال الموقع. سيقوم فريقنا بمراجعة العرض ونشره للمهتمين."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "هل يمكنني المشاركة في المزادات العقارية؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "نعم، توفر منصة شاهين بلس نظام مزادات عقارية متكامل يتيح لك المشاركة في المزايدات على الأراضي والعقارات المعروضة."
+          }
+        }
+      ]
+    }
+    </script>
+
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <div style="padding:20px;text-align:center;background:#fff3cd;color:#856404;font-family:Tajawal,sans-serif;">
+        يجب تفعيل JavaScript لتشغيل هذا التطبيق.
+      </div>
+    </noscript>
+
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>
