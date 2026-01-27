@@ -9,7 +9,7 @@ import ScrollToTop from "./components/common/ScrollToTop";
 import { ToastProvider } from "./components/common/ToastProvider";
 
 // ✅ استيراد HelmetProvider لتجنب مشاكل react-helmet-async
-import { Helmet, HelmetProvider } from '@vuer-ai/react-helmet-async';
+import { HelmetProvider } from '@vuer-ai/react-helmet-async';
 
 // استيراد المكونات
 import Navbar from "./components/common/Navbar";
