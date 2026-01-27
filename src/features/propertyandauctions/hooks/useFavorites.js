@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { propertiesApi } from "../../../api/propertiesApi";
 import { auctionsApi } from "../../../api/auctionApi";
-import { showToast } from "../services/shareService";
 
 // Custom hook for managing favorites (properties and auctions)
 export const useFavorites = (openLogin) => {
@@ -49,10 +48,8 @@ export const useFavorites = (openLogin) => {
 
         if (action === "added") {
           newFavorites = [...currentFavorites, id];
-          showToast("success", "تمت الإضافة إلى المفضلة بنجاح");
         } else {
           newFavorites = currentFavorites.filter((favId) => favId !== id);
-          showToast("info", "تمت الإزالة من المفضلة");
         }
 
         setFavorites((prev) => ({ ...prev, [type]: newFavorites }));
@@ -60,7 +57,6 @@ export const useFavorites = (openLogin) => {
       }
     } catch (error) {
       console.error("خطأ في تحديث المفضلة:", error);
-      showToast("error", "حدث خطأ في تحديث المفضلة");
     }
   };
 
@@ -75,12 +71,6 @@ export const useFavorites = (openLogin) => {
 
     setFavorites((prev) => ({ ...prev, [type]: newFavorites }));
     localStorage.setItem(storageKey, JSON.stringify(newFavorites));
-
-    if (isFavorite) {
-      showToast("info", "تمت الإزالة من المفضلة");
-    } else {
-      showToast("success", "تمت الإضافة إلى المفضلة بنجاح");
-    }
   };
 
   return {
