@@ -528,7 +528,7 @@ const NavbarUI = ({
             }}
           >
             <Icons.FaBullhorn className="ml-3 text-lg" />
-            طلب تسويق منتج عقاري لشركات المزاد
+            طلب تسويق منتج عقاري عبر شركات المزاد
           </Link>
         </div>
 
